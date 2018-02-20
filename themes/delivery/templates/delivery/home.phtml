@@ -1,0 +1,21 @@
+<?
+  // Set up page title:
+  $this->headTitle($this->translate('Delivery Home'));
+
+  $deliverUser = $this->deliveryUser;
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Home') . '</li><li><a href="' . $this->url('delivery-edit') . '">' . $this->transEsc('Delivery Edit') . '</a></li>';
+  if ($deliverUser['is_admin'] == 'y'):
+    $this->layout()->breadcrumbs .= '<li><a href="' . $this->url('delivery-admin') . '">' . $this->transEsc('Delivery Admin') . '</a></li> ';
+  endif;
+?>
+
+<h2 class="lightbox-header"><?=$this->transEsc('Delivery Home')?></h2>
+<?=$this->flashmessages()?>
+
+<h4><?=(isset($deliverUser['title']) ? $deliverUser['title'] . ' ' : '') . $deliverUser['name'] ?></h4>
+<p><?=$this->transEsc('Library') . ': ' . $deliverUser['library'] ?></p>
+<p><?=$this->transEsc('Card Number') . ': ' . $deliverUser['card_number'] ?></p>
+<p><?=$this->transEsc('Email') . ': ' . $deliverUser['delivery_email'] ?></p>
+
+

@@ -1,0 +1,35 @@
+<?
+  // Set up page title:
+  $this->headTitle($this->translate('Delivery Order'));
+
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Order') . '</li><li><a href="' . $this->url('delivery-home') . '">' . $this->transEsc('Delivery Home') . '</a></li>';
+?>
+
+<h2 class="lightbox-header"><?=$this->transEsc('Delivery Order')?></h2>
+<?=$this->flashmessages()?>
+
+<h4><?=$this->formTitle ?></h4>
+
+  <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-login">
+    <input type="hidden" name="order" value="y"/>
+    <input type="hidden" name="id" value="<?=$this->id ?>"/>
+<? foreach ($this->formFields as $formField): ?>
+  <? $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
+    <div class="form-group">
+      <label class="control-label" for="<?=$formField['name'] ?>"><?=$formField['display'] ?><?=$mandatory ?></label>
+      <input type="text" name="<?=$formField['name'] ?>" id="<?=$formField['name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
+    </div>
+<? endforeach; ?>
+
+<h4><?=$this->infoTitle ?></h4>
+<? foreach ($this->infoFields as $infoField): ?>
+  <p><?=$infoField['display'] ?>: <?=$infoField['value'] ?>
+  <input type="hidden" name="<?=$infoField['name'] ?>" value="<?=$infoField['value'] ?>"/></p>
+<? endforeach; ?>
+
+    <div class="form-group">
+      <input class="btn btn-primary" type="submit" name="processRegister" value="<?=$this->transEsc('Order')?>">
+    </div>
+  </form>
+

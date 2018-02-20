@@ -1,0 +1,9 @@
+<?
+global $searchClassId;
+global $lookfor;
+global $searchIndex;
+global $searchType;
+global $hiddenFilters;
+?>
+<? $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
+<?= $this->context($this)->renderInContext('search/searchTabs', ['searchTabs' => $tabConfig['tabs']]); ?>

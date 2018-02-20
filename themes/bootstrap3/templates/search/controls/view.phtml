@@ -1,0 +1,20 @@
+<div class="view-buttons hidden-xs">
+  <? $viewList = $this->params->getViewList(); if (count($viewList) > 1): ?>
+    <? foreach ($viewList as $viewType => $viewData): ?>
+      <? $viewDesc = $this->translate($viewData['desc']); ?>
+      <? if (!$viewData['selected']): ?>
+        <a href="<?=$this->results->getUrlQuery()->setViewParam($viewType)?>" title="<?=$this->escapeHtmlAttr($this->translate('switch_view', ['%%view%%' => $viewDesc]))?>" >
+      <? else: ?>
+        <span title="<?=$this->escapeHtmlAttr($this->translate('view_already_selected', ['%%current%%' => $viewDesc])) ?>">
+      <? endif; ?>
+      <i class="fa fa-<?=$viewType ?>" alt="<?=$this->escapeHtmlAttr($viewDesc)?>"></i>
+      <?=$viewDesc ?>
+      <? if (!$viewData['selected']): ?>
+        </a>
+      <? else: ?>
+        </span>
+      <? endif; ?>
+      &nbsp;
+    <? endforeach; ?>
+  <? endif; ?>
+</div>

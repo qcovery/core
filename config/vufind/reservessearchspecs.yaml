@@ -1,0 +1,26 @@
+---
+# This file contains search specifications used by the reserves module; for details
+# on the workings of this file, see the comments in searchspecs.yaml.
+#-----------------------------------------------------------------------------------
+
+AllFields:
+  DismaxFields:
+    - course^400
+    - instructor^400
+    - department^200
+  DismaxHandler: edismax
+
+Instructor:
+  DismaxFields:
+    - instructor^400
+  DismaxHandler: edismax
+
+Course:
+  DismaxFields:
+    - course^400
+  DismaxHandler: edismax
+
+Department:
+  DismaxFields:
+    - department^400
+  DismaxHandler: edismax

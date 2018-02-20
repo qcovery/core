@@ -1,0 +1,8 @@
+vendor/bin/*.pid
+vufind/alphabetical_browse
+vufind/logs
+vufind/*/conf/_rest_managed.json
+vufind/*/index
+vufind/*/spellchecker
+vufind/*/spellShingle
+vufind/*/tlog

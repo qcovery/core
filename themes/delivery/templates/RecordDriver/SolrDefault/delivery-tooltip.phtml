@@ -1,0 +1,3 @@
+<? if ($this->availabilityChecker()->check($this->driver) == 'available'): ?>
+       <li><a class="deliver-record" data-lightbox href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>" rel="no-follow"><i class="bel-postin" aria-hidden="true"></i> <?=$this->transEsc('deliver') ?></a></li>
+<? endif; ?>

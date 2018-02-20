@@ -1,0 +1,63 @@
+<?php
+$paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR'). '/config/vufind/PAIA.ini'), true);
+if($paiaConfig['Global']['usePAIA'] == 1) {
+	$isil = $paiaConfig['Global']['isil'];
+	$iln = $paiaConfig['Global']['iln'];
+	
+	if (method_exists($this->driver, 'getFormats')) {
+		$formats = $this->driver->tryMethod('getFormats');
+	}
+
+	if (method_exists($this->driver, 'getCollectionDetails')) {
+		$collection_details = $this->driver->tryMethod('getCollectionDetails');
+	}
+	if (method_exists($this->driver, 'getMarcRecord')) {
+		$marcField951 = $this->driver->getMarcRecord()->getField('951');
+		if(!empty($marcField951)) {
+			$marcField951aValue = $this->driver->getMarcRecord()->getField('951')->getSubfield('a')->getData();
+		} else {
+			$marcField951aValue = "";
+		}
+	} else {
+		$marcField951aValue = "";
+	}
+	
+	$daiaPPN = '';
+	if ($marcField951aValue == 'MC' || $marcField951aValue == 'ST') {
+		$daiaPPN = '';
+	} else if ($marcField951aValue == 'AI') {
+		if (method_exists($this->driver, 'getPPNLink')) {
+			$daiaPPN = $this->driver->tryMethod('getPPNLink');
+		}
+	} else if (empty($daiaPPN) && in_array('Article', $formats, TRUE)) {
+		$daiaPPN = "";
+	} else 	{
+		$daiaPPN = $this->driver->getUniqueID();
+	}
+	
+	if (in_array("GBV_ILN_".$iln ,$collection_details, TRUE) && !empty($daiaPPN)) { ?>
+		<div class="daia-availability" data-ppn="<?=$daiaPPN;?>" data-site="<?=$isil?>" data-list="1"><span class="daia-loading"> <?=$this->transEsc('local_availability_being_determined');?> </span></div>
+	<?
+	} else if ($marcField951aValue == 'MC' || $marcField951aValue == 'ST') { ?>
+	<? if (strpos($_SERVER['REQUEST_URI'], 'SolrFindex') === false) { ?>
+		<div class="delimiter"></div>
+		<span style="color: #EB8E12; font-weight: bold;"><?=$this->transEsc('check_volume');?></span>
+		➝
+		<strong><a href="<?=$this->recordLink()->getUrl($this->driver);?>#availability"><?=$this->transEsc('go_to_detail_view');?></a></strong>
+	<? } ?>	
+<? }
+
+	if (empty($daiaPPN) && in_array("GBV_ILN_".$iln,$collection_details, TRUE) && in_array('Article', $formats, TRUE)) {
+		
+		$containingWorks = $this->driver->tryMethod('getContainingWork');
+		if(!empty($containingWorks[0]['ppn'])){
+			echo '<div class="delimiter"></div>';
+			$record_base_path = substr($this->recordLink()->getUrl($this->driver),0,strrpos($this->recordLink()->getUrl($this->driver),"/")+1);
+			echo '<span style="color: #EB8E12; font-weight: bold;">'.$this->transEsc('print_version_available').'</span> - <a target="_blank" class="uncertain_article_access_level" href="'.$record_base_path.$containingWorks[0]['ppn'].'">'.$this->transEsc('to_journal_series').'</a>';
+		} else {
+			echo '<div class="delimiter"></div>';
+			echo '<span style="color: #EB8E12; font-weight: bold;">'.$this->transEsc('print_version_available').'</span> - '.$this->transEsc('to_journal_series');
+		}
+	}
+}
+?>

@@ -1,0 +1,16 @@
+<?
+    // Set page title.
+    $this->headTitle($this->translate('Description') . ': ' . $this->driver->getBreadcrumb());
+
+    $formatter = $this->recordDataFormatter();
+    $mainFields = $formatter->getData($driver, $formatter->getDefaults('description'));
+?>
+<table class="table table-striped" summary="<?=$this->transEsc('Description')?>">
+  <? if (!empty($mainFields)): ?>
+    <? foreach ($mainFields as $key => $current): ?>
+      <tr><th><?=$this->transEsc($key)?>:</th><td><?=$current['value']?></td></tr>
+    <? endforeach; ?>
+  <? else: ?>
+    <tr><td><?=$this->transEsc('no_description')?></td></tr>
+  <? endif; ?>
+</table>

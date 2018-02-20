@@ -1,0 +1,17 @@
+---
+# This file contains search specifications used by the website module; for details
+# on the workings of this file, see the comments in searchspecs.yaml.
+#-----------------------------------------------------------------------------------
+
+AllFields:
+  DismaxFields:
+    - title_unstemmed^800
+    - title^750
+    - description_unstemmed^350
+    - description^300
+    - keywords_unstemmed^250
+    - keywords^200
+    - url_keywords^50
+    - fulltext_unstemmed^10
+    - fulltext
+  DismaxHandler: edismax

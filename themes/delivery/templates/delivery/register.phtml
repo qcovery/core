@@ -1,0 +1,42 @@
+<?
+  // Set up page title:
+  $this->headTitle($this->translate('Delivery Register'));
+
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Register') . '</li>';
+?>
+
+<h2 class="lightbox-header"><?=$this->transEsc('Delivery Register')?></h2>
+<?=$this->flashmessages()?>
+
+  <form method="post" action="<?=$this->url('delivery-register')?>" name="deliveryRegisterForm" class="form-login">
+    <input type="hidden" name="register" value="y"/>
+    <div class="form-group">
+      <label class="control-label" for="delivery_name"><?=$this->transEsc('Name')?>:</label>
+      <input type="text" name="name" id="delivery_name" value="<?=$this->userName?>" class="form-control" readonly="readonly"/>
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="delivery_sex"><?=$this->transEsc('Sex')?>:</label>
+      <input type="text" name="sex" id="delivery_sex" value="<?=$this->escapeHtmlAttr($this->request->get('sex'))?>" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="delivery_title"><?=$this->transEsc('Title')?>:</label>
+      <input type="text" name="title" id="delivery_title" value="<?=$this->escapeHtmlAttr($this->request->get('title'))?>" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="delivery_email"><?=$this->transEsc('Email')?><?=$this->checkDeliveryEmail?>:</label>
+      <input type="text" name="delivery_email" id="delivery_email" value="<?=$this->escapeHtmlAttr($this->request->get('delivery_email'))?>" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="delivery_library"><?=$this->transEsc('Library')?>:</label>
+      <input type="text" name="library" id="delivery_library" value="<?=$this->escapeHtmlAttr($this->request->get('library'))?>" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="delivery_card_number"><?=$this->transEsc('Card Number')?><?=$this->checkCardNumber?>:</label>
+      <input type="text" name="card_number" id="delivery_card_number" value="<?=$this->escapeHtmlAttr($this->request->get('card_number'))?>" class="form-control"/>
+    </div>
+    <div class="form-group">
+      <input class="btn btn-primary" type="submit" name="processRegister" value="<?=$this->transEsc('Register')?>">
+    </div>
+  </form>
+

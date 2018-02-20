@@ -1,0 +1,8 @@
+<? $libraries = $this->connectedLibraries()->getConnectedLibraries($this->searchClassId, $this->driver); ?>
+<? if (!empty($libraries)): ?>
+      <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
+          <tr><th><?=$this->transEsc('Libraries')?>:</th><td>
+              <p><?=implode(', ', $libraries) ?></p>
+          </td></tr>
+      </table>
+<? endif; ?>

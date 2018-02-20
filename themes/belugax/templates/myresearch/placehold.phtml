@@ -1,0 +1,39 @@
+<?
+    // Set up page title:
+	
+	$type = $_GET["type"];
+	
+	if ($type == "recall") {
+		$type = "Recall";
+	} else {
+		$type = "Order";
+	}
+?>
+
+<?=$this->flashmessages()?>
+
+<div class="<?=$this->layoutClass('mainbody')?>">
+    <h3><?=$this->transEsc($type." not possible") ?></h3>
+    <br/>
+    <?
+    if ($error) {
+        echo '<div class="message">'.$error.'</div>';
+    } else {
+        echo $this->transEsc('Your '.$type.' was successful.');
+    }
+    ?>
+
+    <?
+    if ($this->error == 'SCOPE_MISSING_READ_ITEMS') {
+        echo $this->transEsc('You are not allowed to view your '.$type.'s');
+    }
+
+    if ($this->error == 'insufficient_scope') {
+        echo $this->transEsc('You are not permitted to perform '.$type.'s');
+    }
+    ?>
+</div>
+
+<div class="<?=$this->layoutClass('sidebar')?>">
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => isset($list) ? 'list' . $list['id'] : 'favorites'])?>
+</div>

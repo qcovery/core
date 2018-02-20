@@ -1,0 +1,54 @@
+<?
+  $options = $this->searchOptions($this->searchClassId);
+  $params = $this->searchParams($this->searchClassId);
+  $Libraries = $params->getLibraries();
+  $selectedLibrary = $Libraries->selectLibrary();
+  $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
+?>
+    <div id="LibrarySelector">
+      <div id="LibraryData">
+          <div class="" uk-grid>
+              <div class="uk-width-3-4">
+                  <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
+                      <img id="infoimage" src="/vufind/themes/libraries/images/library_icons/<?=$selectedLibrary['logo'] ?>" height="40" alt="Library Logo" /><br/>
+                  </a>
+              </div>
+              <? if (!empty($selectedLibrary['infosite'])): ?>
+                  <div class="uk-width-1-4">
+                      <div class="">
+                          <a href="<?=$selectedLibrary['infosite'] ?>" id="infoopen" target="_blank"><i class="bel-auskunft" aria-hidden="true" title="<?=$this->transEsc('Library Informations') ?>"></i></a>
+                      </div>
+                  </div>
+              <? endif; ?>
+              <div class="uk-width-1-1 uk-margin-remove-top uk-margin-bottom">
+                  <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
+                      <div class="uk-margin-top"><?=$this->transEsc($selectedLibrary['fullname']) ?></div>
+                  </a>
+              </div>
+          </div>
+      </div>
+      <div class="list-group facet" id="side-panel-library">
+          <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Select Library")?><i class="bel-pfeil-u01"></i></button>
+          <div uk-dropdown>
+              <ul class="uk-nav uk-dropdown-nav">
+                  <? foreach($libraryList as $library => $data): ?>
+                      <? $disabled = (empty($data['solr'])) ? ' disabled' : ''; ?>
+                      <? if ($selectedLibrary['code'] == $library): ?>
+                          <li class="uk-active"><strong><?=$data['fullname'] ?></strong></li>
+                      <? else: ?>
+                          <li><a href="<?=$this->currentPath().$results->getUrlQuery()?>&library=<?=$library ?>"><?=$data['fullname'] ?></a></li>
+                      <? endif; ?>
+                  <? endforeach; ?>
+              </ul>
+          </div>
+      </div>
+      <div class="list-group facet" id="side-panel-location">
+          <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Location")?><i class="bel-pfeil-u01"></i></button>
+          <div uk-dropdown>
+              <ul class="uk-nav uk-dropdown-nav">
+                  <li>...</li>
+              </ul>
+          </div>
+      </div>
+    </div>
+
