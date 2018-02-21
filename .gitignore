@@ -18,3 +18,5 @@ public/swagger-ui
 .idea/*
 logs/*
 *.log
+
+themes/belugax_*
