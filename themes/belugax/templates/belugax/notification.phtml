@@ -1,0 +1,7 @@
+<? $notificationConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/notification.ini'), true); ?>
+
+<div id="belugax-notification">
+    <? if (!empty($notificationConfig['Global']['error_notification'])) { ?>
+        <div class="notification"><?=$this->transEsc($notificationConfig['Global']['error_notification']);?></div>
+    <? } ?>
+</div>
