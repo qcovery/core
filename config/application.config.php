@@ -2,7 +2,7 @@
 
 // Set up modules:
 $modules = array(
-    'ZfcRbac', 'VuFindTheme', 'VuFindSearch', 'VuFind', 'VuFindAdmin', 'VuFindApi', 'RecordDriver', 'SearchKeys', 'Libraries', 'Delivery', 'BelugaConfig', 'Findex', 'PAIA'
+    'ZfcRbac', 'VuFindTheme', 'VuFindSearch', 'VuFind', 'VuFindAdmin', 'VuFindApi', 'RecordDriver', 'SearchKeys', 'Libraries', 'Delivery', 'BelugaConfig', 'Findex', 'PAIA', 'ExtendedFacets'
 );
 if (PHP_SAPI == 'cli' && !defined('VUFIND_PHPUNIT_RUNNING')) {
     $modules[] = 'VuFindConsole';
