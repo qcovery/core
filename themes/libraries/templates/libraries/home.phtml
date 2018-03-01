@@ -7,15 +7,15 @@
 ?>
 <div class="uk-child-width-1-1" uk-grid>
     <div class="">
-        <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Select Library")?><i class="bel-pfeil-u01"></i></button>
+        <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Select library")?><i class="bel-pfeil-u01"></i></button>
         <div uk-dropdown>
             <ul class="uk-nav uk-dropdown-nav">
                 <? foreach($libraryList as $library => $data): ?>
                     <? $disabled = (empty($data['solr'])) ? ' disabled' : ''; ?>
                     <? if ($selectedLibrary['code'] == $library): ?>
-                        <li class="uk-active"><strong><?=$data['fullname'] ?></strong></li>
+                        <li class="uk-active"><strong><?=$this->transEsc($data['fullname']) ?></strong></li>
                     <? else: ?>
-                        <li><a href="<?=$this->url($options->getSearchHomeAction());?>?library=<?=$library ?>"><?=$data['fullname'] ?></a></li>
+                        <li><a href="<?=$this->url($options->getSearchHomeAction());?>?library=<?=$library ?>"><?=$this->transEsc($data['fullname']) ?></a></li>
                     <? endif; ?>
                 <? endforeach; ?>
             </ul>
