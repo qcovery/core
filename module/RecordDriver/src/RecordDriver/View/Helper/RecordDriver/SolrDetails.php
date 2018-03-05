@@ -16,11 +16,19 @@ class SolrDetails extends \Zend\View\Helper\AbstractHelper
     /**
      *
      */
-    public function getCoreFields($driver, $category = '')
+    public function getCoreFields($driver, $categories = [])
     {
-        $solrMarcData = array();
-        foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
-            $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+        $solrMarcData = [];
+        if (!empty($categories)) {
+            foreach ($categories as $category) {
+                foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
+                    $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+                }
+            }
+        } else {
+            foreach ($driver->getSolrMarcKeys() as $solrMarcKey) {
+                $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+            }
         }
         return $solrMarcData;
     }
