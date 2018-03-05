@@ -35,17 +35,6 @@
     <?=$this->render('RecordDriver/SolrDefault/core-title.phtml', ['driver' => $driver]); ?>
 <!-- Module RecordDriver -->
 
-    <? $summary = $this->driver->getSummary(); $summary = isset($summary[0]) ? $this->escapeHtml($summary[0]) : false; ?>
-    <? if ($summary): ?>
-      <div id="belugax-summary">
-        <span id="belugax-summary-preview"><?=$this->truncate($summary, 300)?></span>
-        <span id="belugax-summary-full" class="hidden"><?=$summary?></span>
-        <? if(strlen($summary) > 300): ?>
-          <a id="belugax-summary-toggle"><i class="bel-pfeil-u01"></i></a>
-        <? endif; ?>
-      </div>
-    <? endif; ?>
-
     <? if ($this->userlist()->getMode() !== 'disabled'): ?>
       <? /* Display the lists that this record is saved to */ ?>
       <div class="savedLists">
