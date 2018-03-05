@@ -81,18 +81,7 @@ class SolrMarc extends \Libraries\RecordDriver\SolrMarc
     {
         return $this->getMarcData('UniversityNotes');
     }
-	// TODO: To be removed once functions in PAIA-Module can be used --> After
-    public function getCollectionDetails()
-    {
-		$collection_details = $this->getMarcData('CollectionDetails');
-		foreach ($collection_details AS $key => $collection) {
-			$collection_details[$key] = $collection[0];
-		}
-        return $collection_details;
-    }
-	
-	// To be removed once functions in PAIA-Module can be used >-- Before
-	
+
     /**
      * Attach an ILS connection and related logic to the driver
      *
