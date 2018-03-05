@@ -26,6 +26,7 @@ return [
     'helpers' => [
         'factories' => [
             'configreader' => 'BelugaConfig\View\Helper\BelugaConfig\Factory::getConfigReader',
+            'recordDataFormatter' => 'BelugaConfig\View\Helper\Root\RecordDataFormatterFactory',
         ]
     ],
     "less" => [
