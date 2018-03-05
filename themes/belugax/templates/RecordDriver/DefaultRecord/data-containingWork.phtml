@@ -1,0 +1,19 @@
+<? $containingWorks = $this->driver->getContainingWork(); if (!empty($containingWorks)): ?>
+    <? if (!empty($containingWorks)): ?>
+        <? foreach ($containingWorks as $containingWork): ?>
+            <? if (!empty($containingWork['ppn'])): ?>
+                <a href="<?=$this->record($this->driver)->getLink('ppn', $containingWork['ppn'])?>"><?=$this->transEsc($containingWork['title']) ?></a>
+            <? elseif (!empty($containingWork['isn'])): ?>
+                <a href="<?=$this->record($this->driver)->getLink('isn', $containingWork['isn'])?>"><?=$this->transEsc($containingWork['title']) ?></a>
+            <? else: ?>
+                <?=$containingWork['title'] ?>
+            <? endif; ?>
+            <? if (!empty($containingWork['location'])): ?>
+                <?=$containingWork['location'] ?>
+            <? endif; ?>
+            <? if (!empty($containingWork['issue'])): ?>
+                <?=$containingWork['issue'] ?>
+            <? endif; ?>
+        <? endforeach ?>
+    <? endif; ?>
+<? endif; ?>

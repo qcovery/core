@@ -1,0 +1,10 @@
+<? 
+$url=$this->url('record').$this->lookfor;
+
+if (strpos($_SERVER['REQUEST_URI'], 'SolrFindex') !== false) {
+    $url = str_replace('Record','SolrFindexrecord',$url);
+}
+
+echo $url; 
+
+?>
