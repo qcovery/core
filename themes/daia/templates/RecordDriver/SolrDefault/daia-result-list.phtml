@@ -8,6 +8,7 @@ if($paiaConfig['Global']['usePAIA'] == 1) {
 		$formats = $this->driver->tryMethod('getFormats');
 	}
 
+    $collection_details = [];
 	if (method_exists($this->driver, 'getCollectionDetails')) {
 		$collection_details = $this->driver->tryMethod('getCollectionDetails');
 	}
