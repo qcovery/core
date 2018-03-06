@@ -40,7 +40,7 @@ use Zend\ServiceManager\ServiceManager;
  *
  * @codeCoverageIgnore
  */
-class Factory extends GenericFactory
+class Factory extends \VuFind\Controller\GenericFactory
 {
 
 }
