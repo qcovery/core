@@ -114,7 +114,11 @@ class SolrMarc extends SolrDefault
         if (empty($category)) {
             return $solrMarcKeys;
         } else {
-            return array_intersect($this->category[$category], $solrMarcKeys);
+            if (is_array($this->category[$category])) {
+                return array_intersect($this->category[$category], $solrMarcKeys);
+            } else {
+                return [];
+            }
         }
     }
 
