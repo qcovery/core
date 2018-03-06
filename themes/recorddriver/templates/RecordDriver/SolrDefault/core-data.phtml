@@ -1,4 +1,4 @@
-<? $coreFields = $this->solrDefault()->getCoreFields($this->driver, $this->coreFieldCategory); ?>
+<? $coreFields = $this->solrDefault()->getCoreFields($this->driver, $this->coreFieldCategories); ?>
 <? if (!empty($coreFields)): ?>
       <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
         <? foreach ($coreFields as $field => $items): ?>
@@ -18,4 +18,4 @@
            <? endif; ?>
         <? endforeach; ?>
       </table>
-    <? endif; ?>
+<? endif; ?>

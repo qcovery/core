@@ -31,48 +31,9 @@
     </div>
   <? endif; ?>
   <div class="media-body">
-    <?
-        /*
-         * The following parts of the title may be wrapped in arrays. To avoid
-         * extending the record driver these transformations are performed here.
-         */
-        $shortTitle = $this->driver->getShortTitle();
-        if (is_array($shortTitle)) {
-            if (isset($shortTitle[0]) && !empty($shortTitle[0])) {
-                $shortTitle = $shortTitle[0];
-            } else {
-                $shortTitle = '';
-            }
-        }
-        $subTitle = $this->driver->getSubtitle();
-        if (is_array($subTitle)) {
-            if (isset($subTitle[0]) && !empty($subTitle[0])) {
-                $subTitle = $subTitle[0];
-            } else {
-                $subTitle = '';
-            }
-        }
-        $titleSection = $this->driver->getTitleSection();
-        if (is_array($titleSection)) {
-            if (isset($titleSection[0]) && !empty($titleSection[0])) {
-                $titleSection = $titleSection[0];
-            } else {
-                $titleSection = '';
-            }
-        }
-    ?>
-    <h3 property="name"><?=$this->escapeHtml($shortTitle . ' ' . $subTitle . ' ' . $titleSection)?></h3>
-
-    <? $summary = $this->driver->getSummary(); $summary = isset($summary[0]) ? $this->escapeHtml($summary[0]) : false; ?>
-    <? if ($summary): ?>
-      <div id="belugax-summary">
-        <span id="belugax-summary-preview"><?=$this->truncate($summary, 300)?></span>
-        <span id="belugax-summary-full" class="hidden"><?=$summary?></span>
-        <? if(strlen($summary) > 300): ?>
-          <a id="belugax-summary-toggle"><i class="bel-pfeil-u01"></i></a>
-        <? endif; ?>
-      </div>
-    <? endif; ?>
+<!-- Module RecordDriver -->
+    <?=$this->render('RecordDriver/SolrDefault/core-title.phtml', ['driver' => $driver]); ?>
+<!-- Module RecordDriver -->
 
     <? if ($this->userlist()->getMode() !== 'disabled'): ?>
       <? /* Display the lists that this record is saved to */ ?>
@@ -82,22 +43,13 @@
     <? endif; ?>
 
     <?/* Display Main Details */?>
-    <?
-      $formatter = $this->recordDataFormatter();
-      $coreFields = $formatter->getData($driver, $formatter->getDefaults('core'));
-    ?>
-    <? if (!empty($coreFields)): ?>
-      <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
-        <? foreach ($coreFields as $key => $current): ?>
-          <tr><th><?=$this->transEsc($key)?>:</th><td><?=$current['value']?></td></tr>
-        <? endforeach; ?>
-      </table>
-    <? endif; ?>
-    <?/* End Main Details */?>
-	
-	<!-- Module DAIA -->
-        <?=$this->render('RecordDriver/SolrDefault/daia-core.phtml'); ?>
-	<!-- Module DAIA -->
+<!-- Module RecordDriver -->
+    <? $coreFieldCategories = ['title2', 'person', 'publication', 'subject', 'description', 'related']; //coreFieldCategory according to category in solrmarc.yaml ?>
+    <?=$this->render('RecordDriver/SolrDefault/core-data.phtml', ['driver' => $driver, 'coreFieldCategories' => $coreFieldCategories]); ?>
+<!-- Module RecordDriver -->
+<!-- Module DAIA -->
+    <?=$this->render('RecordDriver/SolrDefault/daia-core.phtml'); ?>
+<!-- Module DAIA -->
 
     <?=$this->context($this)->renderInContext('RecordTab/staffviewmarc', []) ?>
   </div>
