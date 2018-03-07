@@ -1,9 +1,11 @@
 <? $cart = $this->cart(); ?>
 <? if ($cart->isActive()): ?>
-    <? $cartId = $this->source . '|' . $this->id; ?>
-    <? if($cart->contains($cartId)): ?>
-      <i class="bel-stern01"></i>
-    <? else: ?>
-      <i class=""></i>
-    <? endif; ?>
+    <div class="belugax-result-badge">
+        <? $cartId = $this->source . '|' . $this->id; ?>
+        <? if($cart->contains($cartId)): ?>
+          <i class="bel-stern01"></i>
+        <? else: ?>
+          <i class=""></i>
+        <? endif; ?>
+    </div>
 <? endif; ?>

@@ -395,6 +395,11 @@ button:hover {
   width: 20%;
 }
 
+.result-badge {
+  width: 10%;
+  float: left;
+}
+
 .result-badge i {
   font-size: 32px;
   color: @color-result-badge !important;
@@ -490,4 +495,11 @@ button.badge {
   color: @color-result-badge;
   background-color: @color-beluga-warning;
   border: 1px solid @color-dark-grey;
+}
+
+@media (min-width: 768px) {
+  .result-body {
+    float: left;
+    width: 70%;
+  }
 }
