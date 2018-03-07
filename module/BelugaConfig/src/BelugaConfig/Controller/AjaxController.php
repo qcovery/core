@@ -52,8 +52,17 @@ class AjaxController extends \VuFind\Controller\AjaxController
      */
     protected function getTabResultCountAjax()
     {
-        $result = [];
+        $runner = $this->serviceLocator->get('VuFind\SearchRunner');
 
-        return $this->output($result, self::STATUS_OK);
+        // Send both GET and POST variables to search class:
+        $request = $this->getRequest()->getQuery()->toArray() + $this->getRequest()->getPost()->toArray();
+
+        if ($results = $runner->run($request, $request['class'], null, null)){
+            if ($results) {
+                return $this->output(number_format($results->getResultTotal(), 0, ",", "." ), self::STATUS_OK);
+            }
+        } else {
+            return $this->output(0, self::STATUS_OK);
+        }
     }
 }

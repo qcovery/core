@@ -78,14 +78,15 @@ $(document).ready(function() {
     /*
      * Get result count for inactive Tabs
      */
-    $('[data-belugax-getTabResultCountAjax]').each(function(){
-        console.log('TEST');
-
+    $('.belugax-getTabResultCountAjax').each(function(){
+        var $this = $(this);
+        var indexClass = $(this).data('belugaxgettabresultcountajaxclass');
+        var lookfor = $(this).data('belugaxgettabresultcountajaxlookfor');
         jQuery.ajax({
-            url:'/vufind/Ajax/JSON?method=getTabResultCount&class='+$(this).attr('data-belugax-getTabResultCountAjax').class,
+            url:'/vufind/Ajax/JSON?method=getTabResultCount&class='+indexClass+'&lookfor='+lookfor,
             dataType:'json',
             success:function(data, textStatus, jqXHR){
-                console.log(data);
+                $this.find('a').append(' ('+data.data+')')
             }
         });
     });

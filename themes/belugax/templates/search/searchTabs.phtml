@@ -3,7 +3,7 @@
   <ul class="nav nav-tabs">
     <? foreach ($searchTabs as $tab): ?>
         <? if ($this->permission()->allowDisplay($tab['permission'])): ?>
-          <li<?=$tab['selected'] ? ' class="active"' : ' data-belugax-getTabResultCountAjax="{tab:'.$tab['class'].'}"'?>>
+          <li<?=$tab['selected'] ? ' class="active"' : ' class="belugax-getTabResultCountAjax" data-belugaxGetTabResultCountAjaxClass="'.$tab['class'].'" data-belugaxGetTabResultCountAjaxLookfor="'.$_GET['lookfor'].'" '?>>
             <a <?=$tab['selected'] ? '' : 'href="' . $this->escapeHtmlAttr($tab['url']) . '"' ?>><?=$this->transEsc($tab['label']); ?><?=$tab['selected'] ? ' ('.number_format($recordTotal, 0, ',', '.').')' : ''?></a>
           </li>
         <? elseif ($block = $this->permission()->getAlternateContent($tab['permission'])): ?>
