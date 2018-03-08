@@ -1138,7 +1138,12 @@ class MyResearchController extends AbstractBase
                      $renewForm = true;
                    }
                }
-   
+               if($dueDateTime = new \DateTime($current['duedate'])) {
+                   $current['duedate'] = $dueDateTime->format('d.m.Y');
+                   if ($dueDateTime < new \DateTime('now')) {
+                       $current['dueStatus'] = 'overdue';
+                   }
+               }
                // Build record driver:
                $transactions[] = $this->getDriverForILSRecord($current);
            }
