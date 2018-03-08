@@ -703,4 +703,48 @@ class PAIA extends AbstractBase
         }
         return $this->session;
     }
+
+
+
+    /**
+     * Public Function which changes the password in the library system
+     * (not supported prior to VuFind 2.4)
+     *
+     * @param array $details Array with patron information, newPassword and
+     *                       oldPassword.
+     *
+     * @return array An array with patron information.
+     */
+    public function changePassword($details) {
+        $json_password = $this->paiaConnector->change($details['patron']['id'], $details['patron']['access_token'], $details['patron']['cat_username'], $details['oldPassword'], $details['newPassword']);
+        $json_password_array = json_decode($json_password, true);
+
+        if (isset($json_password_array['error'])) {
+            // on error
+            $details = [
+                'success'    => false,
+                'status'     => $json_password_array['error_description'],
+                'sysMessage' =>
+                    isset($json_password_array['error'])
+                        ? $json_password_array['error'] : ' ' .
+                    isset($json_password_array['error_description'])
+                        ? $json_password_array['error_description'] : ' '
+            ];
+        } elseif (isset($json_password_array['patron'])
+            && $json_password_array['patron'] === $details['patron']['cat_username']
+        ) {
+            // on success patron_id is returned
+            $details = [
+                'success' => true,
+                'status' => 'Successfully changed'
+            ];
+        } else {
+            $details = [
+                'success' => false,
+                'status' => 'Failure changing password',
+                'sysMessage' => serialize($json_password_array)
+            ];
+        }
+        return $details;
+    }
 }
