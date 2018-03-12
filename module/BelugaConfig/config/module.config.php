@@ -18,6 +18,15 @@ $config = [
             ],
         ],
     ],
+    'controllers' => [
+        'factories' => [
+            'BelugaConfig\Controller\AjaxController' => 'BelugaConfig\Controller\Factory::getAjaxController',
+        ],
+        'aliases' => [
+            'AJAX' => 'BelugaConfig\Controller\AjaxController',
+            'ajax' => 'BelugaConfig\Controller\AjaxController',
+        ],
+    ],
 ];
 
 return $config;

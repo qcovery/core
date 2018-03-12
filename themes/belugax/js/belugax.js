@@ -74,4 +74,20 @@ $(document).ready(function() {
        $('#belugax-summary-full').toggleClass('hidden');
        $(this).find('i').toggleClass('bel-pfeil-u01').toggleClass('bel-pfeil-o01');
     });
+
+    /*
+     * Get result count for inactive Tabs
+     */
+    $('.belugax-getTabResultCountAjax').each(function(){
+        var $this = $(this);
+        var indexClass = $(this).data('belugaxgettabresultcountajaxclass');
+        var lookfor = $(this).data('belugaxgettabresultcountajaxlookfor');
+        jQuery.ajax({
+            url:'/vufind/Ajax/JSON?method=getTabResultCount&class='+indexClass+'&lookfor='+lookfor,
+            dataType:'json',
+            success:function(data, textStatus, jqXHR){
+                $this.find('a').append(' ('+data.data+')')
+            }
+        });
+    });
 });

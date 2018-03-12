@@ -114,7 +114,11 @@ class SolrMarc extends SolrDefault
         if (empty($category)) {
             return $solrMarcKeys;
         } else {
-            return array_intersect($this->category[$category], $solrMarcKeys);
+            if (is_array($this->category[$category])) {
+                return array_intersect($this->category[$category], $solrMarcKeys);
+            } else {
+                return [];
+            }
         }
     }
 
@@ -608,6 +612,53 @@ class SolrMarc extends SolrDefault
         return XSLTProcessor::process(
             'record-marc.xsl', trim($this->getMarcRecord()->toXML())
         );
+    }
+
+    /**
+     * Get containing work infos of the record.
+     *
+     * @return array
+     */
+    public function getContainingWork()
+    {
+        $containingWorks = array();
+        $containingWorkFields = $this->marcRecord->getFields('773');
+        if (empty($containingWorkFields)) {
+            $containingWorkFields = $this->marcRecord->getFields('800');
+            if (empty($containingWorkFields)) {
+                return array();
+            }
+        }
+
+        foreach ($containingWorkFields as $containingWorkField) {
+            $containingWork = array();
+            if (is_object($containingWorkField->getSubfield('i'))) {
+                $containingWork['prefix'] = $this->prepareData($containingWorkField->getSubfield('i')->getData());
+            }
+            if (is_object($containingWorkField->getSubfield('t'))) {
+                $containingWork['title'] = $this->prepareData($containingWorkField->getSubfield('t')->getData());
+            }
+            if (is_object($containingWorkField->getSubfield('z'))) {
+                $containingWork['isn'] = substr(strrchr($containingWorkField->getSubfield('z')->getData(), ')'), 1);
+            }
+            if (is_object($containingWorkField->getSubfield('x'))) {
+                $containingWork['isn'] = substr(strrchr($containingWorkField->getSubfield('x')->getData(), ')'), 1);
+            }
+            if (is_object($containingWorkField->getSubfield('w'))) {
+                $containingWork['ppn'] = substr(strrchr($containingWorkField->getSubfield('w')->getData(), ')'), 1);
+            }
+            if (is_object($containingWorkField->getSubfield('d'))) {
+                $containingWork['location'] = $containingWorkField->getSubfield('d')->getData();
+            }
+            if (is_object($containingWorkField->getSubfield('g'))) {
+                $containingWork['issue'] = $containingWorkField->getSubfield('g')->getData();
+            }
+            if (empty($containingWork['title'])) {
+                $containingWork['title'] = 'Zur Gesamtaufnahme';
+            }
+            $containingWorks[] = $containingWork;
+        }
+        return $containingWorks;
     }
 }
 
