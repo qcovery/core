@@ -23,7 +23,10 @@
     <? endif; ?>
     <? if ($this->ils()->checkCapability('getMyHolds', $capabilityParams)): ?>
       <a href="<?=$this->url('myresearch-holds')?>"<?=$this->active == 'holds' ? ' class="active"' : ''?>>
-        <i class="bel-flagge" aria-hidden="true"></i> <?=$this->transEsc('Holds and Recalls')?>
+        <i class="bel-flagge" aria-hidden="true"></i> <?=$this->transEsc('Holds')?>
+      </a>
+      <a href="<?=str_replace("Holds","Recalls",$this->url('myresearch-holds'))?>"<?=$this->active == 'recalls' ? ' class="active"' : ''?>>
+        <i class="bel-flagge" aria-hidden="true"></i> <?=$this->transEsc('Recalls')?>
       </a>
     <? endif; ?>
     <? if ($this->ils()->checkFunction('StorageRetrievalRequests', $capabilityParams)): ?>
