@@ -184,12 +184,9 @@ class PAIA extends AbstractBase
            $user['token_type']   = $json_array['token_type'];
            $user['scope']        = $json_array['scope'];
            $user['expires_in']   = $json_array['expires_in'];
-           //$user['firstname']    = null;
-           //$user['lastname']     = null;
            $user['cat_username'] = trim($barcode);
            $user['cat_password'] = trim($password);
            $user['cat_isil']     = $isil;
-           //$user['email']        = null;
            $user['major']        = null;
            $user['college']      = null;
            
@@ -224,22 +221,22 @@ class PAIA extends AbstractBase
 			  foreach ($json_array['doc'] as $doc) {
 				 if ($doc['status'] == 3) {
 					$transList[] = array(
-						'duedate' => $doc['endtime'],
-						 'dueStatus' => '',
-						 'barcode' => $doc['label'],
-						 'queue' => $doc['queue'],
-						 'reminder' => $doc['reminder'],
-						 'renew' => $doc['renewals'],
-						 'renewLimit' => $this->paiaConfig['Global']['renewLimit'],
-						 'request' => '',
-						 'id' => $doc['item'],
-						 'item_id' => '',
-						 'renewable' => $doc['canrenew'],
-						 'title' => $doc['about'],
-						 'status' => $doc['status'],
-						 'institution_id' => '',
-						 'institution_name' => '',
-						 'institution_dbkey' => ''
+                          'duedate' => $doc['endtime'],
+                          'dueStatus' => '',
+                          'barcode' => $doc['label'],
+                          'queue' => $doc['queue'],
+                          'reminder' => $doc['reminder'],
+                          'renew' => $doc['renewals'],
+                          'renewLimit' => $this->paiaConfig['Global']['renewLimit'],
+                          'request' => '',
+                          'id' => $doc['item'],
+                          'item_id' => '',
+                          'renewable' => $doc['canrenew'],
+                          'title' => $doc['about'],
+                          'status' => $doc['status'],
+                          'institution_id' => '',
+                          'institution_name' => '',
+                          'institution_dbkey' => ''
 					);
 				 }
 			  }
@@ -278,16 +275,17 @@ class PAIA extends AbstractBase
 			  $counter = 0;
 			  foreach ($json_array['doc'] as $doc) {
 				 if (in_array($doc['status'],$status)) {
-					$holdsList[] = array('location' => $doc['storage'],
-										 'create' => $doc['starttime'],
-										 'expire' => $doc['endtime'],
-										 'item_id' => $doc['item'],
-										 'id' => $doc['item'],
-										 'title' => $doc['about'],
-										 'reqnum' => $doc['item'],
-										 'barcode' => $doc['label'],
-										 'queue' => $doc['queue'],
-										 'status' => $doc['status']
+					$holdsList[] = array(
+                          'location' => $doc['storage'],
+                          'create' => $doc['starttime'],
+                          'expire' => $doc['endtime'],
+                          'item_id' => $doc['item'],
+                          'id' => $doc['item'],
+                          'title' => $doc['about'],
+                          'reqnum' => $doc['item'],
+                          'barcode' => $doc['label'],
+                          'queue' => $doc['queue'],
+                          'status' => $doc['status']
 					);
 				 }
 			  }
@@ -314,28 +312,20 @@ class PAIA extends AbstractBase
         $json = $this->paiaConnector->fees($patron['id'], $patron['access_token']);
         $json_array = json_decode($json, true);
         
-        /*
-        [amount] => 7.00 EUR
-        [date] => 2013-08-05
-        [about] => Der Leitfaden fuer Einsteiger / Achim Senne/Senne, Achim
-        [item] => http://uri.gbv.de/document/opac-de-hil2:bar:HIL2$85037613
-        [feetype] => Mahngebuehr
-        [feetypeid] => http://paia.gbv.de/isil/DE-Hil2/fee/3 
-        */
-        
         if (!isset($this->session->fines)) {
             $finesList = array();
             if (isset($json_array['fee'])) {
                if (!empty($json_array['fee'])) {
                   $counter = 0;
                   foreach ($json_array['fee'] as $fee) {
-                     $finesList[] = array('amount' => $fee['amount'],
-                                          'checkout' => '',
-                                          'fine' => '',
-                                          'balance' => '',
-                                          'duedate' => $fee['date'],
-                                          'title' => $fee['about'],
-                                          'feetype' => $fee['feetype']
+                     $finesList[] = array(
+                       'amount' => $fee['amount'],
+                       'checkout' => '',
+                       'fine' => '',
+                       'balance' => '',
+                       'duedate' => $fee['date'],
+                       'title' => $fee['about'],
+                       'feetype' => $fee['feetype']
                      );
                      $counter++;
                   }
@@ -368,8 +358,6 @@ class PAIA extends AbstractBase
             'firstname' => $name_array[1],
             'lastname' => $name_array[0],
             'email' => $json_array['email'],
-			//'note' => $json_array['note'],
-            //'expires' => $expiresDate->format('d.m.Y'),
             'expires' => $json_array['expires'],
             'status' => $json_array['status'],
             'address' => $json_array['address'],
@@ -445,19 +433,6 @@ class PAIA extends AbstractBase
         }
         $renew_json = json_encode($renew_array);
         
-        /*
-        BibApp als Vergleich
-        {"doc":[
-           {"item" : "http:\/\/uri.gbv.de\/document\/opac-de-ilm1:bar:ILM1$005121337"}
-        ]}
-        
-        $cancel_json
-        {"doc":[
-           {"item":"http:\/\/uri.gbv.de\/document\/opac-de-hil2:bar:HIL2$00118796"},
-           {"item":"http:\/\/uri.gbv.de\/document\/opac-de-hil2:bar:HIL2$74011944"}
-        ]}
-        */
-        
         $this->paiaConnector->setIsil($renewDetails['patron']['cat_isil']);
         $json = $this->paiaConnector->renew($renewDetails['patron']['id'], $renew_json, $renewDetails['patron']['access_token']);
         $json_array = json_decode($json, true);
@@ -475,13 +450,13 @@ class PAIA extends AbstractBase
                   foreach ($json_array_holds['doc'] as $doc) {
                      if ($doc['status'] == 2) {
                         $holdsList[] = array('location' => $doc['storage'],
-                                             'create' => $doc['starttime'],
-                                             'item_id' => $doc['item'],
-                                             'id' => $doc['item'],
-                                             'title' => $doc['about'],
-                                             'reqnum' => $doc['item'],
-											 'barcode' => $doc['label'],
-											 'status' => $doc['status'],
+                          'create' => $doc['starttime'],
+                          'item_id' => $doc['item'],
+                          'id' => $doc['item'],
+                          'title' => $doc['about'],
+                          'reqnum' => $doc['item'],
+                          'barcode' => $doc['label'],
+                          'status' => $doc['status'],
                         );
                      }
                   }
@@ -531,19 +506,6 @@ class PAIA extends AbstractBase
         }
         $cancel_json = json_encode($cancel_array);
         
-        /*
-        BibApp als Vergleich
-        {"doc":[
-           {"item" : "http:\/\/uri.gbv.de\/document\/opac-de-ilm1:bar:ILM1$005121337"}
-        ]}
-        
-        $cancel_json
-        {"doc":[
-           {"item":"http:\/\/uri.gbv.de\/document\/opac-de-hil2:bar:HIL2$00118796"},
-           {"item":"http:\/\/uri.gbv.de\/document\/opac-de-hil2:bar:HIL2$74011944"}
-        ]}
-        */
-        
         $this->paiaConnector->setIsil($cancelDetails['patron']['cat_isil']);
         $json = $this->paiaConnector->cancel($cancelDetails['patron']['id'], $cancel_json, $cancelDetails['patron']['access_token']);
         $json_array = json_decode($json, true);
@@ -560,12 +522,13 @@ class PAIA extends AbstractBase
                   $counter = 0;
                   foreach ($json_array_holds['doc'] as $doc) {
                      if ($doc['status'] == 2) {
-                        $holdsList[] = array('location' => $doc['storage'],
-                                             'create' => $doc['starttime'],
-                                             'item_id' => $doc['item'],
-                                             'id' => $doc['item'],
-                                             'title' => $doc['about'],
-                                             'reqnum' => $doc['item'],
+                        $holdsList[] = array(
+                          'location' => $doc['storage'],
+                          'create' => $doc['starttime'],
+                          'item_id' => $doc['item'],
+                          'id' => $doc['item'],
+                          'title' => $doc['about'],
+                          'reqnum' => $doc['item'],
                         );
                      }
                   }
@@ -623,19 +586,6 @@ class PAIA extends AbstractBase
     public function getShortStatus(string $id) {
        return array();
     }
-
-
-    /*
-        Request to PAIA:
-        {"doc":
-            [
-                {
-                    "edition" : "http:\/\/uri.gbv.de\/document\/opac-de-luen4:ppn:845708503",
-                    "item" : "http:\/\/uri.gbv.de\/document\/opac-de-luen4:epn:1602631271"
-                }
-            ]
-        }
-    */
 
     public function order($documentId, $itemId, $patron){
         // string -> json_encode does not return the correct structure!

@@ -15,7 +15,7 @@
   <?=$this->flashmessages()?>
 
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
-
+    
   <?
   if ($this->cancelForm && $paiaConfig['Global']['cancel_holds_permitted']) {
 	  $cancel_permitted = true;

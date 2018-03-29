@@ -7,23 +7,29 @@
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-  <h2><?=$this->transEsc('Your Checked Out Items')?></h2>
+  <h2><?=$this->transEsc('Checked Out Items')?></h2>
   <?=$this->flashmessages()?>
 
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
   <? if (!empty($this->transactions)): ?>
+    <?=$this->transEsc('checkedout_hints'); ?>
     <? if ($this->renewForm): ?>
     <form name="renewals" method="post" id="renewals">
       <div class="toolbar">
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" name="selectAll" class="checkbox-select-all"/>
-            <?=$this->transEsc('select_page')?>
-          </label>
-          <input type="submit" class="btn btn-default" id="renewSelected" name="renewSelected" value="<?=$this->transEsc("renew_selected")?>" />
-          <!--<input type="submit" class="btn btn-default" id="renewAll" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />-->
-        </div>
+        <table class="checkbox">
+		  <tbody>
+		  <tr>
+			  <td><label>
+				<input type="checkbox" name="selectAll" class="checkbox-select-all"/>
+				<?=$this->transEsc('select_page')?>
+			  </label></td>
+			  <td>
+			  <input type="submit" class="btn btn-default" id="renewSelected" name="renewSelected" value="<?=$this->transEsc("extend_loan")?>" />
+			  </td>
+		  </tr>
+		  </tbody>
+        </table>
       </div>
     <? endif; ?>
 
@@ -98,7 +104,7 @@
               <? $renewDetails = $this->renewResult[$ilsDetails['item_id']]; ?>
               <? if (isset($renewDetails['success']) && $renewDetails['success']): ?>
                 <? $showStatus = false; ?>
-                <<?=$this->escapeHtml($renewDetails['new_date'])?> <? if (isset($renewDetails['new_time'])): ?><?=$this->escapeHtml($renewDetails['new_time'])?><? endif; ?>
+                <?=$this->escapeHtml($renewDetails['new_date'])?> <? if (isset($renewDetails['new_time'])): ?><?=$this->escapeHtml($renewDetails['new_time'])?><? endif; ?>
                 <div class="alert alert-success"><?=$this->transEsc('renew_success')?></div>
               <? else: ?>
                 <?=$this->escapeHtml($ilsDetails['duedate'])?><? if (isset($ilsDetails['dueTime'])): ?> <?=$this->escapeHtml($ilsDetails['dueTime'])?><? endif; ?>

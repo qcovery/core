@@ -15,6 +15,18 @@
 
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
   
+    <?
+      if (isset($this->cancelResults['canceledItems'])) {
+         echo('<div class="message">'.$this->transEsc('canceledItems').': '.count($this->cancelResults['canceledItems']).'</div><br/>');
+      } else if (isset($_GET['placeRecall'])) {
+          if ($_GET['placeRecall'] == 'success') {
+              echo('<div class="message">'.$this->transEsc('placeRecallSuccess').'</div><br/>');
+          }
+      }
+  ?>
+
+  
+  
   <?
   if ($this->cancelForm && $paiaConfig['Global']['cancel_recalls_permitted']) {
 	  $cancel_permitted = true;
@@ -30,7 +42,7 @@
         <input type="hidden" id="submitType" name="cancelSelected" value="1"/>
         <input type="hidden" id="cancelConfirm" name="confirm" value="0"/>
         <div class="btn-group">
-          <input id="cancelSelected" name="cancelSelected" type="submit" value="<?=$this->transEsc("recall_cancel_selected") ?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown"/>
+          <input id="cancelSelected" name="cancelSelected" type="submit" value="<?=$this->transEsc("cancel_selected") ?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown"/>
           <ul class="dropdown-menu">
             <li class="disabled"><a><?=$this->transEsc("confirm_recall_cancel_selected_text") ?></a></li>
             <li><a href="#" onClick="$('#cancelConfirm').val(1);$('#submitType').attr('name','cancelSelected');$(this).parents('form').submit(); return false;"><?=$this->transEsc('confirm_dialog_yes') ?></a></li>
@@ -38,7 +50,7 @@
           </ul>
         </div>
         <div class="btn-group">
-          <input id="cancelAll" name="cancelAll" type="submit" value="<?=$this->transEsc("recall_cancel_all") ?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown"/>
+          <input id="cancelAll" name="cancelAll" type="submit" value="<?=$this->transEsc("cancel_all") ?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown"/>
           <ul class="dropdown-menu">
             <li class="disabled"><a><?=$this->transEsc("confirm_recall_cancel_all_text") ?></a></li>
             <li><a href="#" onClick="$('#cancelConfirm').val(1);$('#submitType').attr('name','cancelAll');$(this).parents('form').submit(); return false;"><?=$this->transEsc('confirm_dialog_yes') ?></a></li>
