@@ -75,7 +75,7 @@
     <? foreach ($this->recordList as $resource): ?>
       <? $iteration++; ?>
       <? $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
-	  <tr class="result<? if (($iteration % 2) == 0): ?> alt<? endif; ?>" id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>">
+	  <tr class="myresearch-result result<? if (($iteration % 2) == 0): ?> alt<? endif; ?>" id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>">
         <? if ($cancel_permitted && isset($ilsDetails['cancel_details'])): ?>
           <? $safeId = preg_replace('/[^a-zA-Z0-9]/', '', $resource->getUniqueId()); ?>
 		  <td>

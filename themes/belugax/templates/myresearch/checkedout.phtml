@@ -79,7 +79,7 @@
 		</thead>
     <? $i = 0; foreach ($this->transactions as $resource): ?>
       <? $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
-	  <tr class="result<?=(++$i % 2 == 0) ? ' alt' : ''?>" id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>">
+	  <tr class="myresearch-result result<?=(++$i % 2 == 0) ? ' alt' : ''?>" id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>">
         <? if ($this->renewForm) { ?>
           <? if (isset($ilsDetails['renewable']) && $ilsDetails['renewable'] && isset($ilsDetails['renew_details'])) { ?>
             <? $safeId = preg_replace('/[^a-zA-Z0-9]/', '', $ilsDetails['renew_details']); ?>
