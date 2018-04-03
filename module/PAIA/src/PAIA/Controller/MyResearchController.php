@@ -935,10 +935,7 @@ class MyResearchController extends AbstractBase
    
            // By default, assume we will not need to display a cancel form:
            $view->cancelForm = false;
-   
-   		   $profile = $catalog->getMyProfile($patron);
-		   $paiaConfig = parse_ini_file(realpath(APPLICATION_PATH . '/local/config/vufind/PAIA.ini'), true);
-   
+		   
            // Get held item details:
            $result = $catalog->getMyHolds($patron, array(1));
            $recordList = array();
@@ -952,16 +949,13 @@ class MyResearchController extends AbstractBase
                    && isset($current['cancel_details'])
                ) {
                    // Enable cancel form if necessary:
-                   //if (stristr($patron['scope'], 'write_items') && !in_array($profile['type'], array('de-84:user-type:24','de-84:user-type:23'))) {
-                   if (stristr($patron['scope'], 'write_items') && !in_array($profile['type'], $paiaConfig['Recalls']['cancel_exlude'])) {
                      $view->cancelForm = true;
-                   }
                }
    
                // Build record driver:
                $recordList[] = $this->getDriverForILSRecord($current);
            }
-   
+  
            // Get List of PickUp Libraries based on patron's home library
            try {
                $view->pickup = $catalog->getPickUpLocations($patron);
@@ -970,6 +964,7 @@ class MyResearchController extends AbstractBase
                // locations, they are not supported and we should ignore them.
            }
            $view->recordList = $recordList;
+		   
            return $view;
         } else {
            return $this->createViewModel(array('error' => 'SCOPE_MISSING_READ_ITEMS'));
