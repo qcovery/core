@@ -26,7 +26,7 @@
 		<? if(isset($record['amount'])) { ?>
 			  <tr>
 				<td><?=isset($record['feetype']) ? $this->escapeHtml($record['feetype']) : ''?></td>
-				<td><?=isset($record['duedate']) ? $this->escapeHtml($record['duedate']) : ''?></td>
+				<td><?=isset($record['duedate']) ? $this->escapeHtml(substr($record['duedate'],0,strpos($record['duedate'],"T"))) : ''?></td>
 				<td>
 				  <? if (empty($record['title'])): ?>
 					<?=$this->transEsc('not_applicable')?>
