@@ -168,7 +168,9 @@ JS;
     </nav>
     <div id="belugax-tabs">
         <div class="container">
-            <?= $this->context($this)->renderInContext('belugax/searchTabs', []); ?>
+            <? if ($this->templateDir && $this->templateDir == 'search'): ?>
+                <?=$this->context($this)->renderInContext('belugax/searchTabs', []); ?>
+            <? endif; ?>
         </div>
     </div>
     <div role="main" class="main">
