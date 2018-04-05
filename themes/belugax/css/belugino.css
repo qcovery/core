@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'belugino';
-  src:  url('fonts/belugino.eot?sgd0sg');
-  src:  url('fonts/belugino.eot?sgd0sg#iefix') format('embedded-opentype'),
-    url('fonts/belugino.ttf?sgd0sg') format('truetype'),
-    url('fonts/belugino.woff?sgd0sg') format('woff'),
-    url('fonts/belugino.svg?sgd0sg#belugino') format('svg');
+  src:  url('fonts/belugino.eot?wx2m99');
+  src:  url('fonts/belugino.eot?wx2m99#iefix') format('embedded-opentype'),
+  url('fonts/belugino.ttf?wx2m99') format('truetype'),
+  url('fonts/belugino.woff?wx2m99') format('woff'),
+  url('fonts/belugino.svg?wx2m99#belugino') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -604,4 +604,222 @@
 .bel-belugalogo:before {
   content: "\e9bf";
 }
-
+.bel-pcsuche:before {
+  content: "\e9c0";
+}
+.bel-pcliste:before {
+  content: "\e9c1";
+}
+.bel-pckacheln:before {
+  content: "\e9c2";
+}
+.bel-pcspalten:before {
+  content: "\e9c3";
+}
+.bel-spalten:before {
+  content: "\e9c4";
+}
+.bel-zeilen:before {
+  content: "\e9c5";
+}
+.bel-raster:before {
+  content: "\e9c6";
+}
+.bel-kacheln:before {
+  content: "\e9c7";
+}
+.bel-tabelle:before {
+  content: "\e9c8";
+}
+.bel-barrierefrei:before {
+  content: "\e9c9";
+}
+.bel-sprache03:before {
+  content: "\e9ca";
+}
+.bel-sprache04:before {
+  content: "\e9cb";
+}
+.bel-antworten:before {
+  content: "\e9cc";
+}
+.bel-uebernehmen:before {
+  content: "\e9cd";
+}
+.bel-verbinden:before {
+  content: "\e9ce";
+}
+.bel-teilen:before {
+  content: "\e9cf";
+}
+.bel-verzeichnis:before {
+  content: "\e9d0";
+}
+.bel-sanduhr01:before {
+  content: "\e9d1";
+}
+.bel-sanduhr02:before {
+  content: "\e9d2";
+}
+.bel-trichter02:before {
+  content: "\e9d3";
+}
+.bel-trichter03:before {
+  content: "\e9d4";
+}
+.bel-flagge02:before {
+  content: "\e9d5";
+}
+.bel-ordner02:before {
+  content: "\e9d6";
+}
+.bel-ordner03:before {
+  content: "\e9d7";
+}
+.bel-sortieren04:before {
+  content: "\e9d8";
+}
+.bel-sortieren05:before {
+  content: "\e9d9";
+}
+.bel-sortieren06:before {
+  content: "\e9da";
+}
+.bel-sortieren07:before {
+  content: "\e9db";
+}
+.bel-nutzer02:before {
+  content: "\e9dc";
+}
+.bel-nutzer03:before {
+  content: "\e9dd";
+}
+.bel-nutzer04:before {
+  content: "\e9de";
+}
+.bel-nutzergruppe:before {
+  content: "\e9df";
+}
+.bel-nutzer05:before {
+  content: "\e9e0";
+}
+.bel-nutzer06:before {
+  content: "\e9e1";
+}
+.bel-nutzer07:before {
+  content: "\e9e2";
+}
+.bel-nutzerplus:before {
+  content: "\e9e3";
+}
+.bel-nutzerminus:before {
+  content: "\e9e4";
+}
+.bel-quadrat01:before {
+  content: "\e9e5";
+}
+.bel-quadrat02:before {
+  content: "\e9e6";
+}
+.bel-quadratok:before {
+  content: "\e9e7";
+}
+.bel-quadratx:before {
+  content: "\e9e8";
+}
+.bel-lupeplus:before {
+  content: "\e9e9";
+}
+.bel-lupeminus:before {
+  content: "\e9ea";
+}
+.bel-lupefrage:before {
+  content: "\e9eb";
+}
+.bel-pfeil-u03:before {
+  content: "\e9ec";
+}
+.bel-pfeil-o03:before {
+  content: "\e9ed";
+}
+.bel-pfeil-l03:before {
+  content: "\e9ee";
+}
+.bel-pfeil-r03:before {
+  content: "\e9ef";
+}
+.bel-recht01:before {
+  content: "\e9f0";
+}
+.bel-recht02:before {
+  content: "\e9f1";
+}
+.bel-glocke01:before {
+  content: "\e9f2";
+}
+.bel-glocke02:before {
+  content: "\e9f3";
+}
+.bel-lautstaerkeaus:before {
+  content: "\e9f4";
+}
+.bel-mikrofon:before {
+  content: "\e9f5";
+}
+.bel-playerplay:before {
+  content: "\e9f6";
+}
+.bel-playerpause:before {
+  content: "\e9f7";
+}
+.bel-playervor:before {
+  content: "\e9f8";
+}
+.bel-playerzurueck:before {
+  content: "\e9f9";
+}
+.bel-playerende:before {
+  content: "\e9fa";
+}
+.bel-playerstart:before {
+  content: "\e9fb";
+}
+.bel-stern03:before {
+  content: "\e9fc";
+}
+.bel-herz03:before {
+  content: "\e9fd";
+}
+.bel-stern04:before {
+  content: "\e9fe";
+}
+.bel-herz04:before {
+  content: "\e9ff";
+}
+.bel-statue:before {
+  content: "\ea00";
+}
+.bel-statuee:before {
+  content: "\ea01";
+}
+.bel-theater:before {
+  content: "\ea02";
+}
+.bel-theatere:before {
+  content: "\ea03";
+}
+.bel-wolke01:before {
+  content: "\ea04";
+}
+.bel-wolke02:before {
+  content: "\ea05";
+}
+.bel-belugacore01:before {
+  content: "\ea06";
+}
+.bel-belugacore02:before {
+  content: "\ea07";
+}
+.bel-keinzeichen:before {
+  content: "\ea08";
+}
