@@ -1183,7 +1183,7 @@ class MyResearchController extends AbstractBase
                        ->load($row['id']);
                    $row['title'] = $record->getShortTitle();
                } catch (\Exception $e) {
-                   if (!isset($row['title'])) {
+                   if (is_array($row) && !isset($row['title'])) {
                        $row['title'] = null;
                    }
                }
