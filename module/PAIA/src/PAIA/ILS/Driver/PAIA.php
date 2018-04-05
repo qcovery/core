@@ -177,8 +177,6 @@ class PAIA extends AbstractBase
         $json = $this->paiaConnector->login($barcode, $password);
         $json_array = json_decode($json, true);
         if (!isset($json_array['error'])) {
-            error_log(print_r($json_array, true));
-            
            $user['id']           = trim($barcode);
            $user['access_token'] = $json_array['access_token'];
            $user['token_type']   = $json_array['token_type'];
