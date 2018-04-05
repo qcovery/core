@@ -31,12 +31,16 @@ class PAIAConnector
     /*
      * PAIA Auth
      */
-    function login ($username, $password, $grandType = 'password') {
+    function login ($username, $password, $grandType = 'password', $scope = null) {
        $client = new \PAIA\RestClient($this->base_url.$this->isil.'/auth/login');
        $client->setHttpClient($this->http_client);
        $client->username($username);
        $client->password($password);
        $client->grant_type($grandType);
+       if (!$scope) {
+           $scope = 'read_patron read_fees read_items write_items change_password read_availability';
+       }
+       $client->scope($scope);
        return $client->get();
     }
     
