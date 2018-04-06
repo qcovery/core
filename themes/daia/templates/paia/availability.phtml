@@ -1,6 +1,4 @@
 <? 
-$paiaConfig = parse_ini_file(realpath(APPLICATION_PATH . '/local/config/vufind/PAIA.ini'), true);
-$site = $paiaConfig['Global']['isil'];
 $language = $this->layout()->userLang;
 $ppn = $_GET['ppn'];
 $list = $_GET['list'];
@@ -9,7 +7,7 @@ echo '<div id="paia-availability">';
 
 if ($list == 1) {
 	
-	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $site, $language);
+	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language);
 	$openUrl = urldecode($_GET['openurl']);
 	$marcField951aValue = urldecode($_GET['marcField951aValue']);
 	
@@ -112,7 +110,7 @@ if ($list == 1) {
 				echo'<table>';
 					echo'<tbody>';
 						if ($useDaia) {
-							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $site, $language);
+							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language);
 							if ($key == 'hide') { $foundHidden = true; }
 							if (!empty($daiaResults['document'][0])) {
 								

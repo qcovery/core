@@ -55,7 +55,12 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      * @return Array
      */
 	//TODO: Currently only working with DAIAplus Service - DAIAplus Service needs to be set up to conform to DAIA request specifications
-    public function getDaiaResults($ppn, $list = false, $site = 'Default', $language = 'en') {
+    public function getDaiaResults($ppn, $list = false, $language = 'en') {
+		if(!empty($this->paiaConfig['Global']['isil'])) {
+			$site = $this->paiaConfig['Global']['isil'];
+		} else {
+			$site = 'Default';
+		}
 		$url_path = $this->paiaConfig['DAIA']['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list;
 		$daia = file_get_contents($url_path);
         $daiaJson = json_decode($daia, true);
