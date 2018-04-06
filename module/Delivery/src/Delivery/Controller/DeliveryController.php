@@ -350,8 +350,11 @@ class DeliveryController extends AbstractBase
     
     private function getLibraryCodes()
     {
-        $libraryCodes = array_keys($this->deliveryConfig); //!!
-        unset($libraryCodes['global']);
+        $libraryCodes = [];
+        if (is_array($this->deliveryConfig)) {
+            $libraryCodes = array_keys($this->deliveryConfig); //!!
+            unset($libraryCodes['global']);
+        }
         return $libraryCodes;
     }
 
