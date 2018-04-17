@@ -141,7 +141,7 @@
         <?=$this->record($this->driver)->getFormatList() ?>
 
 		<!-- Module DAIA -->
-        <?=$this->render('RecordDriver/SolrDefault/daia-result-list.phtml'); ?>
+        <?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '1']); ?>
 		<!-- Module DAIA -->
 		
         <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
