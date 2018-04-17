@@ -4,16 +4,28 @@ $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR'). '/config/vufin
 if($paiaConfig['Global']['usePAIA'] == 1) {
 	$isil = $paiaConfig['Global']['isil'];
 	$iln = $paiaConfig['Global']['iln'];
+	$formats = "";
+	$collection_details = array();
+	$ppnlink = "";
+	$marcField951aValue = "";
 	
 	if (method_exists($this->driver, 'getFormats')) {
 		$formats = $this->driver->tryMethod('getFormats');
+	}
+	
+	if (method_exists($this->driver, 'getCollectionDetails')) {
+		$collection_details = $this->driver->tryMethod('getCollectionDetails');
+	}
+	
+	if (method_exists($this->driver, 'getPPNLink')) {
+		$ppnlink = $this->driver->tryMethod('getPPNLink');
 	}
 
 	if (method_exists($this->driver, 'getMarcRecord')) {
 		
 		$field_values = array();
 		$fields = $this->driver->getMarcRecord()->getFields('912');
-		if(!empty($fields)) {
+		if(!empty($fields) && empty($collection_details)) {
 			foreach($fields as $subfield) {
 				foreach($subfield->getSubfields('a') as $subfield_content) {
 					$field_values[] = $subfield_content->getData();
@@ -24,7 +36,7 @@ if($paiaConfig['Global']['usePAIA'] == 1) {
 		
 		$field_values = array();
 		$fields = $this->driver->getMarcRecord()->getFields('773');
-		if(!empty($fields)) {
+		if(!empty($fields) && empty($ppnlink)) {
 			foreach($fields as $subfield) {
 				foreach($subfield->getSubfields('w') as $subfield_content) {
 					$field_values[] = $subfield_content->getData();
