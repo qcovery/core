@@ -2,14 +2,14 @@
 $language = $this->layout()->userLang;
 $ppn = $_GET['ppn'];
 $list = $_GET['list'];
+$openUrl = urldecode($_GET['openurl']);
+$marcField951aValue = urldecode($_GET['marcField951aValue']);
 
 echo '<div id="paia-availability">';
 
 if ($list == 1) {
 	
 	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language);
-	$openUrl = urldecode($_GET['openurl']);
-	$marcField951aValue = urldecode($_GET['marcField951aValue']);
 	
 	if($daiaResults['document'][0]['daiaplus_best_result']) {
 		echo '<div class="delimiter"></div>';
@@ -193,12 +193,12 @@ if ($list == 1) {
 				echo'</table>';
 			echo'</div>';
 			
-			/*echo '<div style="display:none;"><pre>';
+			echo '<div style="display:none;"><pre>';
 				print_r($daiaResults);
 			echo '</pre></div>';
 			echo '<div style="display:none;"><pre>';
 				echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-			echo '</pre></div>';*/
+			echo '</pre></div>';
 		}
 echo '</div>';
 
