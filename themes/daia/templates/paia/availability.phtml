@@ -93,14 +93,15 @@ if ($list == 1) {
 			}
 			
 		}
-		
-		echo '<div style="display:none;"><pre>';
-			print_r($daiaResults);
-		echo '</pre></div>';
-		echo '<div style="display:none;"><pre>';
-			echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-		echo '</pre></div>';
 	}
+
+	echo '<div style="display:none;"><pre>';
+		print_r($daiaResults);
+	echo '</pre></div>';
+	echo '<div style="display:none;"><pre>';
+		echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	echo '</pre></div>';
+	
 } else {
 			$useDaia = urldecode($_GET['usedaia']);
 			echo '<br/>';
