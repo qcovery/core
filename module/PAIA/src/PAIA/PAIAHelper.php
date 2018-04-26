@@ -424,19 +424,15 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 				}
 				
                 $result['daiaplus']['status'] = $status;
-                $result['daiaplus']['status_org'] = $status;
 				$result['daiaplus']['status_style'] = $status_style;
                 $result['daiaplus']['info'] = $info;
                 $result['daiaplus']['info_org'] = $info;
-                $result['daiaplus']['onlineLocationUrl'] = $onlineLocationUrl;
                 $result['daiaplus']['score'] = $score;
                 $result['daiaplus']['label'] = $label;
                 $result['daiaplus']['fulllabel'] = $fulllabel;
                 $result['daiaplus']['department'] = $department;
                 $result['daiaplus']['storage'] = $storage;
-                $result['daiaplus']['storage_org'] = $storage;
 				$result['daiaplus']['storage_additional_info'] = $storage_additional_info;
-				$result['daiaplus']['storage_additional_info_custom'] = '';
                 $result['daiaplus']['showDepartment'] = false;
                 $result['daiaplus']['about'] = $about;
                 $result['daiaplus']['about_org'] = $about;
@@ -455,7 +451,6 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 $result['daiaplus']['status'] = $this->view->translate('daiaNoResult');
                 $result['daiaplus']['status_style'] = 'color: #ff0000; font-weight: bold;';
                 $result['daiaplus']['info'] = '';
-                $result['daiaplus']['onlineLocationUrl'] = '';
                 $result['daiaplus']['score'] = 3;
                 $result['daiaplus']['label'] = '';
                 $result['daiaplus']['fulllabel'] = '';
