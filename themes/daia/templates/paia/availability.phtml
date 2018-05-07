@@ -3,13 +3,14 @@ $language = $this->layout()->userLang;
 $ppn = $_GET['ppn'];
 $list = $_GET['list'];
 $openUrl = urldecode($_GET['openurl']);
+$format = $_GET['format'];
 $marcField951aValue = urldecode($_GET['marcField951aValue']);
 
 echo '<div id="paia-availability">';
 
 if ($list == 1) {
 	
-	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language);
+	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language, $format);
 	
 	if($daiaResults['document'][0]['daiaplus_best_result']) {
 		echo '<div class="delimiter"></div>';
@@ -111,7 +112,7 @@ if ($list == 1) {
 				echo'<table>';
 					echo'<tbody>';
 						if ($useDaia) {
-							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language);
+							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language, $format);
 							if ($key == 'hide') { $foundHidden = true; }
 							if (!empty($daiaResults['document'][0])) {
 								
