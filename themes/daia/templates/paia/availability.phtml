@@ -2,14 +2,15 @@
 $language = $this->layout()->userLang;
 $ppn = $_GET['ppn'];
 $list = $_GET['list'];
+$openUrl = urldecode($_GET['openurl']);
+$format = $_GET['format'];
+$marcField951aValue = urldecode($_GET['marcField951aValue']);
 
 echo '<div id="paia-availability">';
 
 if ($list == 1) {
 	
-	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language);
-	$openUrl = urldecode($_GET['openurl']);
-	$marcField951aValue = urldecode($_GET['marcField951aValue']);
+	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language, $format);
 	
 	if($daiaResults['document'][0]['daiaplus_best_result']) {
 		echo '<div class="delimiter"></div>';
@@ -93,14 +94,15 @@ if ($list == 1) {
 			}
 			
 		}
-		
-		echo '<div style="display:none;"><pre>';
-			print_r($daiaResults);
-		echo '</pre></div>';
-		echo '<div style="display:none;"><pre>';
-			echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-		echo '</pre></div>';
 	}
+
+	echo '<div style="display:none;"><pre>';
+		print_r($daiaResults);
+	echo '</pre></div>';
+	echo '<div style="display:none;"><pre>';
+		echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	echo '</pre></div>';
+	
 } else {
 			$useDaia = urldecode($_GET['usedaia']);
 			echo '<br/>';
@@ -110,7 +112,7 @@ if ($list == 1) {
 				echo'<table>';
 					echo'<tbody>';
 						if ($useDaia) {
-							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language);
+							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language, $format);
 							if ($key == 'hide') { $foundHidden = true; }
 							if (!empty($daiaResults['document'][0])) {
 								
@@ -193,12 +195,12 @@ if ($list == 1) {
 				echo'</table>';
 			echo'</div>';
 			
-			/*echo '<div style="display:none;"><pre>';
+			echo '<div style="display:none;"><pre>';
 				print_r($daiaResults);
 			echo '</pre></div>';
 			echo '<div style="display:none;"><pre>';
 				echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-			echo '</pre></div>';*/
+			echo '</pre></div>';
 		}
 echo '</div>';
 
