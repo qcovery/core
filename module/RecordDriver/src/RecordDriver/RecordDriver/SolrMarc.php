@@ -583,9 +583,9 @@ class SolrMarc extends SolrDefault
     public function getContainingWork()
     {
         $containingWorks = array();
-        $containingWorkFields = $this->marcRecord->getFields('773');
+        $containingWorkFields = $this->getMarcRecord()->getFields('773');
         if (empty($containingWorkFields)) {
-            $containingWorkFields = $this->marcRecord->getFields('800');
+            $containingWorkFields = $this->getMarcRecord()->getFields('800');
             if (empty($containingWorkFields)) {
                 return array();
             }
@@ -594,10 +594,10 @@ class SolrMarc extends SolrDefault
         foreach ($containingWorkFields as $containingWorkField) {
             $containingWork = array();
             if (is_object($containingWorkField->getSubfield('i'))) {
-                $containingWork['prefix'] = $this->prepareData($containingWorkField->getSubfield('i')->getData());
+                $containingWork['prefix'] = $containingWorkField->getSubfield('i')->getData();
             }
             if (is_object($containingWorkField->getSubfield('t'))) {
-                $containingWork['title'] = $this->prepareData($containingWorkField->getSubfield('t')->getData());
+                $containingWork['title'] = $containingWorkField->getSubfield('t')->getData();
             }
             if (is_object($containingWorkField->getSubfield('z'))) {
                 $containingWork['isn'] = substr(strrchr($containingWorkField->getSubfield('z')->getData(), ')'), 1);
