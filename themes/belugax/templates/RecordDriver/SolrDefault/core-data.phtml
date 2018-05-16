@@ -1,5 +1,14 @@
-<? foreach ($this->coreFieldCategories as $category): ?>
-    <? $coreFields = $this->solrDefault()->getCoreFields($this->driver, [$category]); ?>
+<?
+if (empty($this->coreFieldCategories)):
+    $coreFieldList = [$this->solrDefault()->getCoreFields($this->driver, $this->coreFieldCategories)];
+else:
+    $coreFieldList = [];
+    foreach ($this->coreFieldCategories as $category):
+        $coreFieldList[] = $this->solrDefault()->getCoreFields($this->driver, [$category]);
+    endforeach;
+endif;
+?>
+<? foreach ($coreFieldList as $coreFields): ?>
     <? if (!empty($coreFields)): ?>
       <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
         <? foreach ($coreFields as $field => $items): ?>

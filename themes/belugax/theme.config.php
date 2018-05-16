@@ -7,6 +7,7 @@ return [
         'uikit.min.css',
         'compiled.css',
         'belugino.css',
+        'belugax.css',
     ],
     'js' => [
         'jquery.qtip.min.js',

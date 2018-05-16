@@ -81,7 +81,7 @@ class SolrMarc extends \Libraries\RecordDriver\SolrMarc
     {
         return $this->getMarcData('UniversityNotes');
     }
-
+	
     /**
      * Attach an ILS connection and related logic to the driver
      *

@@ -45,10 +45,11 @@
     <?/* Display Main Details */?>
 <!-- Module RecordDriver -->
     <? $coreFieldCategories = ['title2', 'person', 'publication', 'subject', 'description', 'related']; //coreFieldCategory according to category in solrmarc.yaml ?>
+    <? $coreFieldCategories = []; ?>
     <?=$this->render('RecordDriver/SolrDefault/core-data.phtml', ['driver' => $driver, 'coreFieldCategories' => $coreFieldCategories]); ?>
 <!-- Module RecordDriver -->
 <!-- Module DAIA -->
-    <?=$this->render('RecordDriver/SolrDefault/daia-core.phtml'); ?>
+    <?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '0']); ?>
 <!-- Module DAIA -->
 
     <?=$this->context($this)->renderInContext('RecordTab/staffviewmarc', []) ?>
