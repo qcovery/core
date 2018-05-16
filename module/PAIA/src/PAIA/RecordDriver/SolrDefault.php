@@ -52,4 +52,9 @@ class SolrDefault extends \VuFind\RecordDriver\SolrDefault
     public function getCollectionDetails() {
 		return isset($this->fields['collection_details']) ? $this->fields['collection_details'] : array();
     }
+
+    public function getPPNLink() {
+		return isset($this->fields['collection_details']) ? $this->fields['ppnlink'] : array();
+    }
+
 }

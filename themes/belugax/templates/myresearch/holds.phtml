@@ -14,6 +14,14 @@
 
   <?=$this->flashmessages()?>
 
+  <?
+      if (isset($_GET['placeHold'])) {
+          if ($_GET['placeHold'] == 'success') {
+              echo('<div class="message">'.$this->transEsc('placeHoldSuccess').'</div><br/>');
+          }
+      } 
+  ?>
+
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
     
   <?
