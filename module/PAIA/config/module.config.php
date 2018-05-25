@@ -25,9 +25,9 @@ $config = array(
     'vufind' => array(
         'plugin_managers' => array(
             'ils_driver' => array(
-                'invokables' => array(
-                    'paia' => 'PAIA\ILS\Driver\PAIA',
-                ),
+                'factories' => [
+                    'paia' => 'PAIA\ILS\Driver\Factory::getPaia',
+                ],
             ),
             'recorddriver' => array(
                 'factories' => array(
