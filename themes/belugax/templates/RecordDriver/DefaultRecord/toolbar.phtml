@@ -39,4 +39,5 @@
   <? endif; ?>
   <?=$this->render('record/cart-buttons.phtml', ['id' => $this->driver->getUniqueId(), 'source' => $this->driver->getSourceIdentifier()]); ?>
   <?=$this->render('RecordDriver/SolrDefault/delivery-tooltip.phtml'); ?>
+  <li><?=$this->searchMemory()->getLastSearchLink('<i class="bel-antworten"></i> '.$this->transEsc('Back to Search Results'))?></li>
 </ul>
