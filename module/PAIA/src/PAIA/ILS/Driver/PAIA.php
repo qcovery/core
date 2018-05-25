@@ -53,12 +53,37 @@ class PAIA extends AbstractBase
     protected $baseURL;
     protected $paiaConnector;
     protected $paiaConfig;
+    protected $sessionFactory;
+
+    // $sm->getServiceLocator()->get('VuFind\SessionManager');
 
     public function __construct()
     {
        $this->paiaConnector = new PAIAConnector();
        $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-       $this->session = $this->getSession();
+    }
+
+    public function setSessionFactory ($sessionFactory) {
+        $this->sessionFactory = $sessionFactory;
+        $this->session = $this->getSession();
+    }
+
+    /**
+     * Get the session container (constructing it on demand if not already present)
+     *
+     * @return SessionContainer
+     */
+    protected function getSession()
+    {
+        // SessionContainer not defined yet? Build it now:
+        if (null === $this->session) {
+            if (null === $this->session) {
+                $factory = $this->sessionFactory;
+                $this->session = $factory();
+            }
+            return $this->session;
+        }
+        return $this->session;
     }
 
     /**
@@ -590,23 +615,6 @@ class PAIA extends AbstractBase
         $doc = '{"doc":[{"edition":"'.$documentId.'","item":"'.$itemId.'","confirm":{ "http://purl.org/ontology/paia#FeeCondition": ["http://purl.org/ontology/dso#Reservation"] }}]}';
         return $this->paiaConnector->request($patron['id'], $doc, $patron['access_token']);
     }
-
-    /**
-     * Get the session container (constructing it on demand if not already present)
-     *
-     * @return SessionContainer
-     */
-    protected function getSession()
-    {
-        // SessionContainer not defined yet? Build it now:
-        if (null === $this->session) {
-            $this->session = new \Zend\Session\Container(
-                'PAIA', $this->sessionManager
-            );
-        }
-        return $this->session;
-    }
-
 
 
     /**
