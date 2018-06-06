@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search_SolrAlternative
+ * @package  Search_Search2
  * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
@@ -31,10 +31,10 @@ namespace VuFind\Controller;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
- * SolrAlternative Controller
+ * Search2 Controller
  *
  * @category VuFind
- * @package  Search_SolrAlternative
+ * @package  Search_Search2
  * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
