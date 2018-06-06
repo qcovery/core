@@ -27,7 +27,7 @@ $config = [
                 'factories' => [
                     'solr' => 'Libraries\Search\Params\Factory::getSolr',
                     'primo' => 'Libraries\Search\Params\Factory::getPrimo',
-                    'findex' => 'Libraries\Search\Params\Factory::getFindex',
+                    'search2' => 'Libraries\Search\Params\Factory::getSearch2',
                 ],
             ],
             'recorddriver' => [

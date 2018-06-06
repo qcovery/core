@@ -71,16 +71,17 @@ class Factory
     }
 
     /**
-     * Factory for Findex params object.
+     * Factory for Search2 params object.
      *
      * @param ServiceManager $sm Service manager.
      *
-     * @return \VuFind\Search\Findex\Params
+     * @return \VuFind\Search\Search2\Params
      */
-    public static function getFindex(ServiceManager $sm)
+    public static function getSearch2(ServiceManager $sm)
     {
         $factory = new PluginFactory();
+        $helper = $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper');
         $searchMemory = \VuFind\Service\Factory::getSearchMemory($sm->getServiceLocator());
-        return $factory->createServiceWithName($sm, 'findex', 'Findex', [$searchMemory]);
+        return $factory->createServiceWithName($sm, 'search2', 'Search2', [$searchMemory, $helper]);
     }
 }
