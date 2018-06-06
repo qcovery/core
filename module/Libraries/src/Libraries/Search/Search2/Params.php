@@ -29,7 +29,7 @@
 namespace Libraries\Search\Search2;
 
 use Libraries\Libraries;
-use use VuFindSearch\ParamBag;
+use VuFindSearch\ParamBag;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 
 /**
