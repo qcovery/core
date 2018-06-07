@@ -1,3 +1,3 @@
 # core
 
-http://www.beluga-core.de/
+https://www.beluga-core.de/
