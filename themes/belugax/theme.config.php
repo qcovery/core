@@ -17,7 +17,6 @@ return [
     'mixins' => [
         'delivery',
         'libraries',
-        'findex',
         'searchkeys',
         'dependentworks',
         'daia',
