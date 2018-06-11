@@ -52,7 +52,8 @@ class Factory
     {
         $factory = new PluginFactory();
         $helper = $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper');
-        return $factory->createServiceWithName($sm, 'solr', 'Solr', [$helper]);
+        $searchKeysHelper = $sm->getServiceLocator()->get('SearchKeys\SearchKeysHelper');
+        return $factory->createServiceWithName($sm, 'solr', 'Solr', [$helper, $searchKeysHelper]);
     }
 
     /**
@@ -66,20 +67,22 @@ class Factory
     {
         $factory = new PluginFactory();
         $helper = $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper');
-        return $factory->createServiceWithName($sm, 'primo', 'Primo', [$helper]);
+        $searchKeysHelper = $sm->getServiceLocator()->get('SearchKeys\SearchKeysHelper');
+        return $factory->createServiceWithName($sm, 'primo', 'Primo', [$helper, $searchKeysHelper]);
     }
 
     /**
-     * Factory for Findex params object.
+     * Factory for Search2 params object.
      *
      * @param ServiceManager $sm Service manager.
      *
-     * @return \VuFind\Search\Findex\Params
+     * @return \VuFind\Search\Search2\Params
      */
-    public static function getFindex(ServiceManager $sm)
+    public static function getSearch2(ServiceManager $sm)
     {
         $factory = new PluginFactory();
         $helper = $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper');
-        return $factory->createServiceWithName($sm, 'findex', 'Findex', [$helper]);
+        $searchKeysHelper = $sm->getServiceLocator()->get('SearchKeys\SearchKeysHelper');
+        return $factory->createServiceWithName($sm, 'search2', 'Search2', [$helper, $searchKeysHelper]);
     }
 }
