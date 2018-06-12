@@ -79,7 +79,7 @@ class Params extends \VuFind\Search\Search2\Params
         if (empty($request->get('overrideIds', null))) {
             $config = $this->configLoader->get('searchkeys');
             if (isset($this->searchKeysHelper)) {
-                $request = $this->searchKeysHelper->processSearchKeys($request, $this->getOptions(), $config);
+                $request = $this->searchKeysHelper->processSearchKeys($request, $this->getOptions(), $config, 'Search2');
             }
         }
         parent::initSearch($request);

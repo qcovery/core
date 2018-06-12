@@ -23,11 +23,12 @@ class SearchKeysHelper
      *
      * @return \Zend\StdLib\Parameters $request
      */
-    public function processSearchKeys($request, $options, $config)
+    public function processSearchKeys($request, $options, $config, $searchClassId)
     {
-        $keywords = $config->get('keys-solr');
-        $phrasedKeywords = $config->get('phrasedKeys-solr');
-        $toTranslate = $config->get('translate-solr');
+        $id = strtolower($searchClassId);
+        $keywords = $config->get('keys-' . $id);
+        $phrasedKeywords = $config->get('phrasedKeys-' . $id);
+        $toTranslate = $config->get('translate-' . $id);
         $isAdvancedSearch = false;
         $lookfor = $request->get('lookfor');
         if (!empty($lookfor)) {
