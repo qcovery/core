@@ -15,7 +15,7 @@ endif;
             <? if (!empty($items[0])): ?>
           <tr><th><?=$this->transEsc($field)?>:</th><td>
                 <? foreach ($items as $item): ?>
-             <p>
+             <p style="margin:0px">
                     <? foreach ($item as $key => $value): ?>
                         <? if (!is_int($key)): ?>
                             <?=$this->transEsc($key) ?>:

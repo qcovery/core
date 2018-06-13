@@ -54,7 +54,7 @@ class SolrMarc extends SolrDefault
 
     protected $originalLetters;
 
-    protected $category;
+    protected $solrMarcKeys;
 
     /**
      * Constructor
@@ -105,17 +105,24 @@ class SolrMarc extends SolrDefault
      *
      *
      */
-    public function getSolrMarcKeys($category = '')
+    public function getSolrMarcKeys($category = '', $others = true)
     {
         if (empty($this->solrMarcSpecs)) {
             $this->parseSolrMarcSpecs();
         }
-        $solrMarcKeys = array_keys($this->solrMarcSpecs);
+        $specKeys = array_keys($this->solrMarcSpecs);
         if (empty($category)) {
-            return $solrMarcKeys;
+            if ($others) {
+                return $specKeys;
+            } else {
+                $solrMarcKeys = $this->solrMarcKeys;
+                unset($solrMarcKeys['other']);
+                $keys = array_reduce($solrMarcKeys, 'array_merge', []);
+                return array_intersect($keys, $specKeys);
+            }
         } else {
-            if (is_array($this->category[$category])) {
-                return array_intersect($this->category[$category], $solrMarcKeys);
+            if (is_array($this->solrMarcKeys[$category])) {
+                return array_intersect($this->solrMarcKeys[$category], $specKeys);
             } else {
                 return [];
             }
@@ -141,10 +148,10 @@ class SolrMarc extends SolrDefault
             } else {
                 $category = 'other';
             }
-            if (empty($this->category[$category])) {
-                $this->category[$category] = [];
+            if (empty($this->solrMarcKeys[$category])) {
+                $this->solrMarcKeys[$category] = [];
             }
-            $this->category[$category][] = $item;
+            $this->solrMarcKeys[$category][] = $item;
             foreach ($solrMarcSpec as $marcField => $fieldSpec) {
                 $solrMarcSpecs[$item][$marcField] = [];
                 $conditions = $subfields = $parentMethods = $description = [];

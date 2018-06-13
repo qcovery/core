@@ -53,6 +53,7 @@ class PAIA extends AbstractBase
     protected $baseURL;
     protected $paiaConnector;
     protected $paiaConfig;
+    protected $session;
     protected $sessionFactory;
 
     // $sm->getServiceLocator()->get('VuFind\SessionManager');
@@ -76,14 +77,11 @@ class PAIA extends AbstractBase
     protected function getSession()
     {
         // SessionContainer not defined yet? Build it now:
-        if (null === $this->session) {
             if (null === $this->session) {
                 $factory = $this->sessionFactory;
                 $this->session = $factory();
             }
             return $this->session;
-        }
-        return $this->session;
     }
 
     /**
