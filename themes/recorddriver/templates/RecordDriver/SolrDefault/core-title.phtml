@@ -1,8 +1,8 @@
 <? $titleFields = $this->solrDefault()->getCoreFields($this->driver, ['title']); ?>
 <? if (!empty($titleFields['ShortTitle'][0][0])): ?>
     <h3 property="name">
-        <?= (!empty($titleFields['ShortTitle'][0][0])) ? $this->transEsc($titleFields['ShortTitle'][0][0]) . ' ' : '' ?>
-        <?= (!empty($titleFields['SubTitle'][0][0])) ? $this->transEsc($titleFields['SubTitle'][0][0]) . ' ' : '' ?>
+        <?= $this->transEsc($titleFields['ShortTitle'][0][0]) . ' ' ?>
+        <?= (!empty($titleFields['SubTitle'][0][0])) ? ': ' . $this->transEsc($titleFields['SubTitle'][0][0]) . ' ' : '' ?>
         <?= (!empty($titleFields['TitleSection'][0][0])) ? ': ' . $this->transEsc($titleFields['TitleSection'][0][0]) . ' ' : '' ?>
         <?= (!empty($titleFields['TitleSection'][0]['description'])) ? $this->transEsc($titleFields['TitleSection'][0]['description']) . ' ' : '' ?>
         <?= (!empty($titleFields['TitleStatement'][0][0])) ? '/ ' . $this->transEsc($titleFields['TitleStatement'][0][0]) : '' ?>
