@@ -68,24 +68,25 @@ if($paiaConfig['Global']['usePAIA'] == 1) {
 	if (in_array("GBV_ILN_".$iln ,$collection_details, TRUE) && !empty($daiaPPN)) { ?>
 		<div class="daia-availability" data-ppn="<?=$daiaPPN;?>" data-site="<?=$isil?>" data-marcField951aValue="<?=$marcField951aValue?>" data-list="<?=$this->list;?>" data-format="<?=$formats[0]?>"><span class="daia-loading"> <?=$this->transEsc('local_availability_being_determined');?> </span></div>
 	<?
-	} else if ($marcField951aValue == 'MC' || $marcField951aValue == 'ST') { ?>
-	<? if (strpos($_SERVER['REQUEST_URI'], 'SolrFindex') === false) { ?>
+	} else if (($marcField951aValue == 'MC' || $marcField951aValue == 'ST' || $marcField951aValue == 'AI') && $this->list == 1) { ?>
 		<div class="delimiter"></div>
 		<span style="color: #EB8E12; font-weight: bold;"><?=$this->transEsc('check_volume');?></span>
 		➝
 		<strong><a href="<?=$this->recordLink()->getUrl($this->driver);?>#availability"><?=$this->transEsc('go_to_detail_view');?></a></strong>
-	<? } ?>	
-<? }
+	<? }
 
 	if (empty($daiaPPN) && in_array("GBV_ILN_".$iln,$collection_details, TRUE) && in_array('Article', $formats, TRUE)) {
-		
+		if ($this->list == 1) { 
+			echo '<div class="delimiter"></div>'; 
+		} else {
+			echo '<a name="availability"></a>';
+			echo'<b>'.$this->transEsc('holdings_and_availability').'</b><br>';
+		}
 		$containingWorks = $this->driver->tryMethod('getContainingWork');
 		if(!empty($containingWorks[0]['ppn'])){
-			echo '<div class="delimiter"></div>';
 			$record_base_path = substr($this->recordLink()->getUrl($this->driver),0,strrpos($this->recordLink()->getUrl($this->driver),"/")+1);
 			echo '<span style="color: #EB8E12; font-weight: bold;">'.$this->transEsc('print_version_available').'</span> - <a target="_blank" class="uncertain_article_access_level" href="'.$record_base_path.$containingWorks[0]['ppn'].'">'.$this->transEsc('to_journal_series').'</a>';
 		} else {
-			echo '<div class="delimiter"></div>';
 			echo '<span style="color: #EB8E12; font-weight: bold;">'.$this->transEsc('print_version_available').'</span> - '.$this->transEsc('to_journal_series');
 		}
 	}
