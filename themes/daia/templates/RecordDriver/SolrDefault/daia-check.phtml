@@ -44,7 +44,7 @@ if($paiaConfig['Global']['usePAIA'] == 1) {
 				}
 			}
 		}
-		$ppnlink = $field_values[0];
+		$ppnlink = (empty($field_values[0])) ? '' : $field_values[0];
 		$ppnlink = str_replace("(DE-601)","",$ppnlink);
 		
 		$marcField951aValue = "";

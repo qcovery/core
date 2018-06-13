@@ -1,17 +1,46 @@
 <?php
+
 /**
- * Solr aspect of the Search Multi-class (Params)
+ * Search Params for second Solr index
+ *
+ * PHP version 7
+ *
+ * Copyright (C) Staats- und Universitätsbibliothek Hamburg 2018.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * @category SearchKeys
+ * @package  Search_Search2
+ * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
+ * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
+ * @link     https://vufind.org Main Page
+ */
+namespace SearchKeys\Search\Search2;
 
-**/
-
-namespace SearchKeys\Search\Findex;
-
-//use SearchKeys\Search\QueryAdapter;
 use VuFind\Search\QueryAdapter;
 
-class Params extends \VuFind\Search\Findex\Params
+/**
+ * Search Params for second Solr index
+ *
+ * @category VuFind
+ * @package  Search_Search2
+ * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
+ * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
+ * @link     https://vufind.org Main Site
+ */
+class Params extends \VuFind\Search\Search2\Params
 {
-
     /**
      * Initialize the object's search settings from a request object.
      *
@@ -24,12 +53,13 @@ class Params extends \VuFind\Search\Findex\Params
     {
         if (empty($request->get('overrideIds', null))) {
             $config = $this->configLoader->get('searchkeys');
-            $keywords = $config->get('keys-findex');
-            $phrasedKeywords = $config->get('phrasedKeys-findex');
-            $toTranslate = $config->get('translate-findex');
+            $keywords = $config->get('keys-solr');
+            $phrasedKeywords = $config->get('phrasedKeys-solr');
+            $toTranslate = $config->get('translate-solr');
             $isAdvancedSearch = false;
             $lookfor = $request->get('lookfor');
 
+            $lookforArray = [];
             if (!empty($lookfor)) {
                 $lookforArray = array($lookfor);
                 $typeArray = array($request->get('type'));
@@ -153,8 +183,6 @@ class Params extends \VuFind\Search\Findex\Params
      */
     public function getRawQuery()
     {
-        $config = $this->configLoader->get('searchkeys');
-        $translate = $config->get('translate-solr');
         // Build display query:
         $query = QueryAdapter::display($this->getQuery(), NULL, array($this, 'returnIdentic'));
         if (isset($translate)) {
@@ -170,5 +198,3 @@ class Params extends \VuFind\Search\Findex\Params
     }
 
 }
-
-

@@ -26,7 +26,7 @@ class SolrDetails extends \Zend\View\Helper\AbstractHelper
                 }
             }
         } else {
-            foreach ($driver->getSolrMarcKeys() as $solrMarcKey) {
+            foreach ($driver->getSolrMarcKeys([], false) as $solrMarcKey) {
                 $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
             }
         }

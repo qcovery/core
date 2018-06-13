@@ -19,7 +19,7 @@ $config = [
                 'factories' => [
                     'Solr' => 'Libraries\Search\Factory\SolrDefaultBackendFactory',
                     'Primo' => 'Libraries\Search\Factory\PrimoBackendFactory',
-                    'Findex' => 'Libraries\Search\Factory\FindexBackendFactory',
+                    'Search2' => 'Libraries\Search\Factory\Search2BackendFactory',
                 ],
             ],
             'search_params' => [
@@ -27,7 +27,7 @@ $config = [
                 'factories' => [
                     'solr' => 'Libraries\Search\Params\Factory::getSolr',
                     'primo' => 'Libraries\Search\Params\Factory::getPrimo',
-                    'findex' => 'Libraries\Search\Params\Factory::getFindex',
+                    'search2' => 'Libraries\Search\Params\Factory::getSearch2',
                 ],
             ],
             'recorddriver' => [
