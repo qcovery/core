@@ -21,7 +21,7 @@
     <div class="result-body">
       <div>
         <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>">
-          <?=$this->record($this->driver)->getTitleHtml()?>
+          <?=$this->record($this->driver)->getTitleHtml()?> <?=$this->driver->getTitleSection()[0][0]?>
         </a>
       </div>
 
