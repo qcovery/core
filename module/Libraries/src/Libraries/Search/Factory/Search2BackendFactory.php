@@ -30,7 +30,7 @@ namespace Libraries\Search\Factory;
 use Libraries\Backend\Solr\Connector;
 use VuFindSearch\Backend\Solr\HandlerMap;
 
-class FindexBackendFactory extends \Findex\Search\Factory\FindexBackendFactory
+class Search2BackendFactory extends \VuFind\Search\Factory\Search2BackendFactory
 {
     /**
      * Create the SOLR connector.

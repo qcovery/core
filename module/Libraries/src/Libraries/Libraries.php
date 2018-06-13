@@ -81,7 +81,7 @@ class Libraries
         if ($this->checkLibrary($libraryCode)) {
             $validatedLibraryCode = $libraryCode;
         } else {
-            $libraryCode = $_GET['library'];
+            $libraryCode = (isset($_GET['library'])) ? $_GET['library'] : '';
             if ($this->checkLibrary($libraryCode)) {
                 $validatedLibraryCode = $libraryCode;
             } else {
