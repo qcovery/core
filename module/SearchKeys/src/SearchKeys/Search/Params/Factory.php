@@ -52,7 +52,8 @@ class Factory
     {
         $factory = new PluginFactory();
         $helper = $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper');
-        return $factory->createServiceWithName($sm, 'solr', 'Solr', [$helper]);
+        $searchKeysHelper = $sm->getServiceLocator()->get('SearchKeys\SearchKeysHelper');
+        return $factory->createServiceWithName($sm, 'solr', 'Solr', [$helper, $searchKeysHelper]);
     }
 
     /**
@@ -66,7 +67,8 @@ class Factory
     {
         $factory = new PluginFactory();
         $helper = $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper');
-        return $factory->createServiceWithName($sm, 'primo', 'Primo', [$helper]);
+        $searchKeysHelper = $sm->getServiceLocator()->get('SearchKeys\SearchKeysHelper');
+        return $factory->createServiceWithName($sm, 'primo', 'Primo', [$helper, $searchKeysHelper]);
     }
 
     /**
@@ -80,6 +82,7 @@ class Factory
     {
         $factory = new PluginFactory();
         $helper = $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper');
-        return $factory->createServiceWithName($sm, 'search2', 'Search2', [$helper]);
+        $searchKeysHelper = $sm->getServiceLocator()->get('SearchKeys\SearchKeysHelper');
+        return $factory->createServiceWithName($sm, 'search2', 'Search2', [$helper, $searchKeysHelper]);
     }
 }

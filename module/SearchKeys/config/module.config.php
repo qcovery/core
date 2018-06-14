@@ -14,6 +14,11 @@ $config = [
             ],
         ],
     ],
+    'service_manager' => [
+        'invokables' => [
+            'SearchKeys\SearchKeysHelper' => 'SearchKeys\Search\SearchKeysHelper',
+        ],
+    ],
 ];
 
 return $config;
