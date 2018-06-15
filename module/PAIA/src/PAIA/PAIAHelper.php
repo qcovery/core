@@ -51,13 +51,14 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      * @return Array
      */
 	//TODO: Currently only working with DAIAplus Service - DAIAplus Service needs to be set up to conform to DAIA request specifications
-    public function getDaiaResults($ppn, $list = false, $language = 'en', $format) {
+    public function getDaiaResults($ppn, $list = false, $language = 'en', $mediatype) {
 		if(!empty($this->paiaConfig['Global']['isil'])) {
 			$site = $this->paiaConfig['Global']['isil'];
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA']['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&format='.$format;
+		$url_path = $this->paiaConfig['DAIA']['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.$mediatype;
+		echo "<span style='display:none;'>".$url_path."</span>";
 		$daia = file_get_contents($url_path);
         $daiaJson = json_decode($daia, true);
 
@@ -537,8 +538,19 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      * @return Array
      */
 	//TODO: Complete function once external service is available
-	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $requesturi, $list) {
-		return array();
+	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $list, $mediatype, $language) {
+		if(!empty($this->paiaConfig['Global']['isil'])) {
+			$site = $this->paiaConfig['Global']['isil'];
+		} else {
+			$site = 'Default';
+		}
+		//$url_path = $this->paiaConfig['DAIA']['url'].'e-availability'.'?ppn='.$ppn.'&openurl='.urlencode($openUrl).'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.$mediatype;
+		$url_path = $this->paiaConfig['DAIA']['url'].'e-availability'.'?ppn='.$ppn.'&openurl='.urlencode($openUrl).'&url_access='.$url_access.'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.$doi.'&list='.$list.'&mediatype='.$mediatype.'&language='.$language.'&site='.$site.'&format=json';
+		echo "<span style='display:none;'>".$url_path."</span>";
+		$e_availability = file_get_contents($url_path);
+        $e_availability = json_decode($e_availability, true);
+		
+		return $e_availability;
 	}
 }
 

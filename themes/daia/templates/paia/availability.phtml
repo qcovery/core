@@ -3,14 +3,14 @@ $language = $this->layout()->userLang;
 $ppn = $_GET['ppn'];
 $list = $_GET['list'];
 $openUrl = urldecode($_GET['openurl']);
-$format = $_GET['format'];
+$mediatype = $_GET['mediatype'];
 $marcField951aValue = urldecode($_GET['marcField951aValue']);
 
 echo '<div id="paia-availability">';
 
 if ($list == 1) {
 	
-	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language, $format);
+	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language, $mediatype);
 	
 	if($daiaResults['document'][0]['daiaplus_best_result']) {
 		echo '<div class="delimiter"></div>';

@@ -1,8 +1,9 @@
 <div id="electronic-availability">
 <?
 	$list = $_GET['list'];
+	$language = $this->layout()->userLang;
 	
-	$e_availability = $this->paia()->getElectronicAvailability($_GET['ppn'], urldecode($_GET['openurl']), urldecode($_GET['url-access']),$_GET['url-access-level'], $_GET['first-matching-issn'], $_GET['gvklink'],$_GET['doi'],urldecode($_GET['requesturi']), $_GET['list']);
+	$e_availability = $this->paia()->getElectronicAvailability($_GET['ppn'], urldecode($_GET['openurl']), urldecode($_GET['url-access']),$_GET['url-access-level'], $_GET['first-matching-issn'], $_GET['gvklink'],$_GET['doi'], $list, $_GET['mediatype'], $language);
 	
 	echo '<div style="display:none;">';
 		print_r($e_availability);
@@ -12,17 +13,20 @@
 		if($list == 1) {
 			if($e_availability['list']['url_access']) {
 				$url_access = $e_availability['list']['url_access'];
+				if(is_array($url_access)) {
+					$url_access = $url_access[0];
+				}
 				$url_access_level = $e_availability['list']['url_access_level'];
 				$url_access_label = $e_availability['list']['url_access_label'];
 				$doi = $e_availability['list']['doi'];
 				
 				echo '<div class="delimiter"></div>';
-				echo '<h6>';
+				echo '<span>';
 				echo '<a target="_blank" href="'.$url_access.'" class="'.$url_access_level.'">'.$this->transEsc($url_access_label).' '.$this->transEsc($url_access_level).'</a>';
 				if ($doi) { ?>
 					<span class="doi"><?=$doi;?></i>
 				<? }
-				echo '</h6>';
+				echo '</span>';
 			}
 		} else {
 			if(!empty($e_availability['list']['url_access'])) {
@@ -30,6 +34,9 @@
 				foreach ($e_availability['items'] as $link) {
 					if($link['url_access']) {
 						$url_access = $link['url_access'];
+						if(is_array($url_access)) {
+							$url_access = $url_access[0];
+						}
 						$url_access_level = $link['url_access_level'];
 						$url_access_label = $link['url_access_label'];
 						$doi = $link['doi'];
