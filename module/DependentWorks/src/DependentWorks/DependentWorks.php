@@ -64,7 +64,28 @@ class DependentWorks
 
         $dependentWorksData = [];
         foreach ($records as $record) {
-            $dependentWorksData[] = $record->getDependentWorksData();
+            $dependentWorksDate = array();
+            $fields = $record->getRawData();
+            if (!empty($fields['title'])) {
+                $title = $fields['title'];
+            } elseif (!empty($fields['series2'])) {
+                $title = $fields['series2'];
+            } elseif (!empty($fields['series'])) {
+                $title = $fields['series'];
+            }
+            $title = (is_array($title)) ? $title[0] : $title;
+            $publishDate = $fields['publishDate'][0];
+            $format = $fields['format'][0];
+            $id = $fields['id'];
+            $dependentWorksDate = [
+                'id' => $id,
+                'title' => $title,
+                'publishDate' => $publishDate,
+                'format' => $format,
+            ];
+//print_r($fields);
+            $dependentWorksData[] = $dependentWorksDate;
+//            $dependentWorksData[] = $record->getDependentWorksData();
         }
         return $dependentWorksData;
     }
