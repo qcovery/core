@@ -121,7 +121,7 @@ class Libraries
 
     public function getDefaultLibraryCode($searchClassId = null) {
         $codes = [];
-        foreach ($this->defaultLibrariess as $library => $data) {
+        foreach ($this->defaultLibraries as $library => $data) {
             if (empty($searchClassId) || isset($data[$searchClassId])){
                 $codes[] = $data['code'];
             }
