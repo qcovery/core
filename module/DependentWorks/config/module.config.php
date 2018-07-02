@@ -10,7 +10,7 @@ $config = [
     'vufind' => [
         'plugin_managers' => [
             'recorddriver' => [
-                'abstract_factories' => ['DependentWorks\RecordDriver\PluginFactory'],
+                'abstract_factories' => ['VuFind\RecordDriver\PluginFactory'],
                 'factories' => [
                     'solrdefault' => 'DependentWorks\RecordDriver\Factory::getSolrDefault',
                 ],
