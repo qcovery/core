@@ -30,6 +30,7 @@ use Libraries\Libraries;
 use VuFind\Search\QueryAdapter;
 use VuFindSearch\Query\Query;
 use VuFindSearch\ParamBag;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Selector
 {
