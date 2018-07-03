@@ -38,7 +38,7 @@
     $searchIndex = $this->searchIndex;
     $searchType = $this->searchType;
 ?>
-<? $tabConfig = $this->searchTabs()->getTabConfig($this->searchClassId, $this->lookfor, $this->searchIndex, $this->searchType, $hiddenFilters); ?>
+<? $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
   <form id="searchForm" class="searchForm navbar-form navbar-left flip" method="get" action="<?=$this->url($basicSearch)?>" name="searchForm" autocomplete="off">
     <?//= $this->context($this)->renderInContext('search/searchTabs', ['searchTabs' => $tabConfig['tabs']]); ?>
     <? $placeholder = $this->searchbox()->getPlaceholderText(isset($tabConfig['selected']['id']) ? $tabConfig['selected']['id'] : null); ?>
