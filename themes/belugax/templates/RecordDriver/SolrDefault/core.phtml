@@ -52,8 +52,7 @@
     <?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '0']); ?>
 <!-- Module DAIA -->
 <!-- Module DependentWorks -->
-      <table class="table table-striped dependentWorks">
-      </table>
+    <?=$this->render('RecordDriver/SolrDefault/core-dependentworks.phtml'); ?>
 <!-- Module DependentWorks -->
     <?=$this->context($this)->renderInContext('RecordTab/staffviewmarc', []) ?>
   </div>

@@ -19,13 +19,13 @@ jQuery(document).ready(function() {
         data:{ppn:recordId},
         success:function(data, textStatus) {
             if (data.data.length > 0) {
-                jQuery('table.dependentWorks').append('<tr><th>Dependent Works</th><td><ul id="DependentWorks"></ul></td></tr>');
+                jQuery('div#DependentWorks').append('<ul id="DependentWorks"></ul>');
                 for (var i = 0; i < data.data.length; i++) {
                     var title = data.data[i]['title'] + ' (' + data.data[i]['publishDate'] + ')';
                     var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
                     jQuery('ul#DependentWorks').append('<li>' + href + '</li>');                
                 }
-                jQuery('table.table-striped:last').attr('style', 'display:block');
+                jQuery('div#DependentWorks').attr('style', 'display:block');
             }
         }
     });
