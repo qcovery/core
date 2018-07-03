@@ -21,7 +21,7 @@
     <div class="result-body">
       <div>
         <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>">
-          <?=$this->record($this->driver)->getTitleHtml()?>
+          <?=$this->record($this->driver)->getTitleHtml()?> <? if (!empty($this->driver->getTitleSection()[0][0])) { ?> ; <?=$this->driver->getTitleSection()[0][0]?> <? } ?>
         </a>
       </div>
 
@@ -139,17 +139,17 @@
 
       <div class="result-formats">
         <?=$this->record($this->driver)->getFormatList() ?>
-
-		<!-- Module DAIA -->
-        <?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '1']); ?>
-		<!-- Module DAIA -->
-		
-        <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
+      </div>
+	  
+	  <!-- Module DAIA -->
+      <?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '1']); ?>
+	  <!-- Module DAIA -->
+	  
+	  <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
           <span class="status ajax-availability hidden">
             <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
           </span>
-        <? endif; ?>
-      </div>
+      <? endif; ?>
 
       <div class="result-previews">
         <?=$this->record($this->driver)->getPreviews()?>
