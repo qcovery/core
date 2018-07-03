@@ -1,8 +1,9 @@
 <?php
 return [
-    'helpers' => array(
-        'factories' => array(
+    'helpers' => [
+        'factories' => [
             'searchbox' => 'SearchKeys\View\Helper\SearchKeys\Factory::getSearchBox',
-        ),
-    )
+            'searchTabs' => 'SearchKeys\View\Helper\SearchKeys\Factory::getSearchTabs',
+        ],
+    ],
 ];

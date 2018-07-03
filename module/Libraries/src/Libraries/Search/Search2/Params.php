@@ -31,6 +31,7 @@ namespace Libraries\Search\Search2;
 use Libraries\Libraries;
 use VuFindSearch\ParamBag;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
+use SearchKeys\Search\SearchKeysHelper;
 
 /**
  * Search Params for second Solr index
@@ -55,10 +56,11 @@ class Params extends \SearchKeys\Search\Search2\Params
      * @param \VuFind\Config\PluginManager $configLoader Config loader
      */
     public function __construct($options, \VuFind\Config\PluginManager $configLoader,
+        HierarchicalFacetHelper $facetHelper = null,
         \VuFind\Search\Memory $searchMemory,
-        HierarchicalFacetHelper $facetHelper = null
+        SearchKeysHelper $searchKeysHelper
     ) {
-        parent::__construct($options, $configLoader, $facetHelper);
+        parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper);
         $this->Libraries = new Libraries($configLoader, $searchMemory);
     }
 
