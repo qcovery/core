@@ -43,9 +43,9 @@ if($paiaConfig['Global']['usePAIA'] == 1) {
 					break;
 				}
 			}
+			$ppnlink = (empty($field_values[0])) ? '' : $field_values[0];
+			$ppnlink = str_replace("(DE-601)","",$ppnlink);
 		}
-		$ppnlink = (empty($field_values[0])) ? '' : $field_values[0];
-		$ppnlink = str_replace("(DE-601)","",$ppnlink);
 		
 		$marcField951aValue = "";
 		$marcField951 = $this->driver->getMarcRecord()->getField('951');
