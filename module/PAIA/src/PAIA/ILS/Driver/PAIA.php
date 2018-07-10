@@ -295,7 +295,7 @@ class PAIA extends AbstractBase
 		   if (!empty($json_array['doc'])) {
 			  $counter = 0;
 			  foreach ($json_array['doc'] as $doc) {
-				 if (in_array($doc['status'],$status)) {
+				 if (in_array($doc['status'],$status) && isset($doc['item']) && !empty($doc['item'])) {
 					$holdsList[] = array(
                           'location' => $doc['storage'],
                           'create' => $doc['starttime'],
