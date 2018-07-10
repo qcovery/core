@@ -61,6 +61,8 @@
 				echo $e_availability['list']['url_access_label'];
 			}
 		}
+	} else if (!$e_availability && $list != 1 ) {
+		echo $this->transEsc('no_electronic_availability');
 	}
 	
 

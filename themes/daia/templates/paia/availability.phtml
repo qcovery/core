@@ -104,7 +104,13 @@ if ($list == 1) {
 	echo '</pre></div>';
 	
 } else {
-			$useDaia = urldecode($_GET['usedaia']);
+			$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language, $format);
+			if(!empty($daiaResults)) {
+				$useDaia = True;
+			} else {
+				$useDaia = False;
+			}
+			
 			echo '<br/>';
 			echo '<div id="daia_results">';
 				echo '<a name="availability"></a>';
@@ -112,7 +118,6 @@ if ($list == 1) {
 				echo'<table>';
 					echo'<tbody>';
 						if ($useDaia) {
-							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language, $format);
 							if ($key == 'hide') { $foundHidden = true; }
 							if (!empty($daiaResults['document'][0])) {
 								
