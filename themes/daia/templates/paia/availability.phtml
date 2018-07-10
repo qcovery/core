@@ -79,7 +79,7 @@ if ($list == 1) {
 	echo '</pre></div>';
 	
 } else {
-			$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language, $format);
+			$daiaResults =  $this->paia()->getDaiaResults($ppn, 0, $language, $mediatype);
 			if(!empty($daiaResults)) {
 				$useDaia = True;
 			} else {
