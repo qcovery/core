@@ -70,7 +70,7 @@ if ($list == 1) {
 				
 				if ($status != '') {
 					if (strpos($info, 'class=') === false){
-						echo '<span style="'.$daiaplus_best_result['daiaplus']['status_style'].'">'.$this->transEsc($status).'</span>';
+						echo '<span class="'.$daiaplus_best_result['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 					}
 				}
 				
@@ -156,7 +156,7 @@ if ($list == 1) {
 
 													if ($status != '') {
 														if (strpos($info, 'class=') === false){
-															echo'<span style="'.$daiaResult['daiaplus']['status_style'].'">'.$this->transEsc($status).'</span>';
+															echo'<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 														}
 													}
 													
