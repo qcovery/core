@@ -30,6 +30,7 @@ use Libraries\Libraries;
 use VuFind\Search\QueryAdapter;
 use VuFindSearch\Query\Query;
 use VuFindSearch\ParamBag;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Selector
 {
@@ -100,10 +101,8 @@ class Selector
     public function getSelectorData($searchClassId) {
         if ($searchClassId == 'Primo') {
             return $this->getPrimoSelectorData();
-        } elseif ($searchClassId == 'Findex') {
-            return $this->getSolrSelectorData('Findex');
         } else {
-            return $this->getSolrSelectorData();
+            return $this->getSolrSelectorData($searchClassId);
         }
     }
 
@@ -128,11 +127,14 @@ class Selector
         }
         $params->add('included_libraries', $this->Libraries->getLibraryFilters($this->defaultLibraryCode, $searchClassId, true, false));
         $params->add('excluded_libraries', $this->Libraries->getLibraryFilters($this->defaultLibraryCode, $searchClassId, false, false));
-
+//print_r($params->getArrayCopy());
         $searchService = $this->serviceLocator->get('VuFind\Search');
         $result = $searchService->search($searchClassId, $this->selectorQuery, 0, 0, $params);
 
-        $libraryData = array($this->defaultLibraryCode => array_merge(array('count' => $result->getTotal()), $this->Libraries->getLibrary($this->defaultLibraryCode)));
+        $libraryData = array();
+        if (!empty($this->defaultLibraryCode)) {
+            $libraryData = array($this->defaultLibraryCode => array_merge(array('count' => $result->getTotal()), $this->Libraries->getLibrary($this->defaultLibraryCode)));
+        }
 
         $libraryCounts = array();
 
