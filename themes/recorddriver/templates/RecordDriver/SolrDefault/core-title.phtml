@@ -1,8 +1,8 @@
 <? $titleFields = $this->solrDefault()->getCoreFields($this->driver, ['title']); ?>
 <? if (!empty($titleFields['ShortTitle'][0][0])): ?>
     <h3 property="name">
-        <?= $this->transEsc($titleFields['ShortTitle'][0][0]) . ' ' ?>
-        <?= (!empty($titleFields['SubTitle'][0][0])) ? ': ' . $this->transEsc($titleFields['SubTitle'][0][0]) . ' ' : '' ?>
+        <?= (!empty($titleFields['ShortTitle'][0][0])) ? $this->transEsc($titleFields['ShortTitle'][0][0]) . ' ' : '' ?>
+        <?= (!empty($titleFields['SubTitle'][0][0])) ? $this->transEsc($titleFields['SubTitle'][0][0]) . ' ' : '' ?>
         <?= (!empty($titleFields['TitleSection'][0][0])) ? ': ' . $this->transEsc($titleFields['TitleSection'][0][0]) . ' ' : '' ?>
         <?= (!empty($titleFields['TitleSection'][0]['description'])) ? $this->transEsc($titleFields['TitleSection'][0]['description']) . ' ' : '' ?>
         <?= (!empty($titleFields['TitleStatement'][0][0])) ? '/ ' . $this->transEsc($titleFields['TitleStatement'][0][0]) : '' ?>
@@ -11,7 +11,6 @@
 <? if (!empty($titleFields['Summary'][0][0])): ?>
     <? $summary = $titleFields['Summary'][0][0]; ?>
     <p><?=$this->truncate($summary, 300)?></p>
-
     <? if(strlen($summary) > 300): ?>
         <p><a href='<?=$this->recordLink()->getTabUrl($this->driver, 'Description')?>#tabnav'><?=$this->transEsc('Full description')?></a></p>
     <? endif; ?>

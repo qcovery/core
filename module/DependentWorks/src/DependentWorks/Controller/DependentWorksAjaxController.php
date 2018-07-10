@@ -55,6 +55,6 @@ class DependentWorksAjaxController extends AjaxController
             $this->getRequest()->getQuery()
         );
         $dependentWorksData = $dependentWorks->getDependentWorks($id);
-       return $this->output($dependentWorksData, self::STATUS_OK);
+        return $this->output($dependentWorksData, self::STATUS_OK);
     }
 } 
