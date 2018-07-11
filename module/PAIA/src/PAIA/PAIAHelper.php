@@ -140,7 +140,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 }
                 
                 $status = '';
-                $status_style = '';
+                $status_class = '';
                 $info = '';
                 $score = 1000;
                 $label = '';
@@ -181,9 +181,11 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                     } 
 					
 					if ($item->storage->href) {
-                        $storage_additional_info = '<a target="_blank" href="'.$item->storage->href.'">'.$this->view->translate('Hinweise zum Standort').'</a>';
+                        //$storage_additional_info = '<a target="_blank" href="'.$item->storage->href.'">'.$this->view->translate('Hinweise zum Standort').'</a>';
+						$storage_additional_info['href'] = $item->storage->href;
+						$storage_additional_info['content'] = $this->view->translate('Hinweise zum Standort');
                     } else {
-						$storage_additional_info = '';
+						$storage_additional_info = array();
 					}
                 }
                 
@@ -193,7 +195,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
    
                 if ($openaccess->available) {
                     $status = $this->view->translate('online verfügbar');
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 0;
                     if ($openaccess->limitation) {
                         $status .= ' (';
@@ -210,7 +212,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
 						$score = $score + 5;
                     }
                     if ($openaccess->href) {
@@ -218,7 +220,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                     }
                 } else if ($remote->available) {
                     $status = $this->view->translate('online verfügbar');
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 10;
                     if ($remote->limitation) {
                         $status .= ' (';
@@ -235,14 +237,14 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
                         $score = $score + 5;
                     }
                     if ($remote->href) {
                         $info = '<a target="_blank" class="article_access_level" href="'.$remote->href.'">ansehen</a>';
                     }
                 } else if ($loan->available) {
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 20;
                     $status .= $this->view->translate('ausleihbar');
 					
@@ -262,7 +264,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
                         $score = $score + 5;
                     }
                     if (isset($loan->href) && $loan->limitation[0]->id !== 'http://purl.org/ontology/dso#ApprovalRequired') {
@@ -277,7 +279,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                         $info .= $this->view->translate('bitte am Standort entnehmen');
                     }
                 } else if ($presentation->available) {
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 30;
                     $status .= $this->view->translate('vor Ort benutzbar');
                     
@@ -307,7 +309,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
                         $score = $score + 5;
                     }
                     
@@ -320,7 +322,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             } else {
                                 $status = $this->view->translate('ausgeliehen');
                             }
-                            $status_style = 'color: #EB8E12; font-weight: bold;';
+                            $status_class = 'daia_orange';
                             $score = 40;
                             if (isset($loan->queue)) {
                                 $queue = $loan->queue.' '.$this->view->translate('Vormerkung');
@@ -347,7 +349,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                     }
                                 }
                                 $status .= ')';
-                                $status_style = 'color: #EB8E12; font-weight: bold;';
+                                $status_class = 'daia_orange';
                                 $score = $score + 5;
                             }
                         } else if (!$presentation->available && isset($presentation->href)) {
@@ -357,7 +359,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             } else {
                                 $status = $this->view->translate('ausgeliehen');
                             }
-                            $status_style = 'color: #EB8E12; font-weight: bold;';
+                            $status_class = 'daia_orange';
                             $score = 50;
                             if (isset($presentation->queue)) {
                                 $queue = $presentation->queue.' '.$this->view->translate('Vormerkung');
@@ -385,7 +387,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                     }
                                 }
                                 $status .= ')';
-                                $status_style = 'color: #EB8E12; font-weight: bold;';
+                                $status_class = 'daia_orange';
                                 $score = $score + 5;
                             }
                         } else {
@@ -398,7 +400,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 								$score = 100;
 							}
 						
-                            $status_style = 'color: #ff0000; font-weight: bold;';
+                            $status_class = 'daia_red';
                         }
                     } else {
 						
@@ -411,21 +413,17 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 							$score = 100;
 						}
 						
-                        $status_style = 'color: #ff0000; font-weight: bold;';
+                        $status_class = 'daia_red';
                     }
-                    
-                    // *** dev!
-                    //$info .= $info = '<br/><br/><a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'">vormerken dev</a>'; // PAIA
-                    // *** dev!
                 }
 				
-				if(($marcField951aValue == 'MC' || $marcField951aValue == 'ST')&& $status_style == 'color: #ff0000; font-weight: bold;') {
+				if(($marcField951aValue == 'MC' || $marcField951aValue == 'ST')&& $status_class == 'daia_red') {
 					$status = $this->view->translate('please select a volume');
-					$status_style = 'color: #EB8E12; font-weight: bold;';
+					$status_class = 'daia_orange';
 				}
 				
                 $result['daiaplus']['status'] = $status;
-				$result['daiaplus']['status_style'] = $status_style;
+				$result['daiaplus']['status_class'] = $status_class;
                 $result['daiaplus']['info'] = $info;
                 $result['daiaplus']['info_org'] = $info;
                 $result['daiaplus']['score'] = $score;
@@ -450,7 +448,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
             if (isset($daiaJson->message[0]->content)) {
                 $result = array();
                 $result['daiaplus']['status'] = $this->view->translate('daiaNoResult');
-                $result['daiaplus']['status_style'] = 'color: #ff0000; font-weight: bold;';
+                $result['daiaplus']['status_class'] = 'daia_red';
                 $result['daiaplus']['info'] = '';
                 $result['daiaplus']['score'] = 3;
                 $result['daiaplus']['label'] = '';
@@ -458,7 +456,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 $result['daiaplus']['department'] = '';
                 $result['daiaplus']['storage'] = '';
                 $result['daiaplus']['storage_org'] = '';
-				$result['daiaplus']['storage_additional_info'] = '';
+				$result['daiaplus']['storage_additional_info'] = array();
                 $result['daiaplus']['showDepartment'] = false;
                 $result['daiaplus']['about'] = '';
                 $result['daiaplus']['queue'] = '';
