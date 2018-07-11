@@ -145,7 +145,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 $score = 1000;
                 $label = '';
                 $department = '';
-                $storage = '';
+                $storage = array();
                 $about = '';
                 $queue = '';
                 $listMoreLink = false;
@@ -174,10 +174,10 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 
                 if ($item->storage) {
                     if ($item->storage->content) {
-                        $storage = $item->storage->content;
+						$storage['content'] = $item->storage->content;
                     }
                     if ($item->storage->id) {
-                        $storage = '<a target="_blank" href="'.$item->storage->id.'">'.$storage.'</a>';
+						$storage['id'] = $item->storage->id;
                     } 
 					
 					if ($item->storage->href) {
