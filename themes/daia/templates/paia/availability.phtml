@@ -19,6 +19,13 @@ if ($list == 1) {
 		
 			if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
 				$storage = $daiaplus_best_result['daiaplus']['storage'];
+				
+				if($storage['id']) {
+					$storage = '<a href="'.$storage['id'].'" target="_blank">'.$storage['content'].'</a>';
+				} else {
+					$storage = $storage['content'];
+				}
+				
 				$label = $daiaplus_best_result['daiaplus']['label'];
 				
 				if ($marcField951aValue == 'AI') {
@@ -100,6 +107,11 @@ if ($list == 1) {
 									echo'<tr>';
 										echo'<td valign="top">';
 												$storage = $daiaResult['daiaplus']['storage'];
+												if($storage['id']) {
+													$storage = '<a href="'.$storage['id'].'" target="_blank">'.$storage['content'].'</a>';
+												} else {
+													$storage = $storage['content'];
+												}
 												$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info_custom'];
 												if (empty($storage_additional_info)) {
 													$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info'];

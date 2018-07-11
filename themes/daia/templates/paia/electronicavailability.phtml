@@ -31,6 +31,8 @@
 		} else {
 			if(!empty($e_availability['list']['url_access'])) {
 				$access_notification = array();
+				echo '<a name="availability"></a>';
+				echo'<b>'.$this->transEsc('electronic_availability').'</b><br>';
 				foreach ($e_availability['items'] as $link) {
 					if($link['url_access']) {
 						$url_access = $link['url_access'];

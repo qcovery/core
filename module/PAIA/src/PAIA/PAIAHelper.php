@@ -181,7 +181,6 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                     } 
 					
 					if ($item->storage->href) {
-                        //$storage_additional_info = '<a target="_blank" href="'.$item->storage->href.'">'.$this->view->translate('Hinweise zum Standort').'</a>';
 						$storage_additional_info['href'] = $item->storage->href;
 						$storage_additional_info['content'] = $this->view->translate('Hinweise zum Standort');
                     } else {
