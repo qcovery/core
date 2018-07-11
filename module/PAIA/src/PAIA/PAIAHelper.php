@@ -141,7 +141,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 
                 $status = '';
                 $status_class = '';
-                $info = '';
+                $action = '';
                 $score = 1000;
                 $label = '';
                 $department = '';
@@ -215,7 +215,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 						$score = $score + 5;
                     }
                     if ($openaccess->href) {
-                        $info = '<a target="_blank" class="article_access_level" href="'.$openaccess->href.'">'.$this->view->translate('ansehen').'</a>';
+                        $action = '<a target="_blank" class="article_access_level" href="'.$openaccess->href.'">'.$this->view->translate('ansehen').'</a>';
                     }
                 } else if ($remote->available) {
                     $status = $this->view->translate('online verfügbar');
@@ -240,7 +240,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                         $score = $score + 5;
                     }
                     if ($remote->href) {
-                        $info = '<a target="_blank" class="article_access_level" href="'.$remote->href.'">ansehen</a>';
+                        $action = '<a target="_blank" class="article_access_level" href="'.$remote->href.'">ansehen</a>';
                     }
                 } else if ($loan->available) {
                     $status_class = 'daia_green';
@@ -268,14 +268,14 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                     }
                     if (isset($loan->href) && $loan->limitation[0]->id !== 'http://purl.org/ontology/dso#ApprovalRequired') {
                         if (stristr($loan->href, 'action=order')) {
-                            $info .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>';
+                            $action .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>';
                         } else {
-                            $info .= $this->view->translate('bitte am Standort entnehmen');
+                            $action .= $this->view->translate('bitte am Standort entnehmen');
                         }
                     } else if ($loan->limitation[0]->id === 'http://purl.org/ontology/dso#ApprovalRequired') {
-                            $info .= $this->view->translate('inquiry_required_for_approval');
+                            $action .= $this->view->translate('inquiry_required_for_approval');
 					} else {
-                        $info .= $this->view->translate('bitte am Standort entnehmen');
+                        $action .= $this->view->translate('bitte am Standort entnehmen');
                     }
                 } else if ($presentation->available) {
                     $status_class = 'daia_green';
@@ -284,13 +284,13 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                     
                     if (isset($presentation->href)) {
                         if (stristr($presentation->href, 'action=order')) {
-                            $info .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>'; // PAIA
+                            $action .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>'; // PAIA
                         } else {
                             $status = $this->view->translate('online verfügbar');
-                            $info .= '<a target="_blank" class="article_access_level" href="'.$presentation->href.'">'.$this->view->translate('Zum Volltext').'</a>';
+                            $action .= '<a target="_blank" class="article_access_level" href="'.$presentation->href.'">'.$this->view->translate('Zum Volltext').'</a>';
                         }
                     } else {
-                        $info .= $this->view->translate('bitte am Standort entnehmen');
+                        $action .= $this->view->translate('bitte am Standort entnehmen');
                     }
                     
                     if (isset($presentation->limitation)) {
@@ -331,7 +331,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                 $score = $score + $loan->queue;
                             }
                             if (stristr($loan->href, 'action=reserve')) {
-                                $info = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">'.$this->view->translate('vormerken').'</a>'; // PAIA
+                                $action = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">'.$this->view->translate('vormerken').'</a>'; // PAIA
                             }
                             if (isset($loan->limitation)) {
                                 $status .= ' (';
@@ -368,7 +368,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                 $score = $score + $loan->queue;
                             }
                             if (stristr($presentation->href, 'action=reserve')) {
-                                $info = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">vormerken</a>'; // PAIA
+                                $action = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">vormerken</a>'; // PAIA
 
                             }
                             if (isset($presentation->limitation)) {
@@ -423,8 +423,8 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 				
                 $result['daiaplus']['status'] = $status;
 				$result['daiaplus']['status_class'] = $status_class;
-                $result['daiaplus']['info'] = $info;
-                $result['daiaplus']['info_org'] = $info;
+                $result['daiaplus']['action'] = $action;
+                $result['daiaplus']['action_org'] = $action;
                 $result['daiaplus']['score'] = $score;
                 $result['daiaplus']['label'] = $label;
                 $result['daiaplus']['fulllabel'] = $fulllabel;
@@ -448,7 +448,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 $result = array();
                 $result['daiaplus']['status'] = $this->view->translate('daiaNoResult');
                 $result['daiaplus']['status_class'] = 'daia_red';
-                $result['daiaplus']['info'] = '';
+                $result['daiaplus']['action'] = '';
                 $result['daiaplus']['score'] = 3;
                 $result['daiaplus']['label'] = '';
                 $result['daiaplus']['fulllabel'] = '';

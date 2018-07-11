@@ -44,25 +44,25 @@ if ($list == 1) {
 			}
 			
 			$status = $daiaplus_best_result['daiaplus']['status'];
-			$info = $daiaplus_best_result['daiaplus']['info'];
+			$action = $daiaplus_best_result['daiaplus']['action'];
 				
 			if (strpos($openUrl,"genre=journal")) {
-				$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $info);
+				$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $action);
 			} else {
-				$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $info);	
+				$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $action);	
 			}
 			
 			if ($status != '') {
-				if (strpos($info, 'class=') === false){
+				if (strpos($action, 'class=') === false){
 					echo '<span class="'.$daiaplus_best_result['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 				}
 			}
 			
-			if ($info != '') {
-				if (strpos($info, 'class=') === false){
-					echo ' &#10141; <span class="daia_hint">'.$info.'</span>';
+			if ($action != '') {
+				if (strpos($action, 'class=') === false){
+					echo ' &#10141; <span class="daia_hint">'.$action.'</span>';
 				} else {
-					echo $info;
+					echo $action;
 				}
 			}
 		
@@ -134,25 +134,25 @@ if ($list == 1) {
 												}
 												
 													$status = $daiaResult['daiaplus']['status'];
-													$info = $daiaResult['daiaplus']['info'];
+													$action = $daiaResult['daiaplus']['action'];
 														
 													if (strpos($openUrl,"genre=journal")) {
-														$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $info);
+														$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $action);
 													} else {
-														$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $info);	
+														$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $action);	
 													}
 
 													if ($status != '') {
-														if (strpos($info, 'class=') === false){
+														if (strpos($action, 'class=') === false){
 															echo'<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 														}
 													}
 													
-													if ($info != '') {
-														if (strpos($info, 'class=') === false){
-															echo' &#10141; <span class="daia_hint">'.$info.'</span>';
+													if ($action != '') {
+														if (strpos($action, 'class=') === false){
+															echo' &#10141; <span class="daia_hint">'.$action.'</span>';
 														} else {
-															echo $info;
+															echo $action;
 														}
 													}
 												
