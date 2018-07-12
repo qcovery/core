@@ -51,13 +51,14 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      * @return Array
      */
 	//TODO: Currently only working with DAIAplus Service - DAIAplus Service needs to be set up to conform to DAIA request specifications
-    public function getDaiaResults($ppn, $list = false, $language = 'en', $format) {
+    public function getDaiaResults($ppn, $list = 0, $language = 'en', $mediatype) {
 		if(!empty($this->paiaConfig['Global']['isil'])) {
 			$site = $this->paiaConfig['Global']['isil'];
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA']['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&format='.$format;
+		$url_path = $this->paiaConfig['DAIA']['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.$mediatype;
+		echo "<span style='display:none;'>".$url_path."</span>";
 		$daia = file_get_contents($url_path);
         $daiaJson = json_decode($daia, true);
 
@@ -139,12 +140,12 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 }
                 
                 $status = '';
-                $status_style = '';
-                $info = '';
+                $status_class = '';
+                $action = '';
                 $score = 1000;
                 $label = '';
                 $department = '';
-                $storage = '';
+                $storage = array();
                 $about = '';
                 $queue = '';
                 $listMoreLink = false;
@@ -173,16 +174,17 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 
                 if ($item->storage) {
                     if ($item->storage->content) {
-                        $storage = $item->storage->content;
+						$storage['content'] = $item->storage->content;
                     }
                     if ($item->storage->id) {
-                        $storage = '<a target="_blank" href="'.$item->storage->id.'">'.$storage.'</a>';
+						$storage['id'] = $item->storage->id;
                     } 
 					
 					if ($item->storage->href) {
-                        $storage_additional_info = '<a target="_blank" href="'.$item->storage->href.'">'.$this->view->translate('Hinweise zum Standort').'</a>';
+						$storage_additional_info['href'] = $item->storage->href;
+						$storage_additional_info['content'] = $this->view->translate('Hinweise zum Standort');
                     } else {
-						$storage_additional_info = '';
+						$storage_additional_info = array();
 					}
                 }
                 
@@ -192,7 +194,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
    
                 if ($openaccess->available) {
                     $status = $this->view->translate('online verfügbar');
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 0;
                     if ($openaccess->limitation) {
                         $status .= ' (';
@@ -209,15 +211,15 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
 						$score = $score + 5;
                     }
                     if ($openaccess->href) {
-                        $info = '<a target="_blank" class="article_access_level" href="'.$openaccess->href.'">'.$this->view->translate('ansehen').'</a>';
+                        $action = '<a target="_blank" class="article_access_level" href="'.$openaccess->href.'">'.$this->view->translate('ansehen').'</a>';
                     }
                 } else if ($remote->available) {
                     $status = $this->view->translate('online verfügbar');
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 10;
                     if ($remote->limitation) {
                         $status .= ' (';
@@ -234,14 +236,14 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
                         $score = $score + 5;
                     }
                     if ($remote->href) {
-                        $info = '<a target="_blank" class="article_access_level" href="'.$remote->href.'">ansehen</a>';
+                        $action = '<a target="_blank" class="article_access_level" href="'.$remote->href.'">ansehen</a>';
                     }
                 } else if ($loan->available) {
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 20;
                     $status .= $this->view->translate('ausleihbar');
 					
@@ -261,34 +263,34 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
                         $score = $score + 5;
                     }
                     if (isset($loan->href) && $loan->limitation[0]->id !== 'http://purl.org/ontology/dso#ApprovalRequired') {
                         if (stristr($loan->href, 'action=order')) {
-                            $info .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>';
+                            $action .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>';
                         } else {
-                            $info .= $this->view->translate('bitte am Standort entnehmen');
+                            $action .= $this->view->translate('bitte am Standort entnehmen');
                         }
                     } else if ($loan->limitation[0]->id === 'http://purl.org/ontology/dso#ApprovalRequired') {
-                            $info .= $this->view->translate('inquiry_required_for_approval');
+                            $action .= $this->view->translate('inquiry_required_for_approval');
 					} else {
-                        $info .= $this->view->translate('bitte am Standort entnehmen');
+                        $action .= $this->view->translate('bitte am Standort entnehmen');
                     }
                 } else if ($presentation->available) {
-                    $status_style = 'color: #3DA22D; font-weight: bold;';
+                    $status_class = 'daia_green';
                     $score = 30;
                     $status .= $this->view->translate('vor Ort benutzbar');
                     
                     if (isset($presentation->href)) {
                         if (stristr($presentation->href, 'action=order')) {
-                            $info .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>'; // PAIA
+                            $action .= '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=order">'.$this->view->translate('bestellen').'</a>'; // PAIA
                         } else {
                             $status = $this->view->translate('online verfügbar');
-                            $info .= '<a target="_blank" class="article_access_level" href="'.$presentation->href.'">'.$this->view->translate('Zum Volltext').'</a>';
+                            $action .= '<a target="_blank" class="article_access_level" href="'.$presentation->href.'">'.$this->view->translate('Zum Volltext').'</a>';
                         }
                     } else {
-                        $info .= $this->view->translate('bitte am Standort entnehmen');
+                        $action .= $this->view->translate('bitte am Standort entnehmen');
                     }
                     
                     if (isset($presentation->limitation)) {
@@ -306,7 +308,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             }
                         }
                         $status .= ')';
-                        $status_style = 'color: #EB8E12; font-weight: bold;';
+                        $status_class = 'daia_orange';
                         $score = $score + 5;
                     }
                     
@@ -319,7 +321,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             } else {
                                 $status = $this->view->translate('ausgeliehen');
                             }
-                            $status_style = 'color: #EB8E12; font-weight: bold;';
+                            $status_class = 'daia_orange';
                             $score = 40;
                             if (isset($loan->queue)) {
                                 $queue = $loan->queue.' '.$this->view->translate('Vormerkung');
@@ -329,7 +331,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                 $score = $score + $loan->queue;
                             }
                             if (stristr($loan->href, 'action=reserve')) {
-                                $info = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">'.$this->view->translate('vormerken').'</a>'; // PAIA
+                                $action = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">'.$this->view->translate('vormerken').'</a>'; // PAIA
                             }
                             if (isset($loan->limitation)) {
                                 $status .= ' (';
@@ -346,7 +348,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                     }
                                 }
                                 $status .= ')';
-                                $status_style = 'color: #EB8E12; font-weight: bold;';
+                                $status_class = 'daia_orange';
                                 $score = $score + 5;
                             }
                         } else if (!$presentation->available && isset($presentation->href)) {
@@ -356,7 +358,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                             } else {
                                 $status = $this->view->translate('ausgeliehen');
                             }
-                            $status_style = 'color: #EB8E12; font-weight: bold;';
+                            $status_class = 'daia_orange';
                             $score = 50;
                             if (isset($presentation->queue)) {
                                 $queue = $presentation->queue.' '.$this->view->translate('Vormerkung');
@@ -366,7 +368,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                 $score = $score + $loan->queue;
                             }
                             if (stristr($presentation->href, 'action=reserve')) {
-                                $info = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">vormerken</a>'; // PAIA
+                                $action = '<a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall">vormerken</a>'; // PAIA
 
                             }
                             if (isset($presentation->limitation)) {
@@ -384,7 +386,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                                     }
                                 }
                                 $status .= ')';
-                                $status_style = 'color: #EB8E12; font-weight: bold;';
+                                $status_class = 'daia_orange';
                                 $score = $score + 5;
                             }
                         } else {
@@ -397,7 +399,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 								$score = 100;
 							}
 						
-                            $status_style = 'color: #ff0000; font-weight: bold;';
+                            $status_class = 'daia_red';
                         }
                     } else {
 						
@@ -410,23 +412,19 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 							$score = 100;
 						}
 						
-                        $status_style = 'color: #ff0000; font-weight: bold;';
+                        $status_class = 'daia_red';
                     }
-                    
-                    // *** dev!
-                    //$info .= $info = '<br/><br/><a target="_blank" href="/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'">vormerken dev</a>'; // PAIA
-                    // *** dev!
                 }
 				
-				if(($marcField951aValue == 'MC' || $marcField951aValue == 'ST')&& $status_style == 'color: #ff0000; font-weight: bold;') {
+				if(($marcField951aValue == 'MC' || $marcField951aValue == 'ST')&& $status_class == 'daia_red') {
 					$status = $this->view->translate('please select a volume');
-					$status_style = 'color: #EB8E12; font-weight: bold;';
+					$status_class = 'daia_orange';
 				}
 				
                 $result['daiaplus']['status'] = $status;
-				$result['daiaplus']['status_style'] = $status_style;
-                $result['daiaplus']['info'] = $info;
-                $result['daiaplus']['info_org'] = $info;
+				$result['daiaplus']['status_class'] = $status_class;
+                $result['daiaplus']['action'] = $action;
+                $result['daiaplus']['action_org'] = $action;
                 $result['daiaplus']['score'] = $score;
                 $result['daiaplus']['label'] = $label;
                 $result['daiaplus']['fulllabel'] = $fulllabel;
@@ -449,15 +447,15 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
             if (isset($daiaJson->message[0]->content)) {
                 $result = array();
                 $result['daiaplus']['status'] = $this->view->translate('daiaNoResult');
-                $result['daiaplus']['status_style'] = 'color: #ff0000; font-weight: bold;';
-                $result['daiaplus']['info'] = '';
+                $result['daiaplus']['status_class'] = 'daia_red';
+                $result['daiaplus']['action'] = '';
                 $result['daiaplus']['score'] = 3;
                 $result['daiaplus']['label'] = '';
                 $result['daiaplus']['fulllabel'] = '';
                 $result['daiaplus']['department'] = '';
                 $result['daiaplus']['storage'] = '';
                 $result['daiaplus']['storage_org'] = '';
-				$result['daiaplus']['storage_additional_info'] = '';
+				$result['daiaplus']['storage_additional_info'] = array();
                 $result['daiaplus']['showDepartment'] = false;
                 $result['daiaplus']['about'] = '';
                 $result['daiaplus']['queue'] = '';
@@ -537,8 +535,19 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      * @return Array
      */
 	//TODO: Complete function once external service is available
-	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $requesturi, $list) {
-		return array();
+	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $list, $mediatype, $language) {
+		if(!empty($this->paiaConfig['Global']['isil'])) {
+			$site = $this->paiaConfig['Global']['isil'];
+		} else {
+			$site = 'Default';
+		}
+		//$url_path = $this->paiaConfig['DAIA']['url'].'e-availability'.'?ppn='.$ppn.'&openurl='.urlencode($openUrl).'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.$mediatype;
+		$url_path = $this->paiaConfig['DAIA']['url'].'e-availability'.'?ppn='.$ppn.'&openurl='.urlencode($openUrl).'&url_access='.$url_access.'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.$doi.'&list='.$list.'&mediatype='.$mediatype.'&language='.$language.'&site='.$site.'&format=json';
+		echo "<span style='display:none;'>".$url_path."</span>";
+		$e_availability = file_get_contents($url_path);
+        $e_availability = json_decode($e_availability, true);
+		
+		return $e_availability;
 	}
 }
 

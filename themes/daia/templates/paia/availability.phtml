@@ -2,97 +2,80 @@
 $language = $this->layout()->userLang;
 $ppn = $_GET['ppn'];
 $list = $_GET['list'];
-$openUrl = urldecode($_GET['openurl']);
-$format = $_GET['format'];
+$mediatype = $_GET['mediatype'];
 $marcField951aValue = urldecode($_GET['marcField951aValue']);
+
+print_r($_GET);
 
 echo '<div id="paia-availability">';
 
 if ($list == 1) {
 	
-	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language, $format);
+	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language, $mediatype);
 	
 	if($daiaResults['document'][0]['daiaplus_best_result']) {
 		echo '<div class="delimiter"></div>';
 
 		$daiaplus_best_result = $daiaResults['document'][0]['daiaplus_best_result'];
 		
-		if ($_GET['daia'] == 1 || $_GET['daia'] == 2) {
-				$altText = $daiaplus_best_result['daiaplus']['status'];
-				if (!stristr($daiaplus_best_result['daiaplus']['info'], '<a href') && $daiaplus_best_result['daiaplus']['info'] != '') {
-					$labelDisplay = '';
-					if ($daiaplus_best_result['daiaplus']['label'] != '') {
-						$labelDisplay = ' ('.$daiaplus_best_result['daiaplus']['label'].')';
-					}
-					$altText .= ' &#10141; '.$daiaplus_best_result['daiaplus']['info'].$labelDisplay;
-				}
-			echo "<br/>";
-			echo "<br/>";
-			
-			if ($_GET['daia'] == 1) {
-				if ($daiaplus_best_result['daiaplus']['lights'] != '') {
-					echo '<img src="/vufind/themes/belugax/images/IconsAmpel/'.$daiaplus_best_result['daiaplus']['lights'].'" alt="'.$altText.'" title="'.$altText.'" />';
-				}
-			} else if ($_GET['daia'] == 2) {
-				if ($daiaplus_best_result['daiaplus']['lightsPlus'] != '') {
-					echo '<img src="/vufind/themes/belugax/images/IconsAmpelPlus/'.$daiaplus_best_result['daiaplus']['lightsPlus'].'" alt="'.$altText.'" title="'.$altText.'" />';
-				}
-			}
-		} else {
-			
-				if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
-					$storage = $daiaplus_best_result['daiaplus']['storage'];
-					$label = $daiaplus_best_result['daiaplus']['label'];
-					
-					if ($marcField951aValue == 'AI') {
-						$label = $this->transEsc("Containing Work").": ".$label;
-					}
-					
-					if ($daiaplus_best_result['daiaplus']['showDepartment']) {
-						echo $this->transEsc('department').': '.$daiaplus_best_result['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b>';
-					} else {
-						echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b>';
-					}
-				}
+			if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
+				$storage = $daiaplus_best_result['daiaplus']['storage'];
 				
-				if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
-					echo '<br>';
-				}
-				
-				$status = $daiaplus_best_result['daiaplus']['status'];
-				$info = $daiaplus_best_result['daiaplus']['info'];
-					
-				if (strpos($openUrl,"genre=journal")) {
-					$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $info);
+				if($storage['id']) {
+					$storage = '<a href="'.$storage['id'].'" target="_blank">'.$storage['content'].'</a>';
 				} else {
-					$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $info);	
+					$storage = $storage['content'];
 				}
 				
-				if ($status != '') {
-					if (strpos($info, 'class=') === false){
-						echo '<span style="'.$daiaplus_best_result['daiaplus']['status_style'].'">'.$this->transEsc($status).'</span>';
-					}
+				$label = $daiaplus_best_result['daiaplus']['label'];
+				
+				if ($marcField951aValue == 'AI') {
+					$label = $this->transEsc("Containing Work").": ".$label;
 				}
 				
-				if ($info != '') {
-					if (strpos($info, 'class=') === false){
-						echo ' &#10141; <span class="daia_hint">'.$info.'</span>';
-					} else {
-						echo $info;
-					}
+				if ($daiaplus_best_result['daiaplus']['showDepartment']) {
+					echo $this->transEsc('department').': '.$daiaplus_best_result['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b>';
+				} else {
+					echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b>';
 				}
+			}
 			
-			if ($daiaplus_best_result['daiaplus']['access_notification'] != '') {
+			if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
 				echo '<br>';
-				echo '<i class="access_notification">';
-					echo $daiaplus_best_result['daiaplus']['access_notification'];
-				echo '</i>';
 			}
 			
-			if ($daiaplus_best_result['daiaplus']['list_more_link']) {
-					echo '<br><a href="'.$this->recordLink()->getUrl($this->driver).$ppn.'#availability">'.$this->transEsc('additional_copies').'...</a>';
+			$status = $daiaplus_best_result['daiaplus']['status'];
+			$action = $daiaplus_best_result['daiaplus']['action'];
+				
+			if ($mediatype == "Journal" || $mediatype == "eJournal") {
+				$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $action);
+			} else {
+				$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $action);	
 			}
 			
+			if ($status != '') {
+				if (strpos($action, 'class=') === false){
+					echo '<span class="'.$daiaplus_best_result['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
+				}
+			}
+			
+			if ($action != '') {
+				if (strpos($action, 'class=') === false){
+					echo ' &#10141; <span class="daia_action">'.$action.'</span>';
+				} else {
+					echo $action;
+				}
+			}
+		
+		if ($daiaplus_best_result['daiaplus']['access_notification'] != '') {
+			echo '<br>';
+			echo '<i class="access_notification">';
+				echo $daiaplus_best_result['daiaplus']['access_notification'];
+			echo '</i>';
+		}
+		
+		if ($daiaplus_best_result['daiaplus']['list_more_link']) {
+				echo '<br><a href="'.$this->recordLink()->getUrl($this->driver).$ppn.'#availability">'.$this->transEsc('additional_copies').'...</a>';
 		}
 	}
 
@@ -104,7 +87,13 @@ if ($list == 1) {
 	echo '</pre></div>';
 	
 } else {
-			$useDaia = urldecode($_GET['usedaia']);
+			$daiaResults =  $this->paia()->getDaiaResults($ppn, 0, $language, $mediatype);
+			if(!empty($daiaResults)) {
+				$useDaia = True;
+			} else {
+				$useDaia = False;
+			}
+			
 			echo '<br/>';
 			echo '<div id="daia_results">';
 				echo '<a name="availability"></a>';
@@ -112,7 +101,6 @@ if ($list == 1) {
 				echo'<table>';
 					echo'<tbody>';
 						if ($useDaia) {
-							$daiaResults =  $this->paia()->getDaiaResults($ppn, false, $language, $format);
 							if ($key == 'hide') { $foundHidden = true; }
 							if (!empty($daiaResults['document'][0])) {
 								
@@ -120,13 +108,18 @@ if ($list == 1) {
 									echo'<tr>';
 										echo'<td valign="top">';
 												$storage = $daiaResult['daiaplus']['storage'];
+												if($storage['id']) {
+													$storage = '<a href="'.$storage['id'].'" target="_blank">'.$storage['content'].'</a>';
+												} else {
+													$storage = $storage['content'];
+												}
 												$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info_custom'];
 												if (empty($storage_additional_info)) {
 													$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info'];
 												}
+												
 												$about = $daiaResult['daiaplus']['about'];
 												$label = $daiaResult['daiaplus']['label'];
-												$openUrl = urldecode($_GET['openurl']);
 												
 												if ($marcField951aValue == 'AI') {
 													$label = $this->transEsc("Containing Work").": ".$label;
@@ -141,25 +134,25 @@ if ($list == 1) {
 												}
 												
 													$status = $daiaResult['daiaplus']['status'];
-													$info = $daiaResult['daiaplus']['info'];
+													$action = $daiaResult['daiaplus']['action'];
 														
-													if (strpos($openUrl,"genre=journal")) {
-														$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $info);
+													if ($mediatype == "Journal" || $mediatype == "eJournal") {
+														$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("homepage_access_level"), $action);
 													} else {
-														$info = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $info);	
+														$action = str_replace("ansehen", $this->transEsc("Full Text").' '.$this->transEsc("article_access_level"), $action);	
 													}
 
 													if ($status != '') {
-														if (strpos($info, 'class=') === false){
-															echo'<span style="'.$daiaResult['daiaplus']['status_style'].'">'.$this->transEsc($status).'</span>';
+														if (strpos($action, 'class=') === false){
+															echo'<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 														}
 													}
 													
-													if ($info != '') {
-														if (strpos($info, 'class=') === false){
-															echo' &#10141; <span class="daia_hint">'.$info.'</span>';
+													if ($action != '') {
+														if (strpos($action, 'class=') === false){
+															echo' &#10141; <span class="daia_action">'.$action.'</span>';
 														} else {
-															echo $info;
+															echo $action;
 														}
 													}
 												
@@ -168,17 +161,25 @@ if ($list == 1) {
 											}
 											
 											if ($about != '') {
-												if (strpos($openUrl,"genre=journal")) {
+												if ($mediatype == "Journal" || $mediatype == "eJournal") {
 													echo'<br/><strong>'.$this->transEsc('volume_issue').': '.$about.'</strong>';
-												} else if (strpos($openUrl,"genre=book")) {
+												} else if ($mediatype == "Book") {
 													echo'<br/><strong>'.$this->transEsc('Copy').': '.$about.'</strong>';
 												} else {
 													echo'<br/><strong>'.$about.'</strong>';
 												}
 											}
 											
-											if ($storage_additional_info != '') {
-												echo'<strong> / '.$storage_additional_info.'</strong>';
+											if (!empty($storage_additional_info['content'])) {
+												echo '<strong> / ';
+												if (!empty($storage_additional_info['href'])) {
+													echo '<a href="'.$storage_additional_info['href'].'" target="_blank">';
+												}
+												echo $storage_additional_info['content'];
+												if (!empty($storage_additional_info['href'])) {
+													echo '</a>';
+												}
+												echo '</strong>';
 											}
 										echo'</td>';
 									echo'</tr>';

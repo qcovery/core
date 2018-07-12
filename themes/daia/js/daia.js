@@ -2,10 +2,23 @@ $(document).ready(function() {
 	$('.daia-availability').each(function(){
 		var $this = $(this);
         $.ajax({
-			url:'/vufind/PAIA/availability?ppn='+jQuery(this).attr('data-ppn')+'&daia='+jQuery(this).data('daia')+'&openurl='+jQuery(this).data('openurl')+'&marcField951aValue='+jQuery(this).attr('data-marcField951aValue')+'&requesturi='+jQuery(this).data('requesturi')+'&list='+jQuery(this).data('list')+'&usedaia='+jQuery(this).data('usedaia')+'&format='+jQuery(this).data('format'),
+			url:'/vufind/PAIA/availability?ppn='+jQuery(this).attr('data-ppn')+'&marcField951aValue='+jQuery(this).attr('data-marcField951aValue')+'&list='+jQuery(this).data('list')+'&mediatype='+jQuery(this).data('mediatype'),
 			success:function(data) {
 				$this.html(jQuery(data).find('#paia-availability'));
 			}
 		})
     });
+	$('.electronic-availability').each(function(){
+		var $this = $(this);
+        $.ajax({
+			url:'/vufind/PAIA/electronicavailability?ppn='+jQuery(this).attr('data-ppn')+'&site='+jQuery(this).attr('data-site')+'&openurl='+jQuery(this).data('openurl')+'&url-access='+jQuery(this).attr('data-url-access')+'&url_access_level='+jQuery(this).attr('data-url_access_level')+'&first-matching-issn='+jQuery(this).attr('data-first-matching-issn')+'&gvklink='+jQuery(this).attr('data-gvklink')+'&doi='+jQuery(this).attr('data-doi')+'&list='+jQuery(this).data('list')+'&mediatype='+jQuery(this).data('mediatype'),
+			success:function(data) {
+				$this.html(jQuery(data).find('#electronic-availability'));
+			}
+		})
+    });
+
+
+
+
  });
