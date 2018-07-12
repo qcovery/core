@@ -18,7 +18,7 @@ if ($list == 1) {
 
 		$daiaplus_best_result = $daiaResults['document'][0]['daiaplus_best_result'];
 
-		if(in_array($daiaplus_best_result['daiaplus']['action2']['service'],array("loan","presentation"))) {
+		if(empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaplus_best_result['daiaplus']['action']['service'],array("loan","presentation"))) {
 			if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
 				$storage = $daiaplus_best_result['daiaplus']['storage'];
 				
@@ -43,31 +43,31 @@ if ($list == 1) {
 		}
 		
 		$status = $daiaplus_best_result['daiaplus']['status'];
-		$action2 = $daiaplus_best_result['daiaplus']['action2'];
+		$action = $daiaplus_best_result['daiaplus']['action'];
 		
-		if($status != '' && in_array($daiaplus_best_result['daiaplus']['action2']['service'],array("loan","presentation"))) {
+		if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaplus_best_result['daiaplus']['action']['service'],array("loan","presentation")))) {
 			echo '<span class="'.$daiaplus_best_result['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 		}
 		
-		if (!empty($action2)) {
-			if(!empty($action2['generic'])) {
-				$action_href = $action2['generic']['href'];
-				$action_label = $action2['generic']['label'];
-			} else if (!empty($action2['beluga_core'])) {
-				$action_href = $action2['beluga_core']['href'];
-				$action_label = $action2['beluga_core']['label'];
+		if (!empty($action)) {
+			if(!empty($action['generic'])) {
+				$action_href = $action['generic']['href'];
+				$action_label = $action['generic']['label'];
+			} else if (!empty($action['beluga_core'])) {
+				$action_href = $action['beluga_core']['href'];
+				$action_label = $action['beluga_core']['label'];
 			}
 			
-			if($action2['link_status']) {
-				$action_label .= ' '.$this->transEsc($action2['link_status']);
+			if($action['link_status']) {
+				$action_label .= ' '.$this->transEsc($action['link_status']);
 			}
 			
-			if($status != '' && in_array($daiaplus_best_result['daiaplus']['action2']['service'],array("loan","presentation"))) {
+			if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaplus_best_result['daiaplus']['action']['service'],array("loan","presentation")))) {
 				echo ' &#10141;';
 			}
 			echo ' <span class="daia_action">';
 				if($action_href) {
-					echo '<a class="'.$action2['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
+					echo '<a class="'.$action['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
 				} else {
 					echo $action_label;
 				}
@@ -132,7 +132,7 @@ if ($list == 1) {
 											if ($marcField951aValue == 'AI') {
 												$label = $this->transEsc("Containing Work").": ".$label;
 											}
-											if(in_array($daiaResult['daiaplus']['action2']['service'],array("loan","presentation"))) {
+											if(empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation"))) {
 												if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
 													if ($daiaResult['daiaplus']['showDepartment']) {
 														echo $this->transEsc('department').': '.$daiaResult['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br/>';
@@ -143,31 +143,31 @@ if ($list == 1) {
 											}
 											
 											$status = $daiaResult['daiaplus']['status'];
-											$action2 = $daiaResult['daiaplus']['action2'];
+											$action = $daiaResult['daiaplus']['action'];
 											
-											if($status != '' && in_array($daiaResult['daiaplus']['action2']['service'],array("loan","presentation"))) {
+											if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
 												echo '<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 											}
 											
-											if (!empty($action2)) {
-												if(!empty($action2['generic'])) {
-													$action_href = $action2['generic']['href'];
-													$action_label = $action2['generic']['label'];
-												} else if (!empty($action2['beluga_core'])) {
-													$action_href = $action2['beluga_core']['href'];
-													$action_label = $action2['beluga_core']['label'];
+											if (!empty($action)) {
+												if(!empty($action['generic'])) {
+													$action_href = $action['generic']['href'];
+													$action_label = $action['generic']['label'];
+												} else if (!empty($action['beluga_core'])) {
+													$action_href = $action['beluga_core']['href'];
+													$action_label = $action['beluga_core']['label'];
 												}
 												
-												if($action2['link_status']) {
-													$action_label .= ' '.$this->transEsc($action2['link_status']);
+												if($action['link_status']) {
+													$action_label .= ' '.$this->transEsc($action['link_status']);
 												}
 												
-												if($status != '' && in_array($daiaResult['daiaplus']['action2']['service'],array("loan","presentation"))) {
+												if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
 													echo ' &#10141;';
 												}
 												echo ' <span class="daia_action">';
 													if($action_href) {
-														echo '<a class="'.$action2['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
+														echo '<a class="'.$action['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
 													} else {
 														echo $action_label;
 													}
