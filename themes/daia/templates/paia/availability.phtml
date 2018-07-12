@@ -17,7 +17,8 @@ if ($list == 1) {
 		echo '<div class="delimiter"></div>';
 
 		$daiaplus_best_result = $daiaResults['document'][0]['daiaplus_best_result'];
-		
+
+		if(in_array($daiaplus_best_result['daiaplus']['action2']['service'],array("loan","presentation"))) {
 			if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
 				$storage = $daiaplus_best_result['daiaplus']['storage'];
 				
@@ -34,15 +35,12 @@ if ($list == 1) {
 				}
 				
 				if ($daiaplus_best_result['daiaplus']['showDepartment']) {
-					echo $this->transEsc('department').': '.$daiaplus_best_result['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b>';
+					echo $this->transEsc('department').': '.$daiaplus_best_result['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br>';
 				} else {
-					echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b>';
+					echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b><br>';
 				}
 			}
-			
-			if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
-				echo '<br>';
-			}
+		}
 			
 			$status = $daiaplus_best_result['daiaplus']['status'];
 			$action = $daiaplus_best_result['daiaplus']['action'];
@@ -124,12 +122,13 @@ if ($list == 1) {
 												if ($marcField951aValue == 'AI') {
 													$label = $this->transEsc("Containing Work").": ".$label;
 												}
-												
-												if ($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '') {
-													if ($daiaResult['daiaplus']['showDepartment']) {
-														echo $this->transEsc('department').': '.$daiaResult['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br/>';
-													} else {
-														echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b><br/>';
+												if(in_array($daiaResult['daiaplus']['action2']['service'],array("loan","presentation"))) {
+													if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
+														if ($daiaResult['daiaplus']['showDepartment']) {
+															echo $this->transEsc('department').': '.$daiaResult['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br/>';
+														} else {
+															echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b><br/>';
+														}
 													}
 												}
 												
