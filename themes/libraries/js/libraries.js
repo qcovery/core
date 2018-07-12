@@ -62,6 +62,8 @@ jQuery(document).ready(function() {
         var locationTemplate = jQuery('div#location-list').html();
         jQuery('div#library-list').html('');
         jQuery('div#location-list').html('');
+        jQuery('div#side-panel-library').attr('style', 'display:none');
+        jQuery('div#side-panel-location').attr('style', 'display:none');
         if (typeof(queryString) != "undefined" && typeof(searchClass) != "undefined") {
             queryString = queryString.substring(1, queryString.length - 1);
             var backendUrl = resolveBackend(searchClass, true);
@@ -71,18 +73,23 @@ jQuery(document).ready(function() {
                 data:{querystring:queryString, searchclass:searchClass},
                 success:function(data, textStatus) {
                     var newQueryString;
-                    jQuery.each(data.data.libraryData, function(thisLibraryCode, libraryData) {
-                        newQueryString = queryString.replace(/&library=.+$/, '');
-                        jQuery('div#library-list').append(libraryTemplate);
-                        jQuery('div#library-list .library-item-count').last().before(libraryData.fullname);
-                        jQuery('div#library-list .library-item-count').last().html(formatNumber(libraryData.count));
-                        if (searchClass == "Primo" && libraryData.primo == undefined) {
-                            jQuery('div#library-list .library-item').last().attr('href', '#');
-                        } else {
-                            jQuery('div#library-list .library-item').last().attr('href', '/vufind' + backendUrl + newQueryString + '&library=' + thisLibraryCode);
-                        }
-                    });
-                    jQuery('div#library-list-title').attr('style', 'block');
+                    var libraryCount = Object.keys(data.data.libraryData).length;
+                    if (libraryCount > 1) {
+                        jQuery.each(data.data.libraryData, function(thisLibraryCode, libraryData) {
+                            newQueryString = queryString.replace(/&library=.+$/, '');
+                            jQuery('div#library-list').append(libraryTemplate);
+                            jQuery('div#library-list .library-item-count').last().before(libraryData.fullname);
+                            jQuery('div#library-list .library-item-count').last().html(formatNumber(libraryData.count));
+                            if (searchClass == "Primo" && libraryData.primo == undefined) {
+                                jQuery('div#library-list .library-item').last().attr('href', '#');
+                            } else {
+                                jQuery('div#library-list .library-item').last().attr('href', '/vufind' + backendUrl + newQueryString + '&library=' + thisLibraryCode);
+                            }
+                        });
+                        jQuery('div#side-panel-library').attr('style', 'display:block');
+                    } else {
+                        jQuery('div#side-panel-library').remove();
+                    }
                     if (typeof(data.data.locationFilter) == "object") {
                         if (data.data.locationFilter.value != '' && data.data.locationFilter.value != null) {
                             var queryStringItems = queryString.split('&');
@@ -93,12 +100,12 @@ jQuery(document).ready(function() {
                                 }
                             }
                             jQuery('div#location-list').append(locationTemplate);
-                            jQuery('div#location-list .location-item').last().html(data.data.locationFilter.value);
-                            jQuery('div#location-list .location-item').last().attr('href', '/vufind' + backendUrl + newQueryString);
-                            jQuery('div#location-list-title').attr('class', 'list-group-item title');
-                            jQuery('div#side-collapse-location').attr('class', 'collapse in');
-                            jQuery('div#side-collapse-location').attr('aria-expanded', 'true');
-                            jQuery('div#location-list-title').attr('style', 'block');
+                            //jQuery('div#location-list .location-item').last().html(data.data.locationFilter.value);
+                            //jQuery('div#location-list .location-item').last().attr('href', '/vufind' + backendUrl + newQueryString);
+                            //jQuery('div#location-list-title').attr('class', 'list-group-item title');
+                            //jQuery('div#side-collapse-location').attr('class', 'collapse in');
+                            //jQuery('div#side-collapse-location').attr('aria-expanded', 'true');
+                            jQuery('div#side-panel-location').attr('style', 'display:block');
                         } else if (data.data.locationFacets != '') {
                             jQuery.each(data.data.locationFacets, function(locationName, locationData) {
                                 var filter = encodeURI(locationData.filter);
@@ -107,10 +114,12 @@ jQuery(document).ready(function() {
                                 jQuery('div#location-list .location-item-count').last().html(formatNumber(locationData.count));
                                 jQuery('div#location-list .location-item').last().attr('href', '/vufind' + backendUrl + queryString + '&filter[]=' + filter);
                             });
-                            jQuery('div#location-list-title').attr('style', 'block');
+                            jQuery('div#side-panel-location').attr('style', 'display:block');
                         } else {
                             jQuery('div#side-panel-location').remove();
                         }
+                    } else {
+                        jQuery('div#side-panel-location').remove();
                     }
                 }
             });

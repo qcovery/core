@@ -1,5 +1,4 @@
 <?
-  $options = $this->searchOptions($this->searchClassId);
   $params = $this->searchParams($this->searchClassId);
   $Libraries = $params->getLibraries();
   $selectedLibrary = $Libraries->selectLibrary();
@@ -30,24 +29,17 @@
       <div class="list-group facet" id="side-panel-library">
           <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Select library")?><i class="bel-pfeil-u01"></i></button>
           <div uk-dropdown>
-              <ul class="uk-nav uk-dropdown-nav">
-                  <? foreach($libraryList as $library => $data): ?>
-                      <? $disabled = (empty($data['solr'])) ? ' disabled' : ''; ?>
-                      <? if ($selectedLibrary['code'] == $library): ?>
-                          <li class="uk-active"><strong><?=$this->transEsc($data['fullname']) ?></strong></li>
-                      <? else: ?>
-                          <li><a href="<?=$this->currentPath().$results->getUrlQuery()?>&library=<?=$library ?>"><?=$this->transEsc($data['fullname']) ?></a></li>
-                      <? endif; ?>
-                  <? endforeach; ?>
-              </ul>
+              <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchclass='<?=$searchClassId ?>'>
+                  <a href="" class="list-group-item facetAND library-item"><span class="badge library-item-count"></span></a>
+              </div>
           </div>
       </div>
       <div class="list-group facet" id="side-panel-location">
           <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Location")?><i class="bel-pfeil-u01"></i></button>
           <div uk-dropdown>
-              <ul class="uk-nav uk-dropdown-nav">
-                  <li>...</li>
-              </ul>
+              <div id="location-list">
+                  <a href="" class="list-group-item facetAND location-item"><span class="badge location-item-count"></span></a>
+              </div>
           </div>
       </div>
     </div>
