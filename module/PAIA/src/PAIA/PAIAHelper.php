@@ -19,12 +19,10 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
    protected $serviceLocator;
 
    protected $paiaConfig;
-   protected $ftcheckConfig;
    
    public function __construct()
    {
         $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-		$this->ftcheckConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/fulltext-availability-check.ini'), true);
    }
 
    /**
