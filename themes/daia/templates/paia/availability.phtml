@@ -5,223 +5,148 @@ $list = $_GET['list'];
 $mediatype = $_GET['mediatype'];
 $marcField951aValue = urldecode($_GET['marcField951aValue']);
 
-print_r($_GET);
-
 echo '<div id="paia-availability">';
-
 if ($list == 1) {
-	
-	$daiaResults =  $this->paia()->getDaiaResults($ppn, true, $language, $mediatype);
-	
+	$daiaResults_org =  $this->paia()->getDaiaResults($ppn, true, $language, $mediatype);
 	if($daiaResults['document'][0]['daiaplus_best_result']) {
 		echo '<div class="delimiter"></div>';
-
-		$daiaplus_best_result = $daiaResults['document'][0]['daiaplus_best_result'];
-
-		if(empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaplus_best_result['daiaplus']['action']['service'],array("loan","presentation"))) {
-			if ($daiaplus_best_result['daiaplus']['department'] != '' || $daiaplus_best_result['daiaplus']['storage'] != '' || $daiaplus_best_result['daiaplus']['label'] != '') {
-				$storage = $daiaplus_best_result['daiaplus']['storage'];
-				
-				if($storage['id']) {
-					$storage = '<a href="'.$storage['id'].'" target="_blank">'.$storage['content'].'</a>';
-				} else {
-					$storage = $storage['content'];
-				}
-				
-				$label = $daiaplus_best_result['daiaplus']['label'];
-				
-				if ($marcField951aValue == 'AI') {
-					$label = $this->transEsc("Containing Work").": ".$label;
-				}
-				
-				if ($daiaplus_best_result['daiaplus']['showDepartment']) {
-					echo $this->transEsc('department').': '.$daiaplus_best_result['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br>';
-				} else {
-					echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b><br>';
-				}
-			}
-		}
-		
-		$status = $daiaplus_best_result['daiaplus']['status'];
-		$action = $daiaplus_best_result['daiaplus']['action'];
-		
-		if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaplus_best_result['daiaplus']['action']['service'],array("loan","presentation")))) {
-			echo '<span class="'.$daiaplus_best_result['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
-		}
-		
-		if (!empty($action)) {
-			if(!empty($action['generic'])) {
-				$action_href = $action['generic']['href'];
-				$action_label = $action['generic']['label'];
-			} else if (!empty($action['beluga_core'])) {
-				$action_href = $action['beluga_core']['href'];
-				$action_label = $action['beluga_core']['label'];
-			}
-			
-			if($action['link_status']) {
-				$action_label .= ' '.$this->transEsc($action['link_status']);
-			}
-			
-			if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaplus_best_result['daiaplus']['action']['service'],array("loan","presentation")))) {
-				echo ' &#10141;';
-			}
-			echo ' <span class="daia_action">';
-				if($action_href) {
-					echo '<a class="'.$action['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
-				} else {
-					echo $action_label;
-				}
-			echo '</span>';
-		}
+	}
+	$daiaResults['document'][0]['item'][] = $daiaResults_org['document'][0]['daiaplus_best_result'];
+} else {
+	$daiaResults_org =  $this->paia()->getDaiaResults($ppn, false, $language, $mediatype);
+	if(!empty($daiaResults_org)) {
+		$useDaia = True;
+		$daiaResults = $daiaResults_org;
+	} else {
+		$useDaia = False;
+	}
 	
-		if ($daiaplus_best_result['daiaplus']['access_notification'] != '') {
-			echo '<br>';
-			echo '<i class="access_notification">';
-				echo $daiaplus_best_result['daiaplus']['access_notification'];
-			echo '</i>';
-		}
-		
-		if ($daiaplus_best_result['daiaplus']['list_more_link']) {
-				echo '<br><a href="'.$this->recordLink()->getUrl($this->driver).$ppn.'#availability">'.$this->transEsc('additional_copies').'...</a>';
+	echo '<div id="daia_results">';
+	echo '<a name="availability"></a>';
+	echo'<b>'.$this->transEsc('holdings_and_availability').'</b>';
+	echo'<table>';
+		echo'<tbody>';
+	if($useDaia == false) {
+			echo'<tr>';
+				echo'<td valign="top">';
+					echo $this->transEsc('please select a volume');
+				echo'</td>';
+			echo'</tr>';
+	}
+	
+}
+
+foreach ($daiaResults['document'][0]['item'] as $daiaResult) {
+	
+	if($list != 1) {
+		echo'<tr>';
+			echo'<td valign="top">';
+	}
+	
+	$storage = $daiaResult['daiaplus']['storage'];
+	if($storage['id']) {
+		$storage = '<a href="'.$storage['id'].'" target="_blank">'.$storage['content'].'</a>';
+	} else {
+		$storage = $storage['content'];
+	}
+	$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info_custom'];
+	if (empty($storage_additional_info)) {
+		$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info'];
+	}
+	
+	$about = $daiaResult['daiaplus']['about'];
+	$label = $daiaResult['daiaplus']['label'];
+	
+	if ($marcField951aValue == 'AI') {
+		$label = $this->transEsc("Containing Work").": ".$label;
+	}
+	if(empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation"))) {
+		if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
+			if ($daiaResult['daiaplus']['showDepartment']) {
+				echo $this->transEsc('department').': '.$daiaResult['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br/>';
+			} else {
+				echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b><br/>';
+			}
 		}
 	}
-
-	echo '<div style="display:none;"><pre>';
-		print_r($daiaResults);
-	echo '</pre></div>';
-	echo '<div style="display:none;"><pre>';
-		echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-	echo '</pre></div>';
 	
-} else {
-			$daiaResults =  $this->paia()->getDaiaResults($ppn, 0, $language, $mediatype);
-			if(!empty($daiaResults)) {
-				$useDaia = True;
-			} else {
-				$useDaia = False;
-			}
-			
-			echo '<br/>';
-			echo '<div id="daia_results">';
-				echo '<a name="availability"></a>';
-				echo'<b>'.$this->transEsc('holdings_and_availability').'</b>';
-				echo'<table>';
-					echo'<tbody>';
-						if ($useDaia) {
-							if ($key == 'hide') { $foundHidden = true; }
-							if (!empty($daiaResults['document'][0])) {
-								
-								foreach ($daiaResults['document'][0]['item'] as $daiaResult) {
-									echo'<tr>';
-										echo'<td valign="top">';
-										
-											$storage = $daiaResult['daiaplus']['storage'];
-											if($storage['id']) {
-												$storage = '<a href="'.$storage['id'].'" target="_blank">'.$storage['content'].'</a>';
-											} else {
-												$storage = $storage['content'];
-											}
-											$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info_custom'];
-											if (empty($storage_additional_info)) {
-												$storage_additional_info = $daiaResult['daiaplus']['storage_additional_info'];
-											}
-											
-											$about = $daiaResult['daiaplus']['about'];
-											$label = $daiaResult['daiaplus']['label'];
-											
-											if ($marcField951aValue == 'AI') {
-												$label = $this->transEsc("Containing Work").": ".$label;
-											}
-											if(empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation"))) {
-												if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
-													if ($daiaResult['daiaplus']['showDepartment']) {
-														echo $this->transEsc('department').': '.$daiaResult['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br/>';
-													} else {
-														echo $this->transEsc('department').': '.$storage.' <b>'.$label.'</b><br/>';
-													}
-												}
-											}
-											
-											$status = $daiaResult['daiaplus']['status'];
-											$action = $daiaResult['daiaplus']['action'];
-											
-											if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
-												echo '<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
-											}
-											
-											if (!empty($action)) {
-												if(!empty($action['generic'])) {
-													$action_href = $action['generic']['href'];
-													$action_label = $action['generic']['label'];
-												} else if (!empty($action['beluga_core'])) {
-													$action_href = $action['beluga_core']['href'];
-													$action_label = $action['beluga_core']['label'];
-												}
-												
-												if($action['link_status']) {
-													$action_label .= ' '.$this->transEsc($action['link_status']);
-												}
-												
-												if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
-													echo ' &#10141;';
-												}
-												echo ' <span class="daia_action">';
-													if($action_href) {
-														echo '<a class="'.$action['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
-													} else {
-														echo $action_label;
-													}
-												echo '</span>';
-											}
-
-											if ($daiaResult['daiaplus']['queue'] != '') {
-												echo'<br/>'.$daiaResult['daiaplus']['queue'];
-											}
-											
-											if ($about != '') {
-												if ($mediatype == "Journal" || $mediatype == "eJournal") {
-													echo'<br/><strong>'.$this->transEsc('volume_issue').': '.$about.'</strong>';
-												} else if ($mediatype == "Book") {
-													echo'<br/><strong>'.$this->transEsc('Copy').': '.$about.'</strong>';
-												} else {
-													echo'<br/><strong>'.$about.'</strong>';
-												}
-											}
-											
-											if (!empty($storage_additional_info['content'])) {
-												echo '<strong> / ';
-												if (!empty($storage_additional_info['href'])) {
-													echo '<a href="'.$storage_additional_info['href'].'" target="_blank">';
-												}
-												echo $storage_additional_info['content'];
-												if (!empty($storage_additional_info['href'])) {
-													echo '</a>';
-												}
-												echo '</strong>';
-											}
-										echo'</td>';
-									echo'</tr>';
-								}
-							}
-						} else {
-							echo'<tr>';
-								echo'<td valign="top">';
-									echo $this->transEsc('please select a volume');
-								echo'</td>';
-							echo'</tr>';
-						}
-					echo'</tbody>';
-				echo'</table>';
-			echo'</div>';
-			
-			echo '<div style="display:none;"><pre>';
-				print_r($daiaResults);
-			echo '</pre></div>';
-			echo '<div style="display:none;"><pre>';
-				echo json_encode($daiaResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-			echo '</pre></div>';
+	$status = $daiaResult['daiaplus']['status'];
+	$action = $daiaResult['daiaplus']['action'];
+	
+	if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
+		echo '<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
+	}
+	
+	if (!empty($action)) {
+		if(!empty($action['generic'])) {
+			$action_href = $action['generic']['href'];
+			$action_label = $action['generic']['label'];
+		} else if (!empty($action['beluga_core'])) {
+			$action_href = $action['beluga_core']['href'];
+			$action_label = $action['beluga_core']['label'];
 		}
+		
+		if($action['link_status']) {
+			$action_label .= ' '.$this->transEsc($action['link_status']);
+		}
+		
+		if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
+			echo ' &#10141;';
+		}
+		echo ' <span class="daia_action">';
+			if($action_href) {
+				echo '<a class="'.$action['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
+			} else {
+				echo $action_label;
+			}
+		echo '</span>';
+	}
+
+	if($list == 1) {
+		if ($daiaResult['daiaplus']['list_more_link']) {
+			echo '<br><a href="'.$this->recordLink()->getUrl($this->driver).$ppn.'#availability">'.$this->transEsc('additional_copies').'...</a>';
+		}
+	} else {
+		if ($daiaResult['daiaplus']['queue'] != '') {
+			echo'<br/>'.$daiaResult['daiaplus']['queue'];
+		}
+		
+		if ($about != '') {
+			if ($mediatype == "Journal" || $mediatype == "eJournal") {
+				echo'<br/><strong>'.$this->transEsc('volume_issue').': '.$about.'</strong>';
+			} else if ($mediatype == "Book") {
+				echo'<br/><strong>'.$this->transEsc('Copy').': '.$about.'</strong>';
+			} else {
+				echo'<br/><strong>'.$about.'</strong>';
+			}
+		}
+		
+		if (!empty($storage_additional_info['content'])) {
+			echo '<strong> / ';
+			if (!empty($storage_additional_info['href'])) {
+				echo '<a href="'.$storage_additional_info['href'].'" target="_blank">';
+			}
+			echo $storage_additional_info['content'];
+			if (!empty($storage_additional_info['href'])) {
+				echo '</a>';
+			}
+			echo '</strong>';
+		}
+			echo'</td>';
+		echo'</tr>';
+	}
+}
+
+if ($list != 1) {
+		echo'</tbody>';
+	echo'</table>';
+echo'</div>';
+}
+
+echo '<div style="display:none;"><pre>';
+	print_r($daiaResults_org);
+echo '</pre></div>';
+echo '<div style="display:none;"><pre>';
+	echo json_encode($daiaResults_org, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+echo '</pre></div>';
 echo '</div>';
-
-
-
