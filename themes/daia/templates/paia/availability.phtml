@@ -8,7 +8,7 @@ $marcField951aValue = urldecode($_GET['marcField951aValue']);
 echo '<div id="paia-availability">';
 if ($list == 1) {
 	$daiaResults_org =  $this->paia()->getDaiaResults($ppn, true, $language, $mediatype);
-	if($daiaResults['document'][0]['daiaplus_best_result']) {
+	if($daiaResults_org['document'][0]['daiaplus_best_result']) {
 		echo '<div class="delimiter"></div>';
 	}
 	$daiaResults['document'][0]['item'][] = $daiaResults_org['document'][0]['daiaplus_best_result'];

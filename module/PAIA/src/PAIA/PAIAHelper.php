@@ -180,7 +180,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 					
 					if ($item->storage->href) {
 						$storage_additional_info['href'] = $item->storage->href;
-						$storage_additional_info['content'] = $this->view->translate('Hinweise zum Standort');
+						$storage_additional_info['content'] = $this->view->translate('location_hints');
                     } else {
 						$storage_additional_info = array();
 					}
@@ -191,7 +191,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 }
    
                 if ($openaccess->available) {
-                    $status = $this->view->translate('online verfügbar');
+                    $status = $this->view->translate('Get full text');
                     $status_class = 'daia_green';
                     $score = 0;
                     if ($openaccess->limitation) {
@@ -222,7 +222,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 						$action['beluga_core']['label'] = $this->view->translate('Get full text');
                     }
                 } else if ($remote->available) {
-                    $status = $this->view->translate('online verfügbar');
+                    $status = $this->view->translate('Get full text');
                     $status_class = 'daia_green';
                     $score = 10;
                     if ($remote->limitation) {
@@ -255,7 +255,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 } else if ($loan->available) {
                     $status_class = 'daia_green';
                     $score = 20;
-                    $status .= $this->view->translate('ausleihbar');
+                    $status .= $this->view->translate('lendable');
 					
 					
                     if (isset($loan->limitation)) {
@@ -304,7 +304,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                 } else if ($presentation->available) {
                     $status_class = 'daia_green';
                     $score = 30;
-                    $status .= $this->view->translate('vor Ort benutzbar');
+                    $status .= $this->view->translate('presentation');
                     
                     if (isset($presentation->href)) {
                         if (stristr($presentation->href, 'action=order')) {
@@ -355,17 +355,17 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                         if (isset($loan->href)) {
                             if (isset($loan->expected)) {
                                 $parsedExpected = date_parse($loan->expected);
-                                $status = $this->view->translate('ausgeliehen bis').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
+                                $status = $this->view->translate('on_loan_until').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
                             } else {
-                                $status = $this->view->translate('ausgeliehen');
+                                $status = $this->view->translate('on_loan');
                             }
                             $status_class = 'daia_orange';
                             $score = 40;
                             if (isset($loan->queue)) {
-                                $queue = $loan->queue.' '.$this->view->translate('Vormerkung');
-                                if ($loan->queue != 1) {
-                                    $queue .= $this->view->translate('Vormerkungen_plural_suffix');
-                                }
+								$queue = $loan->queue.' '.$this->view->translate('Recall');
+								if ($loan->queue != 1) {
+									$queue = $loan->queue.' '.$this->view->translate('Recalls');
+								}
                                 $score = $score + $loan->queue;
                             }
                             if (stristr($loan->href, 'action=reserve')) {
@@ -397,17 +397,17 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                         } else if (!$presentation->available && isset($presentation->href)) {
                             if (isset($presentation->expected)) {
                                 $parsedExpected = date_parse($presentation->expected);
-                                $status = $this->view->translate('ausgeliehen bis').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
+                                $status = $this->view->translate('on_loan_until').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
                             } else {
-                                $status = $this->view->translate('ausgeliehen');
+                                $status = $this->view->translate('on_loan');
                             }
                             $status_class = 'daia_orange';
                             $score = 50;
                             if (isset($presentation->queue)) {
-                                $queue = $presentation->queue.' '.$this->view->translate('Vormerkung');
-                                if ($presentation->queue != 1) {
-                                    $queue .= $this->view->translate('Vormerkungen_plural_suffix');
-                                }
+								$queue = $loan->queue.' '.$this->view->translate('Recall');
+								if ($loan->queue != 1) {
+									$queue = $loan->queue.' '.$this->view->translate('Recalls');
+								}
                                 $score = $score + $loan->queue;
                             }
                             if (stristr($presentation->href, 'action=reserve')) {
@@ -416,7 +416,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 								$action['documentId'] = $documentId;
 								$action['itemId'] = $itemId;
 								$action['beluga_core']['href'] = '/vufind/MyResearch/PlaceHold?documentId='.urlencode($documentId).'&itemId='.urlencode($itemId).'&type=recall';
-								$action['beluga_core']['label'] = translate('recall');
+								$action['beluga_core']['label'] = $this->view->translate('recall');
                             }
                             if (isset($presentation->limitation)) {
                                 $status .= ' (';
@@ -439,10 +439,10 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
                         } else {
 							if (isset($presentation->expected)) {
 								$parsedExpected = date_parse($presentation->expected);
-								$status = $this->view->translate('derzeit nicht verfügbar, verfügbar ab').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
+								$status = $this->view->translate('not_available_until').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
 								$score = 90;
 							} else {
-								$status = $this->view->translate('derzeit nicht verfügbar');
+								$status = $this->view->translate('not_available');
 								$score = 100;
 							}
 						
@@ -452,10 +452,10 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 						
 						if (isset($loan->expected)) {
 							$parsedExpected = date_parse($loan->expected);
-							$status = $this->view->translate('derzeit nicht verfügbar, verfügbar ab').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
+							$status = $this->view->translate('not_available_until').' '.$parsedExpected['day'].'.'.$parsedExpected['month'].'.'.$parsedExpected['year'];
 							$score = 90;
 						} else {
-							$status = $this->view->translate('derzeit nicht verfügbar');
+							$status = $this->view->translate('not_available');
 							$score = 100;
 						}
 						
