@@ -55,11 +55,11 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA']['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.$mediatype;
+		$url_path = $this->paiaConfig['DAIA']['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.urlencode($mediatype);
 		echo "<span style='display:none;'>".$url_path."</span>";
 		$daia = file_get_contents($url_path);
         $daiaJson = json_decode($daia, true);
-
+		
 		if ($daiaJson['document'][0]['item']['daiaplus'] || $daiaJson['document'][0]['daiaplus_best_result']) {
 			return $daiaJson;
 		}
