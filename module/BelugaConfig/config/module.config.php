@@ -2,6 +2,7 @@
 namespace BelugaConfig\Module\Configuration;
 
 $config = [
+/*
     'vufind' => [
         'recorddriver_tabs' => [
             'VuFind\RecordDriver\Primo' => [
@@ -18,6 +19,8 @@ $config = [
             ],
         ],
     ],
+*/
+/*
     'controllers' => [
         'factories' => [
             'BelugaConfig\Controller\AjaxController' => 'BelugaConfig\Controller\Factory::getAjaxController',
@@ -27,6 +30,7 @@ $config = [
             'ajax' => 'BelugaConfig\Controller\AjaxController',
         ],
     ],
+*/
 ];
 
 return $config;
