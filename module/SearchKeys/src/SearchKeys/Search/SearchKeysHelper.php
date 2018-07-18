@@ -66,6 +66,7 @@ class SearchKeysHelper
                     $lookfor = preg_replace('/\\'.$translateFrom.'/', '{'.$translateTo.'}', $lookfor);
                 }
             }
+			
             while (!empty($lookfor) && $limit-- > 0) {
                 $itemFound = false;
                 foreach ($phrasedKeywords as $keyword => $searchtype) {
@@ -85,6 +86,7 @@ class SearchKeysHelper
                 foreach ($keywords as $keyword => $searchtype) {
                     $searchname = $options->getHumanReadableFieldName($searchtype);
                     $keyRegex = '(('.$keyword.'\s)|('.$searchtype.':)|('.$searchname.':))';
+					
                     if (preg_match('#^'.$keyRegex.'([^"\s]+|("[^"]+"))((?=\s)|(?=$))#', $lookfor, $matches)) {
                         $newLookfor = $matches[5];
                         $foundKey = $matches[1];
@@ -103,8 +105,7 @@ class SearchKeysHelper
                         if ($newLookfor == 'OR') {
                             $searchBoolean = array($newLookfor);
                         } else {
-                            $searchItems[] = $newLookfor;
-                            $searchTypes[] = $options->getDefaultHandler();
+                            $searchItems[] = array_pop($searchItems).' '.$newLookfor;
                             $itemFound = true;
                         }
                     }
