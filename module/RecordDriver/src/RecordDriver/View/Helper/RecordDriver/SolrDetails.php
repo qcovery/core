@@ -4,7 +4,9 @@
  */
 namespace RecordDriver\View\Helper\RecordDriver;
 
-class SolrDetails extends \Zend\View\Helper\AbstractHelper
+use Zend\View\Helper\AbstractHelper;
+
+class SolrDetails extends AbstractHelper
 {
     /**
      *

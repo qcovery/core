@@ -1,10 +1,10 @@
 <?
 if (empty($this->coreFieldCategories)):
-    $coreFieldList = [$this->solrDefault()->getCoreFields($this->driver, $this->coreFieldCategories)];
+    $coreFieldList = [$this->solrDetails()->getCoreFields($this->driver, $this->coreFieldCategories)];
 else:
     $coreFieldList = [];
     foreach ($this->coreFieldCategories as $category):
-        $coreFieldList[] = $this->solrDefault()->getCoreFields($this->driver, [$category]);
+        $coreFieldList[] = $this->solrDetails()->getCoreFields($this->driver, [$category]);
     endforeach;
 endif;
 ?>

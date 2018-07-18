@@ -2,7 +2,10 @@
 return [
     'helpers' => [
         'factories' => [
-            'solrdefault' => 'RecordDriver\View\Helper\RecordDriver\Factory::getSolrDetails',
+            'RecordDriver\View\Helper\RecordDriver\SolrDetails' => 'RecordDriver\View\Helper\RecordDriver\SolrDetailsFactory',
+        ],
+        'aliases' => [
+            'solrdetails' => 'RecordDriver\View\Helper\RecordDriver\SolrDetails',
         ]
     ]
 ];

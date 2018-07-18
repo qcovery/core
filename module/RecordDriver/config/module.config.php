@@ -2,14 +2,15 @@
 namespace RecordDriver\Module\Configuration;
 
 $config = [
-    'vufind' => [
-        'plugin_managers' => [
+    'service_manager' => [
+        'allow_override' => true,
+        'factories' => [
             'recorddriver' => [
-                'abstract_factories' => ['VuFind\RecordDriver\PluginFactory'],
-                'factories' => [
-                    'solrmarc' => 'RecordDriver\RecordDriver\Factory::getSolrMarc',
-                ],
+                'RecordDriver\RecordDriver\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
             ],
+        ],
+        'aliases' => [
+            'RecordDriver\RecordDriverPluginManager' => 'RecordDriver\RecordDriver\PluginManager',
         ],
     ],
 ];
