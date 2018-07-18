@@ -60,7 +60,7 @@ foreach ($daiaResults['document'][0]['item'] as $daiaResult) {
 	if ($marcField951aValue == 'AI') {
 		$label = $this->transEsc("Containing Work").": ".$label;
 	}
-	if(empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation"))) {
+	if(empty($daiaResult['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation"))) {
 		if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
 			if ($daiaResult['daiaplus']['showDepartment']) {
 				echo $this->transEsc('department').': '.$daiaResult['daiaplus']['department'].' - '.$storage.' <b>'.$label.'</b><br/>';
@@ -73,7 +73,7 @@ foreach ($daiaResults['document'][0]['item'] as $daiaResult) {
 	$status = $daiaResult['daiaplus']['status'];
 	$action = $daiaResult['daiaplus']['action'];
 	
-	if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
+	if($status != '' && (empty($daiaResult['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
 		echo '<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
 	}
 	
@@ -90,7 +90,7 @@ foreach ($daiaResults['document'][0]['item'] as $daiaResult) {
 			$action_label .= ' '.$this->transEsc($action['link_status']);
 		}
 		
-		if($status != '' && (empty($daiaplus_best_result['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
+		if($status != '' && (empty($daiaResult['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
 			echo ' &#10141;';
 		}
 		echo ' <span class="daia_action">';
