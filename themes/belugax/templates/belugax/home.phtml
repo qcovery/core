@@ -1,9 +1,12 @@
 <? $catalogs = []; ?>
-<? foreach ($this->configreader()->getConfigData('Home') as $source): ?>
-    <? if (is_a($source, 'Zend\Config\Config')): ?>
-        <? $catalogs[] = $source; ?>
-    <? endif; ?>
-<? endforeach; ?>
+
+<? if (!empty($this->configreader()->getConfigData('Home'))): ?>
+    <? foreach ($this->configreader()->getConfigData('Home') as $source): ?>
+        <? if (is_a($source, 'Zend\Config\Config')): ?>
+            <? $catalogs[] = $source; ?>
+        <? endif; ?>
+    <? endforeach; ?>
+<? endif; ?>
 
 <div id="beluga-home-content" class="uk-flex-center" uk-grid>
     <div class="uk-width-1-2">
