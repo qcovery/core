@@ -28,8 +28,6 @@
  */
 namespace VuFind\Search\Factory;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
-
 /**
  * Factory for a second Solr backend
  *
@@ -47,33 +45,7 @@ class Search2BackendFactory extends SolrDefaultBackendFactory
     public function __construct()
     {
         parent::__construct();
-        $this->searchConfig = 'Search2';
-    }
-
-    /**
-     * Create the backend.
-     *
-     * @param ServiceLocatorInterface $serviceLocator Superior service manager
-     *
-     * @return BackendInterface
-     */
-    public function createService(ServiceLocatorInterface $serviceLocator)
-    {
-        $backend = parent::createService($serviceLocator);
-        $this->searchConfig = 'Search2';
-        return $backend;
-    }
-
-    /**
-     * Get the Solr URL.
-     *
-     * @param string $config name of configuration file
-     *
-     * @return string|array
-     */
-    protected function getSolrUrl($config = '')
-    {
-        return parent::getSolrUrl(empty($config) ? $this->searchConfig : $config);
+        $this->mainConfig = $this->searchConfig = $this->facetConfig = 'Search2';
+        $this->searchYaml = 'searchspecs2.yaml';
     }
 }
-

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SolrAlternative Controller
+ * Search2 Controller
  *
  * PHP version 7
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search_Search2
+ * @package  Controller
  * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
@@ -34,12 +34,12 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  * Search2 Controller
  *
  * @category VuFind
- * @package  Search_Search2
+ * @package  Controller
  * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class Search2Controller extends AbstractSearch
+class Search2Controller extends AbstractSolrSearch
 {
     /**
      * Constructor
@@ -65,4 +65,3 @@ class Search2Controller extends AbstractSearch
             && $config->Record->next_prev_navigation;
     }
 }
-
