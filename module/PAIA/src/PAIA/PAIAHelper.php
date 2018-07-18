@@ -596,6 +596,92 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		
 		return $e_availability;
 	}
+	
+	public function getContext($driver){
+		
+		$formats = "";
+		$collection_details = array();
+		$ppnlink = "";
+		$marcField951aValue = "";
+		$context_array = array();
+		$doi = "";
+		
+		if (method_exists($driver, 'getFormats')) {
+			$formats = $driver->tryMethod('getFormats');
+		}
+		
+		if (method_exists($driver, 'getCollectionDetails')) {
+			$collection_details = $driver->tryMethod('getCollectionDetails');
+		}
+		
+		if (method_exists($driver, 'getPPNLink')) {
+			$ppnlink = $driver->tryMethod('getPPNLink');
+		}
+
+		if (method_exists($driver, 'getMarcRecord')) {
+			
+			$field_values = array();
+			$fields = $driver->getMarcRecord()->getFields('912');
+			if(!empty($fields) && empty($collection_details)) {
+				foreach($fields as $subfield) {
+					foreach($subfield->getSubfields('a') as $subfield_content) {
+						$field_values[] = $subfield_content->getData();
+					}
+				}
+			}
+			$collection_details = $field_values;
+			
+			$field_values = array();
+			$fields = $driver->getMarcRecord()->getFields('773');
+			if(!empty($fields) && empty($ppnlink)) {
+				foreach($fields as $subfield) {
+					foreach($subfield->getSubfields('w') as $subfield_content) {
+						$field_values[] = $subfield_content->getData();
+						break;
+					}
+				}
+				$ppnlink = (empty($field_values[0])) ? '' : $field_values[0];
+				$ppnlink = str_replace("(DE-601)","",$ppnlink);
+			}
+			
+			$marcField951aValue = "";
+			$marcField951 = $driver->getMarcRecord()->getField('951');
+			if(!empty($marcField951)) {
+				$marcField951aValue = $marcField951->getSubfield('a')->getData();
+			}
+				
+			$field_values = array();
+			$fields = $driver->getMarcRecord()->getFields('024');
+			if(!empty($fields) && empty($doi)) {
+				foreach($fields as $field) {
+					if(strpos($field,"_2doi") == true) {
+						$doi = $field->getSubfield('a')->getData();
+						break;
+					}
+				}
+			}
+		}
+			
+		$daiaPPN = '';
+		if ($marcField951aValue == 'MC' || $marcField951aValue == 'ST') {
+			$daiaPPN = '';
+		} else if ($marcField951aValue == 'AI' && !empty($ppnlink)) {
+			$daiaPPN = $ppnlink;
+		} else if (empty($daiaPPN) && in_array('Article', $formats, TRUE)) {
+			$daiaPPN = "";
+		} else 	{
+			$daiaPPN = $driver->getUniqueID();
+		}
+		
+		$context_array['daiaPPN'] = $daiaPPN;
+		$context_array['formats'] = $formats;
+		$context_array['collection_details'] = $collection_details;
+		$context_array['ppnlink'] = $ppnlink;
+		$context_array['marcField951aValue'] = $marcField951aValue;
+		$context_array['doi'] = $doi;
+		
+		return $context_array;
+	}
 }
 
 ?>
