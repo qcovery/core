@@ -36,7 +36,8 @@ namespace RecordDriver\RecordDriver;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
-class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
+//class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
+class PluginManager extends \VuFind\RecordDriver\PluginManager
 {
     /**
      * Default plugin aliases.
@@ -124,7 +125,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         // we are building a brand new object.
         $this->sharedByDefault = false;
 
-        $this->addAbstractFactory('VuFind\RecordDriver\PluginFactory');
+        $this->addAbstractFactory('RecordDriver\RecordDriver\PluginFactory');
 
         parent::__construct($configOrContainerInstance, $v3config);
 

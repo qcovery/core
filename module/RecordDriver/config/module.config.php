@@ -6,7 +6,7 @@ $config = [
         'allow_override' => true,
         'factories' => [
             'recorddriver' => [
-                'RecordDriver\RecordDriver\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
+                'RecordDriver\RecordDriver\PluginManager' => 'RecordDriver\ServiceManager\AbstractPluginManagerFactory',
             ],
         ],
         'aliases' => [

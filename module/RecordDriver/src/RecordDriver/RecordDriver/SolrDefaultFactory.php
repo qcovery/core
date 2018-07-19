@@ -28,7 +28,7 @@
 namespace RecordDriver\RecordDriver;
 
 use Interop\Container\ContainerInterface;
-use VuFind\RecordDriver\SolrDefaultWithoutSearchServiceFactory;
+//use VuFind\RecordDriver\SolrDefaultWithoutSearchServiceFactory;
 
 /**
  * Factory for SolrDefault record drivers.

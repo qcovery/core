@@ -5,20 +5,14 @@
 namespace RecordDriver\View\Helper\RecordDriver;
 
 use Zend\View\Helper\AbstractHelper;
+use RecordDriver\RecordDriver\SolrMarc as RecordDriver;
 
 class SolrDetails extends AbstractHelper
 {
     /**
      *
      */
-    public function __construct()
-    {
-    }
-
-    /**
-     *
-     */
-    public function getCoreFields($driver, $categories = [])
+    public function getCoreFields(RecordDriver $driver, $categories = [])
     {
         $solrMarcData = [];
         if (!empty($categories)) {
