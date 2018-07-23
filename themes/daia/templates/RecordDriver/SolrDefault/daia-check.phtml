@@ -93,7 +93,7 @@ if($paiaConfig['Global']['usePAIA'] == 1) {
 	<? } ?>
 	
 	<? if (!in_array("GBV_ILN_".$iln,$collection_details, TRUE) || in_array("Article",$formats,true)){ ?>
-		<div class="electronic-availability" data-ppn="<?=$this->driver->getUniqueID();?>" data-site="<?=$isil?>" data-openurl="<?=urlencode($this->driver->tryMethod('getOpenURL'));?>" data-url-access="<?=urlencode($url_access);?>" data-url-access-level="<?=$url_access_level;?>" data-first-matching-issn="" data-gvklink="<?=$GVKlink;?>" data-doi="<?=$doi;?>" data-list="<?=$this->list;?>" data-mediatype="<?=$formats[0]?>"><span class="daia-loading"> <?=$this->transEsc('ft_availability_being_determined');?></span></div>
+		<div class="electronic-availability" data-ppn="<?=$this->driver->getUniqueID();?>" data-site="<?=$isil?>" data-openurl="<?=urlencode($this->driver->tryMethod('getOpenURL'));?>" data-first-matching-issn="" data-doi="<?=$doi;?>" data-list="<?=$this->list;?>" data-mediatype="<?=$formats[0]?>"><span class="daia-loading"> <?=$this->transEsc('ft_availability_being_determined');?></span></div>
 	<? } ?>
 
 	<?if (empty($daiaPPN) && in_array("GBV_ILN_".$iln,$collection_details, TRUE) && in_array('Article', $formats, TRUE)) {
