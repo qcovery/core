@@ -29,11 +29,8 @@ class SearchBox extends \VuFind\View\Helper\Root\SearchBox
     public function __construct(OptionsManager $optionsManager, $config = [],
         $searchkeysConfig = [], $placeholders = [], $alphabrowseConfig = []
     ) {
-        $this->optionsManager = $optionsManager;
-        $this->config = $config;
         $this->searchkeysConfig = $searchkeysConfig;
-        $this->alphabrowseConfig = $alphabrowseConfig;
-        $this->placeholders = $placeholders;
+        parent::__construct($optionsManager, $config, $placeholders, $alphabrowseConfig);
     }
 
     public function getHandlers($activeSearchClass, $activeHandler)

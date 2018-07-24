@@ -2,6 +2,7 @@
 namespace SearchKeys\Module\Configuration;
 
 $config = [
+/*
     'vufind' => [
         'plugin_managers' => [
             'search_params' => [
@@ -14,9 +15,15 @@ $config = [
             ],
         ],
     ],
+*/
     'service_manager' => [
-        'invokables' => [
-            'SearchKeys\SearchKeysHelper' => 'SearchKeys\Search\SearchKeysHelper',
+        'allow_override' => true,
+        'factories' => [
+            'SearchKeys\Search\Params\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
+//            'SearchKeys\Search\SearchKeysHelper' => 'SearchKeys\Search\SearchKeysHelperFactory',
+        ],
+        'aliases' => [
+            'SearchKeys\SearchParamsPluginManager' => 'SearchKeys\Search\Params\PluginManager',
         ],
     ],
 ];

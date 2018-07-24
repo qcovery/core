@@ -27,7 +27,7 @@
  */
 namespace Libraries\Search\Params;
 
-class PluginFactory extends \VuFind\Search\Params\PluginFactory
+class PluginFactory extends \SearchKeys\Search\Params\PluginFactory
 {
     /**
      * Constructor
