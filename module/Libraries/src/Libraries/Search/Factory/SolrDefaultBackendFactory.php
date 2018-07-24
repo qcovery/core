@@ -30,7 +30,7 @@ namespace Libraries\Search\Factory;
 use Libraries\Backend\Solr\Connector;
 use VuFindSearch\Backend\Solr\HandlerMap;
 
-class SolrDefaultBackendFactory extends \VuFind\Search\Factory\SolrDefaultBackendFactory
+class SolrDefaultBackendFactory extends \RecordDriver\Search\Factory\SolrDefaultBackendFactory
 {
     /**
      * Create the SOLR connector.

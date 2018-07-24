@@ -121,73 +121,7 @@ class PluginManager extends \VuFind\RecordDriver\PluginManager
     public function __construct($configOrContainerInstance = null,
         array $v3config = []
     ) {
-        // These objects are not meant to be shared -- every time we retrieve one,
-        // we are building a brand new object.
-        $this->sharedByDefault = false;
-
         $this->addAbstractFactory('RecordDriver\RecordDriver\PluginFactory');
-
         parent::__construct($configOrContainerInstance, $v3config);
-
-        // Add an initializer for setting up hierarchies
-        $initializer = function ($sm, $instance) {
-            $hasHierarchyType = is_callable([$instance, 'getHierarchyType']);
-            if ($hasHierarchyType
-                && is_callable([$instance, 'setHierarchyDriverManager'])
-            ) {
-                if ($sm && $sm->has('VuFind\Hierarchy\Driver\PluginManager')) {
-                    $instance->setHierarchyDriverManager(
-                        $sm->get('VuFind\Hierarchy\Driver\PluginManager')
-                    );
-                }
-            }
-        };
-        $this->addInitializer($initializer, false);
-    }
-
-    /**
-     * Return the name of the base class or interface that plug-ins must conform
-     * to.
-     *
-     * @return string
-     */
-    protected function getExpectedInterface()
-    {
-        return 'VuFind\RecordDriver\AbstractBase';
-    }
-
-    /**
-     * Convenience method to retrieve a populated Solr record driver.
-     *
-     * @param array  $data             Raw Solr data
-     * @param string $keyPrefix        Record class name prefix
-     * @param string $defaultKeySuffix Default key suffix
-     *
-     * @return AbstractBase
-     */
-    public function getSolrRecord($data, $keyPrefix = 'Solr',
-        $defaultKeySuffix = 'Default'
-    ) {
-        $key = $keyPrefix . ucwords(
-            $data['record_format'] ?? $data['recordtype'] ?? $defaultKeySuffix
-        );
-        $recordType = $this->has($key) ? $key : $keyPrefix . $defaultKeySuffix;
-
-        // Build the object:
-        $driver = $this->get($recordType);
-        $driver->setRawData($data);
-        return $driver;
-    }
-
-    /**
-     * Convenience method to retrieve a populated Solr authority record driver.
-     *
-     * @param array $data Raw Solr data
-     *
-     * @return AbstractBase
-     */
-    public function getSolrAuthRecord($data)
-    {
-        return $this->getSolrRecord($data, 'SolrAuth');
     }
 }
