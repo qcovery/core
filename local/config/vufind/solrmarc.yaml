@@ -34,7 +34,9 @@ WorkTitle:
     a:
       - [name, person]
     c:
-      - [name, 
+      - [name, titles]
+    d:
+      - [name, dates] 
 OtherTitles:
   category: title
   246:
