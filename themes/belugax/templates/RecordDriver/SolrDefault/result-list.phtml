@@ -21,7 +21,14 @@
     <div class="result-body">
       <div>
         <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>">
-          <?=$this->record($this->driver)->getTitleHtml()?> <? if (!empty($this->driver->getTitleSection()[0][0])) { ?> ; <?=$this->driver->getTitleSection()[0][0]?> <? } ?>
+          <? if(!empty($this->driver->getShortTitle()[0][0]) && $this->driver->getShortTitle()[0][0] != $this->transEsc('Title not available')) { ?>
+            <?=$this->record($this->driver)->getTitleHtml()?> <? if (!empty($this->driver->getTitleSection()[0][0])) { ?> ; <?=$this->driver->getTitleSection()[0][0]?> <? } ?>
+          <? } else { ?>
+            <? if (!empty($this->driver->getSeries()[0]['name'])) { ?> 
+              <?=$this->driver->getSeries()[0]['name']?>
+              <?=' '.$this->driver->getSeries()[0]['number']?>
+            <? } ?>
+          <? } ?>
         </a>
       </div>
 

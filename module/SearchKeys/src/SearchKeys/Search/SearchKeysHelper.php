@@ -46,7 +46,7 @@ class SearchKeysHelper
         $searchItems = array();
         $searchTypes = array();
         $searchBoolean = array('AND');
-        $limit = 10;
+        $limit = 1000000;
         foreach ($lookforArray as $lookfor) {
             $type = strval(array_shift($typeArray));
             if (empty($lookfor) || $lookfor == '""') {
@@ -66,6 +66,7 @@ class SearchKeysHelper
                     $lookfor = preg_replace('/\\'.$translateFrom.'/', '{'.$translateTo.'}', $lookfor);
                 }
             }
+			
             while (!empty($lookfor) && $limit-- > 0) {
                 $itemFound = false;
                 foreach ($phrasedKeywords as $keyword => $searchtype) {
@@ -85,10 +86,11 @@ class SearchKeysHelper
                 foreach ($keywords as $keyword => $searchtype) {
                     $searchname = $options->getHumanReadableFieldName($searchtype);
                     $keyRegex = '(('.$keyword.'\s)|('.$searchtype.':)|('.$searchname.':))';
+					
                     if (preg_match('#^'.$keyRegex.'([^"\s]+|("[^"]+"))((?=\s)|(?=$))#', $lookfor, $matches)) {
                         $newLookfor = $matches[5];
                         $foundKey = $matches[1];
-                        $lookfor = trim(str_replace($foundKey.$newLookfor, '', $lookfor));
+						$lookfor = trim(preg_replace('/'.$foundKey.str_replace(array("*","?"),array("\*","\?"),$newLookfor).'/', '', $lookfor,1));
                         $searchItems[] = $newLookfor;
                         $searchTypes[] = $searchtype;
                         $itemFound = true;
@@ -99,14 +101,8 @@ class SearchKeysHelper
                 if (!empty($lookfor) && !$itemFound) {
                    if (preg_match('#^([^"\s]+|("[^"]+"))((?=\s)|(?=$))#', $lookfor, $matches)) {
                         $newLookfor = $matches[1];
-                        $lookfor = trim(preg_replace('#^'.$newLookfor.'#', '', $lookfor));
-                        if ($newLookfor == 'OR') {
-                            $searchBoolean = array($newLookfor);
-                        } else {
-                            $searchItems[] = $newLookfor;
-                            $searchTypes[] = $options->getDefaultHandler();
-                            $itemFound = true;
-                        }
+						$lookfor = trim(preg_replace('/'.str_replace(array("*","?"),array("\*","\?"),$newLookfor).'/', '', $lookfor,1));
+                        $searchItems[] = array_pop($searchItems).' '.$newLookfor;
                     }
                 }
             }

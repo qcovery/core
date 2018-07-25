@@ -7,6 +7,11 @@
         <?= (!empty($titleFields['TitleSection'][0]['description'])) ? $this->transEsc($titleFields['TitleSection'][0]['description']) . ' ' : '' ?>
         <?= (!empty($titleFields['TitleStatement'][0][0])) ? '/ ' . $this->transEsc($titleFields['TitleStatement'][0][0]) : '' ?>
     </h3>
+<? else: ?>
+    <h3 property="name">
+        <?= (!empty($titleFields['Series'][0][0])) ? $this->transEsc($titleFields['Series'][0][0]) : '' ?>
+        <?= (!empty($titleFields['Series'][0][1])) ? ' '.$this->transEsc($titleFields['Series'][0][1]) : '' ?>
+    </h3>
 <? endif; ?>
 <? if (!empty($titleFields['Summary'][0][0])): ?>
     <? $summary = $titleFields['Summary'][0][0]; ?>

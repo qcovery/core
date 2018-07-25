@@ -4,84 +4,14 @@ $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR'). '/config/vufin
 if($paiaConfig['Global']['usePAIA'] == 1) {
 	$isil = $paiaConfig['Global']['isil'];
 	$iln = $paiaConfig['Global']['iln'];
-	$formats = "";
-	$collection_details = array();
-	$ppnlink = "";
-	$marcField951aValue = "";
 	
-	if (method_exists($this->driver, 'getFormats')) {
-		$formats = $this->driver->tryMethod('getFormats');
-	}
-	
-	if (method_exists($this->driver, 'getCollectionDetails')) {
-		$collection_details = $this->driver->tryMethod('getCollectionDetails');
-	}
-	
-	if (method_exists($this->driver, 'getPPNLink')) {
-		$ppnlink = $this->driver->tryMethod('getPPNLink');
-	}
-
-	if (method_exists($this->driver, 'getMarcRecord')) {
-		
-		$field_values = array();
-		$fields = $this->driver->getMarcRecord()->getFields('912');
-		if(!empty($fields) && empty($collection_details)) {
-			foreach($fields as $subfield) {
-				foreach($subfield->getSubfields('a') as $subfield_content) {
-					$field_values[] = $subfield_content->getData();
-				}
-			}
-		}
-		$collection_details = $field_values;
-		
-		$field_values = array();
-		$fields = $this->driver->getMarcRecord()->getFields('773');
-		if(!empty($fields) && empty($ppnlink)) {
-			foreach($fields as $subfield) {
-				foreach($subfield->getSubfields('w') as $subfield_content) {
-					$field_values[] = $subfield_content->getData();
-					break;
-				}
-			}
-			$ppnlink = (empty($field_values[0])) ? '' : $field_values[0];
-			$ppnlink = str_replace("(DE-601)","",$ppnlink);
-		}
-		
-		$marcField951aValue = "";
-		$marcField951 = $this->driver->getMarcRecord()->getField('951');
-		if(!empty($marcField951)) {
-			$marcField951aValue = $marcField951->getSubfield('a')->getData();
-		}
-		
-		/*$doi = "";
-		$doi = $this->driver->getMarcRecord()->getField('024');
-		if(!empty($doi)) {
-			$doi = $doi->getSubfield('a')->getData();
-		} */
-		
-		$doi = "";
-		$field_values = array();
-		$fields = $this->driver->getMarcRecord()->getFields('024');
-		if(!empty($fields) && empty($doi)) {
-			foreach($fields as $field) {
-				if(strpos($field,"_2doi") == true) {
-					$doi = $field->getSubfield('a')->getData();
-					break;
-				}
-			}
-		}
-	}
-		
-	$daiaPPN = '';
-	if ($marcField951aValue == 'MC' || $marcField951aValue == 'ST') {
-		$daiaPPN = '';
-	} else if ($marcField951aValue == 'AI' && !empty($ppnlink)) {
-		$daiaPPN = $ppnlink;
-	} else if (empty($daiaPPN) && in_array('Article', $formats, TRUE)) {
-		$daiaPPN = "";
-	} else 	{
-		$daiaPPN = $this->driver->getUniqueID();
-	}
+	$context_array = $this->paia()->getContext($this->driver);
+	$formats = $context_array['formats'];
+	$collection_details = $context_array['collection_details'];
+	$ppnlink = $context_array['ppnlink'];
+	$marcField951aValue = $context_array['marcField951aValue'];
+	$daiaPPN = $context_array['daiaPPN'];
+	$doi = $context_array['doi'];
 	
 	if (in_array("GBV_ILN_".$iln ,$collection_details, TRUE) && !empty($daiaPPN)) { ?>
 		<div class="daia-availability" data-ppn="<?=$daiaPPN;?>" data-site="<?=$isil?>" data-marcField951aValue="<?=$marcField951aValue?>" data-list="<?=$this->list;?>" data-mediatype="<?=$formats[0]?>"><span class="daia-loading"> <?=$this->transEsc('local_availability_being_determined');?> </span></div>
