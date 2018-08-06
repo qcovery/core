@@ -31,6 +31,8 @@ namespace PAIA\ILS\Driver;
 use DOMDocument, VuFind\Exception\ILS as ILSException;
 use VuFind\ILS\Driver\AbstractBase;
 use PAIA\PAIAConnector;
+use Zend\Session\Container;
+use PAIA\Config\PAIAConfigService;
 
 /**
  * ILS Driver for VuFind to query availability information via DAIA.
@@ -95,11 +97,12 @@ class PAIA extends AbstractBase
      */
     public function init()
     {
-        if (!isset($this->config['Global']['baseUrl'])) {
+        $paiaConfigService = new PAIAConfigService();
+        if (!isset($this->config[$paiaConfigService->getPaiaGlobalKey()]['baseUrl'])) {
             throw new ILSException('Global/baseUrl configuration needs to be set.');
         }
 
-        $this->baseURL = $this->config['Global']['baseUrl'];
+        $this->baseURL = $this->config[$paiaConfigService->getPaiaGlobalKey()]['baseUrl'];
     }
 
     /**
@@ -192,9 +195,13 @@ class PAIA extends AbstractBase
     {
         if (!$isil) {
             $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-            $isil = $paiaConfig['Global']['isil'];
+            $paiaConfigService = new PAIAConfigService();
+            $isil = $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['isil'];
         }
-        
+
+        $paiaSession = new Container('PAIAsession');
+        $paiaSession->offsetSet('PAIAisil', $isil);
+
         $user = array();
         $this->paiaConnector->setIsil($isil);
         $json = $this->paiaConnector->login($barcode, $password);
@@ -232,6 +239,7 @@ class PAIA extends AbstractBase
      */
     public function getMyTransactions($patron)
     {
+        $paiaConfigService = new PAIAConfigService();
         $this->paiaConnector->setIsil($patron['cat_isil']);
         $json = $this->paiaConnector->items($patron['id'], $patron['access_token']);
         $json_array = json_decode($json, true);
@@ -248,7 +256,7 @@ class PAIA extends AbstractBase
                           'queue' => $doc['queue'],
                           'reminder' => $doc['reminder'],
                           'renew' => $doc['renewals'],
-                          'renewLimit' => $this->paiaConfig['Global']['renewLimit'],
+                          'renewLimit' => $this->paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['renewLimit'],
                           'request' => '',
                           'id' => $doc['item'],
                           'item_id' => '',
@@ -372,6 +380,7 @@ class PAIA extends AbstractBase
      */
     public function getMyProfile($patron)
     {
+        $paiaConfigService = new PAIAConfigService();
         $this->paiaConnector->setIsil($patron['cat_isil']);
         $json = $this->paiaConnector->patron($patron['id'], $patron['access_token']);
         $json_array = json_decode($json, true);
@@ -388,7 +397,7 @@ class PAIA extends AbstractBase
         );
 		
 		
-		if ($this->paiaConfig['Global']['show_profile_note'] == 1) {
+		if ($this->paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['show_profile_note'] == 1) {
 			$patron += array(
 				'note' => $json_array['note'],
 			);

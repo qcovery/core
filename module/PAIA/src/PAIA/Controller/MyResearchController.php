@@ -34,6 +34,7 @@ use VuFind\Exception\Auth as AuthException,
     Zend\Stdlib\Parameters;
 use VuFind\Controller\AbstractBase;
 use PAIA\PAIA;
+use PAIA\Config\PAIAConfigService;
 
 /**
  * Controller for the user account area.
@@ -1550,8 +1551,9 @@ class MyResearchController extends AbstractBase
             && ($password = $this->params()->fromPost('cat_password', false))
         ) {
             $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-            
-            $patron = $account->newCatalogLogin($username, $password, $paiaConfig['Global']['isil']);
+
+            $paiaConfigService = new PAIAConfigService();
+            $patron = $account->newCatalogLogin($username, $password, $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['isil']);
 
             // If login failed, store a warning message:
             if (!$patron) {
