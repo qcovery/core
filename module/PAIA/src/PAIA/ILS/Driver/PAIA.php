@@ -57,6 +57,7 @@ class PAIA extends AbstractBase
     protected $paiaConfig;
     protected $session;
     protected $sessionFactory;
+    private $paiaConfigService;
 
     // $sm->getServiceLocator()->get('VuFind\SessionManager');
 
@@ -69,6 +70,10 @@ class PAIA extends AbstractBase
     public function setSessionFactory ($sessionFactory) {
         $this->sessionFactory = $sessionFactory;
         $this->session = $this->getSession();
+    }
+
+    public function setPaiaConfigService ($paiaConfigService) {
+        $this->paiaConfigService = $paiaConfigService;
     }
 
     /**
@@ -97,12 +102,11 @@ class PAIA extends AbstractBase
      */
     public function init()
     {
-        $paiaConfigService = new PAIAConfigService();
-        if (!isset($this->config[$paiaConfigService->getPaiaGlobalKey()]['baseUrl'])) {
+        if (!isset($this->config[$this->paiaConfigService->getPaiaGlobalKey()]['baseUrl'])) {
             throw new ILSException('Global/baseUrl configuration needs to be set.');
         }
 
-        $this->baseURL = $this->config[$paiaConfigService->getPaiaGlobalKey()]['baseUrl'];
+        $this->baseURL = $this->config[$this->paiaConfigService->getPaiaGlobalKey()]['baseUrl'];
     }
 
     /**
@@ -195,8 +199,7 @@ class PAIA extends AbstractBase
     {
         if (!$isil) {
             $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-            $paiaConfigService = new PAIAConfigService();
-            $isil = $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['isil'];
+            $isil = $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
         }
 
         $this->session->offsetSet('PAIAisil', $isil);
@@ -238,7 +241,6 @@ class PAIA extends AbstractBase
      */
     public function getMyTransactions($patron)
     {
-        $paiaConfigService = new PAIAConfigService();
         $this->paiaConnector->setIsil($patron['cat_isil']);
         $json = $this->paiaConnector->items($patron['id'], $patron['access_token']);
         $json_array = json_decode($json, true);
@@ -255,7 +257,7 @@ class PAIA extends AbstractBase
                           'queue' => $doc['queue'],
                           'reminder' => $doc['reminder'],
                           'renew' => $doc['renewals'],
-                          'renewLimit' => $this->paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['renewLimit'],
+                          'renewLimit' => $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['renewLimit'],
                           'request' => '',
                           'id' => $doc['item'],
                           'item_id' => '',
@@ -379,7 +381,6 @@ class PAIA extends AbstractBase
      */
     public function getMyProfile($patron)
     {
-        $paiaConfigService = new PAIAConfigService();
         $this->paiaConnector->setIsil($patron['cat_isil']);
         $json = $this->paiaConnector->patron($patron['id'], $patron['access_token']);
         $json_array = json_decode($json, true);
@@ -396,7 +397,7 @@ class PAIA extends AbstractBase
         );
 		
 		
-		if ($this->paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['show_profile_note'] == 1) {
+		if ($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['show_profile_note'] == 1) {
 			$patron += array(
 				'note' => $json_array['note'],
 			);

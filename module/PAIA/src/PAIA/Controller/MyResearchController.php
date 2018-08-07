@@ -55,6 +55,8 @@ class MyResearchController extends AbstractBase
 
     private $mailer;
 
+    private $paiaConfigService;
+
     /**
      * Constructor
      *
@@ -66,6 +68,7 @@ class MyResearchController extends AbstractBase
         $this->pluginManager = $pluginManager;
         $this->recordLoader = $recordLoader;
         $this->mailer = $mailer;
+        //$this->paiaConfigService = new PAIAConfigService($sm->getServiceLocator()->get('VuFind\SessionManager'))
     }
 
     /**
@@ -1552,8 +1555,7 @@ class MyResearchController extends AbstractBase
         ) {
             $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
 
-            $paiaConfigService = new PAIAConfigService();
-            $patron = $account->newCatalogLogin($username, $password, $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['isil']);
+            $patron = $account->newCatalogLogin($username, $password, $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil']);
 
             // If login failed, store a warning message:
             if (!$patron) {

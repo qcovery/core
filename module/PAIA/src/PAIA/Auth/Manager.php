@@ -51,6 +51,8 @@ class Manager extends \VuFind\Auth\Manager
 
     private $ilsConnection;
 
+    private $paiaConfigService;
+
     /**
      * Constructor
      *
@@ -91,6 +93,8 @@ class Manager extends \VuFind\Auth\Manager
         $this->setAuthMethod($method);              // load it
 
         $this->ilsConnection = $ilsConnection;
+
+        $this->paiaConfigService = new PAIAConfigService($sessionManager);
     }
 
     /**
@@ -167,9 +171,8 @@ class Manager extends \VuFind\Auth\Manager
             if (isset($this->ilsAccount[$user->cat_username])) {
                 return $this->ilsAccount[$user->cat_username];
             }
-            $paiaConfigService = new PAIAConfigService();
             $patron = $this->ilsConnection->patronLogin(
-                $user->cat_username, $user->getCatPassword(), $paiaConfigService->getIsil()
+                $user->cat_username, $user->getCatPassword(), $this->paiaConfigService->getIsil()
             );
             if (empty($patron)) {
                 // Problem logging in -- clear user credentials so they can be
