@@ -1123,9 +1123,8 @@ class DefaultRecord extends AbstractBase
      */
     public function getShortTitle()
     {
-        $shortTitle = isset($this->fields['title_short']) ?
+        return isset($this->fields['title_short']) ?
             $this->fields['title_short'] : '';
-        return is_array($shortTitle) ? $shortTitle[0] : $shortTitle;
     }
 
     /**
@@ -1249,9 +1248,8 @@ class DefaultRecord extends AbstractBase
      */
     public function getTitle()
     {
-        $title = isset($this->fields['title']) ?
+        return isset($this->fields['title']) ?
             $this->fields['title'] : '';
-        return is_array($title) ? $title[0] : $title;
     }
 
     /**
@@ -1455,7 +1453,7 @@ class DefaultRecord extends AbstractBase
             $xml->addChild('title', htmlspecialchars($this->getTitle()), $dc);
             $authors = $this->getDeduplicatedAuthors();
             foreach ($authors as $list) {
-                foreach ((array)$list as $author) {
+                foreach (array_keys($list) as $author) {
                     $xml->addChild('creator', htmlspecialchars($author), $dc);
                 }
             }
