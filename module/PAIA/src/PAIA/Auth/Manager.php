@@ -35,7 +35,6 @@ use Zend\Config\Config;
 use Zend\Session\SessionManager;
 use Zend\Validator\Csrf;
 use VuFind\Auth\PluginManager;
-use PAIA\Config\PAIAConfigService;
 
 /**
  * Wrapper class for handling logged-in user in session.
@@ -167,9 +166,8 @@ class Manager extends \VuFind\Auth\Manager
             if (isset($this->ilsAccount[$user->cat_username])) {
                 return $this->ilsAccount[$user->cat_username];
             }
-            $paiaConfigService = new PAIAConfigService();
             $patron = $this->ilsConnection->patronLogin(
-                $user->cat_username, $user->getCatPassword(), $paiaConfigService->getIsil()
+                $user->cat_username, $user->getCatPassword()
             );
             if (empty($patron)) {
                 // Problem logging in -- clear user credentials so they can be

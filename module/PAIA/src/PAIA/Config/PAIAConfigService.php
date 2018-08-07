@@ -5,15 +5,13 @@ use Zend\Session\Container;
 
 class PAIAConfigService {
 
-    private $serviceManager;
-
     private $isil;
 
     private $paiaConfig;
 
     public function __construct() {
-        //$paiaSession = new Container('PAIAsession');
-        $this->isil = 'DE-Hil2'; //$paiaSession->offsetGet('PAIAisil');
+        $paiaSession = new Container('PAIAsession');
+        $this->isil = $paiaSession->offsetGet('PAIAisil');
         $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
     }
 
@@ -53,9 +51,6 @@ class PAIAConfigService {
         return $result;
     }
 
-    public function getIsil() {
-        return $this->isil;
-    }
 }
 
 ?>
