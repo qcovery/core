@@ -199,7 +199,8 @@ class PAIA extends AbstractBase
             $isil = $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['isil'];
         }
 
-        $this->session->offsetSet('PAIAisil', $isil);
+        $paiaSession = new Container('PAIAsession');
+        $paiaSession->offsetSet('PAIAisil', $isil);
 
         $user = array();
         $this->paiaConnector->setIsil($isil);
