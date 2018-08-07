@@ -2,19 +2,13 @@
 namespace DependentWorks\Module\Configuration;
 
 $config = [
-    'controllers' => [
+    'service_manager' => [
+        'allow_override' => true,
         'factories' => [
-            'dependentworksajax' => 'DependentWorks\Controller\Factory::getDependentWorksAjaxController',
+            'DependentWorks\AjaxHandler\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
         ],
-    ],
-    'vufind' => [
-        'plugin_managers' => [
-            'recorddriver' => [
-                'abstract_factories' => ['VuFind\RecordDriver\PluginFactory'],
-                'factories' => [
-                    'solrdefault' => 'DependentWorks\RecordDriver\Factory::getSolrDefault',
-                ],
-            ],
+        'aliases' => [
+            'VuFind\AjaxHandler\PluginManager' => 'DependentWorks\AjaxHandler\PluginManager'
         ],
     ],
 ];
