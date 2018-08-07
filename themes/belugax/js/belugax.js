@@ -90,15 +90,4 @@ $(document).ready(function() {
             }
         });
     });
-
-    $('#paia-multilogin-select').on('change', function(){
-        var isil = $('#paia-multilogin-select option:selected').val();
-        $('#paia-multilogin-icons img').each(function(){
-            if ($(this).data('isil') == isil) {
-                $(this).removeClass('hidden');
-            } else {
-                $(this).addClass('hidden');
-            }
-        });
-    })
 });
