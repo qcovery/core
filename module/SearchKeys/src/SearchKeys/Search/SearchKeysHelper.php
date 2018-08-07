@@ -32,20 +32,19 @@ class SearchKeysHelper
         $isAdvancedSearch = false;
         $lookfor = $request->get('lookfor');
         if (!empty($lookfor)) {
-            $lookforArray = array($lookfor);
-            //$typeArray = array($request->get('type'));
-            $typeArray = array();
+            $lookforArray = [$lookfor];
+            $typeArray = [];
         } elseif (!empty($lookfor0)) {
             $lookforArray = $request->get('lookfor0');
             $typeArray = $request->get('type0');
             $isAdvancedSearch = true;
         } else {
-            parent::initSearch($request);
+            return $request;
         }
 
-        $searchItems = array();
-        $searchTypes = array();
-        $searchBoolean = array('AND');
+        $searchItems = [];
+        $searchTypes = [];
+        $searchBoolean = ['AND'];
         $limit = 10;
         foreach ($lookforArray as $lookfor) {
             $type = strval(array_shift($typeArray));
@@ -71,7 +70,7 @@ class SearchKeysHelper
                 foreach ($phrasedKeywords as $keyword => $searchtype) {
                     $searchname = $options->getHumanReadableFieldName($searchtype);
                     $keyRegex = '(('.$keyword.'\s)|('.$searchtype.':)|('.$searchname.':))';
-                    if (preg_match('#^'.$keyRegex.'([^"]+|("[^"]+"))((?=$))#', $lookfor, $matches)) {
+                    if (preg_match('#^'.$keyRegex.'([^"]*|("[^"]*"))((?=$))#', $lookfor, $matches)) {
                         $foundKey = $matches[1];
                         $newLookfor = trim(str_replace($foundKey, '', $lookfor));
                         $lookfor = '';
@@ -85,7 +84,7 @@ class SearchKeysHelper
                 foreach ($keywords as $keyword => $searchtype) {
                     $searchname = $options->getHumanReadableFieldName($searchtype);
                     $keyRegex = '(('.$keyword.'\s)|('.$searchtype.':)|('.$searchname.':))';
-                    if (preg_match('#^'.$keyRegex.'([^"\s]+|("[^"]+"))((?=\s)|(?=$))#', $lookfor, $matches)) {
+                    if (preg_match('#^'.$keyRegex.'([^"\s]*|("[^"]*"))((?=\s)|(?=$))#', $lookfor, $matches)) {
                         $newLookfor = $matches[5];
                         $foundKey = $matches[1];
                         $lookfor = trim(str_replace($foundKey.$newLookfor, '', $lookfor));
@@ -101,7 +100,7 @@ class SearchKeysHelper
                         $newLookfor = $matches[1];
                         $lookfor = trim(preg_replace('#^'.$newLookfor.'#', '', $lookfor));
                         if ($newLookfor == 'OR') {
-                            $searchBoolean = array($newLookfor);
+                            $searchBoolean = [$newLookfor];
                         } else {
                             $searchItems[] = $newLookfor;
                             $searchTypes[] = $options->getDefaultHandler();

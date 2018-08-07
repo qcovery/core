@@ -39,7 +39,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class SearchTabsHelperFactory implements FactoryInterface
+class SearchKeysHelperFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -61,17 +61,6 @@ class SearchTabsHelperFactory implements FactoryInterface
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $config = $container->get('VuFind\Config\PluginManager')->get('config');
-        $tabConfig = isset($config->SearchTabs)
-            ? $config->SearchTabs->toArray() : [];
-        $filterConfig = isset($config->SearchTabsFilters)
-            ? $config->SearchTabsFilters->toArray() : [];
-        $permissionConfig = isset($config->SearchTabsPermissions)
-            ? $config->SearchTabsPermissions->toArray() : [];
-        return new $requestedName(
-            $container->get('VuFind\Search\Results\PluginManager'),
-            $tabConfig, $filterConfig,
-            $container->get('Application')->getRequest(), $permissionConfig
-        );
+        return new $requestedName();
     }
 }
