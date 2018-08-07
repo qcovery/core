@@ -63,7 +63,6 @@ class PAIA extends AbstractBase
 
     public function __construct()
     {
-       $this->paiaConnector = new PAIAConnector();
        $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
     }
 
@@ -74,6 +73,7 @@ class PAIA extends AbstractBase
 
     public function setPaiaConfigService ($paiaConfigService) {
         $this->paiaConfigService = $paiaConfigService;
+        $this->paiaConnector = new PAIAConnector($this->paiaConfigService);
     }
 
     /**

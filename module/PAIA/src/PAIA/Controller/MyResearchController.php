@@ -62,13 +62,13 @@ class MyResearchController extends AbstractBase
      *
      * @param ServiceLocatorInterface $sm Service locator
      */
-    public function __construct(\Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer)
+    public function __construct(\Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer, \Zend\Session\SessionManager $sessionManager)
     {
         $this->tags = $tags;
         $this->pluginManager = $pluginManager;
         $this->recordLoader = $recordLoader;
         $this->mailer = $mailer;
-        //$this->paiaConfigService = new PAIAConfigService($sm->getServiceLocator()->get('VuFind\SessionManager'))
+        $this->paiaConfigService = new PAIAConfigService($sessionManager);
     }
 
     /**

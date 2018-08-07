@@ -13,20 +13,22 @@ class PAIAConnector
     protected $base_url;
     protected $isil;
 
-    public function __construct()
+    private $paiaConfigService;
+
+    public function __construct(PAIAConfigService $paiaConfigService)
     {
-        $paiaConfigService = new PAIAConfigService();
+        $this->paiaConfigService = $paiaConfigService;
         $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-        $this->http_client = new \Zend\Http\Client(null, array('adapter' => 'Zend\Http\Client\Adapter\Socket', 'sslverifypeer' => false, 'timeout' => $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['timeout']));
+        $this->http_client = new \Zend\Http\Client(null, array('adapter' => 'Zend\Http\Client\Adapter\Socket', 'sslverifypeer' => false, 'timeout' => $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['timeout']));
         $this->debug = true;
-        $this->base_url = $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['baseUrl'];
+        $this->base_url = $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['baseUrl'];
         $this->isil = '';
         if (isset($_POST['paia_isil'])) {
            $this->isil .= $_POST['paia_isil'];
         } else if (isset($_GET['paia_isil'])) {
            $this->isil .= $_GET['paia_isil'];
         } else {
-           $this->isil = $paiaConfig[$paiaConfigService->getPaiaGlobalKey()]['isil'];
+           $this->isil = $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
         }
     }
 

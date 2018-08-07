@@ -23,9 +23,9 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 
    protected $paiaConfigService;
    
-   public function __construct()
+   public function __construct(ServiceManager $sm)
    {
-        $this->paiaConfigService = new PAIAConfigService();
+        $this->paiaConfigService = new PAIAConfigService($sm->getServiceLocator()->get('VuFind\SessionManager'));
         $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
    }
 
