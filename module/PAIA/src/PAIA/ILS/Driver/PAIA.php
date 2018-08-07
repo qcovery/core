@@ -266,9 +266,7 @@ class PAIA extends AbstractBase
 		foreach ($transList as $key => $row) {
 			$duedate[$key]  = $row['duedate'];
 		}
-		if (is_array($duedate)) {
-            array_multisort($duedate, SORT_ASC, $transList);
-        }
+		array_multisort($duedate, SORT_ASC, $transList);
 		$this->session->transactions = $transList;
         return $transList;
     }
