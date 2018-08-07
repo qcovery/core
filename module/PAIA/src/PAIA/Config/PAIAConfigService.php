@@ -22,7 +22,7 @@ class PAIAConfigService {
         foreach (array_keys($this->paiaConfig) as $arrayKey) {
             if (stristr($arrayKey, 'Global')) {
                 if (isset($paiaConfig[$arrayKey]['isil'])) {
-                    if ($this->paiaConfig[$arrayKey]['isil'] == $this->isil) {
+                    if ($this->paiaConfig[$arrayKey]['isil'] == $this->getIsil()) {
                         return $arrayKey;
                     }
                 }

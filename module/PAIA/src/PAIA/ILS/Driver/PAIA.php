@@ -197,11 +197,14 @@ class PAIA extends AbstractBase
      */
     public function patronLogin($barcode, $password, $isil = null)
     {
-        if (!$isil) {
-            $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-            $isil = $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
-        }
 
+        if (!$isil) {
+            $isil = $this->session->offsetGet('PAIAisil', $isil);
+            if (!$isil) {
+                $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
+                $isil = $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
+            }
+        }
         $this->session->offsetSet('PAIAisil', $isil);
 
         $user = array();
