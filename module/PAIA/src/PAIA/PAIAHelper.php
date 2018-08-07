@@ -12,7 +12,6 @@ use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManagerInterface;
 use VuFindSearch\Query\Query;
 use \SimpleXMLElement;
-use PAIA\Config\PAIAConfigService;
 
 class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 {
@@ -20,12 +19,9 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
    protected $serviceLocator;
 
    protected $paiaConfig;
-
-   protected $paiaConfigService;
    
    public function __construct()
    {
-        $this->paiaConfigService = new PAIAConfigService();
         $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
    }
 
@@ -54,8 +50,8 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      */
 	//TODO: Currently only working with DAIAplus Service - DAIAplus Service needs to be set up to conform to DAIA request specifications
     public function getDaiaResults($ppn, $list = 0, $language = 'en', $mediatype) {
-		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
-			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
+		if(!empty($this->paiaConfig['Global']['isil'])) {
+			$site = $this->paiaConfig['Global']['isil'];
 		} else {
 			$site = 'Default';
 		}
@@ -588,8 +584,8 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      */
 	//TODO: Complete function once external service is available
 	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $list, $mediatype, $language) {
-		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
-			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
+		if(!empty($this->paiaConfig['Global']['isil'])) {
+			$site = $this->paiaConfig['Global']['isil'];
 		} else {
 			$site = 'Default';
 		}
@@ -688,11 +684,19 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 	}
 
 	public function hasMultipleLoginSources() {
-	    return $this->paiaConfigService->hasMultipleLoginSources();
+	    if (isset($this->paiaConfig['Global_2'])) {
+	        return true;
+        }
+        return false;
     }
 
     public function getMultipleLoginSources() {
-	    return $this->paiaConfigService->getMultipleLoginSources();
+	    $result = [];
+	    $result[] = $this->paiaConfig['Global'];
+        if (isset($this->paiaConfig['Global_2'])) {
+            $result[] = $this->paiaConfig['Global_2'];
+        }
+        return $result;
     }
 }
 
