@@ -682,22 +682,6 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		
 		return $context_array;
 	}
-
-	public function hasMultipleLoginSources() {
-	    if (isset($this->paiaConfig['Global_2'])) {
-	        return true;
-        }
-        return false;
-    }
-
-    public function getMultipleLoginSources() {
-	    $result = [];
-	    $result[] = $this->paiaConfig['Global'];
-        if (isset($this->paiaConfig['Global_2'])) {
-            $result[] = $this->paiaConfig['Global_2'];
-        }
-        return $result;
-    }
 }
 
 ?>
