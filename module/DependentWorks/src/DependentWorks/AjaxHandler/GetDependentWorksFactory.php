@@ -64,8 +64,9 @@ class GetDependentWorksFactory
             throw new \Exception('Unexpected options passed to factory.');
         }
         return new $requestedName(
-            $container->get('Request'),
-            $container->get('VuFind\Search\Results\PluginManager')->get('Solr')
+            $container->get('Config'),
+            $container->get('VuFind\Search\Results\PluginManager'),
+            $container->get('VuFind\Record\Loader')
         );
     }
 }

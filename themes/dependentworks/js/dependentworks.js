@@ -14,7 +14,7 @@ jQuery(document).ready(function() {
     }
 
     jQuery.ajax({
-        url:'/vufind/DependentWorksAjax/JSON?method=getDependentWorks',
+        url:'/vufind/AJAX/JSON?method=getDependentWorks',
         dataType:'json',
         data:{ppn:recordId},
         success:function(data, textStatus) {

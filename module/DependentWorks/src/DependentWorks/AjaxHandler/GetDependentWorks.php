@@ -25,10 +25,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:building_a_controller Wiki
  */
-namespace DependentWorks\Controller;
-use DependentWorks\DependentWorks;
-use VuFind\Controller\AjaxController;
-use Zend\ServiceManager\ServiceLocatorInterface;
+namespace DependentWorks\AjaxHandler;
+
+//use DependentWorks\DependentWorks;
+use VuFind\AjaxHandler\AbstractBase;
+use VuFind\Search\Results\PluginManager as ResultsManager;
+use VuFind\Record\Loader;
+use Zend\Http\PhpEnvironment\Request;
+use Zend\Mvc\Controller\Plugin\Params;
+use Zend\Stdlib\Parameters;
 
 /**
  * This controller handles global AJAX functionality
@@ -39,22 +44,65 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:building_a_controller Wiki
  */
-class DependentWorksAjaxController extends AjaxController
+class GetDependentWorks extends AbstractBase
 {
+    /**
+     * ZF configuration
+     *
+     * @var array
+     */
+    protected $config;
 
-   public function __construct(ServiceLocatorInterface $sm)
-   {
-        parent::__construct($sm);
-   }
+    /**
+     * Request
+     *
+     * @var Request
+     */
+    protected $resultsManager;
 
-    public function getDependentWorksAjax()
+    /**
+     * Record loader
+     *
+     * @var Loader
+     */
+    protected $recordLoader;
+
+    /**
+     * Constructor
+     *
+     * @param array             $config   ZF configuration
+     * @param Request           $request  HTTP request
+     */
+    public function __construct(array $config, ResultsManager $resultsManager, Loader $loader)
     {
-        $id = $_GET['ppn'];
-        $dependentWorks = new DependentWorks(
-            $this->serviceLocator,
-            $this->getRequest()->getQuery()
-        );
-        $dependentWorksData = $dependentWorks->getDependentWorks($id);
-        return $this->output($dependentWorksData, self::STATUS_OK);
+        $this->config = $config;
+        $this->resultsManager = $resultsManager;
+        $this->recordLoader = $loader;
+    }
+
+    /**
+     * Handle a request.
+     *
+     * @param Params $params Parameter helper from controller
+     *
+     * @return array [response data, HTTP status code]
+     */
+    public function handleRequest(Params $params)
+    {
+        $ppn = $params->fromQuery('ppn');
+        $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
+        $results = $this->resultsManager->get($backend);
+        $paramsObj = $results->getParams();
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn]));
+
+        $records = $results->getResults();
+        $data = [];
+        foreach ($records as $record) {
+            $publishDates = $record->getPublicationDates();
+            $data[] = ['id' => $record->getUniqueID(), 
+                       'title' => $record->getTitle(), 
+                       'publishDate' => $publishDates[0]];
+        }
+        return $this->formatResponse($data);
     }
 } 

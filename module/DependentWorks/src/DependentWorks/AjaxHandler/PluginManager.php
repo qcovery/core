@@ -36,7 +36,8 @@ namespace DependentWorks\AjaxHandler;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
+//class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
+class PluginManager extends \VuFind\AjaxHandler\PluginManager
 {
     /**
      * Default plugin aliases.
