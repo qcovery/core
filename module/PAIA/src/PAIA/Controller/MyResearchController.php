@@ -34,6 +34,7 @@ use VuFind\Exception\Auth as AuthException,
     Zend\Stdlib\Parameters;
 use VuFind\Controller\AbstractBase;
 use PAIA\PAIA;
+use PAIA\Config\PAIAConfigService;
 
 /**
  * Controller for the user account area.
@@ -54,17 +55,20 @@ class MyResearchController extends AbstractBase
 
     private $mailer;
 
+    private $paiaConfigService;
+
     /**
      * Constructor
      *
      * @param ServiceLocatorInterface $sm Service locator
      */
-    public function __construct(\Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer)
+    public function __construct(\Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer, \Zend\Session\SessionManager $sessionManager)
     {
         $this->tags = $tags;
         $this->pluginManager = $pluginManager;
         $this->recordLoader = $recordLoader;
         $this->mailer = $mailer;
+        $this->paiaConfigService = new PAIAConfigService($sessionManager);
     }
 
     /**
@@ -1550,8 +1554,8 @@ class MyResearchController extends AbstractBase
             && ($password = $this->params()->fromPost('cat_password', false))
         ) {
             $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-            
-            $patron = $account->newCatalogLogin($username, $password, $paiaConfig['Global']['isil']);
+
+            $patron = $account->newCatalogLogin($username, $password, $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil']);
 
             // If login failed, store a warning message:
             if (!$patron) {

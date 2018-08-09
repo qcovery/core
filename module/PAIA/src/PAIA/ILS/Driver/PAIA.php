@@ -31,6 +31,8 @@ namespace PAIA\ILS\Driver;
 use DOMDocument, VuFind\Exception\ILS as ILSException;
 use VuFind\ILS\Driver\AbstractBase;
 use PAIA\PAIAConnector;
+use Zend\Session\Container;
+use PAIA\Config\PAIAConfigService;
 
 /**
  * ILS Driver for VuFind to query availability information via DAIA.
@@ -55,18 +57,23 @@ class PAIA extends AbstractBase
     protected $paiaConfig;
     protected $session;
     protected $sessionFactory;
+    private $paiaConfigService;
 
     // $sm->getServiceLocator()->get('VuFind\SessionManager');
 
     public function __construct()
     {
-       $this->paiaConnector = new PAIAConnector();
        $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
     }
 
     public function setSessionFactory ($sessionFactory) {
         $this->sessionFactory = $sessionFactory;
         $this->session = $this->getSession();
+    }
+
+    public function setPaiaConfigService ($paiaConfigService) {
+        $this->paiaConfigService = $paiaConfigService;
+        $this->paiaConnector = new PAIAConnector($this->paiaConfigService);
     }
 
     /**
@@ -95,11 +102,11 @@ class PAIA extends AbstractBase
      */
     public function init()
     {
-        if (!isset($this->config['Global']['baseUrl'])) {
+        if (!isset($this->config[$this->paiaConfigService->getPaiaGlobalKey()]['baseUrl'])) {
             throw new ILSException('Global/baseUrl configuration needs to be set.');
         }
 
-        $this->baseURL = $this->config['Global']['baseUrl'];
+        $this->baseURL = $this->config[$this->paiaConfigService->getPaiaGlobalKey()]['baseUrl'];
     }
 
     /**
@@ -190,11 +197,16 @@ class PAIA extends AbstractBase
      */
     public function patronLogin($barcode, $password, $isil = null)
     {
+
         if (!$isil) {
-            $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-            $isil = $paiaConfig['Global']['isil'];
+            $isil = $this->session->offsetGet('PAIAisil', $isil);
+            if (!$isil) {
+                $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
+                $isil = $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
+            }
         }
-        
+        $this->session->offsetSet('PAIAisil', $isil);
+
         $user = array();
         $this->paiaConnector->setIsil($isil);
         $json = $this->paiaConnector->login($barcode, $password);
@@ -248,7 +260,7 @@ class PAIA extends AbstractBase
                           'queue' => $doc['queue'],
                           'reminder' => $doc['reminder'],
                           'renew' => $doc['renewals'],
-                          'renewLimit' => $this->paiaConfig['Global']['renewLimit'],
+                          'renewLimit' => $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['renewLimit'],
                           'request' => '',
                           'id' => $doc['item'],
                           'item_id' => '',
@@ -266,7 +278,9 @@ class PAIA extends AbstractBase
 		foreach ($transList as $key => $row) {
 			$duedate[$key]  = $row['duedate'];
 		}
-		array_multisort($duedate, SORT_ASC, $transList);
+		if (is_array($duedate)) {
+            array_multisort($duedate, SORT_ASC, $transList);
+        }
 		$this->session->transactions = $transList;
         return $transList;
     }
@@ -386,7 +400,7 @@ class PAIA extends AbstractBase
         );
 		
 		
-		if ($this->paiaConfig['Global']['show_profile_note'] == 1) {
+		if ($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['show_profile_note'] == 1) {
 			$patron += array(
 				'note' => $json_array['note'],
 			);
