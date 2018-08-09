@@ -65,7 +65,7 @@ class ParamsFactory implements FactoryInterface
             ->get($optionsService);
         $configLoader = $container->get('VuFind\Config\PluginManager');
         // Replace leading "VuFind" with "SearchKeys" to get the expected namespace:
-        $requestedName = preg_replace('/^VuFind/', 'SearchKeys', $requestedName);
+//        $requestedName = preg_replace('/^VuFind/', 'SearchKeys', $requestedName);
         // Clone the options instance in case caller modifies it:
         return new $requestedName(
             clone $optionsObj, $configLoader, ...($options ?: [])

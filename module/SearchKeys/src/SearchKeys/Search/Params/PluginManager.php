@@ -65,6 +65,7 @@ class PluginManager extends \VuFind\Search\Params\PluginManager
         'summon' => 'VuFind\Search\Summon\Params',
         'tags' => 'VuFind\Search\Tags\Params',
         'worldcat' => 'VuFind\Search\WorldCat\Params',
+        'VuFind\Search\Solr\Params' => 'SearchKeys\Search\Solr\Params',
     ];
 
     /**
@@ -84,7 +85,7 @@ class PluginManager extends \VuFind\Search\Params\PluginManager
         'VuFind\Search\Pazpar2\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\Primo\Params' => 'SearchKeys\Search\Params\ParamsFactory',
         'VuFind\Search\Search2\Params' => 'SearchKeys\Search\Solr\ParamsFactory',
-        'VuFind\Search\Solr\Params' => 'SearchKeys\Search\Solr\ParamsFactory',
+        'SearchKeys\Search\Solr\Params' => 'SearchKeys\Search\Solr\ParamsFactory',
         'VuFind\Search\SolrAuth\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\SolrAuthor\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\SolrAuthorFacets\Params' =>
