@@ -27,6 +27,7 @@
  */
 namespace PAIA\ILS\Driver;
 
+use PAIA\Config\PAIAConfigService;
 use Zend\ServiceManager\ServiceManager;
 
 /**
@@ -59,6 +60,9 @@ class Factory
         };
 
         $paia->setSessionFactory($sessionFactory);
+
+        $paia->setPaiaConfigService(new PAIAConfigService($sm->getServiceLocator()->get('VuFind\SessionManager')));
+
         return $paia;
     }
 }

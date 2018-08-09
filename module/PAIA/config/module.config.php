@@ -24,6 +24,11 @@ $config = array(
     ),
     'vufind' => array(
         'plugin_managers' => array(
+            'auth' => [
+                'factories' => [
+                    'ils' => 'PAIA\Auth\Factory::getILS',
+                ],
+            ],
             'ils_driver' => array(
                 'factories' => [
                     'paia' => 'PAIA\ILS\Driver\Factory::getPaia',
