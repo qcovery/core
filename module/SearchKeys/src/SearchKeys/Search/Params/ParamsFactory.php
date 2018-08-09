@@ -60,7 +60,8 @@ class ParamsFactory implements FactoryInterface
     ) {
 //echo $requestedName;
         // Replace trailing "Params" with "Options" to get the options service:
-        $optionsService = preg_replace('/Params$/', 'Options', $requestedName);
+        //$optionsService = preg_replace('/Params$/', 'Options', $requestedName);
+        $optionsService = 'VuFind\Search\Solr\Options';
         $optionsObj = $container->get('VuFind\Search\Options\PluginManager')
             ->get($optionsService);
         $configLoader = $container->get('VuFind\Config\PluginManager');
