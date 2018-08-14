@@ -40,14 +40,14 @@ class Libraries
     protected $locations;
     protected $searchMemory;
 
-    public function __construct(\VuFind\Config\PluginManager $configLoader, \VuFind\Search\Memory $searchMemory = null)
+    public function __construct(array $config, \VuFind\Search\Memory $searchMemory = null)
     {
         $this->searchMemory = $searchMemory;
         $this->includedLibraries = array();
         $this->excludedLibraries = array();
         $this->defaultLibraries = array();
-        foreach ($configLoader->get('libraries') as $dataObject) {
-            $data = $dataObject->toArray();
+        foreach ($config as $data) {
+//            $data = $dataObject->toArray();
             $libraryCode = $data['code'];
             if ($data['action'] == 'include') {
                 $this->includedLibraries[$libraryCode] = $data;
