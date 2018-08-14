@@ -121,15 +121,4 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
             'VuFind\AjaxHandler\SystemStatusFactory',
         'VuFind\AjaxHandler\TagRecord' => 'VuFind\AjaxHandler\TagRecordFactory',
     ];
-
-    /**
-     * Return the name of the base class or interface that plug-ins must conform
-     * to.
-     *
-     * @return string
-     */
-    protected function getExpectedInterface()
-    {
-        return 'VuFind\AjaxHandler\AjaxHandlerInterface';
-    }
 }
