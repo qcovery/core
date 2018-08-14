@@ -2,15 +2,19 @@
 namespace Libraries\Module\Configuration;
 
 $config = [
-    'controllers' => [
-        'factories' => [
-            'librariesajax' => 'Libraries\Controller\Factory::getLibrariesAjaxController',
-        ],
-    ],
+//    'controllers' => [
+//        'factories' => [
+//            'librariesajax' => 'Libraries\Controller\Factory::getLibrariesAjaxController',
+//        ],
+//    ],
     'service_manager' => [
         'allow_override' => true,
         'factories' => [
-            'VuFind\SessionManager' => 'VuFind\Session\ManagerFactory',
+            'Libraries\AjaxHandler\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
+            //'VuFind\SessionManager' => 'VuFind\Session\ManagerFactory',
+        ],
+        'aliases' => [
+            'VuFind\AjaxHandler\PluginManager' => 'Libraries\AjaxHandler\PluginManager'
         ],
     ],
     'vufind' => [
