@@ -28,8 +28,13 @@
 namespace Libraries\AjaxHandler;
 
 use Libraries\Selector;
+use VuFind\Search\Results\PluginManager as ResultsManager;
+use VuFind\Search\Memory;
+use Libraries\Libraries;
 use VuFind\AjaxHandler\AbstractBase;
 use Zend\Mvc\Controller\Plugin\Params;
+use Zend\Stdlib\Parameters;
+use Zend\Config\Config;
 //use VuFind\Controller\AjaxController;
 //use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -45,32 +50,138 @@ use Zend\Mvc\Controller\Plugin\Params;
 class GetLibraries extends AbstractBase
 {
     /**
-     * Request
+     * Libraries
      *
-     * @var Request
+     * @var Libraries
      */
-    protected $request;
+    protected $Libraries;
 
-
+    /**
+     * ResultsManager
+     *
+     * @var ResultsManager
+     */
+    protected $resultsManager;
 
     /**
      * Constructor
      *
      * @param ServiceLocatorInterface $sm Service locator
      */
-    public function __construct(Request $request)
+    public function __construct(Config $config, ResultsManager $resultsManager, Memory $searchMemory)
     {
-        $this->request = $request;
+        $this->resultsManager = $resultsManager;
+        $this->Libraries = new Libraries(
+        	$config,
+        	$searchMemory
+        );
     }
 
     /**
-     * Get the number of Books for a selected library
+     * Handle a request.
      *
-     * @return \Zend\Http\Response
+     * @param Params $params Parameter helper from controller
+     *
+     * @return array [response data, HTTP status code]
      */
-    protected function getLibraryFacetsAjax()
+    public function handleRequest(Params $params)
     {
-        $searchClassId = trim($_GET['searchclass']);
+        $queryString = $params->fromQuery('querystring');
+        $queryString = urldecode(
+            str_replace('&amp;', '&',
+                substr_replace(
+                    trim($queryString), '', 0, 1
+                )
+            )
+        );
+        $queryArray = explode('&', $queryString);
+
+        $libraryCode = $this->Libraries->getDefaultLibraryCode();
+
+        $searchParams = [];
+        foreach ($queryArray as $queryItem) {
+            $arrayKey = false;
+            list($key, $value) = explode('=', $queryItem, 2);
+            if (strpos('[]', $key) > 0) {
+                $key = str_replace('[]', '', $key);
+                $arrayKey = true;
+            }
+            if ($key == 'library') {
+                $libraryCode = $value;
+            } else {
+                if ($arrayKey) {
+                    $searchParams[$key][] = $value;
+                } else {
+                    $searchParams[$key] = $value;
+                }
+            }
+        }
+
+        $searchClassId = trim($params->fromQuery('searchclass', 'Solr'));
+        $this->Libraries->selectLibrary($libraryCode);
+        $locationFilter = $this->Libraries->getLocationFilter();
+
+        if (!empty($locationFilter) && !empty($searchParams['filter'])) {
+            foreach ($searchParams['filter'] as $filter ) {
+                if (strpos($filter, $locationFilter['field']) === 0) {
+                    $locationFilter['value'] = $filter;
+                }
+            }
+        }
+
+        $searchParams['library'] = $libraryCode;
+        $searchParams['included_libraries'] = $this->Libraries->getLibraryFilters($this->defaultLibraryCode, $searchClassId, true, false);
+        $searchParams['excluded_libraries'] = $this->Libraries->getLibraryFilters($this->defaultLibraryCode, $searchClassId, false, false);
+
+        $searchParams = array_merge(
+            $searchParams,
+            [
+                'hl' => 'false',
+                'facet' => 'true',
+                'facet.mincount' => 1,
+                'facet.limit' => 2000,
+                'facet.sort' => 'count'
+            ]
+        );
+
+        $libraryFacet = array_shift($this->Libraries->getLibraryFacetFields($searchClassId));
+        $libraryCodes = array_flip($this->Libraries->getLibraryFacetValues($searchClassId));
+        if (!empty($libraryFacet)) {
+            $searchParams['facet.field'][] = $libraryFacet;
+        }
+        if (!empty($locationFilter)) {
+            $searchParams['facet.field'][] = $locationFilter['facet'];
+            if (!empty($locationFilter['prefix'])) {
+                $searchParams['f.' . $locationFilter['facet'] . '.facet.prefix'] = $locationFilter['prefix'];
+            }
+        }
+
+        $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
+        $results = $this->resultsManager->get($backend);
+        $paramsObj = $results->getParams();
+        $paramsObj->addFacet($libraryFacet, null, false);
+        //$paramsObj->addFacet($locationFilter['facet'], null, false);
+        $paramsObj->initFromRequest(new Parameters($searchParams));
+
+        $facets = $results->getFacetList();
+//var_dump($facets);
+/*
+        $data = [];
+        foreach ($records as $record) {
+            $publishDates = $record->getPublicationDates();
+            $data[] = ['id' => $record->getUniqueID(),
+                       'title' => $record->getTitle(),
+                       'publishDate' => $publishDates[0]];
+        }
+*/
+        $data = $facets;
+        return $this->formatResponse($data);
+
+
+/*
+
+        $this->Libraries->selectLibrary
+
 
         $Selector = new Selector($this->request->getQuery());
         $Selector->setServiceLocator($this->serviceLocator);
@@ -85,45 +196,14 @@ class GetLibraries extends AbstractBase
             'counterTabCount' => $Selector->getCounterTabCount()
         ], self::STATUS_OK);
 
-/*-------------------------------------------------------------------------------*/
+-------------------------------------------------------------------------------
 
 
-        $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
-        $results = $this->resultsManager->get($backend);
-        $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn]));
 
-        $records = $results->getResults();
-        $data = [];
-        foreach ($records as $record) {
-            $publishDates = $record->getPublicationDates();
-            $data[] = ['id' => $record->getUniqueID(),
-                       'title' => $record->getTitle(),
-                       'publishDate' => $publishDates[0]];
-        }
-        return $this->formatResponse($data);
-
-
+*/
 
     }
 
-    /**
-     * Handle a request.
-     *
-     * @param Params $params Parameter helper from controller
-     *
-     * @return array [response data, HTTP status code]
-     */
-    public function handleRequest(Params $params)
-    {
-        $searchClassId = $params->fromQuery('searchclass');
-        $selector = new Selector();
-        $selector->setLibraries();//$config und \VuFind\Search\Memory
-        $selector->buildSelectorQuery($params->fromQuery('querystring');//requestObject; hier: Rückgabe nur ein Parameter Array
-        $libraryData = $selector->getSelectorData($searchClassId);//searchService; hier: Rückgabe nur ein Parameter Array
-
-
-    }
 }
 
 

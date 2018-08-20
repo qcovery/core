@@ -27,8 +27,9 @@
  */
 namespace Libraries;
 //use Zend\ServiceManager\ServiceManager;
-use Zend\Session\Container as SessionContainer;
 use VuFind\Search\Memory;
+use Zend\Session\Container as SessionContainer;
+use Zend\Config\Config;
 
 class Libraries
 {
@@ -40,14 +41,15 @@ class Libraries
     protected $locations;
     protected $searchMemory;
 
-    public function __construct(array $config, \VuFind\Search\Memory $searchMemory = null)
+    public function __construct(Config $config, Memory $searchMemory = null)
     {
         $this->searchMemory = $searchMemory;
         $this->includedLibraries = array();
         $this->excludedLibraries = array();
         $this->defaultLibraries = array();
-        foreach ($config as $data) {
-//            $data = $dataObject->toArray();
+
+        foreach ($config as $dataObject) {
+            $data = $dataObject->toArray();
             $libraryCode = $data['code'];
             if ($data['action'] == 'include') {
                 $this->includedLibraries[$libraryCode] = $data;

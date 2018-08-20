@@ -64,9 +64,9 @@ class GetLibrariesFactory
             throw new \Exception('Unexpected options passed to factory.');
         }
         return new $requestedName(
-            $container->get('Config'),
+            $container->get('VuFind\Config\PluginManager')->get('libraries'),
             $container->get('VuFind\Search\Results\PluginManager'),
-            $container->get('VuFind\Record\Loader')
+            $container->get('VuFind\Search\Memory')
         );
     }
 }
