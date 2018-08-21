@@ -1,0 +1,38 @@
+<? if ($this->paia()->hasMultipleLoginSources()): ?>
+<div class="form-group">
+  <div id="paia-multilogin-icons">
+    <? $first = true; ?>
+    <? foreach ($this->paia()->getMultipleLoginSources() as $loginSource): ?>
+        <img src="<?=$this->imageLink($loginSource['icon'])?>" class="<? if (!$first): ?>hidden<? endif; ?>" data-isil="<?=$loginSource['isil']?>"/>
+        <? $first = false; ?>
+    <? endforeach; ?>
+  </div>
+  <select id="paia-multilogin-select" name="isil">
+    <? foreach ($this->paia()->getMultipleLoginSources() as $loginSource): ?>
+      <option value="<?=$loginSource['isil']?>"><?=$loginSource['name']?></option>
+    <? endforeach; ?>
+  </select>
+</div>
+<? endif; ?>
+<div class="form-group">
+  <label class="control-label" for="login_<?=$this->escapeHtmlAttr($topClass)?>_username"><?=$this->transEsc('Username')?>:</label>
+  <input type="text" name="username" id="login_<?=$this->escapeHtmlAttr($topClass)?>_username" value="<?=$this->escapeHtmlAttr($this->request->get('username'))?>" class="form-control"/>
+</div>
+<div class="form-group">
+  <label class="control-label" for="login_<?=$this->escapeHtmlAttr($topClass)?>_password"><?=$this->transEsc('Password')?>:</label>
+  <input type="password" name="password" id="login_<?=$this->escapeHtmlAttr($topClass)?>_password" class="form-control"/>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#paia-multilogin-select').on('change', function(){
+            var isil = $('#paia-multilogin-select option:selected').val();
+            $('#paia-multilogin-icons img').each(function(){
+                if ($(this).data('isil') == isil) {
+                    $(this).removeClass('hidden');
+                } else {
+                    $(this).addClass('hidden');
+                }
+            });
+        })
+    });
+</script>

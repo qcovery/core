@@ -55,7 +55,8 @@ class Factory extends \VuFind\Controller\Factory
             $sm->getServiceLocator()->get('VuFind\Tags'),
             $sm->getServiceLocator()->get('VuFind\SearchResultsPluginManager'),
             $sm->getServiceLocator()->get('VuFind\RecordLoader'),
-            $sm->getServiceLocator()->get('VuFind\Mailer')
+            $sm->getServiceLocator()->get('VuFind\Mailer'),
+            $sm->getServiceLocator()->get('VuFind\SessionManager')
         );
     }
 }
