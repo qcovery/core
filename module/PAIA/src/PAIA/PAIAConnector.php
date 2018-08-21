@@ -41,14 +41,14 @@ class PAIAConnector
            $scope = 'read_patron read_fees read_items write_items change_password read_availability';
        }
        $client->scope($scope);
-       return $client->get();
+       return $client->post();
     }
     
     function logout ($patron) {
        $client = new \PAIA\RestClient($this->base_url.$this->isil.'/auth/logout');
        $client->setHttpClient($this->http_client);
        $client->patron($patron);
-       return $client->get();
+       return $client->post();
     }
     
     function change ($patron, $access_token, $username, $old_password, $new_password) {
