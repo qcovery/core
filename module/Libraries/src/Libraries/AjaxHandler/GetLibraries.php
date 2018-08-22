@@ -28,7 +28,7 @@
 namespace Libraries\AjaxHandler;
 
 use Libraries\Selector;
-use VuFind\Search\Results\PluginManager as ResultsManager;
+use Libraries\Search\Results\PluginManager as ResultsManager;
 use VuFind\Search\Memory;
 use Libraries\Libraries;
 use VuFind\AjaxHandler\AbstractBase;
@@ -96,8 +96,6 @@ class GetLibraries extends AbstractBase
         );
         $queryArray = explode('&', $queryString);
 
-        $libraryCode = $this->Libraries->getDefaultLibraryCode();
-
         $searchParams = [];
         foreach ($queryArray as $queryItem) {
             $arrayKey = false;
@@ -117,77 +115,57 @@ class GetLibraries extends AbstractBase
             }
         }
 
-        $searchClassId = trim($params->fromQuery('searchclass', 'Solr'));
-        $this->Libraries->selectLibrary($libraryCode);
-        $locationFilter = $this->Libraries->getLocationFilter();
-
-        if (!empty($locationFilter) && !empty($searchParams['filter'])) {
-            foreach ($searchParams['filter'] as $filter ) {
-                if (strpos($filter, $locationFilter['field']) === 0) {
-                    $locationFilter['value'] = $filter;
-                }
-            }
-        }
-
-        $searchParams['library'] = $libraryCode;
-        $searchParams['included_libraries'] = $this->Libraries->getLibraryFilters($this->defaultLibraryCode, $searchClassId, true, false);
-        $searchParams['excluded_libraries'] = $this->Libraries->getLibraryFilters($this->defaultLibraryCode, $searchClassId, false, false);
-
-        $searchParams = array_merge(
-            $searchParams,
-            [
-                'hl' => 'false',
-                'facet' => 'true',
-                'facet.mincount' => 1,
-                'facet.limit' => 2000,
-                'facet.sort' => 'count'
-            ]
-        );
-
-        $libraryFacet = array_shift($this->Libraries->getLibraryFacetFields($searchClassId));
-        $libraryCodes = array_flip($this->Libraries->getLibraryFacetValues($searchClassId));
-        if (!empty($libraryFacet)) {
-            $searchParams['facet.field'][] = $libraryFacet;
-        }
-        if (!empty($locationFilter)) {
-            $searchParams['facet.field'][] = $locationFilter['facet'];
-            if (!empty($locationFilter['prefix'])) {
-                $searchParams['f.' . $locationFilter['facet'] . '.facet.prefix'] = $locationFilter['prefix'];
-            }
-        }
-
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
+        $selectedLibrary = $this->Libraries->selectLibrary($libraryCode);
+        $locationFilter = $this->Libraries->getLocationFilter();
+        $libraryFacet = array_shift($this->Libraries->getLibraryFacetFields($backend));
+        $libraryCodes = array_flip($this->Libraries->getLibraryFacetValues($backend));
+//echo $backend;
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
         $paramsObj->addFacet($libraryFacet, null, false);
-        //$paramsObj->addFacet($locationFilter['facet'], null, false);
+        if (!empty($locationFilter['field'])) {
+            $paramsObj->addFacet($locationFilter['field'], null, false);
+            $paramsObj->setFacetPrefix($locationFilter['field'], $locationFilter['prefix']);
+        }
+//        $paramsObj->setFacetPrefix($locationFilter['prefix']);
+        $paramsObj->setFacetLimit(2000); 
+        $paramsObj->getOptions()->disableHighlighting();
+        $paramsObj->getOptions()->spellcheckEnabled(false);
+        
+       //$paramsObj->addFacet($locationFilter['facet'], null, false);
         $paramsObj->initFromRequest(new Parameters($searchParams));
 
-        $facets = $results->getFacetList();
-//var_dump($facets);
-/*
-        $data = [];
-        foreach ($records as $record) {
-            $publishDates = $record->getPublicationDates();
-            $data[] = ['id' => $record->getUniqueID(),
-                       'title' => $record->getTitle(),
-                       'publishDate' => $publishDates[0]];
+        $facetList = $results->getFacetList();
+        $libraryList = $facetList['collection_details']['list'];
+        $locationList = $facetList['standort_iln_str_mv']['list'];
+
+//print_r($facetList);
+        $libraryData = [];
+        foreach ($libraryList as $libraryItem) {
+            $library = $this->Libraries->getLibrary($libraryItem['value']);
+            $libraryData[$libraryItem['value']] = ['fullname' => $library['fullname'], 'count' => $libraryItem['count']];
         }
-*/
-        $data = $facets;
+        $libraryData = array_intersect_key($libraryData, $libraryCodes);
+
+        $locationFacets = [];
+//print_r($locationList);
+//print_r($iln);
+        foreach ($locationList as $locationItem) {
+            $locationFacets[$locationItem['value']] = $locationItem['count'];
+        }
+        $locationFacets = $this->Libraries->getLocationList($locationFacets);
+
+        $data = [
+            'libraryCount' => count($libraryData) + 2,
+            'libraryData' => $libraryData,
+            'locationFacets' => $locationFacets,
+            'locationFilter' => ['field' => $locationFilter['field'], 'value' => ''],
+        ];
         return $this->formatResponse($data);
 
 
 /*
-
-        $this->Libraries->selectLibrary
-
-
-        $Selector = new Selector($this->request->getQuery());
-        $Selector->setServiceLocator($this->serviceLocator);
-        $Selector->setLibraries();
-        $Selector->buildSelectorQuery($_GET['querystring']);
-        $libraryData = $Selector->getSelectorData($searchClassId);
 
         return $this->output([
             'libraryData' => $libraryData,
@@ -196,7 +174,6 @@ class GetLibraries extends AbstractBase
             'counterTabCount' => $Selector->getCounterTabCount()
         ], self::STATUS_OK);
 
--------------------------------------------------------------------------------
 
 
 

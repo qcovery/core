@@ -38,7 +38,7 @@ class Params extends \SearchKeys\Search\Solr\Params
     protected $selectedLibrary = null;
     protected $includedLibraries = null;
     protected $excludedLibraries = null;
-
+    protected $facetFieldPrefix = [];
 
     /**
      * Constructor
@@ -48,11 +48,11 @@ class Params extends \SearchKeys\Search\Solr\Params
      */
     public function __construct($options, \VuFind\Config\PluginManager $configLoader,
         HierarchicalFacetHelper $facetHelper = null,
-        \VuFind\Search\Memory $searchMemory,
-        SearchKeysHelper $searchKeysHelper
+        SearchKeysHelper $searchKeysHelper,
+        \VuFind\Search\Memory $searchMemory
     ) {
         parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper);
-        $this->Libraries = new Libraries($configLoader, $searchMemory);
+        $this->Libraries = new Libraries($configLoader->get('libraries'), $searchMemory);
     }
 
     /**
@@ -60,6 +60,7 @@ class Params extends \SearchKeys\Search\Solr\Params
      *
      * @return array $filterQuery
      */
+/*
     public function getFilterSettings()
     {
         // Define Filter Query
@@ -95,7 +96,25 @@ class Params extends \SearchKeys\Search\Solr\Params
         }
         return $filterQuery;
     }
+*/
 
+    public function setFacetPrefix($field, $prefix) {
+        $this->facetFieldPrefix[$field] = $prefix;
+    }
+
+    /**
+     * Return current facet configurations
+     *
+     * @return array $facetSet
+     */
+    public function getFacetSettings()
+    {
+        $facetSet = parent::getFacetSettings();
+        foreach ($this->facetFieldPrefix as $field => $prefix) {
+            $facetSet["f.{$field}.facet.prefix"] = $prefix;
+        }
+        return $facetSet;
+    }
 
     /**
      * Create search backend parameters for advanced features.
