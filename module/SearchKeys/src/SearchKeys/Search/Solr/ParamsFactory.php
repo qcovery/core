@@ -62,7 +62,6 @@ class ParamsFactory extends \SearchKeys\Search\Params\ParamsFactory
         }
         $facetHelper = $container->get('VuFind\Search\Solr\HierarchicalFacetHelper');
         $searchKeysHelper = $container->get('SearchKeys\Search\SearchKeysHelper');
-//        return parent::__invoke($container, $requestedName, [$facetHelper]);
         return parent::__invoke($container, $requestedName, [$facetHelper, $searchKeysHelper]);
     }
 }

@@ -58,7 +58,6 @@ class ParamsFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-//echo $requestedName;
         // Replace trailing "Params" with "Options" to get the options service:
         $optionsService = preg_replace('/Params$/', 'Options', $requestedName);
         // Replace leading "SearchKeys" with "VuFind" to get the VuFind options service:
