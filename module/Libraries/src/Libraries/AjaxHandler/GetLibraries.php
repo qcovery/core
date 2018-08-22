@@ -163,22 +163,6 @@ class GetLibraries extends AbstractBase
             'locationFilter' => ['field' => $locationFilter['field'], 'value' => ''],
         ];
         return $this->formatResponse($data);
-
-
-/*
-
-        return $this->output([
-            'libraryData' => $libraryData,
-            'locationFacets' => $Selector->getLocationFacets(),
-            'locationFilter' => $Selector->getLocationFilter(),
-            'counterTabCount' => $Selector->getCounterTabCount()
-        ], self::STATUS_OK);
-
-
-
-
-*/
-
     }
 
 }

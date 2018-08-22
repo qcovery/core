@@ -1,9 +1,9 @@
 <?
-  $options = $this->searchOptions($this->searchClassId);
-  $params = $this->searchParams($this->searchClassId);
-  $Libraries = $params->getLibraries();
+/*
+  $Libraries = $this->params->getLibraries();
   $selectedLibrary = $Libraries->selectLibrary();
   $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
+*/
 ?>
 <div class="uk-child-width-1-1" uk-grid>
     <div class="">
@@ -15,7 +15,7 @@
                     <? if ($selectedLibrary['code'] == $library): ?>
                         <li class="uk-active"><strong><?=$this->transEsc($data['fullname']) ?></strong></li>
                     <? else: ?>
-                        <li><a href="<?=$this->url($options->getSearchHomeAction());?>?library=<?=$library ?>"><?=$this->transEsc($data['fullname']) ?></a></li>
+                        <li><a href="<?=$this->url($this->options->getSearchHomeAction());?>?library=<?=$library ?>"><?=$this->transEsc($data['fullname']) ?></a></li>
                     <? endif; ?>
                 <? endforeach; ?>
             </ul>

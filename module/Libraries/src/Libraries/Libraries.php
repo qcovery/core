@@ -251,7 +251,7 @@ class Libraries
             $locations = $this->locations[$this->selectedLibrary['code']];
             foreach ($locationFacets as $facetKey => $facetValue) {
                 foreach ($locations as $key => $value) {
-                    if (in_array($key, array('code', 'solr-field', 'filter-prefix'))) {
+                    if (in_array($key, ['code', 'solr-field', 'filter-prefix'])) {
                         continue;
                     }
                     if (!empty($locations['filter-prefix'])) {
@@ -259,14 +259,14 @@ class Libraries
                     }
                     if (preg_match('#^'.$key.'$#', $facetKey)) {
                         if (!isset($locationList[$value])) {
-                            $filterList[$value] = array();
-                            $locationList[$value] = array('count' => 0);
+                            $filterList[$value] = [];
+                            $locationList[$value] = ['count' => 0];
                         }
                         $locationList[$value]['count'] += intval($facetValue);
                         if (strpos($key, ' ') !== false) {
                             $key = '"'.$key.'"';
                         }
-                        $filterList[$value][] = $locations['solr-field'].':'.str_replace(array('.', '/', ':'), array('', '\/', '\:'), $key);
+                        $filterList[$value][] = $locations['solr-field'].':'.str_replace(['.', '/', ':'], ['', '/', ':'], $key);
                         break;
                     }
                 }
