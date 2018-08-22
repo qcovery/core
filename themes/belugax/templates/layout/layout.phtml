@@ -191,10 +191,12 @@ JS;
     </div>
     <div class="offcanvas-toggle" data-toggle="offcanvas"><i class="fa" title="<?=$this->transEsc('sidebar_expand') ?>"></i></div>
     <div class="offcanvas-overlay" data-toggle="offcanvas"></div>
+<? if (false): ?>
     <?=$this->googleanalytics()?>
     <?=$this->piwik()?>
     <? if ($this->recaptcha()->active()): ?>
       <?=$this->inlineScript(\Zend\View\Helper\HeadScript::FILE, "https://www.google.com/recaptcha/api.js?onload=recaptchaOnLoad&render=explicit&hl=" . $this->layout()->userLang, 'SET')?>
     <? endif; ?>
+<? endif; ?>
   </body>
 </html>
