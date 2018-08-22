@@ -64,13 +64,13 @@ jQuery(document).ready(function() {
         jQuery('div#location-list').html('');
         jQuery('div#side-panel-library').attr('style', 'display:none');
         jQuery('div#side-panel-location').attr('style', 'display:none');
-        if (typeof(queryString) != "undefined" && typeof(searchClass) != "undefined") {
+        if (typeof(queryString) != "undefined") {
             queryString = queryString.substring(1, queryString.length - 1);
             var backendUrl = resolveBackend(searchClass, true);
             jQuery.ajax({
-                url:'/vufind/LibrariesAjax/JSON?method=getLibraryFacets',
+                url:'/vufind/AJAX/JSON?method=getLibraries',
                 dataType:'json',
-                data:{querystring:queryString, searchclass:searchClass},
+                data:{querystring:queryString},
                 success:function(data, textStatus) {
                     var newQueryString;
                     var libraryCount = Object.keys(data.data.libraryData).length;
@@ -78,7 +78,7 @@ jQuery(document).ready(function() {
                         jQuery.each(data.data.libraryData, function(thisLibraryCode, libraryData) {
                             newQueryString = queryString.replace(/&library=.+$/, '');
                             jQuery('div#library-list').append(libraryTemplate);
-                            jQuery('div#library-list .library-item-count').last().before(libraryData.fullname);
+                            jQuery('div#library-list .library-item-text').last().html(libraryData.fullname);
                             jQuery('div#library-list .library-item-count').last().html(formatNumber(libraryData.count));
                             if (searchClass == "Primo" && libraryData.primo == undefined) {
                                 jQuery('div#library-list .library-item').last().attr('href', '#');
@@ -90,6 +90,7 @@ jQuery(document).ready(function() {
                     } else {
                         jQuery('div#side-panel-library').remove();
                     }
+//alert(data.data.locationFilter);
                     if (typeof(data.data.locationFilter) == "object") {
                         if (data.data.locationFilter.value != '' && data.data.locationFilter.value != null) {
                             var queryStringItems = queryString.split('&');
