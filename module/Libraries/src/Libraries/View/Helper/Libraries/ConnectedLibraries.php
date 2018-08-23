@@ -4,6 +4,8 @@
  */
 namespace Libraries\View\Helper\Libraries;
 
+use Libraries\Libraries;
+
 class ConnectedLibraries extends \Zend\View\Helper\AbstractHelper
 {
     protected $Libraries;
@@ -11,18 +13,20 @@ class ConnectedLibraries extends \Zend\View\Helper\AbstractHelper
     /**
      *
      */
-    public function __construct($Libraries)
+    public function __construct($config, \VuFind\Search\Memory $memory)
     {
-        $this->Libraries = $Libraries;
+        $this->Libraries = new Libraries($config, $memory);
     }
 
     /**
      *
      */
-    public function getConnectedLibraries($searchClassId, $driver)
+    public function getConnectedLibraries($searchClassId, $driver = null)
     {
-        $includedLibraries = $this->Libraries->getLibraryCodes($searchClassId);
-        $libraryCodes = array_intersect($includedLibraries, $driver->getLibraries());
+        $libraryCodes = $this->Libraries->getLibraryCodes($searchClassId);
+        if (!empty($driver)) {
+            $libraryCodes = array_intersect($includedLibraries, $driver->getLibraries());
+        }
         $connectedLibraries = [];
         foreach ($libraryCodes as $libraryCode) {
             $library = $this->Libraries->getLibrary($libraryCode);

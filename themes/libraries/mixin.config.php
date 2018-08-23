@@ -3,7 +3,10 @@ return [
     'js' => ['libraries.js'],
     'helpers' => [
         'factories' => [
-            'connectedlibraries' => 'Libraries\View\Helper\Libraries\Factory::getConnectedLibraries',
+            'Libraries\View\Helper\Libraries\ConnectedLibraries' => 'Libraries\View\Helper\Libraries\ConnectedLibrariesFactory',
+        ],
+        'aliases' => [
+            'connectedlibraries' => 'Libraries\View\Helper\Libraries\ConnectedLibraries',
         ]
     ]
 ];
