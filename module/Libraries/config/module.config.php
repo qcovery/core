@@ -24,20 +24,6 @@ $config = [
                     'Search2' => 'Libraries\Search\Factory\Search2BackendFactory',
                 ],
             ],
-            'search_params' => [
-                'abstract_factories' => ['Libraries\Search\Params\PluginFactory'],
-                'factories' => [
-                    'solr' => 'Libraries\Search\Params\Factory::getSolr',
-                    'primo' => 'Libraries\Search\Params\Factory::getPrimo',
-                    'search2' => 'Libraries\Search\Params\Factory::getSearch2',
-                ],
-            ],
-            'recorddriver' => [
-                'abstract_factories' => ['VuFind\RecordDriver\PluginFactory'],
-                'factories' => [
-                    'solrmarc' => 'Libraries\RecordDriver\Factory::getSolrMarc',
-                ],
-            ],
         ],
     ],
 ];

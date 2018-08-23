@@ -229,6 +229,7 @@ class Libraries
     public function getLocationValue($filter) {
         if (isset($this->locations[$this->selectedLibrary['code']])) {
             $locations = $this->locations[$this->selectedLibrary['code']];
+            $filter = str_replace(['(', ')'], '', $filter);
             list($field, $filterString) = explode(':', $filter, 2);
             if ($locations['solr-field'] == $field) {
                 list($rawFilter, ) = explode('OR', $filterString, 2);
@@ -242,7 +243,7 @@ class Libraries
                 }
             }
         }
-        return null;
+        return $filter;
     }
 
     public function getLocationList($locationFacets) {
@@ -263,16 +264,16 @@ class Libraries
                             $locationList[$value] = ['count' => 0];
                         }
                         $locationList[$value]['count'] += intval($facetValue);
-                        if (strpos($key, ' ') !== false) {
+                        if (true || strpos($key, ' ') !== false) {
                             $key = '"'.$key.'"';
                         }
-                        $filterList[$value][] = $locations['solr-field'].':'.str_replace(['.', '/', ':'], ['', '/', ':'], $key);
+                        $filterList[$value][] = $locations['solr-field'].':'.str_replace('.', '', $key);
                         break;
                     }
                 }
             }
             foreach ($locationList as $value => $data) {
-                $locationList[$value]['filter'] = implode('+OR+', array_unique($filterList[$value]));
+                $locationList[$value]['filter'] = '(' . implode('+OR+', array_unique($filterList[$value])) . ')';
             }
         }
         uasort($locationList, function($a, $b) {return $b['count'] - $a['count'];});

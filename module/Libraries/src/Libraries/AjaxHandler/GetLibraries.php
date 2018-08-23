@@ -126,7 +126,7 @@ class GetLibraries extends AbstractBase
         $paramsObj->addFacet($libraryFacet, null, false);
         if (!empty($locationFilter['field'])) {
             $paramsObj->addFacet($locationFilter['field'], null, false);
-            $paramsObj->setFacetPrefix($locationFilter['field'], $locationFilter['prefix']);
+            $paramsObj->setFacetFieldPrefix($locationFilter['field'], $locationFilter['prefix']);
         }
 //        $paramsObj->setFacetPrefix($locationFilter['prefix']);
         $paramsObj->setFacetLimit(2000); 

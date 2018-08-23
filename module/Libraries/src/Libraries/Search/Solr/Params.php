@@ -55,50 +55,30 @@ class Params extends \SearchKeys\Search\Solr\Params
         $this->Libraries = new Libraries($configLoader->get('libraries'), $searchMemory);
     }
 
-    /**
-     * Return the current filters as an array of strings ['field:filter']
-     *
-     * @return array $filterQuery
-     */
-/*
-    public function getFilterSettings()
-    {
-        // Define Filter Query
-        $filterQuery = $this->getHiddenFilters();
-        $orFilters = array();
-        foreach ($this->filterList as $field => $filter) {
-            if ($orFacet = (substr($field, 0, 1) == '~')) {
-                $field = substr($field, 1);
-            }
-            foreach ($filter as $value) {
-                // Special case -- allow trailing wildcards, ranges and already ored facets:
-                if (substr($value, -1) == '*'
-                    || preg_match('/\[[^\]]+\s+TO\s+[^\]]+\]/', $value)
-                    || preg_match('/^(.+)\sOR\s(.+)$/', $value, $matches)
-                ) {
-                    $q = $field.':'.$value;
-                } else {
-                // Be sure that values aren't slashed twice
-                    $q = $field.':"'.addcslashes(stripcslashes($value), '"\\').'"';
-                }
-                if ($orFacet) {
-                    $orFilters[$field] = isset($orFilters[$field])
-                        ? $orFilters[$field] : array();
-                    $orFilters[$field][] = $q;
-                } else {
-                    $filterQuery[] = $q;
-                }
-            }
-        }
-        foreach ($orFilters as $field => $parts) {
-            $filterQuery[] = '{!tag=' . $field . '_filter}' . $field
-                . ':(' . implode(' OR ', $parts) . ')';
-        }
-        return $filterQuery;
-    }
-*/
 
-    public function setFacetPrefix($field, $prefix) {
+    /**
+     * Format a single filter for use in getFilterList().
+     *
+     * @param string $field     Field name
+     * @param string $value     Field value
+     * @param string $operator  Operator (AND/OR/NOT)
+     * @param bool   $translate Should we translate the label?
+     *
+     * @return array
+     */
+    protected function formatFilterListEntry($field, $value, $operator, $translate)
+    {
+        $filter = parent::formatFilterListEntry(
+            $field, $value, $operator, $translate
+        );
+        if ($filter['field'] == '#') {
+            $filter['field'] = 'Location';
+            $filter['displayText'] = $this->Libraries->getLocationValue($filter['displayText']);
+        }
+        return $filter;
+    }
+
+    public function setFacetFieldPrefix($field, $prefix) {
         $this->facetFieldPrefix[$field] = $prefix;
     }
 
