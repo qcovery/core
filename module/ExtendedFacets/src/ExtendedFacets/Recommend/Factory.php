@@ -2,7 +2,7 @@
 /**
  * Recommendation Module Factory Class
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) Villanova University 2014.
  *
@@ -52,8 +52,8 @@ class Factory
     public static function getSideFacets(ServiceManager $sm)
     {
         return new SideFacets(
-            $sm->getServiceLocator()->get('VuFind\Config'),
-            $sm->getServiceLocator()->get('VuFind\HierarchicalFacetHelper')
+            $sm->get('VuFind\Config\PluginManager'),
+            $sm->get('VuFind\Search\Solr\HierarchicalFacetHelper')
         );
     }
 }

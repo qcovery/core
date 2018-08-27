@@ -2,14 +2,13 @@
 namespace ExtendedFacets\Module\Configuration;
 
 $config = [
-    'vufind' => [
-        'plugin_managers' => [
-            'recommend' => [
-                'abstract_factories' => ['VuFind\Recommend\PluginFactory'],
-                'factories' => [
-                    'sidefacets' => 'ExtendedFacets\Recommend\Factory::getSideFacets',
-                ],
-            ],
+    'service_manager' => [
+        'allow_override' => true,
+        'factories' => [
+            'ExtendedFacets\Recommend\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
+        ],
+        'aliases' => [
+            'VuFind\Recommend\PluginManager' => 'ExtendedFacets\Recommend\PluginManager',
         ],
     ],
 ];
