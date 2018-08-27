@@ -166,17 +166,26 @@ JS;
         <? endif; ?>
       </div>
     </nav>
-    <div id="belugax-tabs">
-        <div class="container">
-            <? if ($this->templateName && ($this->templateName == 'results' || $this->templateName == 'search')): ?>
-<? $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
-<?= $this->context($this)->renderInContext('search/searchTabs', ['searchTabs' => $tabConfig['tabs']]); ?>
-            <? endif; ?>
-        </div>
-    </div>
     <div role="main" class="main">
       <div id="content" class="container">
-        <?=$this->render('belugax/notification.phtml')?>
+<? //$notificationConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/notification.ini'), true); ?>
+
+<? if(!empty($notificationConfig['Global'])): ?>
+        <? if (!empty($notificationConfig['Global']['error_notification'])): ?>
+            <div id="belugax-notification"><?=$this->transEsc($notificationConfig['Global']['error_notification']);?></div>
+        <? elseif (!empty($notificationConfig['Global']['ip_notification'])): ?>
+        <?
+            $ip = '';
+            if(isset($_SERVER['REMOTE_ADDR'])) {
+                $ip = $_SERVER['REMOTE_ADDR'];
+            }
+        ?>
+        <? if (strpos($ip, $notificationConfig['Global']['ip_notification']) === false) { ?>
+            <div id="belugax-notification"><?=$this->transEsc($notificationConfig['Global']['ip_notification_message'])?></div>
+        <? } ?>
+        <? endif; ?>
+<? endif; ?>
+
         <?=$this->layout()->content ?>
       </div>
     </div>
