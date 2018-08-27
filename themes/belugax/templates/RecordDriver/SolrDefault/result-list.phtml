@@ -213,7 +213,10 @@
     </div>
     <div class="result-badge hidden-print">
         <? if ($this->cart()->isActiveInSearch() && $this->params->getOptions()->supportsCart() && $this->cart()->isActive()): ?>
-            <?=$this->render('belugax/result-badge.phtml', ['id' => $this->driver->getUniqueId(), 'source' => $this->driver->getSourceIdentifier()]); ?><br/>
+    <div class="belugax-result-badge">
+        <? $cartId = $this->source . '|' . $this->id; ?>
+        <?=($cart->contains($cartId)) ? '<i class="bel-stern01">' : '<i>' ?></i>
+    </div>
         <? endif; ?>
 
         <? /* We need to find out if we're supposed to display an OpenURL link ($openUrlActive),

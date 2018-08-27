@@ -169,7 +169,8 @@ JS;
     <div id="belugax-tabs">
         <div class="container">
             <? if ($this->templateName && ($this->templateName == 'results' || $this->templateName == 'search')): ?>
-                <?=$this->context($this)->renderInContext('belugax/searchTabs', []); ?>
+<? $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
+<?= $this->context($this)->renderInContext('search/searchTabs', ['searchTabs' => $tabConfig['tabs']]); ?>
             <? endif; ?>
         </div>
     </div>
