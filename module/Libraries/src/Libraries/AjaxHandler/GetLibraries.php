@@ -100,8 +100,8 @@ class GetLibraries extends AbstractBase
         foreach ($queryArray as $queryItem) {
             $arrayKey = false;
             list($key, $value) = explode('=', $queryItem, 2);
-            if (strpos('[]', $key) > 0) {
-                $key = str_replace('[]', '', $key);
+            if (preg_match('/([0-9]\[\]$)/', $key, $matches)) {
+                $key = str_replace($matches[1], '', $key);
                 $arrayKey = true;
             }
             if ($key == 'library') {
@@ -114,7 +114,7 @@ class GetLibraries extends AbstractBase
                 }
             }
         }
-
+//print_r($searchParams);
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $selectedLibrary = $this->Libraries->selectLibrary($libraryCode);
         $locationFilter = $this->Libraries->getLocationFilter();
