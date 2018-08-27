@@ -8,7 +8,8 @@ $config = [
             'RecordDriver\RecordDriver\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
         ],
         'aliases' => [
-            'RecordDriver\RecordDriverPluginManager' => 'RecordDriver\RecordDriver\PluginManager',
+            //'RecordDriver\RecordDriverPluginManager' => 'RecordDriver\RecordDriver\PluginManager',
+            'VuFind\RecordDriver\PluginManager' => 'RecordDriver\RecordDriver\PluginManager',
         ],
     ],
 ];
