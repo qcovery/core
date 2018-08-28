@@ -70,6 +70,7 @@ jQuery(document).ready(function() {
             jQuery.ajax({
                 url:'/vufind/AJAX/JSON?method=getLibraries',
                 dataType:'json',
+                //data:{querystring:encodeURIComponent(queryString)},
                 data:{querystring:queryString},
                 success:function(data, textStatus) {
                     var newQueryString;
