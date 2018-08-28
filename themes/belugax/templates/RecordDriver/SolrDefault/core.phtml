@@ -32,7 +32,7 @@
   <? endif; ?>
   <div class="media-body">
 <!-- Module RecordDriver -->
-    <?=$this->render('RecordDriver/SolrDefault/core-title.phtml', ['driver' => $driver]); ?>
+    <?=$this->render('RecordDriver/SolrDefault/recorddriver-core-title.phtml', ['driver' => $driver]); ?>
 <!-- Module RecordDriver -->
 
     <? if ($this->userlist()->getMode() !== 'disabled'): ?>
@@ -46,7 +46,7 @@
 <!-- Module RecordDriver -->
     <? $coreFieldCategories = ['title2', 'person', 'publication', 'subject', 'description', 'related']; //coreFieldCategory according to category in solrmarc.yaml ?>
     <? $coreFieldCategories = []; ?>
-    <?=$this->render('RecordDriver/SolrDefault/core-data.phtml', ['driver' => $driver, 'coreFieldCategories' => $coreFieldCategories]); ?>
+    <?=$this->render('RecordDriver/SolrDefault/recorddriver-core-data.phtml', ['driver' => $driver, 'coreFieldCategories' => $coreFieldCategories]); ?>
 <!-- Module RecordDriver -->
 <!-- Module DAIA -->
     <?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '0']); ?>
