@@ -1,11 +1,10 @@
 <?php
-
 /**
- * Search Params for second Solr index
+ * Params Extension for Libraries Module
  *
- * PHP version 7
+ * PHP version 5
  *
- * Copyright (C) Staats- und Universitätsbibliothek Hamburg 2018.
+ * Copyright (C) Staats- und Universitätsbibliothek 2017.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -13,18 +12,18 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @category VuFind
- * @package  Search_Search2
+ * @category VuFind2
+ * @package  Search
  * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org Main Page
+ * @link     https://github.com/subhh/beluga
  */
 namespace Libraries\Search\Search2;
 
@@ -33,21 +32,13 @@ use VuFindSearch\ParamBag;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use SearchKeys\Search\SearchKeysHelper;
 
-/**
- * Search Params for second Solr index
- *
- * @category VuFind
- * @package  Search_Search2
- * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
- * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org Main Site
- */
 class Params extends \SearchKeys\Search\Search2\Params
 {
     protected $Libraries = null;
     protected $selectedLibrary = null;
     protected $includedLibraries = null;
     protected $excludedLibraries = null;
+    protected $facetFieldPrefix = [];
 
     /**
      * Constructor
@@ -57,52 +48,52 @@ class Params extends \SearchKeys\Search\Search2\Params
      */
     public function __construct($options, \VuFind\Config\PluginManager $configLoader,
         HierarchicalFacetHelper $facetHelper = null,
-        \VuFind\Search\Memory $searchMemory,
-        SearchKeysHelper $searchKeysHelper
+        SearchKeysHelper $searchKeysHelper,
+        \VuFind\Search\Memory $searchMemory
     ) {
         parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper);
-        $this->Libraries = new Libraries($configLoader, $searchMemory);
+        $this->Libraries = new Libraries($configLoader->get('libraries'), $searchMemory);
+    }
+
+
+    /**
+     * Format a single filter for use in getFilterList().
+     *
+     * @param string $field     Field name
+     * @param string $value     Field value
+     * @param string $operator  Operator (AND/OR/NOT)
+     * @param bool   $translate Should we translate the label?
+     *
+     * @return array
+     */
+    protected function formatFilterListEntry($field, $value, $operator, $translate)
+    {
+        $filter = parent::formatFilterListEntry(
+            $field, $value, $operator, $translate
+        );
+        if ($filter['field'] == '#') {
+            $filter['field'] = 'Location';
+            $filter['displayText'] = $this->Libraries->getLocationValue($filter['displayText']);
+        }
+        return $filter;
+    }
+
+    public function setFacetFieldPrefix($field, $prefix) {
+        $this->facetFieldPrefix[$field] = $prefix;
     }
 
     /**
-     * Return the current filters as an array of strings ['field:filter']
+     * Return current facet configurations
      *
-     * @return array $filterQuery
+     * @return array $facetSet
      */
-    public function getFilterSettings()
+    public function getFacetSettings()
     {
-        // Define Filter Query
-        $filterQuery = $this->getHiddenFilters();
-        $orFilters = array();
-        foreach ($this->filterList as $field => $filter) {
-            if ($orFacet = (substr($field, 0, 1) == '~')) {
-                $field = substr($field, 1);
-            }
-            foreach ($filter as $value) {
-                // Special case -- allow trailing wildcards, ranges and already ored facets:
-                if (substr($value, -1) == '*'
-                    || preg_match('/\[[^\]]+\s+TO\s+[^\]]+\]/', $value)
-                    || preg_match('/^(.+)\sOR\s(.+)$/', $value, $matches)
-                ) {
-                    $q = $field.':'.$value;
-                } else {
-                // Be sure that values aren't slashed twice
-                    $q = $field.':"'.addcslashes(stripcslashes($value), '"\\').'"';
-                }
-                if ($orFacet) {
-                    $orFilters[$field] = isset($orFilters[$field])
-                        ? $orFilters[$field] : array();
-                    $orFilters[$field][] = $q;
-                } else {
-                    $filterQuery[] = $q;
-                }
-            }
+        $facetSet = parent::getFacetSettings();
+        foreach ($this->facetFieldPrefix as $field => $prefix) {
+            $facetSet["f.{$field}.facet.prefix"] = $prefix;
         }
-        foreach ($orFilters as $field => $parts) {
-            $filterQuery[] = '{!tag=' . $field . '_filter}' . $field
-                . ':(' . implode(' OR ', $parts) . ')';
-        }
-        return $filterQuery;
+        return $facetSet;
     }
 
     /**
@@ -180,3 +171,4 @@ class Params extends \SearchKeys\Search\Search2\Params
         $this->initLibraries();
     }
 }
+

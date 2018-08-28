@@ -84,7 +84,7 @@ class PluginManager extends \VuFind\Search\Results\PluginManager
         'VuFind\Search\MixedList\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\Pazpar2\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\Primo\Results' => 'VuFind\Search\Results\ResultsFactory',
-        'VuFind\Search\Search2\Results' => 'VuFind\Search\Search2\ResultsFactory',
+        'VuFind\Search\Search2\Results' => 'Libraries\Search\Search2\ResultsFactory',
         'VuFind\Search\Solr\Results' => 'Libraries\Search\Solr\ResultsFactory',
         'VuFind\Search\SolrAuth\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\SolrAuthor\Results' => 'VuFind\Search\Results\ResultsFactory',

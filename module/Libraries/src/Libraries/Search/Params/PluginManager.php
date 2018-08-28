@@ -36,7 +36,7 @@ namespace Libraries\Search\Params;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
-class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
+class PluginManager extends \VuFind\Search\Params\PluginManager
 {
     /**
      * Default plugin aliases.
@@ -54,7 +54,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'mixedlist' => 'VuFind\Search\MixedList\Params',
         'pazpar2' => 'VuFind\Search\Pazpar2\Params',
         'primo' => 'VuFind\Search\Primo\Params',
-        'search2' => 'VuFind\Search\Search2\Params',
+        'search2' => 'Libraries\Search\Search2\Params',
         'solr' => 'Libraries\Search\Solr\Params',
         'solrauth' => 'VuFind\Search\SolrAuth\Params',
         'solrauthor' => 'VuFind\Search\SolrAuthor\Params',
@@ -83,7 +83,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'VuFind\Search\MixedList\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\Pazpar2\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\Primo\Params' => 'VuFind\Search\Params\ParamsFactory',
-        'VuFind\Search\Search2\Params' => 'VuFind\Search\Solr\ParamsFactory',
+        'Libraries\Search\Search2\Params' => 'Libraries\Search\Solr\ParamsFactory',
         'Libraries\Search\Solr\Params' => 'Libraries\Search\Solr\ParamsFactory',
         'VuFind\Search\SolrAuth\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\SolrAuthor\Params' => 'VuFind\Search\Params\ParamsFactory',

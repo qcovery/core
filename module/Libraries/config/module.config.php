@@ -15,17 +15,6 @@ $config = [
             'VuFind\Search\Results\PluginManager' => 'Libraries\Search\Results\PluginManager',
         ],
     ],
-    'vufind' => [
-        'plugin_managers' => [
-            'search_backend' => [
-                'factories' => [
-                    'Solr' => 'Libraries\Search\Factory\SolrDefaultBackendFactory',
-                    'Primo' => 'Libraries\Search\Factory\PrimoBackendFactory',
-                    'Search2' => 'Libraries\Search\Factory\Search2BackendFactory',
-                ],
-            ],
-        ],
-    ],
 ];
 
 return $config;

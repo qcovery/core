@@ -114,13 +114,11 @@ class GetLibraries extends AbstractBase
                 }
             }
         }
-//print_r($searchParams);
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $selectedLibrary = $this->Libraries->selectLibrary($libraryCode);
         $locationFilter = $this->Libraries->getLocationFilter();
         $libraryFacet = array_shift($this->Libraries->getLibraryFacetFields($backend));
         $libraryCodes = array_flip($this->Libraries->getLibraryFacetValues($backend));
-//echo $backend;
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
         $paramsObj->addFacet($libraryFacet, null, false);
@@ -128,12 +126,10 @@ class GetLibraries extends AbstractBase
             $paramsObj->addFacet($locationFilter['field'], null, false);
             $paramsObj->setFacetFieldPrefix($locationFilter['field'], $locationFilter['prefix']);
         }
-//        $paramsObj->setFacetPrefix($locationFilter['prefix']);
         $paramsObj->setFacetLimit(2000); 
         $paramsObj->getOptions()->disableHighlighting();
         $paramsObj->getOptions()->spellcheckEnabled(false);
         
-       //$paramsObj->addFacet($locationFilter['facet'], null, false);
         $paramsObj->initFromRequest(new Parameters($searchParams));
 
         $facetList = $results->getFacetList();

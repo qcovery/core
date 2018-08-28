@@ -71,7 +71,7 @@ jQuery(document).ready(function() {
                 url:'/vufind/AJAX/JSON?method=getLibraries',
                 dataType:'json',
                 //data:{querystring:encodeURIComponent(queryString)},
-                data:{querystring:queryString},
+                data:{querystring:queryString, source:searchClass},
                 success:function(data, textStatus) {
                     var newQueryString;
                     var libraryCount = Object.keys(data.data.libraryData).length;
@@ -91,7 +91,6 @@ jQuery(document).ready(function() {
                     } else {
                         jQuery('div#side-panel-library').remove();
                     }
-//alert(data.data.locationFilter);
                     if (typeof(data.data.locationFilter) == "object") {
                         if (data.data.locationFilter.value != '' && data.data.locationFilter.value != null) {
                             var queryStringItems = queryString.split('&');

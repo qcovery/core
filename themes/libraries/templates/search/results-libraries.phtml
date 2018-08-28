@@ -28,7 +28,7 @@
       <div class="facet-group" id="side-panel-library">
           <button class="title" data-toggle="collapse" href="#side-collapse-library"><?=$this->transEsc("Library")?></button>
           <div id="side-collapse-library" class="collapse out">
-              <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchclass='<?=$searchClassId ?>'>
+              <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchclass='<?=$this->searchClassId ?>'>
                   <a href="" class="facet facetAND library-item"><span class="badge library-item-count"></span><span class="text library-item-text"></span></a>
               </div>
           </div>
