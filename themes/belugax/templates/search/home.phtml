@@ -38,7 +38,8 @@ JS;
   <?=$this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, '$("#searchForm_lookfor").focus();', 'SET'); ?>
 </div>
 
-<? $catalogs = []; ?>
+<? $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
+<? $tabs = $tabConfig['tabs']; ?>
 
 <? if (!empty($this->configreader()->getConfigData('Home'))): ?>
     <? foreach ($this->configreader()->getConfigData('Home') as $source): ?>
@@ -54,15 +55,15 @@ JS;
             <?=$this->context($this)->renderInContext("search/searchbox.phtml", ['ignoreHiddenFilterMemory' => true])?>
         </div>
 
-        <? if (sizeof($catalogs) == 2): ?>
+        <? if (count($tabs) == 2): ?>
             <div class="uk-width-1-1 uk-text-center uk-margin-small-top">
-                <?=$catalogs[0]['title']?>
+                <?=$tabs[0]['label']?>
                 <label class="switch_small">
                     <input id="belugax-catalog-select-searchbox" type="checkbox" class="switch-input" checked="checked">
                     <span class="switch-label" data-on="" data-off=""></span>
                     <span class="switch-handle"></span>
                 </label>
-                <?=$catalogs[1]['title']?>
+                <?=$tabs[1]['label']?>
             </div>
         <? endif; ?>
 
@@ -75,32 +76,29 @@ JS;
 
         <div class="<?=$belugaxGridWidth?>" uk-grid>
             <? $first = true; ?>
-            <? $index = 0; ?>
-            <? foreach ($catalogs as $source): ?>
+        <? if (count($tabs) == 2): ?>
+            <? foreach ($tabs as $index => $tab): ?>
                 <div class="uk-card uk-card-body uk-padding-remove-top uk-padding-remove-bottom">
                     <div class="uk-card-header">
-                        <h2 class="uk-card-title"><?=$this->transEsc($source['title'])?></h2>
+                        <h2 class="uk-card-title"><?=$this->transEsc($tab['label'])?></h2>
                     </div>
                     <div class="">
                         <p>
-                            <?=$this->transEsc($source['text'])?>
+<!-- Module Libraries -->
+<?=$this->context($this)->renderInContext('search/libraries-home.phtml', ['searchClassId' => $tab['id']]); ?>
+<!-- Module Libraries -->
+                            <?=$this->transEsc($tab['text'])?>
                         </p>
                     </div>
-                    <? if (sizeof($catalogs) == 2): ?>
                         <div class="uk-card-footer">
-                            <input type="radio" class="belugax-catalog-select" id="belugax-catalog-select_<?=$index?>" name="belugax-catalog-select" value="source_<?=$index?>" data-index="<?=$index?>" data-url="<?=$this->transEsc($source['url'])?>" <? if($first): ?>checked<? endif; ?>>
-                            <label for="belugax-catalog-select_<?=$index?>" class="belugax-catalog-select-label"><?=$this->transEsc($source['title'])?></label>
+                            <input type="radio" class="belugax-catalog-select" id="belugax-catalog-select_<?=$index?>" name="belugax-catalog-select" value="source_<?=$index?>" data-index="<?=$index?>" data-url="<?=$this->transEsc($tab['url'])?>" <? if($first): ?>checked<? endif; ?>>
+                            <label for="belugax-catalog-select_<?=$index?>" class="belugax-catalog-select-label"><?=$this->transEsc($tab['title'])?></label>
                         </div>
-                    <? endif; ?>
                 </div>
                 <? $first = false; ?>
-                <? $index++; ?>
             <? endforeach; ?>
+        <? endif; ?>
         </div>
     </div>
 </div>
 
-
-<!-- Module Libraries -->
-<?=$this->render('search/home-libraries.phtml'); ?>
-<!-- Module Libraries -->

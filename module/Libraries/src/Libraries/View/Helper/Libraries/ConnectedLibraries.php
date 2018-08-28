@@ -29,9 +29,14 @@ class ConnectedLibraries extends \Zend\View\Helper\AbstractHelper
         }
         $connectedLibraries = [];
         foreach ($libraryCodes as $libraryCode) {
-            $library = $this->Libraries->getLibrary($libraryCode);
-            $connectedLibraries[] = $library['abbrieviation'];
+            //$library = $this->Libraries->getLibrary($libraryCode);
+            //$connectedLibraries[] = $library['abbrieviation'];
+            $connectedLibraries[] = $this->Libraries->getLibrary($libraryCode);
         }
         return $connectedLibraries;
+    }
+
+    public function getSelectedLibrary() {
+        return $this->Libraries->selectLibrary();
     }
 }

@@ -122,10 +122,11 @@ class Libraries
     }
 
     public function getDefaultLibraryCode($searchClassId = null) {
+        $searchClassId = strtolower($searchClassId);
         $codes = [];
-        foreach ($this->defaultLibraries as $library => $data) {
-            if (empty($searchClassId) || isset($data[$searchClassId])){
-                $codes[] = $data['code'];
+        foreach ($this->defaultLibraries as $library) {
+            if (empty($searchClassId) || isset($library[$searchClassId])){
+                $codes[] = $library['code'];
             }
         }
         return array_shift($codes);
@@ -134,18 +135,18 @@ class Libraries
     public function getLibraryCodes($searchClassId = null) {
         $searchClassId = strtolower($searchClassId);
         $codes = [];
-        foreach ($this->includedLibraries as $library => $data) {
-            if (empty($searchClassId) || isset($data[$searchClassId])){
-                $codes[] = $data['code'];
+        foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library) {
+            if (empty($searchClassId) || isset($library[$searchClassId])){
+                $codes[] = $library['code'];
             }
         }
         return $codes;
     }
 
     public function getLibraryFacetFields($searchClassId) {
-        $facets = [];
         $searchClassId = strtolower($searchClassId);
-         foreach ($this->includedLibraries as $library) {
+        $facets = [];
+         foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library) {
             if (isset($library[$searchClassId.'-field'])) {
                 $facets[] = $library[$searchClassId.'-field'];
             }
@@ -154,9 +155,9 @@ class Libraries
     }
 
     public function getLibraryFacetValues($searchClassId) {
-        $codes = [];
         $searchClassId = strtolower($searchClassId);
-         foreach ($this->includedLibraries as $library => $data) {
+        $codes = [];
+         foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library => $data) {
             if (isset($data[$searchClassId])) {
                 $codes[$library] = $data[$searchClassId];
             }

@@ -137,6 +137,8 @@ class GetLibraries extends AbstractBase
         $locationList = $facetList['standort_iln_str_mv']['list'];
 
 //print_r($facetList);
+        $defaultLibraryCode = $this->Libraries->getDefaultLibraryCode($backend);
+        array_unshift($libraryList, ['value' => $defaultLibraryCode, 'count' => $results->getResultTotal()]);
         $libraryData = [];
         foreach ($libraryList as $libraryItem) {
             $library = $this->Libraries->getLibrary($libraryItem['value']);
@@ -145,8 +147,7 @@ class GetLibraries extends AbstractBase
         $libraryData = array_intersect_key($libraryData, $libraryCodes);
 
         $locationFacets = [];
-//print_r($locationList);
-//print_r($iln);
+
         foreach ($locationList as $locationItem) {
             $locationFacets[$locationItem['value']] = $locationItem['count'];
         }

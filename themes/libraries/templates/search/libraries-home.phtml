@@ -5,23 +5,22 @@
   $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
 */
 
-$libraries = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId);
-print_r($libraries);
+$libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId);
+$selectedLibrary = $this->connectedlibraries()->getSelectedLibrary();
 
 ?>
 
-<!--
 <div class="uk-child-width-1-1" uk-grid>
     <div class="">
         <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Select library")?><i class="bel-pfeil-u01"></i></button>
         <div uk-dropdown>
             <ul class="uk-nav uk-dropdown-nav">
-                <? foreach($libraryList as $library => $data): ?>
-                    <? $disabled = (empty($data['solr'])) ? ' disabled' : ''; ?>
-                    <? if ($selectedLibrary['code'] == $library): ?>
-                        <li class="uk-active"><strong><?=$this->transEsc($data['fullname']) ?></strong></li>
+                <? foreach($libraryList as $library): ?>
+                    <? $disabled = (empty($library[strtolower($this->searchClassId)])) ? ' disabled' : ''; ?>
+                    <? if ($library['code'] == $selectedLibrary['code']): ?>
+                        <li class="uk-active"><strong><?=$this->transEsc($library['fullname']) ?></strong></li>
                     <? else: ?>
-                        <li><a href="<?=$this->url($this->options->getSearchHomeAction());?>?library=<?=$library ?>"><?=$this->transEsc($data['fullname']) ?></a></li>
+                        <li><a href=""><?=$this->transEsc($library['fullname']) ?></a></li>
                     <? endif; ?>
                 <? endforeach; ?>
             </ul>
@@ -47,4 +46,3 @@ print_r($libraries);
         </div>
     </div>
 </div>
--->

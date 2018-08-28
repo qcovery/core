@@ -123,7 +123,7 @@
 <? /* Narrow Search Options */ ?>
 <div class="<?=$this->layoutClass('sidebar')?>">
 <!-- Module Libraries -->
-    <?=$this->render('search/results-libraries.phtml'); ?>
+    <?=$this->render('search/libraries-results.phtml'); ?>
 <!-- Module Libraries -->
   <? foreach ($this->results->getRecommendations('side') as $current): ?>
     <?=$this->recommend($current)?>
