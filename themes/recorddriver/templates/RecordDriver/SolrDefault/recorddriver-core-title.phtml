@@ -1,4 +1,4 @@
-<? $titleFields = $this->solrDefault()->getCoreFields($this->driver, ['title']); ?>
+<? $titleFields = $this->solrDetails()->getCoreFields($this->driver, ['title']); ?>
 <? if (!empty($titleFields['ShortTitle'][0][0])): ?>
     <h3 property="name">
         <?= (!empty($titleFields['ShortTitle'][0][0])) ? $this->transEsc($titleFields['ShortTitle'][0][0]) . ' ' : '' ?>
