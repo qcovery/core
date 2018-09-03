@@ -1,0 +1,14 @@
+<?
+
+$libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId, $this->driver);
+
+?>
+<br /><?=$this->transEsc('Libraries')?>: 
+
+<?
+foreach ($libraryList as $library): 
+    echo $library['abbrieviation'] . ' ';
+endforeach;
+
+?>
+

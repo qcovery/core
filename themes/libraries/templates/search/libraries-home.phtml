@@ -1,9 +1,4 @@
 <?
-/*
-  $Libraries = $this->params->getLibraries();
-  $selectedLibrary = $Libraries->selectLibrary();
-  $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
-*/
 
 $libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId);
 $selectedLibrary = $this->connectedlibraries()->getSelectedLibrary();

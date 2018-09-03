@@ -56,6 +56,9 @@
             <?=!empty($summAuthor) ? '<br />' : ''?>
             <?=$this->transEsc('Published') . ' ' . $this->escapeHtml($summDate[0])?>
           <? endif; ?>
+<!-- Module Libraries -->
+<?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/libraries-result-list.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]); ?>
+<!-- Module Libraries -->
           <? $summInCollection = $this->driver->getContainingCollections(); if (!empty($summInCollection)): ?>
             <? foreach ($summInCollection as $collId => $collText): ?>
               <div>
