@@ -25,12 +25,15 @@ class ConnectedLibraries extends \Zend\View\Helper\AbstractHelper
     {
         $libraryCodes = $this->Libraries->getLibraryCodes($searchClassId);
         if (!empty($driver)) {
-            $libraryCodes = array_intersect($includedLibraries, $driver->getLibraries());
+            $collectionDetails = $driver->getMarcData('CollectionDetails');
+            $holdingCodes = [];
+            foreach ($collectionDetails as $collectionDetail) {
+                $holdingCodes[] = $collectionDetail['code'];
+            }
+            $libraryCodes = array_intersect($libraryCodes, $holdingCodes);
         }
         $connectedLibraries = [];
         foreach ($libraryCodes as $libraryCode) {
-            //$library = $this->Libraries->getLibrary($libraryCode);
-            //$connectedLibraries[] = $library['abbrieviation'];
             $connectedLibraries[] = $this->Libraries->getLibrary($libraryCode);
         }
         return $connectedLibraries;
