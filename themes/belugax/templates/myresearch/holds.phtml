@@ -25,7 +25,7 @@
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
     
   <?
-  if ($this->cancelForm && $paiaConfig['Global']['cancel_holds_permitted']) {
+  if ($this->cancelForm && $paiaConfig[$this->paia()->getPaiaGlobalKey()]['cancel_holds_permitted']) {
 	  $cancel_permitted = true;
   } else {
 	  $cancel_permitted = false;

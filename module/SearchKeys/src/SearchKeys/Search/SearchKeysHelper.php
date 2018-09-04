@@ -40,7 +40,8 @@ class SearchKeysHelper
             $typeArray = $request->get('type0');
             $isAdvancedSearch = true;
         } else {
-            parent::initSearch($request);
+            //parent::initSearch($request);
+            $lookforArray = [];
         }
 
         $searchItems = array();

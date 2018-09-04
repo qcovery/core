@@ -1,9 +1,9 @@
 <?php
 $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR'). '/config/vufind/PAIA.ini'), true);
 
-if($paiaConfig['Global']['usePAIA'] == 1) {
-	$isil = $paiaConfig['Global']['isil'];
-	$iln = $paiaConfig['Global']['iln'];
+if($paiaConfig[$this->paia()->getPaiaGlobalKey()]['usePAIA'] == 1) {
+	$isil = $paiaConfig[$this->paia()->getPaiaGlobalKey()]['isil'];
+	$iln = $paiaConfig[$this->paia()->getPaiaGlobalKey()]['iln'];
 	
 	$context_array = $this->paia()->getContext($this->driver);
 	$formats = $context_array['formats'];
