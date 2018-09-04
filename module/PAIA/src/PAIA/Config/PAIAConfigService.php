@@ -55,7 +55,11 @@ class PAIAConfigService {
     }
 
     public function getIsil() {
-        return $this->session->offsetGet('PAIAisil');
+        if ($this->session->offsetGet('PAIAisil')) {
+            return $this->session->offsetGet('PAIAisil');
+        } else {
+            return $this->paiaConfig['Global']['isil'];
+        }
     }
 }
 
