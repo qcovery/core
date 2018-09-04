@@ -28,7 +28,7 @@
   
   
   <?
-  if ($this->cancelForm && $paiaConfig['Global']['cancel_recalls_permitted']) {
+  if ($this->cancelForm && $paiaConfig[$this->paia()->getPaiaGlobalKey()]['cancel_recalls_permitted']) {
 	  $cancel_permitted = true;
   } else {
 	  $cancel_permitted = false;

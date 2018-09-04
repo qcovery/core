@@ -713,6 +713,10 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
     public function getMultipleLoginSources() {
 	    return $this->paiaConfigService->getMultipleLoginSources();
     }
+
+    public function getPaiaGlobalKey() {
+	    return $this->paiaConfigService->getPaiaGlobalKey();
+    }
 }
 
 ?>

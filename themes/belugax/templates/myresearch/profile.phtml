@@ -66,7 +66,7 @@
   </table>
   <?
   	  $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR'). '/config/vufind/PAIA.ini'), true);
-	  if ($paiaConfig['Global']['show_profile_note'] == 1) { ?>
+	  if ($paiaConfig[$this->paia()->getPaiaGlobalKey()]['show_profile_note'] == 1) { ?>
 		  <div class="profile_note">
 		  <table class="table table-striped">
 		  <? echo $this->renderArray(
