@@ -15,11 +15,12 @@ return [
         'belugax.js',
     ],
     'mixins' => [
+        'belugaconfig',
         'delivery',
         'libraries',
         'searchkeys',
         'dependentworks',
-        'daia',
+//        'daia',
         'recorddriver',
         'belugadefault',
     ],
