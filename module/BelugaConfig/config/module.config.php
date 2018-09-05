@@ -2,35 +2,15 @@
 namespace BelugaConfig\Module\Configuration;
 
 $config = [
-/*
-    'vufind' => [
-        'recorddriver_tabs' => [
-            'VuFind\RecordDriver\Primo' => [
-                'tabs' => null,
-                'defaultTab' => null,
-            ],
-            'VuFind\RecordDriver\DefaultRecord' => [
-                'tabs' => null,
-                'defaultTab' => null,
-            ],
-            'VuFind\RecordDriver\SolrMarc' => [
-                'tabs' => null,
-                'defaultTab' => null,
-            ],
-        ],
-    ],
-*/
-/*
-    'controllers' => [
+    'service_manager' => [
+        'allow_override' => true,
         'factories' => [
-            'BelugaConfig\Controller\AjaxController' => 'BelugaConfig\Controller\Factory::getAjaxController',
+            'BelugaConfig\AjaxHandler\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
         ],
         'aliases' => [
-            'AJAX' => 'BelugaConfig\Controller\AjaxController',
-            'ajax' => 'BelugaConfig\Controller\AjaxController',
+            'VuFind\AjaxHandler\PluginManager' => 'BelugaConfig\AjaxHandler\PluginManager',
         ],
     ],
-*/
 ];
 
 return $config;

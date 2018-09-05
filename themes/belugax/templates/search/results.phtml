@@ -1,5 +1,4 @@
 <?
-  global $recordTotal;
 
   // Set up page title:
   $lookfor = $this->results->getUrlQuery()->isQuerySuppressed() ? '' : $this->params->getDisplayQuery();
@@ -8,11 +7,13 @@
   } else {
       $this->headTitle($this->translate('Search Results') . (empty($lookfor) ? '' : " - {$lookfor}"));
   }
+  $recordTotal = $this->results->getResultTotal();
 
   // Set up search box:
   $this->layout()->searchbox = $this->context($this)->renderInContext(
       'search/searchbox.phtml',
       [
+        'recordTotal' => $recordTotal,
         'lookfor' => $lookfor,
         'searchIndex' => $this->params->getSearchHandler(),
         'searchType' => $this->params->getSearchType(),
@@ -55,7 +56,7 @@
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-  <? if (($recordTotal = $this->results->getResultTotal()) > 0): // only display these at very top if we have results ?>
+  <? if ($recordTotal > 0): // only display these at very top if we have results ?>
     <? foreach ($this->results->getRecommendations('top') as $current): ?>
       <?=$this->recommend($current)?>
     <? endforeach; ?>
