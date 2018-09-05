@@ -49,8 +49,8 @@ class Factory
     public static function getILS(ServiceManager $sm)
     {
         return new ILS(
-            $sm->get('VuFind\ILS\Connection'),
-            $sm->get('VuFind\Auth\ILSAuthenticator')
+            $sm->getServiceLocator()->get('VuFind\ILSConnection'),
+            $sm->getServiceLocator()->get('VuFind\ILSAuthenticator')
         );
     }
 

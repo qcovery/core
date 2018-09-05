@@ -1,8 +1,8 @@
 <?php
 /**
- * ZF2 module definition for the VuFind application
+ * Template for ZF2 module for storing local overrides.
  *
- * PHP version 7
+ * PHP version 5
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -17,26 +17,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @category VuFind
+ * @category VuFind2
  * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org
+ * @link     https://github.com/dmj/vf2-proxy
  */
 namespace PAIA;
-
-use Zend\Mvc\MvcEvent;
+use Zend\ModuleManager\ModuleManager,
+    Zend\Mvc\MvcEvent;
+use PAIA\PAIAHelper;
 
 /**
- * ZF2 module definition for the VuFind application
+ * Template for ZF2 module for storing local overrides.
  *
- * @category VuFind
+ * @category VuFind2
  * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org
+ * @link     https://github.com/dmj/vf2-proxy
  */
 class Module
 {
@@ -57,18 +58,25 @@ class Module
      */
     public function getAutoloaderConfig()
     {
-        return [
-            'Zend\Loader\ClassMapAutoloader' => [
-                'classes' => [
-                    'minSO' => __DIR__ . '/src/VuFind/Search/minSO.php'
-                ]
-            ],
-            'Zend\Loader\StandardAutoloader' => [
-                'namespaces' => [
+        return array(
+            'Zend\Loader\StandardAutoloader' => array(
+                'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ],
-            ],
-        ];
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Initialize the module
+     *
+     * @param ModuleManager $m Module manager
+     *
+     * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function init(ModuleManager $m)
+    {
     }
 
     /**
@@ -77,10 +85,34 @@ class Module
      * @param MvcEvent $e Event
      *
      * @return void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function onBootstrap(MvcEvent $e)
     {
-        $bootstrapper = new Bootstrapper($e);
-        $bootstrapper->bootstrap();
+    }
+    
+    /**
+     * Return service configuration.
+     *
+     * @return array
+     */
+    public function getServiceConfig()
+    {
+    }
+    
+    /**
+     * Get view helper configuration.
+     *
+     * @return array
+     */
+    public function getViewHelperConfig()
+    {
+        return array(
+            'factories' => array(
+                'paia' => function($sm) {
+                    return new PAIAHelper($sm);
+                },
+            ),
+        );
     }
 }
