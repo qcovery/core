@@ -1,19 +1,6 @@
-<? if ($this->paia()->hasMultipleLoginSources()): ?>
-<div class="form-group">
-  <div id="paia-multilogin-icons">
-    <? $first = true; ?>
-    <? foreach ($this->paia()->getMultipleLoginSources() as $loginSource): ?>
-        <img src="<?=$this->imageLink($loginSource['icon'])?>" class="<? if (!$first): ?>hidden<? endif; ?>" data-isil="<?=$loginSource['isil']?>"/>
-        <? $first = false; ?>
-    <? endforeach; ?>
-  </div>
-  <select id="paia-multilogin-select" name="isil">
-    <? foreach ($this->paia()->getMultipleLoginSources() as $loginSource): ?>
-      <option value="<?=$loginSource['isil']?>"><?=$loginSource['name']?></option>
-    <? endforeach; ?>
-  </select>
-</div>
-<? endif; ?>
+<!--Modul PAIA-->
+<?=$this->render('Auth/AbstractBase/paia-loginfields.phtml'); ?>
+<!--Modul PAIA-->
 <div class="form-group">
   <label class="control-label" for="login_<?=$this->escapeHtmlAttr($topClass)?>_username"><?=$this->transEsc('Username')?>:</label>
   <input type="text" name="username" id="login_<?=$this->escapeHtmlAttr($topClass)?>_username" value="<?=$this->escapeHtmlAttr($this->request->get('username'))?>" class="form-control"/>
