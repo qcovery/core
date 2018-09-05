@@ -35,8 +35,6 @@ use VuFind\AjaxHandler\AbstractBase;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\Stdlib\Parameters;
 use Zend\Config\Config;
-//use VuFind\Controller\AjaxController;
-//use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * This controller handles global AJAX functionality
