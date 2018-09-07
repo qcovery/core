@@ -58,8 +58,8 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.urlencode($mediatype);
-		echo "<span style='display:none;'>".$url_path."</span>";
+		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.urlencode($mediatype);
+        echo "<span style='display:none;'>".$url_path."</span>";
 
         $ch = curl_init();
         $timeout = 0;
