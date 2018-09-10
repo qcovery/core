@@ -42,21 +42,9 @@ jQuery(document).ready(function() {
         return formattedNumber;
     }
 
-    function resolveBackend(searchClass, basic) {
-        searchClass = searchClass.toLowerCase();
-        if (searchClass == 'solr') {
-            return (basic) ? '/Search/Results' : '/Search/Advanced';
-        } else if (searchClass == 'primo') {
-            return (basic) ? '/Primo/Search' : '/Primo/Advanced';
-        } else if (searchClass == 'findex') {
-            return (basic) ? '/Findex/Search' : '/Findex/Advanced';
-        } else {
-            return '';
-        }
-    }
-
     function getLibraryList() {
         var queryString = jQuery('div#library-list').attr('data-query');
+        var searchLink = jQuery('div#library-list').attr('data-searchlink');
         var searchClass = jQuery('div#library-list').attr('data-searchclass');
         var libraryTemplate = jQuery('div#library-list').html();
         var locationTemplate = jQuery('div#location-list').html();
@@ -66,11 +54,9 @@ jQuery(document).ready(function() {
         jQuery('div#side-panel-location').attr('style', 'display:none');
         if (typeof(queryString) != "undefined") {
             queryString = queryString.substring(1, queryString.length - 1);
-            var backendUrl = resolveBackend(searchClass, true);
             jQuery.ajax({
                 url:'/vufind/AJAX/JSON?method=getLibraries',
                 dataType:'json',
-                //data:{querystring:encodeURIComponent(queryString)},
                 data:{querystring:queryString, source:searchClass},
                 success:function(data, textStatus) {
                     var newQueryString;
@@ -84,7 +70,7 @@ jQuery(document).ready(function() {
                             if (searchClass == "Primo" && libraryData.primo == undefined) {
                                 jQuery('div#library-list .library-item').last().attr('href', '#');
                             } else {
-                                jQuery('div#library-list .library-item').last().attr('href', '/vufind' + backendUrl + newQueryString + '&library=' + thisLibraryCode);
+                                jQuery('div#library-list .library-item').last().attr('href', searchLink + newQueryString + '&library=' + thisLibraryCode);
                             }
                         });
                         jQuery('div#side-panel-library').attr('style', 'display:block');
@@ -101,11 +87,6 @@ jQuery(document).ready(function() {
                                 }
                             }
                             jQuery('div#location-list').append(locationTemplate);
-                            //jQuery('div#location-list .location-item').last().html(data.data.locationFilter.value);
-                            //jQuery('div#location-list .location-item').last().attr('href', '/vufind' + backendUrl + newQueryString);
-                            //jQuery('div#location-list-title').attr('class', 'list-group-item title');
-                            //jQuery('div#side-collapse-location').attr('class', 'collapse in');
-                            //jQuery('div#side-collapse-location').attr('aria-expanded', 'true');
                             jQuery('div#side-panel-location').attr('style', 'display:block');
                         } else if (data.data.locationFacets != '') {
                             jQuery.each(data.data.locationFacets, function(locationName, locationData) {
@@ -113,7 +94,7 @@ jQuery(document).ready(function() {
                                 jQuery('div#location-list').append(locationTemplate);
                                 jQuery('div#location-list .location-item-count').last().before(locationName);
                                 jQuery('div#location-list .location-item-count').last().html(formatNumber(locationData.count));
-                                jQuery('div#location-list .location-item').last().attr('href', '/vufind' + backendUrl + queryString + '&filter[]=' + filter);
+                                jQuery('div#location-list .location-item').last().attr('href', searchLink + queryString + '&filter[]=' + filter);
                             });
                             jQuery('div#side-panel-location').attr('style', 'display:block');
                         } else {

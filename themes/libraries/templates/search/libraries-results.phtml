@@ -2,8 +2,10 @@
   $Libraries = $this->params->getLibraries();
   $selectedLibrary = $Libraries->selectLibrary();
   $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
+  $searchLink = $this->url($this->searchOptions($this->searchClassId)->getSearchAction());
 ?>
     <div id="LibrarySelector">
+<? if ($selectedLibrary['show-library'] != 'n' || count($libraryList) > 1): ?>
       <div id="LibraryData">
           <div class="" uk-grid>
               <div class="uk-width-3-4">
@@ -25,10 +27,11 @@
               </div>
           </div>
       </div>
+<? endif; ?>
       <div class="facet-group" id="side-panel-library">
           <button class="title" data-toggle="collapse" href="#side-collapse-library"><?=$this->transEsc("Library")?></button>
           <div id="side-collapse-library" class="collapse out">
-              <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchclass='<?=$this->searchClassId ?>'>
+              <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchlink='<?=$searchLink ?>' data-searchclass='<?=$this->searchClassId ?>'>
                   <a href="" class="facet facetAND library-item"><span class="badge library-item-count"></span><span class="text library-item-text"></span></a>
               </div>
           </div>
@@ -42,4 +45,3 @@
           </div>
       </div>
     </div>
-

@@ -14,6 +14,7 @@
       'search/searchbox.phtml',
       [
         'recordTotal' => $recordTotal,
+        'query' => $this->results->getUrlQuery(),
         'lookfor' => $lookfor,
         'searchIndex' => $this->params->getSearchHandler(),
         'searchType' => $this->params->getSearchType(),
