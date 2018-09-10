@@ -39,7 +39,7 @@ class SolrDefaultBackendFactory extends \RecordDriver\Search\Factory\SolrDefault
      */
     protected function createConnector()
     {
-        $config = $this->config->get('config');
+        $config = $this->config->get($this->mainConfig);
 
         $handlers = [
             'select' => [
