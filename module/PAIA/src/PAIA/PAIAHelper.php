@@ -544,7 +544,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		return $results;
 	} else {
 		
-		$results = $this->makeDaiaConform($results, $daiaJson);
+		$results = $this->makeDaiaConform($results, json_decode($daia, true)); // convert again to json, as makeDaiaConform() can not use object representation of DAIA results.
 		$results = json_decode($results, true);
 		return $results;
 	}
