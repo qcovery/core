@@ -1,11 +1,10 @@
 <?php
 /**
- * Model for MARC records in Solr.
+ * Module RecordDriver: SolrMarc Parser
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Villanova University 2010.
- * Copyright (C) The National Library of Finland 2015.
+ * Copyright (C) Staats- und Universitätsbibliothek Hamburg 2018.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -18,27 +17,26 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @category VuFind
  * @package  RecordDrivers
- * @author   Demian Katz <demian.katz@villanova.edu>
- * @author   Ere Maijala <ere.maijala@helsinki.fi>
+ * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
+ * @link     https://github.com/beluga-core
  */
 namespace RecordDriver\RecordDriver;
 
 use VuFind\XSLT\Processor as XSLTProcessor;
 use VuFind\Config\SearchSpecsReader;
+use VuFind\RecordDriver\SolrDefault;
 
 /**
  * Model for MARC records in Solr.
  *
  * @category VuFind
  * @package  RecordDrivers
- * @author   Demian Katz <demian.katz@villanova.edu>
- * @author   Ere Maijala <ere.maijala@helsinki.fi>
+ * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
@@ -46,14 +44,33 @@ class SolrMarc extends SolrDefault
 {
     use \VuFind\RecordDriver\IlsAwareTrait;
     use \VuFind\RecordDriver\MarcReaderTrait;
-    use \VuFind\RecordDriver\MarcAdvancedTrait;
 
+    /**
+     * Configuration (yaml)
+     *
+     * @var string
+     */
     protected $solrMarcYaml = 'solrmarc.yaml';
 
+    /**
+     * Specifications to use
+     *
+     * @var array
+     */
     protected $solrMarcSpecs;
 
+    /**
+     * Data in original letters
+     *
+     * @var array
+     */
     protected $originalLetters;
 
+    /**
+     * Keys of SolrMarc Specifications
+     *
+     * @var array
+     */
     protected $solrMarcKeys;
 
     /**
@@ -76,18 +93,6 @@ class SolrMarc extends SolrDefault
     }
 
     /**
-     * Get text that can be displayed to represent this record in
-     * breadcrumbs. Here for compatibility reasons
-     *
-     * @return string Breadcrumb text to represent this record.
-     */
-    public function getBreadcrumb()
-    {
-        $breadCrumbs = $this->getShortTitle();
-        return (is_array($breadCrumbs)) ? $breadCrumbs[0] : $breadCrumbs;
-    }
-
-    /**
      * Get and parse SolrMarcSpecs config.
      *
      * @return array
@@ -103,7 +108,7 @@ class SolrMarc extends SolrDefault
     /**
      * Get keys of SolrMarcSpecs config.
      *
-     *
+     * @return array
      */
     public function getSolrMarcKeys($category = '', $others = true)
     {
@@ -132,13 +137,12 @@ class SolrMarc extends SolrDefault
     /**
      * Parse SolrMarcSpecs config.
      *
-     * @return array
+     * @return null
      */
     private function parseSolrMarcSpecs()
     {
         $specsReader = new SearchSpecsReader();
         $rawSolrMarcSpecs = $specsReader->get($this->solrMarcYaml);
-//print_r($rawSolrMarcSpecs);
         $solrMarcSpecs = array();
         foreach ($rawSolrMarcSpecs as $item => $solrMarcSpec) {
             $solrMarcSpecs[$item] = [];
@@ -194,7 +198,6 @@ class SolrMarc extends SolrDefault
         if (empty($this->originalLetters)) {
             $this->originalLetters = $this->getOriginalLetters();
         }
-//print_r($solrMarcSpecs);
     }
 
     /**
@@ -242,7 +245,7 @@ class SolrMarc extends SolrDefault
                     }
                 }
             }
-           foreach ($this->getMarcRecord()->getFields($field) as $fieldObject) {
+            foreach ($this->getMarcRecord()->getFields($field) as $fieldObject) {
                 $data = $indexData;
                 if (!empty($subFieldSpecs['conditions'])) {
                     foreach ($subFieldSpecs['conditions'] as $condition) {
@@ -325,7 +328,6 @@ class SolrMarc extends SolrDefault
         if (!empty($returnData)) {
             $returnData['title'] = $title;
         }
-//print_r($returnData);
         return $returnData;
     }
 
@@ -386,286 +388,4 @@ class SolrMarc extends SolrDefault
             return "Unknown";
         }
     }
-
-    /**
-     * Get a title for the record.
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        $titles = parent::getTitle();
-        if (is_array($titles)) {
-            $title = array_shift($titles);
-        } else {
-            $title= $titles;
-        }
-        $formats = parent::getFormats();
-        $indexSeries = parent::getSeries();
-
-        if (!empty($indexSeries) && ($formats[0] == 'Journal' || $formats[0] == 'eJournal')) {
-            $seriesArray = $this->getSeriesFromMARC(array('490' => array('a')));
-            if (isset($seriesArray[0]['name'])) {
-                $title = $seriesArray[0]['name'];
-            }
-            if (isset($seriesArray[0]['number'])) {
-                $title = $title.' '.strval(' ('.$seriesArray[0]['number']).')';
-            }
-        }
-        return $title;
-    }
-
-    /**
-     * Get formal subjects
-     *
-     * @return array
-     */
-    public function getSubjects()
-    {
-        $subjects = array('subject' => array(), 'geographic' => array());
-        $collectedSubjects = array();
-        $chains = array();
-        $chainCount = -1;
-
-        $classFields = $this->getMarcRecord()->getFields('650');
-        $source = null;
-        foreach ($classFields as $classField) {
-            if ($classField->getIndicator(2) == '7') {
-                if (is_object($classField->getSubfield('a'))) {
-                    $data = $classField->getSubfield('a')->getData();
-                    if (in_array($data, $collectedSubjects) || strlen($data) <= 1) {
-                        continue;
-                    }
-                    if (is_object($classField->getSubfield('9'))) {
-                        $detail = preg_replace('/^.*:/', '', $classField->getSubfield('9')->getData());
-                        $data .= ' / '.$detail;
-                    }
-                    foreach ($classField->getSubfields() as $subField) {
-                        if (!is_numeric($subField->getCode()) && $subField->getCode() != 'a') {
-    	                    $data = $data.' '.$subField->getData();
-                        }
-                    }
-                    $newSource = (is_object($classField->getSubfield('2'))) ? strval($classField->getSubfield('2')->getData()) : '-';
-                    if ($source == null || $newSource != $source) {
-                        $source = $newSource;
-                        $chains[++$chainCount] = array('source' => $source, 'data' => array());
-                    }
-                    $chains[$chainCount]['data'][] = $data;
-                    $collectedSubjects[] = $data;
-                }
-            }
-        }
-
-        $classFields = $this->getMarcRecord()->getFields('600');
-        $source = null;
-        foreach ($classFields as $classField) {
-            if ($classField->getIndicator(2) == '7') {
-                if (is_object($classField->getSubfield('a'))) {
-                    $data = $classField->getSubfield('a')->getData();
-                    if (in_array($data, $collectedSubjects) || strlen($data) <= 1) {
-                        continue;
-                    }
-                    $collectedSubjects[] = $data;
-                    foreach ($classField->getSubfields() as $subField) {
-                        if (!is_numeric($subField->getCode()) && $subField->getCode() != 'a') {
-        	                $data = $data.' '.$subField->getData();
-                        }
-                    }
-                    if (is_object($classField->getSubfield('9'))) {
-                        $detail = preg_replace('/^.*:/', '', $classField->getSubfield('9')->getData());
-                        $data .= ' / '.$detail;
-                    }
-                    $newSource = (is_object($classField->getSubfield('2'))) ? strval($classField->getSubfield('2')->getData()) : '-';
-                    if ($source == null || $newSource != $source) {
-                        $source = $newSource;
-                        $chains[++$chainCount] = array('source' => $source, 'data' => array());
-                    }
-                    $chains[$chainCount]['data'][] = $data;
-                }
-            }
-        }
-
-        $classFields = $this->getMarcRecord()->getFields('689');
-        $indicator = null;
-        foreach ($classFields as $classField) {
-            if (is_object($classField->getSubfield('a'))) {
-                $data = $classField->getSubfield('a')->getData();
-                if (in_array($data, $collectedSubjects) || strlen($data) <= 1) {
-                    continue;
-                }
-                $collectedSubjects[] = $data;
-                foreach ($classField->getSubfields() as $subField) {
-                    if (!is_numeric($subField->getCode()) && $subField->getCode() != 'a') {
-        	            $data = $data.' '.$subField->getData();
-                    }
-                }
-                $newIndicator = $classField->getIndicator(1);
-                if ($indicator == null || $newIndicator != $indicator) {
-                    $indicator = $newIndicator;
-                    $chains[++$chainCount] = array('source' => '', 'data' => array());
-                }
-                $chains[$chainCount]['data'][] = $data;
-            }
-        }
-
-        $classFields = $this->getMarcRecord()->getFields('650');
-        $source = null;
-        foreach ($classFields as $classField) {
-            if ($classField->getIndicator(2) != '7') {
-                if (is_object($classField->getSubfield('a'))) {
-                    $data = $classField->getSubfield('a')->getData();
-                    if (in_array($data, $collectedSubjects) || strlen($data) <= 1) {
-                        continue;
-                    }
-                    $collectedSubjects[] = $data;
-                    foreach ($classField->getSubfields() as $subField) {
-                    if (!is_numeric($subField->getCode()) && $subField->getCode() != 'a') {
-        	                $data = $data.' '.$subField->getData();
-                        }
-                    }
-                    $newSource = (is_object($classField->getSubfield('2'))) ? strval($classField->getSubfield('2')->getData()) : '-';
-                    if ($source == null || $newSource != $source) {
-                        $source = $newSource;
-                        $chains[++$chainCount] = array('source' => $source, 'data' => array());
-                    }
-                    $chains[$chainCount]['data'][] = $data;
-                }
-            }
-        }
-
-        $classFields = $this->getMarcRecord()->getFields('600');
-        $source = null;
-        foreach ($classFields as $classField) {
-            if ($classField->getIndicator(2) != '7') {
-                if (is_object($classField->getSubfield('a'))) {
-                   $data = $classField->getSubfield('a')->getData();
-                    if (in_array($data, $collectedSubjects) || strlen($data) <= 1) {
-                        continue;
-                    }
-                    $collectedSubjects[] = $data;
-                    foreach ($classField->getSubfields() as $subField) {
-                        if (!is_numeric($subField->getCode()) && $subField->getCode() != 'a') {
-    	                    $data = $data.' '.$subField->getData();
-                        }
-                    }
-                    if (is_object($classField->getSubfield('9'))) {
-                        $detail = preg_replace('/^.*:/', '', $classField->getSubfield('9')->getData());
-                        $data .= ' / '.$detail;
-                    }
-                    $newSource = (is_object($classField->getSubfield('2'))) ? strval($classField->getSubfield('2')->getData()) : '-';
-                    if ($source == null || $newSource != $source) {
-                        $source = $newSource;
-                        $chains[++$chainCount] = array('source' => $source, 'data' => array());
-                    }
-                    $chains[$chainCount]['data'][] = $data;
-                }
-            }
-        }
-
-        $classFields = $this->getMarcRecord()->getFields('653');
-        $source = null;
-        foreach ($classFields as $classField) {
-            if (is_object($classField->getSubfield('a'))) {
-                $data = $classField->getSubfield('a')->getData();
-                if (in_array($data, $collectedSubjects) || strlen($data) <= 1) {
-                    continue;
-                }
-                $newSource = (is_object($classField->getSubfield('2'))) ? strval($classField->getSubfield('2')->getData()) : '';
-                if ($source == null || $newSource != $source) {
-                    $source = $newSource;
-                    $chains[++$chainCount] = array('source' => $source, 'data' => array());
-                }
-                foreach ($classField->getSubfields('a') as $subField) {
-                    $chains[$chainCount]['data'][] = $subField->getData();
-                    $collectedSubjects[] = $subField->getData();
-                }
-            }
-        }
-
-        $subjects['subject'] = $chains;
-
-        $collectedSubjects = array();
-        $chains = array();
-        $chainCount = -1;
-        $classFields = $this->getMarcRecord()->getFields('651');
-        $source = null;
-        foreach ($classFields as $classField) {
-            if (is_object($classField->getSubfield('a'))) {
-                $data = $classField->getSubfield('a')->getData();
-                if (in_array($data, $collectedSubjects) || strlen($data) <= 1) {
-                    continue;
-                }
-                $collectedSubjects[] = $data;
-                $newSource = (is_object($classField->getSubfield('2'))) ? strval($classField->getSubfield('2')->getData()) : '-';
-                if ($source == null || $newSource != $source) {
-                    $source = $newSource;
-                    $chains[++$chainCount] = array('source' => $source, 'data' => array());
-                }
-                $chains[$chainCount]['data'][] = $data;
-            }
-        }
-
-        $subjects['geographic'] = $chains;
-        return $subjects;
-    }
-
-    /**
-     * Get an HTML representation of the data in this record.
-     *
-     * @return html.
-     */
-    public function getStaffView()
-    {
-        return XSLTProcessor::process(
-            'record-marc.xsl', trim($this->getMarcRecord()->toXML())
-        );
-    }
-
-    /**
-     * Get containing work infos of the record.
-     *
-     * @return array
-     */
-    public function getContainingWork()
-    {
-        $containingWorks = array();
-        $containingWorkFields = $this->getMarcRecord()->getFields('773');
-        if (empty($containingWorkFields)) {
-            $containingWorkFields = $this->getMarcRecord()->getFields('800');
-            if (empty($containingWorkFields)) {
-                return array();
-            }
-        }
-
-        foreach ($containingWorkFields as $containingWorkField) {
-            $containingWork = array();
-            if (is_object($containingWorkField->getSubfield('i'))) {
-                $containingWork['prefix'] = $containingWorkField->getSubfield('i')->getData();
-            }
-            if (is_object($containingWorkField->getSubfield('t'))) {
-                $containingWork['title'] = $containingWorkField->getSubfield('t')->getData();
-            }
-            if (is_object($containingWorkField->getSubfield('z'))) {
-                $containingWork['isn'] = substr(strrchr($containingWorkField->getSubfield('z')->getData(), ')'), 1);
-            }
-            if (is_object($containingWorkField->getSubfield('x'))) {
-                $containingWork['isn'] = substr(strrchr($containingWorkField->getSubfield('x')->getData(), ')'), 1);
-            }
-            if (is_object($containingWorkField->getSubfield('w'))) {
-                $containingWork['ppn'] = substr(strrchr($containingWorkField->getSubfield('w')->getData(), ')'), 1);
-            }
-            if (is_object($containingWorkField->getSubfield('d'))) {
-                $containingWork['location'] = $containingWorkField->getSubfield('d')->getData();
-            }
-            if (is_object($containingWorkField->getSubfield('g'))) {
-                $containingWork['issue'] = $containingWorkField->getSubfield('g')->getData();
-            }
-            if (empty($containingWork['title'])) {
-                $containingWork['title'] = 'Zur Gesamtaufnahme';
-            }
-            $containingWorks[] = $containingWork;
-        }
-        return $containingWorks;
-    }
 }
-

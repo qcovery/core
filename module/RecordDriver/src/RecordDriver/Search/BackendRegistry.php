@@ -34,10 +34,11 @@ namespace RecordDriver\Search;
  * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class BackendRegistry extends \VuFind\ServiceManager\AbstractPluginManager
+class BackendRegistry extends \VuFind\Search\BackendRegistry
 {
     /**
      * Default plugin aliases.

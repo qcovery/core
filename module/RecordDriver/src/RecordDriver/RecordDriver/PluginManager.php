@@ -33,10 +33,10 @@ namespace RecordDriver\RecordDriver;
  * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
-//class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
 class PluginManager extends \VuFind\RecordDriver\PluginManager
 {
     /**
@@ -82,6 +82,8 @@ class PluginManager extends \VuFind\RecordDriver\PluginManager
      * @var array
      */
     protected $factories = [
+        'RecordDriver\RecordDriver\SolrMarc' => 
+            'RecordDriver\RecordDriver\SolrDefaultFactory',
         'VuFind\RecordDriver\BrowZine' =>
             'Zend\ServiceManager\Factory\InvokableFactory',
         'VuFind\RecordDriver\EDS' => 'VuFind\RecordDriver\NameBasedConfigFactory',
@@ -98,7 +100,6 @@ class PluginManager extends \VuFind\RecordDriver\PluginManager
             'VuFind\RecordDriver\SolrDefaultWithoutSearchServiceFactory',
         'VuFind\RecordDriver\SolrDefault' =>
             'VuFind\RecordDriver\SolrDefaultFactory',
-        'RecordDriver\RecordDriver\SolrMarc' => 'RecordDriver\RecordDriver\SolrDefaultFactory',
         'VuFind\RecordDriver\SolrMarcRemote' =>
             'VuFind\RecordDriver\SolrDefaultFactory',
         'VuFind\RecordDriver\SolrReserves' =>
