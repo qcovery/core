@@ -32,7 +32,10 @@ use VuFindSearch\ParamBag;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use SearchKeys\Search\SearchKeysHelper;
 
-class Params extends \SearchKeys\Search\Solr\Params
+//use VuFind\Search\Solr\Params as BaseParams;
+use SearchKeys\Search\Solr\Params as BaseParams;
+
+class Params extends BaseParams
 {
     protected $Libraries = null;
     protected $selectedLibrary = null;

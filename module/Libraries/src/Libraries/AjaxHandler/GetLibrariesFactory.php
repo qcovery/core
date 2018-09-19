@@ -20,10 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  AJAX
+ * @package  Libraries\AJAX
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de> 
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
+ * @link     https://github.com/beluga-core
  */
 namespace Libraries\AjaxHandler;
 

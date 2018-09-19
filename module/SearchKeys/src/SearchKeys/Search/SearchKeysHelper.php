@@ -28,7 +28,6 @@ class SearchKeysHelper
         $id = strtolower($searchClassId);
         $keywords = $config->get('keys-' . $id)->toArray();
         $phrasedKeywords = $config->get('phrasedKeys-' . $id)->toArray();
-        $toTranslate = $config->get('translate-' . $id)->toArray();
 
         $lookfor = $lookfor = preg_replace('/\s+/', ' ', $request->get('lookfor'));
         $lookfor = preg_replace('/""+/', '"', $lookfor);
@@ -38,12 +37,6 @@ class SearchKeysHelper
         $searchItems = [];
         $searchBoolean = ['AND'];
         $limit = 10;
-
-        if (is_array($toTranslate)) {
-            foreach($toTranslate as $translateTo => $translateFrom) {
-                $lookfor = preg_replace('/\\'.$translateFrom.'/', '{'.$translateTo.'}', $lookfor);
-            }
-        }
 
         $type = '';
         while (!empty($lookfor) && $limit-- > 0) {
@@ -87,15 +80,14 @@ class SearchKeysHelper
         foreach ($searchItems as $type => $items) {
             $types[] = $type;
             $lookfor = implode(' ', $items);
-            if (in_array($type, array_keys($phrasedKeywords))) {
+            if (in_array($type, $phrasedKeywords)) {
                 $lookfor = '"' . $lookfor . '"';
             }
             $lookfors[] = $lookfor;
         }
 
-        $request->set('lookfor0', null);
-        $request->set('lookfor', null);
         if (count($lookfors) > 1) {
+            $request->set('lookfor', null);
             $request->set('lookfor0', $lookfors);
             $request->set('type0', $types);
             if (empty($request->get('bool0'))) {
@@ -108,11 +100,13 @@ class SearchKeysHelper
                 $request->set('join', 'OR');
             }
         } elseif (count($lookfors) == 1) {
+            $request->set('lookfor0', null);
             $request->set('lookfor', $lookfors[0]);
             if ($types[0] != $defaultType) {
                 $request->set('type', $types[0]);
             }
         } else {
+            $request->set('lookfor0', null);
             $request->set('lookfor', '');
         }
         return $request;

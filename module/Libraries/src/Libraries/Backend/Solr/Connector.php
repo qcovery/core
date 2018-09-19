@@ -41,7 +41,7 @@ class Connector extends \VuFindSearch\Backend\Solr\Connector
      *
      * @var string
      */
-    const LIBRARY_FILTER_TYPE = 'url';
+    const LIBRARY_FILTER_TYPE = 'filter';
 
     /**
      * Send query to SOLR and return response body.

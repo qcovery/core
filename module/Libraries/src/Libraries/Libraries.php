@@ -1,10 +1,10 @@
 <?php
 /**
- * Libraries Module
+ * Module Libraries: basic class
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Staats- und Universitätsbibliothek 2017.
+ * Copyright (C) Staats- und Universitätsbibliothek Hamburg 2018.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -19,14 +19,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Libraries
  * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://github.com/subhh/beluga
+ * @link     https://github.com/beluga-core
  */
 namespace Libraries;
-//use Zend\ServiceManager\ServiceManager;
+
 use VuFind\Search\Memory;
 use Zend\Session\Container as SessionContainer;
 use Zend\Config\Config;
@@ -34,13 +34,55 @@ use Zend\Config\Config;
 class Libraries
 {
 
+    /**
+     * Libraries to include
+     *
+     * @var array
+     */
     protected $includedLibraries;
+
+    /**
+     * Libraries to exclude
+     *
+     * @var array
+     */
     protected $excludedLibraries;
+
+    /**
+     * Default library (if none is chosen)
+     * Default library could and should be sth like "all libraries"
+     *
+     * @var array
+     */
     protected $defaultLibraries;
+
+    /**
+     * Current library
+     *
+     * @var array
+     */
     protected $selectedLibrary;
+
+    /**
+     * Locations of a library
+     *
+     * @var array
+     */
     protected $locations;
+
+    /**
+     * Search memory
+     *
+     * @var VuFind\Search\Memory
+     */
     protected $searchMemory;
 
+    /**
+     * Constructor
+     *
+     * @param Config        $config                Configuration of Libraries
+     * @param Memory        $searchMemory          Query object to use to update
+     */
     public function __construct(Config $config, Memory $searchMemory = null)
     {
         $this->searchMemory = $searchMemory;
@@ -71,6 +113,13 @@ class Libraries
         $this->selectLibrary();
     }
 
+    /**
+     * Check if a identifying code is valid 
+     *
+     * @param string        $libraryCode           code
+     *
+     * @return boolean
+     */
     private function checkLibrary($libraryCode) {
         return (!empty($libraryCode)
                 && (in_array($libraryCode, array_keys($this->includedLibraries))
@@ -78,6 +127,13 @@ class Libraries
                 );
     }
 
+    /**
+     * Select a current library and return according data
+     *
+     * @param string        $libraryCode           code
+     *
+     * @return array
+     */
     public function selectLibrary($libraryCode = null) {
         $validatedLibraryCode = null;
         if ($this->checkLibrary($libraryCode)) {
@@ -107,6 +163,13 @@ class Libraries
         return $this->selectedLibrary;
     }
 
+    /**
+     * Get the library data
+     *
+     * @param string        $libraryCode           code
+     *
+     * @return array
+     */
     public function getLibrary($libraryCode = '') {
         if (empty($libraryCode)) {
             return $this->selectLibrary();
@@ -121,6 +184,13 @@ class Libraries
         }
     }
 
+    /**
+     * Get the code of the default library
+     *
+     * @param string        $searchClassId           Searchclass id
+     *
+     * @return string
+     */
     public function getDefaultLibraryCode($searchClassId = null) {
         $searchClassId = strtolower($searchClassId);
         $codes = [];
@@ -132,6 +202,13 @@ class Libraries
         return array_shift($codes);
     }
 
+    /**
+     * Get the codes of all includes libraries
+     *
+     * @param string        $searchClassId           Searchclass id
+     *
+     * @return array
+     */
     public function getLibraryCodes($searchClassId = null) {
         $searchClassId = strtolower($searchClassId);
         $codes = [];
@@ -143,6 +220,13 @@ class Libraries
         return $codes;
     }
 
+    /**
+     * Get the facet fields identifying includes libraries
+     *
+     * @param string        $searchClassId           Searchclass id
+     *
+     * @return array
+     */
     public function getLibraryFacetFields($searchClassId) {
         $searchClassId = strtolower($searchClassId);
         $facets = [];
@@ -154,18 +238,36 @@ class Libraries
         return array_unique($facets);
     }
 
+    /**
+     * Get the facet values identifying includes libraries
+     *
+     * @param string        $searchClassId           Searchclass id
+     *
+     * @return array
+     */
     public function getLibraryFacetValues($searchClassId) {
         $searchClassId = strtolower($searchClassId);
-        $codes = [];
+        $values = [];
          foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library => $data) {
             if (isset($data[$searchClassId])) {
-                $codes[$library] = $data[$searchClassId];
+                $values[$library] = $data[$searchClassId];
             }
         }
-        return $codes;
+        return $values;
     }
 
-    public function getLibraryFilters($libraryCode, $searchClassId, $included = true, $getDefaultInsteadOfAll = false) {
+    /**
+     * Generate the filters to select libraries
+     *
+     * @param string        $libraryCode             code of the selected library
+     * @param string        $searchClassId           Searchclass id
+     * @param boolean       $included                whether to select included or excluded libraries
+     * @param boolean       $getDefaultInsteadOfAll  whether to select default library or all libraries if
+     *                                                no library is chosen 
+     *
+     * @return array
+     */
+    public function getLibraryFilters($libraryCode = '', $searchClassId, $included = true, $getDefaultInsteadOfAll = false) {
         $libraryFilters = [];
         $searchClassId = strtolower($searchClassId);
         $libraries = ($included) ? $this->includedLibraries : $this->excludedLibraries;
@@ -199,6 +301,15 @@ class Libraries
         return $libraryFilters;
     }
 
+    /**
+     * Get a list of all libraries
+     *
+     * @param boolean       $includedOnly            whether to select only included libraries
+     * @param boolean       $withDefault             whether to select default library as well
+     * @param string        $searchClassId           Searchclass id
+     *
+     * @return array
+     */
     public function getLibraryList($includedOnly = true, $withDefault = true, $searchClassId = '') {
         $searchClassId = strtolower($searchClassId);
         if ($withDefault) {
@@ -216,6 +327,11 @@ class Libraries
         return $libraryList;
     }
 
+    /**
+     * Get filter values for locations
+     *
+     * @return array
+     */
     public function getLocationFilter() {
         if (isset($this->locations[$this->selectedLibrary['code']])) {
             $locations = $this->locations[$this->selectedLibrary['code']];
@@ -227,6 +343,11 @@ class Libraries
         return null;
     }
 
+    /**
+     * Determine a proper filter value by a filter
+     *
+     * @return array
+     */
     public function getLocationValue($filter) {
         if (isset($this->locations[$this->selectedLibrary['code']])) {
             $locations = $this->locations[$this->selectedLibrary['code']];
@@ -247,6 +368,11 @@ class Libraries
         return $filter;
     }
 
+    /**
+     * Get a list of locations (to build a location facet)
+     *
+     * @return array
+     */
     public function getLocationList($locationFacets) {
         $locationList = array();
         if (isset($this->locations[$this->selectedLibrary['code']])) {
