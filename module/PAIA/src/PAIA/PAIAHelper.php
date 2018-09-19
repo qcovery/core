@@ -52,21 +52,22 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      *
      * @return Array
      */
-	//TODO: Currently only working with DAIAplus Service - DAIAplus Service needs to be set up to conform to DAIA request specifications
     public function getDaiaResults($ppn, $list = 0, $language = 'en', $mediatype) {
 		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
 			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.urlencode($mediatype);
-		echo "<span style='display:none;'>".$url_path."</span>";
+		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'availability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.urlencode($mediatype);
+        echo "<span style='display:none;'>".$url_path."</span>";
 
         $ch = curl_init();
         $timeout = 0;
         curl_setopt($ch, CURLOPT_URL, $url_path);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         $daia = curl_exec($ch);
         curl_close($ch);
 
@@ -543,7 +544,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		return $results;
 	} else {
 		
-		$results = $this->makeDaiaConform($results, $daiaJson);
+		$results = $this->makeDaiaConform($results, json_decode($daia, true)); // convert again to json, as makeDaiaConform() can not use object representation of DAIA results.
 		$results = json_decode($results, true);
 		return $results;
 	}
@@ -604,14 +605,17 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'e-availability'.'?ppn='.$ppn.'&openurl='.urlencode($openUrl).'&url_access='.$url_access.'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.$doi.'&list='.$list.'&mediatype='.$mediatype.'&language='.$language.'&site='.$site.'&format=json';
-		echo "<span style='display:none;'>".$url_path."</span>";
+        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.$url_access.'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.$doi.'&list='.$list.'&mediatype='.$mediatype.'&language='.$language.'&site='.$site.'&format=json';
+
+        echo "<span style='display:none;'>".$url_path."</span>";
 
         $ch = curl_init();
         $timeout = 0;
         curl_setopt($ch, CURLOPT_URL, $url_path);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         $e_availability = curl_exec($ch);
         curl_close($ch);
 
