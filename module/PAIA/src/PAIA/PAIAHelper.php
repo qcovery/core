@@ -605,7 +605,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		} else {
 			$site = 'Default';
 		}
-        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.$url_access.'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.$doi.'&list='.$list.'&mediatype='.$mediatype.'&language='.$language.'&site='.$site.'&format=json';
+        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.urlencode($url_access).'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.urlencode($doi).'&list='.$list.'&mediatype='.urlencode($mediatype).'&language='.$language.'&site='.$site.'&format=json';
 
         echo "<span style='display:none;'>".$url_path."</span>";
 
