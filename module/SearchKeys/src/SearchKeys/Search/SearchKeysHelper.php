@@ -28,11 +28,11 @@ class SearchKeysHelper
         $id = strtolower($searchClassId);
         $keywords = $config->get('keys-' . $id)->toArray();
         $phrasedKeywords = $config->get('phrasedKeys-' . $id)->toArray();
+        $defaultType = $options->getDefaultHandler();
 
         $lookfor = $lookfor = preg_replace('/\s+/', ' ', $request->get('lookfor'));
         $lookfor = preg_replace('/""+/', '"', $lookfor);
         $type = $request->get('type');
-        $defaultType = $options->getDefaultHandler();
 
         $searchItems = [];
         $searchBoolean = ['AND'];
@@ -54,22 +54,18 @@ class SearchKeysHelper
                 }
             }
             if (empty($item)) {
+                $type = (empty($type)) ? $defaultType : $type;
                 if (preg_match('#^([^"\s]+|("[^"]+"))((?=\s)|(?=$))#', $lookfor, $matches)) {
                     $item = $matches[1];
-                    $type = (empty($type)) ? $defaultType : $type;
                     $pos = strpos($lookfor, $item);
                     $lookfor = trim(substr_replace($lookfor, '', $pos, strlen($item)));
                     if ($item == 'OR') {
                         $searchBoolean = ['OR'];
-                        $item = '';
                     }
                 }
                 if (!empty($item)) {
-                    if (empty($type)) {
-                        $type = $defaultType;
-                    }
                     if (!isset($searchItems[$type])) {
-                        $searchItems[$type] = array();
+                        $searchItems[$type] = [];
                     }
                     $searchItems[$type][] = $item;
                 }
@@ -102,9 +98,7 @@ class SearchKeysHelper
         } elseif (count($lookfors) == 1) {
             $request->set('lookfor0', null);
             $request->set('lookfor', $lookfors[0]);
-            if ($types[0] != $defaultType) {
-                $request->set('type', $types[0]);
-            }
+            $request->set('type', $types[0]);
         } else {
             $request->set('lookfor0', null);
             $request->set('lookfor', '');
