@@ -22,7 +22,7 @@ return [
         'dependentworks',
 //        'daia',
         'recorddriver',
-        'belugadefault',
+        'beluga-core-base',
     ],
     "less" => [
         "active" => false,

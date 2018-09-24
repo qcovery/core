@@ -85,7 +85,7 @@ JS;
                     <div class="">
                         <p>
 <!-- Module Libraries -->
-<?=$this->context($this)->renderInContext('search/libraries-home.phtml', ['searchClassId' => $tab['id']]); ?>
+<?=$this->render('search/libraries-home.phtml', ['searchClassId' => $tab['id']]); ?>
 <!-- Module Libraries -->
                             <?=$this->transEsc($tab['text'])?>
                         </p>
