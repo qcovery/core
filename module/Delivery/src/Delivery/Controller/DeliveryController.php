@@ -71,7 +71,7 @@ class DeliveryController extends AbstractBase
      */
     public function getTable($table)
     {
-        return $this->serviceLocator->get('Delivery\DbTablePluginManager')->get($table);
+        return $this->serviceLocator->get('Delivery\Db\Table\PluginManager')->get($table);
     }
 
     /**
@@ -97,7 +97,7 @@ class DeliveryController extends AbstractBase
  
         return $view;
     }
-    
+
     /**
      * Edit action
      *
@@ -179,10 +179,10 @@ class DeliveryController extends AbstractBase
     public function adminAction()
     {
         // First make sure user is logged in to VuFind:
-        if ($this->getAuthManager()->isLoggedIn() == false) {
+        if (!$this->getAuthManager()->isLoggedIn()) {
             return $this->forceLogin();
         }
-        
+
         $view = $this->createViewModel();
         $deliveryAdmin = $this->userDelivery->get($this->user->id);
         if ($deliveryAdmin->is_admin == 'y') {
@@ -192,36 +192,34 @@ class DeliveryController extends AbstractBase
                 $this->authorize($id, ($action == 'revoke') || ($action == 'refuse'));
                 $this->sendDeliveryMail($action, $id);
             }
-            
+
             $deliveryUsers = $this->userDelivery->select(function (\Zend\Db\Sql\Select $select) {
                  $select->order('authorized ASC');
             });
 
             foreach ($deliveryUsers as $key => $value) {
                 if ($deliveryAdmin->library != '*' && $deliveryAdmin->library != $value->library) {
-                    if ($value->library != $deliveryAdmin->library) {
-                        unset($deliveryUsers[$key]);
-                    }
+                    unset($deliveryUsers[$key]);
                 }
             }
             $view->deliveryUsers = array_values($deliveryUsers);
         } else {
             return $this->forwardTo('Delivery', 'Home');
         }
-        
+
         return $view;
     }
     
     public function orderAction()
     {
         // First make sure user is logged in to VuFind:
-        if ($this->getAuthManager()->isLoggedIn() == false) {
+        if (!$this->getAuthManager()->isLoggedIn()) {
             return $this->forceLogin();
         }
         if (!$this->checkAuthorization()) {
             return $this->forwardTo('Delivery', 'Home');
        	}
-        $id = (!empty($this->params()->fromQuery('id'))) ? $this->params()->fromQuery('id') : $this->params()->fromPost('id');
+        $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
 
         $view = $this->createViewModel();
         $view->deliveryUser = $this->userDelivery->get($this->user->id);

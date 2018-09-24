@@ -2,7 +2,7 @@
 /**
  * Database table plugin manager
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -36,16 +36,51 @@ namespace Delivery\Db\Table;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:database_gateways Wiki
  */
-class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
+class PluginManager extends \VuFind\Db\Table\PluginManager
 {
     /**
-     * Return the name of the base class or interface that plug-ins must conform
-     * to.
+     * Default plugin aliases.
      *
-     * @return string
+     * @var array
      */
-    protected function getExpectedInterface()
-    {
-        return 'Delivery\Db\Table\Gateway';
-    }
+    protected $aliases = [
+        'changetracker' => 'VuFind\Db\Table\ChangeTracker',
+        'comments' => 'VuFind\Db\Table\Comments',
+        'externalsession' => 'VuFind\Db\Table\ExternalSession',
+        'oairesumption' => 'VuFind\Db\Table\OaiResumption',
+        'record' => 'VuFind\Db\Table\Record',
+        'resource' => 'VuFind\Db\Table\Resource',
+        'resourcetags' => 'VuFind\Db\Table\ResourceTags',
+        'search' => 'VuFind\Db\Table\Search',
+        'session' => 'VuFind\Db\Table\Session',
+        'tags' => 'VuFind\Db\Table\Tags',
+        'user' => 'VuFind\Db\Table\User',
+        'usercard' => 'VuFind\Db\Table\UserCard',
+        'userdelivery' => 'Delivery\Db\Table\UserDelivery',
+        'userlist' => 'VuFind\Db\Table\UserList',
+        'userresource' => 'VuFind\Db\Table\UserResource',
+    ];
+
+    /**
+     * Default plugin factories.
+     *
+     * @var array
+     */
+    protected $factories = [
+        'Delivery\Db\Table\UserDelivery' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\ChangeTracker' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\Comments' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\ExternalSession' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\OaiResumption' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\Record' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\Resource' => 'VuFind\Db\Table\ResourceFactory',
+        'VuFind\Db\Table\ResourceTags' => 'VuFind\Db\Table\CaseSensitiveTagsFactory',
+        'VuFind\Db\Table\Search' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\Session' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\Tags' => 'VuFind\Db\Table\CaseSensitiveTagsFactory',
+        'VuFind\Db\Table\User' => 'VuFind\Db\Table\UserFactory',
+        'VuFind\Db\Table\UserCard' => 'VuFind\Db\Table\GatewayFactory',
+        'VuFind\Db\Table\UserList' => 'VuFind\Db\Table\UserListFactory',
+        'VuFind\Db\Table\UserResource' => 'VuFind\Db\Table\GatewayFactory',
+    ];
 }

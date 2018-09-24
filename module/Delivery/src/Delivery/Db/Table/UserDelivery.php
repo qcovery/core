@@ -30,7 +30,6 @@ namespace Delivery\Db\Table;
 use VuFind\Db\Row\RowGateway;
 use Zend\Db\Adapter\Adapter;
 use VuFind\Exception\LoginRequired as LoginRequiredException;
-use VuFind\Exception\RecordMissing as RecordMissingException;
 
 /**
  * Table Definition for user_delivery
@@ -70,13 +69,8 @@ class UserDelivery extends Gateway
         $result = $this->select(['user_id' => $user_id])->current();
         if (empty($result)) {
             return null;
-//            throw new RecordMissingException('Cannot load delivery user ' . $user_id);
         }
         return $result;
-    }
-/*
-    public function select($statement) {
-        return $this->select($statement)->current();
     }
 */
 }
