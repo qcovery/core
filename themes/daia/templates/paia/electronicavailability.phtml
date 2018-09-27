@@ -3,7 +3,7 @@
 	$list = $_GET['list'];
 	$language = $this->layout()->userLang;
 	
-	$e_availability = $this->paia()->getElectronicAvailability($_GET['ppn'], urldecode($_GET['openurl']), urldecode($_GET['url-access']),$_GET['url-access-level'], $_GET['first-matching-issn'], $_GET['gvklink'],$_GET['doi'], $list, $_GET['mediatype'], $language);
+	$e_availability = $this->paia()->getElectronicAvailability($_GET['ppn'], urldecode($_GET['openurl']), urldecode($_GET['url-access']),$_GET['url-access-level'], $_GET['gvklink'],$_GET['doi'], $list, $_GET['mediatype'], $language);
 	
 	echo '<div style="display:none;">';
 		print_r($e_availability);
