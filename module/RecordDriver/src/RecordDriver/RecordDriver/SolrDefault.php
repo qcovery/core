@@ -79,4 +79,127 @@ class SolrDefault extends \VuFind\RecordDriver\SolrDefault
         $breadCrumbs = $this->getShortTitle();
         return (is_array($breadCrumbs)) ? $breadCrumbs[0] : $breadCrumbs;
     }
+	
+    /**
+     * Support method for getOpenUrl() -- pick the OpenURL format.
+     *
+     * @return string
+     */
+    protected function getOpenUrlFormat()
+    {
+        // If we have multiple formats, Book, Journal and Article are most
+        // important...
+        $formats = $this->getFormats();
+        if (in_array('Book', $formats)) {
+            return 'Book';
+        } elseif (in_array('Article', $formats) || in_array('electronic Article', $formats)) {
+            return 'Article';
+        } elseif (in_array('Journal', $formats) || in_array('electronic Journal', $formats) || in_array('eJournal', $formats)) {
+            return 'Journal';
+        } elseif (isset($formats[0])) {
+            return $formats[0];
+        } elseif (strlen($this->getCleanISSN()) > 0) {
+            return 'Journal';
+        } elseif (strlen($this->getCleanISBN()) > 0) {
+            return 'Book';
+        }
+        return 'UnknownFormat';
+    }
+
+	
+    /**
+     * Get the volume of the item that contains this record (i.e. MARC 773v of a
+     * journal).
+     *
+     * @return string
+     */
+    public function getContainerVolume()
+    {
+		$volume = '';
+		
+		if(isset($this->fields['source'])) {
+			
+				if (strpos($this->fields['source'], 'Vol. ') == true) {
+					$volume = substr($this->fields['source'],strpos($this->fields['source'], 'Vol.'));
+					
+					if (strpos($volume, 'No. ') == true) {
+						$volume = strtok($volume,',');
+					} else if (strpos($volume, ' (') == true) {
+						$volume = strtok($volume,'(');
+					} else if (strpos($volume, 'p.') == true) {
+						$volume = strtok($volume,',');
+					}
+					
+					$volume = trim(substr($volume, 5));
+					
+				}
+		}
+		
+		return $volume;
+        //return isset($this->fields['container_volume'])
+        //    ? $this->fields['container_volume'] : '';
+    }
+
+    /**
+     * Get the issue of the item that contains this record (i.e. MARC 773l of a
+     * journal).
+     *
+     * @return string
+     */
+    public function getContainerIssue()
+    {
+		$issue = '';
+		
+		if(isset($this->fields['source'])) {
+			
+				if (strpos($this->fields['source'], 'No. ') == true) {
+					$issue = substr($this->fields['source'],strpos($this->fields['source'], 'No.'));
+					
+					if (strpos($issue, ' (') == true) {
+						$issue = strtok($issue,'(');
+					} else if (strpos($issue, 'p.') == true) {
+						$issue = strtok($issue,',');
+					}
+					
+					$issue = trim(substr($issue, 4));
+					
+				}
+		}
+		
+		return $issue;
+	
+		
+        //return isset($this->fields['container_issue'])
+        //    ? $this->fields['container_issue'] : '';
+    }
+
+    /**
+     * Get the start page of the item that contains this record (i.e. MARC 773q of a
+     * journal).
+     *
+     * @return string
+     */
+    public function getContainerStartPage()
+    {
+        $spage = '';
+		
+		if(isset($this->fields['source'])) {
+			
+				if (strpos($this->fields['source'], 'p. ') == true) {
+					$spage = substr($this->fields['source'],strpos($this->fields['source'], 'p.'));
+					
+					if (strpos($spage, '-') == true) {
+						$spage = strtok($spage,'-');
+					}
+					
+					$spage = trim(substr($spage, 3));
+					
+				}
+		}
+		
+		return $spage;
+		
+		//return isset($this->fields['container_start_page'])
+        //    ? $this->fields['container_start_page'] : '';
+    }
 }

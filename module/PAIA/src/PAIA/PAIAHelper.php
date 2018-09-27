@@ -49,7 +49,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
     
 	/**
      * Get Results from external DAIA Service
-     *
+     * 
      * @return Array
      */
     public function getDaiaResults($ppn, $list = 0, $language = 'en', $mediatype) {
@@ -599,13 +599,13 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      * @return Array
      */
 	//TODO: Complete function once external service is available
-	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $list, $mediatype, $language) {
+	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $GVKlink, $doi, $list, $mediatype, $language) {
 		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
 			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
 		} else {
 			$site = 'Default';
 		}
-        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.urlencode($url_access).'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.urlencode($doi).'&list='.$list.'&mediatype='.urlencode($mediatype).'&language='.$language.'&site='.$site.'&format=json';
+        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.urlencode($url_access).'&url_access_level='.$url_access_level.'&GVKlink='.$GVKlink.'&doi='.urlencode($doi).'&list='.$list.'&mediatype='.urlencode($mediatype).'&language='.$language.'&site='.$site.'&format=json';
 
         echo "<span style='display:none;'>".$url_path."</span>";
 
