@@ -42,7 +42,7 @@ class SearchKeysHelper
         while (!empty($lookfor) && $limit-- > 0) {
             $item = $key = '';
             foreach (array_merge($keywords, $phrasedKeywords) as $keyword => $searchType) {
-                $searchname = $options->getHumanReadableFieldName($searchtype);
+                $searchName = $options->getHumanReadableFieldName($searchtype);
                 $keyRegex = '(('.$keyword.'\s)|('.$searchType.':)|('.$searchName.':))';
                 if (preg_match('#^'.$keyRegex.'([^"\s]*|("[^"]*"))((?=\s)|(?=$))#', $lookfor, $matches)) {
                     $key = $matches[1];
