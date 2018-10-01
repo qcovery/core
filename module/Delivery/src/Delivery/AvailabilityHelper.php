@@ -16,7 +16,7 @@ namespace Delivery;
 use VuFindSearch\Query\Query;
 use VuFind\Search\Factory\SolrDefaultBackendFactory;
 
-class Availability {
+class AvailabilityHelper {
 
     protected $deliveryConfig;
     protected $solrDriver;
@@ -46,8 +46,8 @@ class Availability {
         $deliveryConfig = $this->deliveryConfig;
         $iln = $deliveryConfig['iln'];
         $format = array_shift($this->solrDriver->getFormats());
-        $signatureData = $this->solrDriver->getSignatureData($iln);
-        $licenceData = $this->solrDriver->getLicenceData($iln);
+        $signatureData = $this->solrDriver->getMarcData('Signature');
+        $licenceData = $this->solrDriver->getMarcData('Licence');
 
         $sigel = '';
         $signature = '';
@@ -95,8 +95,8 @@ class Availability {
         $iln = $deliveryConfig['iln'];
         $formats = $this->solrDriver->getFormats();
         $format = array_shift($formats);
-        $signatureData = $this->solrDriver->getSignatureData($iln);
-        $licenceData = $this->solrDriver->getLicenceData($iln);
+        $signatureData = $this->solrDriver->getMarcData('Signature');
+        $licenceData = $this->solrDriver->getMarcData('Licence');
 
         if (in_array($format, $deliveryConfig['formats'])) {
             if (empty($signatureData) && $this->checkSigel(array(), $format)) {
@@ -136,17 +136,8 @@ class Availability {
                     }
                     $regex = substr($regex, 1);
                     $noMatch = true;
-//echo 'noMatch ';
                 }
-/*
-echo 'item:'.$item.' ';
-echo 'format:'.$format.' ';
-echo 'regex:'.$regex.' ';
-echo 'data:'.$data.' ';
-echo '<br>';
-*/
                 if ($regex == $extraFullMatch || (!$noMatch && preg_match('#'.$regex.'$#', $data)) || ($noMatch && !preg_match('#'.$regex.'$#', $data))) {
-//echo 'HIT<br>';
                     return true;
                 }
             }

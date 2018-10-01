@@ -4,24 +4,23 @@
  */
 namespace Delivery\View\Helper\Delivery;
 
-use Delivery\Availability;
+use Delivery\AvailabilityHelper;
 
 class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
 {
 
-    protected $Availability;
+    protected $AvailabilityHelper;
 
     public function __construct($config)
     {
-        $this->Availability = new Availability();
-        $this->Availability->setDeliveryConfig($config);
+        $this->AvailabilityHelper = new AvailabilityHelper(null, $config['default']);
     }
 
     /**
      *
      */
     public function check($driver) {
-        $this->Availability->setSolrDriver($driver);
-        return ($this->Availability->checkItem()) ? 'available' : 'not available'; 
+        $this->AvailabilityHelper->setSolrDriver($driver);
+        return ($this->AvailabilityHelper->checkItem()) ? 'available' : 'not available'; 
     }
 }

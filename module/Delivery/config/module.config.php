@@ -2,6 +2,7 @@
 namespace Delivery\Module\Configuration;
 
 $config = [
+/*
     'controllers' => [
         'factories' => [
             'Delivery\Controller\DeliveryController' => 'Delivery\Controller\Factory::getDeliveryController',
@@ -31,14 +32,15 @@ $config = [
             ],
         ],
     ],
+*/
 ];
 
 // Define static routes -- Controller/Action strings
 $staticRoutes = [
    'Delivery/Home', 'Delivery/Edit', 'Delivery/Register', 'Delivery/Admin', 'Delivery/Order'
 ];
-
+/*
 $routeGenerator = new \VuFind\Route\RouteGenerator();
 $routeGenerator->addStaticRoutes($config, $staticRoutes);
-
+*/
 return $config;

@@ -2,7 +2,10 @@
 return [
     'helpers' => [
         'factories' => [
-            'availabilitychecker' => 'Delivery\View\Helper\Delivery\Factory::getAvailabilityChecker',
+            'Delivery\View\Helper\Delivery\AvailabilityChecker' => 'Delivery\View\Helper\Delivery\AvailabilityCheckerFactory',
+        ],
+        'aliases' => [
+            'availabilitychecker' => 'Delivery\View\Helper\Delivery\AvailabilityChecker',
         ]
     ]
 ];
