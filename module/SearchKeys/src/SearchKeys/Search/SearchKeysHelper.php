@@ -63,12 +63,10 @@ class SearchKeysHelper
                         $searchBoolean = ['OR'];
                     }
                 }
-                if (!empty($item)) {
-                    if (!isset($searchItems[$type])) {
-                        $searchItems[$type] = [];
-                    }
-                    $searchItems[$type][] = $item;
+                if (!isset($searchItems[$type])) {
+                    $searchItems[$type] = [];
                 }
+                $searchItems[$type][] = $item;
             }
         }
 
@@ -100,8 +98,7 @@ class SearchKeysHelper
             $request->set('lookfor', $lookfors[0]);
             $request->set('type', $types[0]);
         } else {
-            $request->set('lookfor0', null);
-            $request->set('lookfor', '');
+            $request->set('lookfor', null);
         }
         return $request;
     }
