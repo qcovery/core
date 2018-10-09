@@ -53,7 +53,6 @@ class DeliveryController extends AbstractBase
 
     /**
      * Constructor
-     */
     public function __construct(ServiceLocatorInterface $sm)
     {
         parent::__construct($sm);
@@ -61,6 +60,7 @@ class DeliveryController extends AbstractBase
         $this->userDelivery = $this->getTable('user_delivery');
         $this->deliveryGlobalConfig = $this->getConfig('deliveryGlobal');
     }
+     */
 
     /**
      * Get a database table object.
