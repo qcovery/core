@@ -1,4 +1,4 @@
-<?
+<?php
 if (empty($this->coreFieldCategories)):
     $coreFieldList = [$this->solrDetails()->getCoreFields($this->driver, $this->coreFieldCategories)];
 else:
@@ -8,27 +8,30 @@ else:
     endforeach;
 endif;
 ?>
-<? foreach ($coreFieldList as $coreFields): ?>
-    <? if (!empty($coreFields)): ?>
+<?php foreach ($coreFieldList as $coreFields): ?>
+    <?php if (!empty($coreFields)): ?>
       <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
-        <? foreach ($coreFields as $field => $items): ?>
-            <? if (!empty($items[0])): ?>
+        <?php foreach ($coreFields as $field => $items): ?>
+            <?php if (!empty($items[0])): ?>
           <tr><th><?=$this->transEsc($field)?>:</th><td>
-                <? foreach ($items as $item): ?>
+                <?php foreach ($items as $item): ?>
              <p style="margin:0px">
-                 <? if (is_array($item)): ?>
-                    <? foreach ($item as $key => $value): ?>
-                        <? if (!is_int($key)): ?>
+                 <?php if (is_array($item)): ?>
+                    <?php foreach ($item as $key => $value): ?>
+                        <?php if (!is_int($key)): ?>
                             <?=$this->transEsc($key) ?>:
-                        <? endif; ?>
-                        <?=$value ?><br />
-                    <? endforeach; ?>
-                 <? endif; ?>
+                        <?php endif; ?>
+                        <?=$value['data'] ?><br />
+                        <?php if (!empty($value['originalLetters']) && $value['originalLetters'] != $value['data']): ?>
+                            <?=$this->transEsc('Original Letters') ?>: <?=$value['originalLetters'] ?><br />
+                         <?php endif; ?>
+                    <?php endforeach; ?>
+                 <?php endif; ?>
              </p>
-                <? endforeach; ?>
+                <?php endforeach; ?>
           </td></tr>
-             <? endif; ?>
-        <? endforeach; ?>
+             <?php endif; ?>
+        <?php endforeach; ?>
       </table>
-    <? endif; ?>
-<? endforeach; ?>
+    <?php endif; ?>
+<?php endforeach; ?>

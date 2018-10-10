@@ -26,7 +26,7 @@
  * @link     https://vufind.org Main Page
  */
 namespace Delivery\Db\Table;
-//use VuFind\Db\Table\Gateway;
+use VuFind\Db\Table\Gateway;
 use VuFind\Db\Row\RowGateway;
 use Zend\Db\Adapter\Adapter;
 use VuFind\Exception\LoginRequired as LoginRequiredException;
@@ -72,5 +72,4 @@ class UserDelivery extends Gateway
         }
         return $result;
     }
-*/
 }
