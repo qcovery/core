@@ -168,7 +168,7 @@ JS;
     </nav>
     <div role="main" class="main">
       <div id="content" class="container">
-<? //$notificationConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/notification.ini'), true); ?>
+<? $notificationConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/notification.ini'), true); ?>
 
 <? if(!empty($notificationConfig['Global'])): ?>
         <? if (!empty($notificationConfig['Global']['error_notification'])): ?>
