@@ -152,7 +152,7 @@
       </div>
 	  
 	  <!-- Module DAIA -->
-      <?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '1']); ?>
+      <?//=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '1']); ?>
 	  <!-- Module DAIA -->
 	  
 	  <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
@@ -218,7 +218,9 @@
         <? if ($this->cart()->isActiveInSearch() && $this->params->getOptions()->supportsCart() && $this->cart()->isActive()): ?>
     <div class="belugax-result-badge">
         <? $cartId = $this->source . '|' . $this->id; ?>
-        <?=($cart->contains($cartId)) ? '<i class="bel-stern01">' : '<i>' ?></i>
+        <? if ($cart): ?>
+            <?=($cart->contains($cartId)) ? '<i class="bel-stern01">' : '<i>' ?></i>
+        <? endif; ?>
     </div>
         <? endif; ?>
 
