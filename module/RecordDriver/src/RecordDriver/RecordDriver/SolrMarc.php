@@ -143,7 +143,7 @@ class SolrMarc extends SolrDefault
     {
         $specsReader = new SearchSpecsReader();
         $rawSolrMarcSpecs = $specsReader->get($this->solrMarcYaml);
-        $solrMarcSpecs = array();
+        $solrMarcSpecs = [];
         foreach ($rawSolrMarcSpecs as $item => $solrMarcSpec) {
             $solrMarcSpecs[$item] = [];
             if (array_key_exists('category', $solrMarcSpec)) {
@@ -156,6 +156,10 @@ class SolrMarc extends SolrDefault
                 $this->solrMarcKeys[$category] = [];
             }
             $this->solrMarcKeys[$category][] = $item;
+            if (!empty($solrMarcSpec['originalletters']) && $solrMarcSpec['originalletters'] == 'no') {
+                $solrMarcSpecs[$item]['originalletters'] = 'no';
+            }
+            unset($solrMarcSpec['originalletters']);
             foreach ($solrMarcSpec as $marcField => $fieldSpec) {
                 $solrMarcSpecs[$item][$marcField] = [];
                 $conditions = $subfields = $parentMethods = $description = [];
@@ -214,10 +218,10 @@ class SolrMarc extends SolrDefault
         $title = $solrMarcSpecs['title'];
         unset($solrMarcSpecs['title']);
         foreach ($solrMarcSpecs as $field => $subFieldSpecs) {
-            $indexData = array();
+            $indexData = [];
             if (!empty($subFieldSpecs['parent'])) {
                 $tmpKey = '';
-                $tmpData = array();
+                $tmpData = [];
                 foreach ($subFieldSpecs['parent'] as $subFieldSpec) {
                     if ($subFieldSpec[0] == 'method') {
                         $method = $subFieldSpec[1];
@@ -238,14 +242,14 @@ class SolrMarc extends SolrDefault
                 if (!empty($tmpData)) {
                    if (!empty($tmpKey)) {
                         foreach ($tmpData as $value) {
-                            $indexData[] = array($tmpKey => $value);
+                            $indexData[] = [$tmpKey => $value];
                         }
                     } else {
                         $indexData[] = $tmpData;
                     }
                 }
             }
-            foreach ($this->getMarcRecord()->getFields($field) as $fieldObject) {
+            foreach ($this->getMarcRecord()->getFields($field) as $index => $fieldObject) {
                 $data = $indexData;
                 if (!empty($subFieldSpecs['conditions'])) {
                     foreach ($subFieldSpecs['conditions'] as $condition) {
@@ -262,9 +266,9 @@ class SolrMarc extends SolrDefault
                     }
                 }
                 if (!empty($subFieldSpecs['subfields'])) {
-                    $subFieldList = array();
+                    $subFieldList = [];
                     foreach ($subFieldSpecs['subfields'] as $subField => $specs) {
-                        $subFieldList[$subField] = array();
+                        $subFieldList[$subField] = [];
                         if (!empty($specs)) {
                             foreach ($specs as $spec) {
                                 if (isset($spec[0])) {
@@ -296,7 +300,7 @@ class SolrMarc extends SolrDefault
                             }
                         }
                         if (!empty($fieldData)) {
-                            foreach ($fieldData as $fieldDate) {
+                            foreach ($fieldData as $dataIndex => $fieldDate) {
                                 if (isset($properties['filter']) && isset($properties['match'])) {
                                     if (preg_match('/'.$properties['filter'].'/', $fieldDate, $matches)) {
                                         $fieldDate = $matches[$properties['match']];
@@ -309,10 +313,12 @@ class SolrMarc extends SolrDefault
                                     $function = $properties['function'];
                                     $fieldDate = $function($fieldDate);
                                 }
-                                if (isset($properties['name'])) {
-                                    $data[$properties['name']] = trim($fieldDate);
-                                } else {
-                                    $data[] = trim($fieldDate);
+                                $name = $properties['name'] ?? $dataIndex;
+                                $data[$name] = ['data'=>trim($fieldDate)];
+                                if (empty($solrMarcSpecs['originalletters']) || $solrMarcSpecs['originalletters'] != 'no') {
+                                    if (!empty($this->originalLetters[$field][$index][$subfield])) {
+                                        $data[$name]['originalLetters'] = $this->originalLetters[$field][$index][$subfield];
+                                    }
                                 }
                             }
                         }
@@ -338,11 +344,11 @@ class SolrMarc extends SolrDefault
      */
     protected function getOriginalLetters()
     {
-        $originalLetters = array();
+        $originalLetters = [];
         if ($fields = $this->getMarcRecord()->getFields('880')) {
             foreach ($fields as $field) {
                 $subfields = $field->getSubfields();
-                $letters = array();
+                $letters = [];
                 foreach ($subfields as $subfield) {
                     $code = $subfield->getCode();
                     if ($code == '6') {
@@ -354,7 +360,7 @@ class SolrMarc extends SolrDefault
                 if (isset($originalLetters[$index])) {
                     $originalLetters[$index][] .= $letters;
                 } else {
-                    $originalLetters[$index] = array($letters);
+                    $originalLetters[$index] = [$letters];
                 }
             }
         }
