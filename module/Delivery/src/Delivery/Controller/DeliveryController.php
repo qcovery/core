@@ -84,11 +84,12 @@ class DeliveryController extends AbstractBase
         // First make sure user is logged in to VuFind:
         if (!$this->getAuthManager()->isLoggedIn()) {
             return $this->forceLogin();
-        } elseif (empty($this->userDelivery->get($this->user->id))) {
+        //} elseif (empty($this->userDelivery->get($this->user->id))) {
+        } elseif (empty($this->getTable('userdelivery')->get($this->user->id))) {
             return $this->forwardTo('Delivery', 'Register');
         }
 
-        $deliveryUser = (array) $this->userDelivery->get($this->user->id);
+        $deliveryUser = (array) $this->getTable('userdelivery')->get($this->user->id);
         $deliveryUser['name'] = $this->user->firstname . ' ' . $this->user->lastname;
         // Make view
         $view = $this->createViewModel();
