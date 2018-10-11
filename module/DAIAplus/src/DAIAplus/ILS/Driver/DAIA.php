@@ -32,6 +32,11 @@
  */
 namespace DAIAplus\ILS\Driver;
 
+use DOMDocument;
+use VuFind\Exception\ILS as ILSException;
+use VuFindHttp\HttpServiceAwareInterface as HttpServiceAwareInterface;
+use Zend\Log\LoggerAwareInterface as LoggerAwareInterface;
+
 /**
  * ILS Driver for VuFind to query availability information via DAIA.
  *
@@ -43,8 +48,7 @@ namespace DAIAplus\ILS\Driver;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-class DAIA extends \Vufind\ILS\Driver\DAIA implements
-    HttpServiceAwareInterface, LoggerAwareInterface
+class DAIA extends \VuFind\ILS\Driver\DAIA
 {
     /**
      * Initialize the driver.
