@@ -51,6 +51,13 @@ use Zend\Log\LoggerAwareInterface as LoggerAwareInterface;
 class DAIA extends \VuFind\ILS\Driver\DAIA
 {
     /**
+     * API key needed for DAIA+ Service
+     *
+     * @var string
+     */
+    protected $apiKey;
+
+    /**
      * Initialize the driver.
      *
      * Validate configuration and perform all resource-intensive tasks needed to
@@ -70,6 +77,11 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
             );
         } else {
             throw new ILSException('DAIA/baseUrl configuration needs to be set.');
+        }
+        if (isset($this->config['DAIA']['daiaplus_api_key'])) {
+            $this->apiKey = $this->config['DAIA']['daiaplus_api_key'];
+        } else {
+            throw new ILSException('DAIA/daiaplus_api_key configuration needs to be set.');
         }
         // use DAIA specific timeout setting for http requests if configured
         if ((isset($this->config['DAIA']['timeout']))) {
@@ -114,5 +126,79 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
                 'default value.'
             );
         }
+    }
+
+    /**
+     * Perform an HTTP request.
+     *
+     * @param string $id id for query in daia
+     *
+     * @return xml or json object
+     * @throws ILSException
+     */
+    protected function doHTTPRequest($id)
+    {
+        $http_headers = [
+            'Content-type: ' . $this->contentTypesRequest[$this->daiaResponseFormat],
+            'Accept: ' . $this->contentTypesRequest[$this->daiaResponseFormat],
+        ];
+
+        $params = [
+            'apikey' => $this->apiKey,
+            //'id' => $id,
+            'format' => $this->daiaResponseFormat,
+            'language' => 'de',
+        ];
+
+        try {
+            $result = $this->httpService->get(
+                $this->baseUrl.$id,
+                $params, $this->daiaTimeout, $http_headers
+            );
+        } catch (\Exception $e) {
+            throw new ILSException(
+                'HTTP request exited with Exception ' . $e->getMessage() .
+                ' for record: ' . $id
+            );
+        }
+
+        if (!$result->isSuccess()) {
+            throw new ILSException(
+                'HTTP status ' . $result->getStatusCode() .
+                ' received, retrieving availability information for record: ' . $id
+            );
+        }
+
+        // check if result matches daiaResponseFormat
+        if ($this->contentTypesResponse != null) {
+            if ($this->contentTypesResponse[$this->daiaResponseFormat]) {
+                $contentTypesResponse = array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        $this->contentTypesResponse[$this->daiaResponseFormat]
+                    )
+                );
+                list($responseMediaType) = array_pad(
+                    explode(
+                        ';',
+                        $result->getHeaders()->get('ContentType')->getFieldValue(),
+                        2
+                    ),
+                    2,
+                    null
+                ); // workaround to avoid notices if encoding is not set in header
+                if (!in_array(trim($responseMediaType), $contentTypesResponse)) {
+                    throw new ILSException(
+                        'DAIA-ResponseFormat not supported. Received: ' .
+                        $responseMediaType . ' - ' .
+                        'Expected: ' .
+                        $this->contentTypesResponse[$this->daiaResponseFormat]
+                    );
+                }
+            }
+        }
+
+        return $result->getBody();
     }
 }
