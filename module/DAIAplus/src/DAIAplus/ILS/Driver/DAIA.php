@@ -201,4 +201,101 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
 
         return $result->getBody();
     }
+
+    /**
+     * Parse an array with DAIA status information.
+     *
+     * @param string $id        Record id for the DAIA array.
+     * @param array  $daiaArray Array with raw DAIA status information.
+     *
+     * @return array            Array with VuFind compatible status information.
+     */
+    protected function parseDaiaArray($id, $daiaArray)
+    {
+        $doc_id = null;
+        $doc_href = null;
+        if (isset($daiaArray['id'])) {
+            $doc_id = $daiaArray['id'];
+        }
+        if (isset($daiaArray['href'])) {
+            // url of the document (not needed for VuFind)
+            $doc_href = $daiaArray['href'];
+        }
+        if (isset($daiaArray['message'])) {
+            // log messages for debugging
+            $this->logMessages($daiaArray['message'], 'document');
+        }
+        // if one or more items exist, iterate and build result-item
+        if (isset($daiaArray['item']) && is_array($daiaArray['item'])) {
+            $number = 0;
+            foreach ($daiaArray['item'] as $item) {
+                $result_item = [];
+                $result_item['id'] = $id;
+                // custom DAIA field
+                $result_item['doc_id'] = $doc_id;
+                $result_item['item_id'] = $item['id'];
+                // custom DAIA field used in getHoldLink()
+                $result_item['ilslink']
+                    = ($item['href'] ?? $doc_href);
+                // count items
+                $number++;
+                $result_item['number'] = $this->getItemNumber($item, $number);
+                // set default value for barcode
+                $result_item['barcode'] = $this->getItemBarcode($item);
+                // set default value for reserve
+                $result_item['reserve'] = $this->getItemReserveStatus($item);
+                // get callnumber
+                $result_item['callnumber'] = $this->getItemCallnumber($item);
+                // get location
+                $result_item['location'] = $this->getItemDepartment($item);
+                // custom DAIA field
+                $result_item['locationid'] = $this->getItemDepartmentId($item);
+                // get location link
+                $result_item['locationhref'] = $this->getItemDepartmentLink($item);
+                // custom DAIA field
+                $result_item['storage'] = $this->getItemStorage($item);
+                // custom DAIA field
+                $result_item['storageid'] = $this->getItemStorageId($item);
+                // custom DAIA field
+                $result_item['storagehref'] = $this->getItemStorageLink($item);
+                // status and availability will be calculated in own function
+                $result_item = $this->getItemStatus($item) + $result_item;
+                // add result_item to the result array
+
+                // keep DAIA+ data
+                if (isset($item['daiaplus'])) {
+                    $result_item['daiaplus'] = $item['daiaplus'];
+                }
+
+                $result[] = $result_item;
+            } // end iteration on item
+        }
+
+        return $result;
+    }
+
+    /**
+     * Parse a DAIA document depending on its type.
+     *
+     * Parse a DAIA document depending on its type and return a VuFind
+     * compatible array of status information.
+     * Supported types are:
+     *      - array (for JSON results)
+     *
+     * @param string $id      Record Id corresponding to the DAIA document
+     * @param mixed  $daiaDoc The DAIA document, only array is supported
+     *
+     * @return array An array with status information for the record
+     * @throws ILSException
+     */
+    protected function parseDaiaDoc($id, $daiaDoc)
+    {
+        if (is_array($daiaDoc)) {
+            return $this->parseDaiaArray($id, $daiaDoc);
+        } else {
+            throw new ILSException(
+                'Unsupported document type (did not match Array or DOMNode).'
+            );
+        }
+    }
 }

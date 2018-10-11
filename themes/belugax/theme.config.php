@@ -13,6 +13,7 @@ return [
         'jquery.qtip.min.js',
         'uikit.min.js',
         'belugax.js',
+        'check_item_statuses.js',
     ],
     'mixins' => [
         'belugaconfig',
