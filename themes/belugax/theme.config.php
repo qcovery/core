@@ -13,7 +13,6 @@ return [
         'jquery.qtip.min.js',
         'uikit.min.js',
         'belugax.js',
-        'check_item_statuses.js',
     ],
     'mixins' => [
         'belugaconfig',
@@ -24,6 +23,7 @@ return [
 //        'daia',
         'recorddriver',
         'beluga-core-base',
+        'daiaplus',
     ],
     "less" => [
         "active" => false,

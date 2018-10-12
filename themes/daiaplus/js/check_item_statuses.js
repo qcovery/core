@@ -76,8 +76,8 @@ function displayItemStatus(result, $item) {
   }
   if (typeof(result.daiaplus) != 'undefined'
     && result.daiaplus.length > 0) {
-    $item.find('.callnumAndLocation').empty().append(result.daiaplus);
-    $item.find('.locationDetails').removeClass('hidden');
+    $item.find('.status').empty().append(result.daiaplus);
+    $item.find('.status').removeClass('hidden');
   }
 }
 function itemStatusFail(response, textStatus) {
