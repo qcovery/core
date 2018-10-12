@@ -99,20 +99,4 @@ class Module
     public function getServiceConfig()
     {
     }
-    
-    /**
-     * Get view helper configuration.
-     *
-     * @return array
-     */
-    public function getViewHelperConfig()
-    {
-        return array(
-            'factories' => array(
-                'paia' => function($sm) {
-                    return new PAIAHelper($sm);
-                },
-            ),
-        );
-    }
 }

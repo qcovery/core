@@ -3,7 +3,7 @@
 namespace PAIA;
 
 use \Zend\View\Helper\AbstractHelper;
-use Zend\View\HelperPluginManager as ServiceManager;
+use Zend\ServiceManager\ServiceManager as ServiceManager;
 use Beluga\Search\Factory\PrimoBackendFactory;
 use Beluga\Search\Factory\SolrDefaultBackendFactory;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -14,7 +14,7 @@ use VuFindSearch\Query\Query;
 use \SimpleXMLElement;
 use PAIA\Config\PAIAConfigService;
 
-class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
+class PAIAHelper extends AbstractHelper
 {
 
    protected $serviceLocator;
@@ -25,7 +25,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
    
    public function __construct(ServiceManager $sm)
    {
-        $this->paiaConfigService = new PAIAConfigService($sm->getServiceLocator()->get('VuFind\SessionManager'));
+        $this->paiaConfigService = new PAIAConfigService($sm->get('VuFind\SessionManager'));
         $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
    }
 

@@ -35,6 +35,7 @@ use VuFind\Exception\Auth as AuthException,
 use VuFind\Controller\AbstractBase;
 use PAIA\PAIA;
 use PAIA\Config\PAIAConfigService;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Controller for the user account area.
@@ -62,8 +63,9 @@ class MyResearchController extends AbstractBase
      *
      * @param ServiceLocatorInterface $sm Service locator
      */
-    public function __construct(\Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer, \Zend\Session\SessionManager $sessionManager)
+    public function __construct(ServiceLocatorInterface $sm, \Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer, \Zend\Session\SessionManager $sessionManager)
     {
+        $this->serviceLocator = $sm;
         $this->tags = $tags;
         $this->pluginManager = $pluginManager;
         $this->recordLoader = $recordLoader;

@@ -3,12 +3,8 @@ namespace PAIA\Module\Configuration;
 
 $config = array(
     'controllers' => array(
-        'invokables' => array(
-            'paia' => 'PAIA\Controller\PAIAController',
-            'MyResearch' => 'PAIA\Controller\MyResearchController',
-        ),
         'factories' => [
-            'PAIA\Controller\MyResearchController' => 'PAIA\Controller\Factory::getMyResearchController',
+            'PAIA\Controller\MyResearchController' => 'PAIA\Controller\Factory',
         ],
         'aliases' => [
             'MyResearch' => 'PAIA\Controller\MyResearchController',
