@@ -8,7 +8,7 @@ $config = [
         ],
     ],
     'service_manager' => [
-        'allow_override' => false,
+        'allow_override' => true,
         'factories' => [
             'DAIAplus\AjaxHandler\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
             'DAIAplus\ILS\Connection' => 'DAIAplus\ILS\ConnectionFactory',
