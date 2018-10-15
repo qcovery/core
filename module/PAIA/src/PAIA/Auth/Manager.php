@@ -36,6 +36,7 @@ use Zend\Session\SessionManager;
 use Zend\Validator\Csrf;
 use PAIA\Auth\PluginManager;
 use PAIA\Config\PAIAConfigService;
+use PAIA\ILS\Connection;
 
 /**
  * Wrapper class for handling logged-in user in session.
@@ -64,7 +65,7 @@ class Manager extends \VuFind\Auth\Manager
      */
     public function __construct(Config $config, UserTable $userTable,
                                 SessionManager $sessionManager, PluginManager $pm,
-                                CookieManager $cookieManager, Csrf $csrf
+                                CookieManager $cookieManager, Csrf $csrf, Connection $ilsConnection
     ) {
         // Store dependencies:
         $this->config = $config;
@@ -93,7 +94,7 @@ class Manager extends \VuFind\Auth\Manager
         $this->legalAuthOptions = [$method];   // mark it as legal
         $this->setAuthMethod($method);              // load it
 
-        //$this->ilsConnection = $ilsConnection;
+        $this->ilsConnection = $ilsConnection;
 
         $this->paiaConfigService = new PAIAConfigService($sessionManager);
     }

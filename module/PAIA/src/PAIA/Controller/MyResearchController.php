@@ -1719,4 +1719,14 @@ class MyResearchController extends AbstractBase
     {
         return $this->serviceLocator->get('VuFind\AuthManager');
     }
+
+    /**
+     * Get the ILS connection.
+     *
+     * @return \VuFind\ILS\Connection
+     */
+    public function getILS()
+    {
+        return $this->serviceLocator->get('PAIA\ILS\Connection');
+    }
 }

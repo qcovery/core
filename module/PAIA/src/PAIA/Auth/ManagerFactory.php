@@ -85,11 +85,13 @@ class ManagerFactory implements FactoryInterface
         $pm = $container->get('PAIA\Auth\PluginManager');
         $cookies = $container->get('VuFind\Cookie\CookieManager');
         $csrf = $container->get('VuFind\Validator\Csrf');
+        $ilsConnection = $container->get('VuFind\ILSConnection');
 
         // Build the object and make sure account credentials haven't expired:
         $manager = new $requestedName(
-            $config, $userTable, $sessionManager, $pm, $cookies, $csrf
+            $config, $userTable, $sessionManager, $pm, $cookies, $csrf, $ilsConnection
         );
+
         $manager->checkForExpiredCredentials();
         return $manager;
     }
