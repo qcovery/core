@@ -95,6 +95,7 @@ var itemStatusEls = {};
 var itemStatusTimer = null;
 var itemStatusDelay = 200;
 var itemStatusRunning = false;
+var itemDAIAplusList = false;
 
 function runItemAjaxForQueue() {
   // Only run one item status AJAX request at a time:
@@ -107,7 +108,7 @@ function runItemAjaxForQueue() {
     dataType: 'json',
     method: 'POST',
     url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
-    data: { 'id': itemStatusIds }
+    data: { 'id': itemStatusIds, 'list': itemDAIAplusList }
   })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
@@ -139,6 +140,9 @@ function itemQueueAjax(id, el) {
 
 function checkItemStatus(el) {
   var $item = $(el);
+  if ($item.data('daiaplus-list') !== 'undefined') {
+    itemDAIAplusList = true;
+  }
   if ($item.find('.hiddenId').length === 0) {
     return false;
   }

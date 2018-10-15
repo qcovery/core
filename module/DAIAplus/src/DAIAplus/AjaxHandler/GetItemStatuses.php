@@ -84,7 +84,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
     {
         $this->disableSessionWrites();  // avoid session write timing bug
         $ids = $params->fromPost('id', $params->fromQuery('id', []));
+        $list = $params->fromPost('list', $params->fromQuery('list', []));
         try {
+            $this->ils->setList($list);
             $results = $this->ils->getStatuses($ids);
         } catch (ILSException $e) {
             // If the ILS fails, send an error response instead of a fatal
