@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-namespace DAIAplus\ILS\Driver;
+namespace PAIA\ILS\Driver;
 
 /**
  * ILS driver plugin manager

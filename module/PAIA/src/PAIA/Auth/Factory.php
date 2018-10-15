@@ -48,9 +48,13 @@ class Factory
      */
     public static function getILS(ServiceManager $sm)
     {
+        $connection = $sm->get('PAIA\ILS\Connection');
+        $authenticator = $sm->get('PAIA\Auth\ILSAuthenticator');
+
+
         return new ILS(
-            $sm->getServiceLocator()->get('VuFind\ILSConnection'),
-            $sm->getServiceLocator()->get('VuFind\ILSAuthenticator')
+            $sm->get('PAIA\ILS\Connection'),
+            $sm->get('PAIA\Auth\ILSAuthenticator')
         );
     }
 
@@ -92,17 +96,5 @@ class Factory
         $manager = new Manager($config, $userTable, $sessionManager, $pm, $cookies, $ilsConnection);
         $manager->checkForExpiredCredentials();
         return $manager;
-    }
-
-    /**
-     * Construct the MultiILS plugin.
-     *
-     * @param ServiceManager $sm Service manager.
-     *
-     * @return MultiILS
-     */
-    public static function getMultiILS(ServiceManager $sm)
-    {
-        return new MultiILS($sm->getServiceLocator()->get('VuFind\ILSConnection'));
     }
 }

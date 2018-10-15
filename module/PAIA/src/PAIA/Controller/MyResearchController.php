@@ -127,6 +127,9 @@ class MyResearchController extends AbstractBase
             || $this->params()->fromPost('auth_method')
         ) {
             try {
+
+                $authManager = $this->getAuthManager();
+
                 $this->getAuthManager()->login($this->getRequest());
             } catch (AuthException $e) {
                 $this->processAuthenticationException($e);
@@ -1706,4 +1709,14 @@ class MyResearchController extends AbstractBase
         
         return $view;
     }
-	}
+
+    /**
+     * Get the account manager object.
+     *
+     * @return \VuFind\Auth\Manager
+     */
+    protected function getAuthManager()
+    {
+        return $this->serviceLocator->get('VuFind\AuthManager');
+    }
+}

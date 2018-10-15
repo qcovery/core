@@ -27,6 +27,7 @@ $config = array(
             'VuFind\ILSConnection' => 'PAIA\ILS\Connection',
             'VuFind\ILSDriverPluginManager' => 'PAIA\ILS\Driver\PluginManager',
             'VuFind\AuthManager' => 'PAIA\Auth\Manager',
+            'VuFind\Auth\Manager' => 'PAIA\Auth\Manager',
             'VuFind\AuthPluginManager' => 'PAIA\Auth\PluginManager',
             'VuFind\ILSAuthenticator' => 'PAIA\Auth\ILSAuthenticator',
         ],

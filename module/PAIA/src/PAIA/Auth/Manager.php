@@ -34,7 +34,7 @@ use VuFind\Exception\Auth as AuthException;
 use Zend\Config\Config;
 use Zend\Session\SessionManager;
 use Zend\Validator\Csrf;
-use VuFind\Auth\PluginManager;
+use PAIA\Auth\PluginManager;
 use PAIA\Config\PAIAConfigService;
 
 /**
@@ -64,7 +64,7 @@ class Manager extends \VuFind\Auth\Manager
      */
     public function __construct(Config $config, UserTable $userTable,
                                 SessionManager $sessionManager, PluginManager $pm,
-                                CookieManager $cookieManager, \VuFind\ILS\Connection $ilsConnection
+                                CookieManager $cookieManager, Csrf $csrf
     ) {
         // Store dependencies:
         $this->config = $config;
@@ -77,13 +77,14 @@ class Manager extends \VuFind\Auth\Manager
         $this->session = new \Zend\Session\Container('Account', $sessionManager);
 
         // Set up CSRF:
-        $this->csrf = new Csrf(
+        /* $this->csrf = new Csrf(
             [
                 'session' => new \Zend\Session\Container('csrf', $sessionManager),
                 'salt' => isset($this->config->Security->HMACkey)
                     ? $this->config->Security->HMACkey : 'VuFindCsrfSalt',
             ]
-        );
+        ); */
+        $this->csrf = $csrf;
 
         // Initialize active authentication setting (defaulting to Database
         // if no setting passed in):
@@ -92,7 +93,7 @@ class Manager extends \VuFind\Auth\Manager
         $this->legalAuthOptions = [$method];   // mark it as legal
         $this->setAuthMethod($method);              // load it
 
-        $this->ilsConnection = $ilsConnection;
+        //$this->ilsConnection = $ilsConnection;
 
         $this->paiaConfigService = new PAIAConfigService($sessionManager);
     }
