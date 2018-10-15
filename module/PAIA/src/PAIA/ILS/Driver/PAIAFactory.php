@@ -28,6 +28,7 @@
 namespace PAIA\ILS\Driver;
 
 use Interop\Container\ContainerInterface;
+use PAIA\Config\PAIAConfigService;
 
 /**
  * Factory for PAIA ILS driver.
@@ -60,9 +61,20 @@ class PAIAFactory extends DriverWithDateConverterFactory
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
-        return parent::__invoke(
+        $paia = parent::__invoke(
             $container, $requestedName,
             [$container->get('Zend\Session\SessionManager')]
         );
+
+        $sessionFactory = function () use ($container) {
+            $manager = $container->get('VuFind\SessionManager');
+            return new \Zend\Session\Container("PAIA", $manager);
+        };
+
+        $paia->setSessionFactory($sessionFactory);
+
+        $paia->setPaiaConfigService(new PAIAConfigService($container->get('VuFind\SessionManager')));
+
+        return $paia;
     }
 }

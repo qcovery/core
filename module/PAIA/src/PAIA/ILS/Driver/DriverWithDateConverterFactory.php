@@ -1,6 +1,6 @@
 <?php
 /**
- * Authentication Manager factory.
+ * Generic factory suitable for most ILS drivers.
  *
  * PHP version 7
  *
@@ -20,26 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Authentication
+ * @package  ILS_Drivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace PAIA\Auth;
+namespace PAIA\ILS\Driver;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Authentication Manager factory.
+ * Generic factory suitable for most ILS drivers.
  *
  * @category VuFind
- * @package  Authentication
+ * @package  ILS_Drivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ManagerFactory implements FactoryInterface
+class DriverWithDateConverterFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -58,39 +58,19 @@ class ManagerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        if (!empty($options)) {
-            throw new \Exception('Unexpected options sent to factory.');
-        }
-        // Set up configuration:
-        $config = $container->get('VuFind\Config\PluginManager')->get('config');
-        try {
-            // Check if the catalog wants to hide the login link, and override
-            // the configuration if necessary.
-            $catalog = $container->get('PAIA\ILS\Connection');
-            if ($catalog->loginIsHidden()) {
-                $config = new \Zend\Config\Config($config->toArray(), true);
-                $config->Authentication->hideLogin = true;
-                $config->setReadOnly();
-            }
-        } catch (\Exception $e) {
-            // Ignore exceptions; if the catalog is broken, throwing an exception
-            // here may interfere with UI rendering. If we ignore it now, it will
-            // still get handled appropriately later in processing.
-            error_log($e->getMessage());
-        }
-
-        // Load remaining dependencies:
-        $userTable = $container->get('VuFind\Db\Table\PluginManager')->get('user');
-        $sessionManager = $container->get('Zend\Session\SessionManager');
-        $pm = $container->get('PAIA\Auth\PluginManager');
-        $cookies = $container->get('VuFind\Cookie\CookieManager');
-        $csrf = $container->get('VuFind\Validator\Csrf');
-
-        // Build the object and make sure account credentials haven't expired:
-        $manager = new $requestedName(
-            $config, $userTable, $sessionManager, $pm, $cookies, $csrf
+        // Set up the driver with the date converter (and any extra parameters
+        // passed in as options):
+        $driver = new $requestedName(
+            $container->get('VuFind\Date\Converter'), ...($options ?: [])
         );
-        $manager->checkForExpiredCredentials();
-        return $manager;
+
+        // Populate cache storage if a setCacheStorage method is present:
+        if (method_exists($driver, 'setCacheStorage')) {
+            $driver->setCacheStorage(
+                $container->get('VuFind\Cache\Manager')->getCache('object')
+            );
+        }
+
+        return $driver;
     }
 }
