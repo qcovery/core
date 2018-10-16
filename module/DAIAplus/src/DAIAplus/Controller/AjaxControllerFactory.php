@@ -1,10 +1,10 @@
 <?php
 /**
- * Factory for controllers.
+ * Ajax controller factory.
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Villanova University 2014.
+ * Copyright (C) Villanova University 2018.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -25,37 +25,43 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace PAIA\Controller;
+namespace DAIAplus\Controller;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Factory for controllers.
+ * Ajax controller factory.
  *
  * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
- *
- * @codeCoverageIgnore
  */
-class Factory implements FactoryInterface
+class AjaxControllerFactory extends \VuFind\Controller\AjaxControllerFactory
 {
+    /**
+     * Create an object
+     *
+     * @param ContainerInterface $container     Service manager
+     * @param string             $requestedName Service being created
+     * @param null|array         $options       Extra options (optional)
+     *
+     * @return object
+     *
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     * creating a service.
+     * @throws ContainerException if any other error occurs
+     */
     public function __invoke(ContainerInterface $container, $requestedName,
-                             array $options = null
+        array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        return new MyResearchController(
-            $container,
-            $container->get('VuFind\Tags'),
-            $container->get('VuFind\SearchResultsPluginManager'),
-            $container->get('VuFind\RecordLoader'),
-            $container->get('VuFind\Mailer'),
-            $container->get('VuFind\SessionManager')
-        );
+        $pm = $container->get('DAIAplus\AjaxHandler\PluginManager');
+        return new AjaxController($pm);
     }
 }

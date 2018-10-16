@@ -25,10 +25,9 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://github.com/dmj/vf2-proxy
  */
-namespace PAIA;
+namespace DAIAplus;
 use Zend\ModuleManager\ModuleManager,
     Zend\Mvc\MvcEvent;
-use PAIA\PAIAHelper;
 
 /**
  * Template for ZF2 module for storing local overrides.
@@ -88,15 +87,6 @@ class Module
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function onBootstrap(MvcEvent $e)
-    {
-    }
-    
-    /**
-     * Return service configuration.
-     *
-     * @return array
-     */
-    public function getServiceConfig()
     {
     }
 }

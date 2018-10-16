@@ -3,7 +3,7 @@
 namespace PAIA;
 
 use \Zend\View\Helper\AbstractHelper;
-use Zend\View\HelperPluginManager as ServiceManager;
+use Zend\ServiceManager\ServiceManager as ServiceManager;
 use Beluga\Search\Factory\PrimoBackendFactory;
 use Beluga\Search\Factory\SolrDefaultBackendFactory;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -14,7 +14,7 @@ use VuFindSearch\Query\Query;
 use \SimpleXMLElement;
 use PAIA\Config\PAIAConfigService;
 
-class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
+class PAIAHelper extends AbstractHelper
 {
 
    protected $serviceLocator;
@@ -25,43 +25,34 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
    
    public function __construct(ServiceManager $sm)
    {
-        $this->paiaConfigService = new PAIAConfigService($sm->getServiceLocator()->get('VuFind\SessionManager'));
+        $this->paiaConfigService = new PAIAConfigService($sm->get('VuFind\SessionManager'));
         $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
    }
 
-   /**
-     * Set service locator
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator) {
-        $this->serviceLocator = $serviceLocator;
-    }
-
-    /**
-     * Get service locator
-     *
-     * @return ServiceLocatorInterface
-     */
-    public function getServiceLocator() {
-        return $this->serviceLocator;
-    }
-    
 	/**
      * Get Results from external DAIA Service
-     *
+     * 
      * @return Array
      */
-	//TODO: Currently only working with DAIAplus Service - DAIAplus Service needs to be set up to conform to DAIA request specifications
     public function getDaiaResults($ppn, $list = 0, $language = 'en', $mediatype) {
 		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
 			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'?id=ppn:'.$ppn.'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.urlencode($mediatype);
-		echo "<span style='display:none;'>".$url_path."</span>";
-		$daia = file_get_contents($url_path);
+		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'availability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&format=json'.'&site='.$site.'&language='.$language.'&list='.$list.'&mediatype='.urlencode($mediatype);
+        echo "<span style='display:none;'>".$url_path."</span>";
+
+        $ch = curl_init();
+        $timeout = 0;
+        curl_setopt($ch, CURLOPT_URL, $url_path);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $daia = curl_exec($ch);
+        curl_close($ch);
+
         $daiaJson = json_decode($daia, true);
 		
 		if ($daiaJson['document'][0]['item']['daiaplus'] || $daiaJson['document'][0]['daiaplus_best_result']) {
@@ -535,7 +526,7 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 		return $results;
 	} else {
 		
-		$results = $this->makeDaiaConform($results, $daiaJson);
+		$results = $this->makeDaiaConform($results, json_decode($daia, true)); // convert again to json, as makeDaiaConform() can not use object representation of DAIA results.
 		$results = json_decode($results, true);
 		return $results;
 	}
@@ -543,40 +534,43 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 	
 	public function makeDaiaConform ($results, $daiaJson, $bestResult = array()) {
 		$daia_conform_results = array ();
-		foreach ($daiaJson as $key => $value) {
-			if($key == "document") {
-				if(!empty($value)) {
-					foreach($value as $document_key => $document_item){
-						if($document_key == 0) {
-							foreach($document_item as $document_item_key => $document_item_value){
-								if($document_item_key == "item") {
-									$results = json_decode(json_encode($results), true);
-									foreach ($results as $result) {
-										$result_item = $result['item'];
-										$result_item['daiaplus'] = $result['daiaplus'];
-										$daia_conform_results[$key][$document_key][$document_item_key][] = $result_item;
-									}
-								} else {
-									$daia_conform_results[$key][$document_key][$document_item_key] = $document_item_value;
-								}
-							}
-							if ($bestResult) {
-								$bestResult = json_decode(json_encode($bestResult), true);
-								$bestResult_item = $bestResult['item'];
-								$bestResult_item['daiaplus'] = $bestResult['daiaplus'];
-								$daia_conform_results[$key][$document_key]['daiaplus_best_result'] = $bestResult_item;
-							}
-						} else {
-							$daia_conform_results[$key][$document_key] = $document_item;
-						}
-					}
-				} else {
-					$daia_conform_results[$key] = $value;
-				}
-			} else {
-				$daia_conform_results[$key] = $value;
-			}
-		}
+
+		if (is_array($daiaJson)) {
+            foreach ($daiaJson as $key => $value) {
+                if ($key == "document") {
+                    if (!empty($value)) {
+                        foreach ($value as $document_key => $document_item) {
+                            if ($document_key == 0) {
+                                foreach ($document_item as $document_item_key => $document_item_value) {
+                                    if ($document_item_key == "item") {
+                                        $results = json_decode(json_encode($results), true);
+                                        foreach ($results as $result) {
+                                            $result_item = $result['item'];
+                                            $result_item['daiaplus'] = $result['daiaplus'];
+                                            $daia_conform_results[$key][$document_key][$document_item_key][] = $result_item;
+                                        }
+                                    } else {
+                                        $daia_conform_results[$key][$document_key][$document_item_key] = $document_item_value;
+                                    }
+                                }
+                                if ($bestResult) {
+                                    $bestResult = json_decode(json_encode($bestResult), true);
+                                    $bestResult_item = $bestResult['item'];
+                                    $bestResult_item['daiaplus'] = $bestResult['daiaplus'];
+                                    $daia_conform_results[$key][$document_key]['daiaplus_best_result'] = $bestResult_item;
+                                }
+                            } else {
+                                $daia_conform_results[$key][$document_key] = $document_item;
+                            }
+                        }
+                    } else {
+                        $daia_conform_results[$key] = $value;
+                    }
+                } else {
+                    $daia_conform_results[$key] = $value;
+                }
+            }
+        }
 		
 		return  json_encode($daia_conform_results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 	}
@@ -587,15 +581,26 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
      * @return Array
      */
 	//TODO: Complete function once external service is available
-	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $list, $mediatype, $language) {
+	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $GVKlink, $doi, $list, $mediatype, $language) {
 		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
 			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
 		} else {
 			$site = 'Default';
 		}
-		$url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'e-availability'.'?ppn='.$ppn.'&openurl='.urlencode($openUrl).'&url_access='.$url_access.'&url_access_level='.$url_access_level.'&first_matching_issn='.$first_matching_issn.'&GVKlink='.$GVKlink.'&doi='.$doi.'&list='.$list.'&mediatype='.$mediatype.'&language='.$language.'&site='.$site.'&format=json';
-		echo "<span style='display:none;'>".$url_path."</span>";
-		$e_availability = file_get_contents($url_path);
+        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.urlencode($url_access).'&url_access_level='.$url_access_level.'&GVKlink='.$GVKlink.'&doi='.urlencode($doi).'&list='.$list.'&mediatype='.urlencode($mediatype).'&language='.$language.'&site='.$site.'&format=json';
+
+        echo "<span style='display:none;'>".$url_path."</span>";
+
+        $ch = curl_init();
+        $timeout = 0;
+        curl_setopt($ch, CURLOPT_URL, $url_path);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $e_availability = curl_exec($ch);
+        curl_close($ch);
+
         $e_availability = json_decode($e_availability, true);
 		
 		return $e_availability;
@@ -693,6 +698,10 @@ class PAIAHelper extends AbstractHelper implements ServiceLocatorAwareInterface
 
     public function getMultipleLoginSources() {
 	    return $this->paiaConfigService->getMultipleLoginSources();
+    }
+
+    public function getPaiaGlobalKey() {
+	    return $this->paiaConfigService->getPaiaGlobalKey();
     }
 }
 

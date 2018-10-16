@@ -20,9 +20,10 @@ return [
         'libraries',
         'searchkeys',
         'dependentworks',
-//        'daia',
         'recorddriver',
         'beluga-core-base',
+        'daiaplus',
+        'paia',
     ],
     "less" => [
         "active" => false,

@@ -1,10 +1,10 @@
 <?php
 /**
- * Factory for controllers.
+ * Factory for PAIA ILS driver.
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Villanova University 2014.
+ * Copyright (C) Villanova University 2018.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -20,42 +20,49 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Controller
+ * @package  ILS_Drivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace PAIA\Controller;
+namespace DAIAplus\ILS\Driver;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Factory for controllers.
+ * Factory for PAIA ILS driver.
  *
  * @category VuFind
- * @package  Controller
+ * @package  ILS_Drivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
- *
- * @codeCoverageIgnore
  */
-class Factory implements FactoryInterface
+class PAIAFactory extends DriverWithDateConverterFactory
 {
+    /**
+     * Create an object
+     *
+     * @param ContainerInterface $container     Service manager
+     * @param string             $requestedName Service being created
+     * @param null|array         $options       Extra options (optional)
+     *
+     * @return object
+     *
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     * creating a service.
+     * @throws ContainerException if any other error occurs
+     */
     public function __invoke(ContainerInterface $container, $requestedName,
-                             array $options = null
+        array $options = null
     ) {
         if (!empty($options)) {
-            throw new \Exception('Unexpected options sent to factory.');
+            throw new \Exception('Unexpected options passed to factory.');
         }
-        return new MyResearchController(
-            $container,
-            $container->get('VuFind\Tags'),
-            $container->get('VuFind\SearchResultsPluginManager'),
-            $container->get('VuFind\RecordLoader'),
-            $container->get('VuFind\Mailer'),
-            $container->get('VuFind\SessionManager')
+        return parent::__invoke(
+            $container, $requestedName,
+            [$container->get('Zend\Session\SessionManager')]
         );
     }
 }

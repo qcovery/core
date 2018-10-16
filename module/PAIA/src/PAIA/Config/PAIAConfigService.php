@@ -21,7 +21,7 @@ class PAIAConfigService {
     public function getPaiaGlobalKey() {
         foreach (array_keys($this->paiaConfig) as $arrayKey) {
             if (stristr($arrayKey, 'Global')) {
-                if (isset($paiaConfig[$arrayKey]['isil'])) {
+                if (isset($this->paiaConfig[$arrayKey]['isil'])) {
                     if ($this->paiaConfig[$arrayKey]['isil'] == $this->getIsil()) {
                         return $arrayKey;
                     }
@@ -55,7 +55,11 @@ class PAIAConfigService {
     }
 
     public function getIsil() {
-        return $this->session->offsetGet('PAIAisil');
+        if ($this->session->offsetGet('PAIAisil')) {
+            return $this->session->offsetGet('PAIAisil');
+        } else {
+            return $this->paiaConfig['Global']['isil'];
+        }
     }
 }
 

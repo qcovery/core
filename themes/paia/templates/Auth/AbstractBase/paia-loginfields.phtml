@@ -1,0 +1,17 @@
+<? if ($this->paia()->hasMultipleLoginSources()): ?>
+<div class="form-group">
+  <div id="paia-multilogin-icons">
+    <? $first = true; ?>
+    <? foreach ($this->paia()->getMultipleLoginSources() as $loginSource): ?>
+        <img src="<?=$this->imageLink($loginSource['icon'])?>" class="<? if (!$first): ?>hidden<? endif; ?>" data-isil="<?=$loginSource['isil']?>"/>
+        <? $first = false; ?>
+    <? endforeach; ?>
+  </div>
+  <select id="paia-multilogin-select" name="isil">
+    <? foreach ($this->paia()->getMultipleLoginSources() as $loginSource): ?>
+      <option value="<?=$loginSource['isil']?>"><?=$loginSource['name']?></option>
+    <? endforeach; ?>
+  </select>
+</div>
+<? endif; ?>
+
