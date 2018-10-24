@@ -27,8 +27,7 @@
  */
 namespace PAIA\Controller;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\ServiceManager\ServiceManager;
 
 /**
  * Factory for controllers.
@@ -41,21 +40,23 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  *
  * @codeCoverageIgnore
  */
-class Factory implements FactoryInterface
+class Factory extends \VuFind\Controller\Factory
 {
-    public function __invoke(ContainerInterface $container, $requestedName,
-                             array $options = null
-    ) {
-        if (!empty($options)) {
-            throw new \Exception('Unexpected options sent to factory.');
-        }
+    /**
+     * Construct the MyResearchController.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return MyResearchController
+     */
+    public static function getMyResearchController(ServiceManager $sm)
+    {
         return new MyResearchController(
-            $container,
-            $container->get('VuFind\Tags'),
-            $container->get('VuFind\SearchResultsPluginManager'),
-            $container->get('VuFind\RecordLoader'),
-            $container->get('VuFind\Mailer'),
-            $container->get('VuFind\SessionManager')
+            $sm->getServiceLocator()->get('VuFind\Tags'),
+            $sm->getServiceLocator()->get('VuFind\SearchResultsPluginManager'),
+            $sm->getServiceLocator()->get('VuFind\RecordLoader'),
+            $sm->getServiceLocator()->get('VuFind\Mailer'),
+            $sm->getServiceLocator()->get('VuFind\SessionManager')
         );
     }
 }

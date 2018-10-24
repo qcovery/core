@@ -3,8 +3,12 @@ namespace PAIA\Module\Configuration;
 
 $config = array(
     'controllers' => array(
+        'invokables' => array(
+            'paia' => 'PAIA\Controller\PAIAController',
+            'MyResearch' => 'PAIA\Controller\MyResearchController',
+        ),
         'factories' => [
-            'PAIA\Controller\MyResearchController' => 'PAIA\Controller\Factory',
+            'PAIA\Controller\MyResearchController' => 'PAIA\Controller\Factory::getMyResearchController',
         ],
         'aliases' => [
             'MyResearch' => 'PAIA\Controller\MyResearchController',
@@ -12,27 +16,13 @@ $config = array(
         ],
     ),
     'service_manager' => array(
-        'allow_override' => true,
         'factories' => array(
-            //'VuFind\ILSHoldLogic' => 'PAIA\Service\Factory::getILSHoldLogic',
-            //'VuFind\ILSTitleHoldLogic' => 'PAIA\Service\Factory::getILSTitleHoldLogic',
-            //'VuFind\AuthManager' => 'PAIA\Auth\Factory::getManager',
-            'PAIA\ILS\Connection' => 'PAIA\ILS\ConnectionFactory',
-            'PAIA\ILS\Driver\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-            'PAIA\Auth\Manager' => 'PAIA\Auth\ManagerFactory',
-            'PAIA\Auth\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-            'PAIA\Auth\ILSAuthenticator' => 'PAIA\Auth\ILSAuthenticatorFactory',
+            'VuFind\ILSHoldLogic' => 'PAIA\Service\Factory::getILSHoldLogic',
+            'VuFind\ILSTitleHoldLogic' => 'PAIA\Service\Factory::getILSTitleHoldLogic',
+            'VuFind\AuthManager' => 'PAIA\Auth\Factory::getManager',
         ),
-        'aliases' => [
-            'VuFind\ILSConnection' => 'PAIA\ILS\Connection',
-            'VuFind\ILSDriverPluginManager' => 'PAIA\ILS\Driver\PluginManager',
-            'VuFind\AuthManager' => 'PAIA\Auth\Manager',
-            'VuFind\Auth\Manager' => 'PAIA\Auth\Manager',
-            'VuFind\AuthPluginManager' => 'PAIA\Auth\PluginManager',
-            'VuFind\ILSAuthenticator' => 'PAIA\Auth\ILSAuthenticator',
-        ],
     ),
-    /* 'vufind' => array(
+    'vufind' => array(
         'plugin_managers' => array(
             'auth' => [
                 'factories' => [
@@ -50,7 +40,7 @@ $config = array(
                ),
             ),
         ),
-    ), */
+    ),
 );
 
 // Define record view routes -- route name => controller

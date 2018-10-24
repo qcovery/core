@@ -35,7 +35,6 @@ use VuFind\Exception\Auth as AuthException,
 use VuFind\Controller\AbstractBase;
 use PAIA\PAIA;
 use PAIA\Config\PAIAConfigService;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Controller for the user account area.
@@ -63,9 +62,8 @@ class MyResearchController extends AbstractBase
      *
      * @param ServiceLocatorInterface $sm Service locator
      */
-    public function __construct(ServiceLocatorInterface $sm, \Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer, \Zend\Session\SessionManager $sessionManager)
+    public function __construct(\Vufind\Tags $tags, \VuFind\Search\Results\PluginManager $pluginManager, \VuFind\Record\Loader $recordLoader, \VuFind\Mailer\Mailer $mailer, \Zend\Session\SessionManager $sessionManager)
     {
-        $this->serviceLocator = $sm;
         $this->tags = $tags;
         $this->pluginManager = $pluginManager;
         $this->recordLoader = $recordLoader;
@@ -127,9 +125,6 @@ class MyResearchController extends AbstractBase
             || $this->params()->fromPost('auth_method')
         ) {
             try {
-
-                $authManager = $this->getAuthManager();
-
                 $this->getAuthManager()->login($this->getRequest());
             } catch (AuthException $e) {
                 $this->processAuthenticationException($e);
@@ -1709,24 +1704,4 @@ class MyResearchController extends AbstractBase
         
         return $view;
     }
-
-    /**
-     * Get the account manager object.
-     *
-     * @return \VuFind\Auth\Manager
-     */
-    protected function getAuthManager()
-    {
-        return $this->serviceLocator->get('VuFind\AuthManager');
-    }
-
-    /**
-     * Get the ILS connection.
-     *
-     * @return \VuFind\ILS\Connection
-     */
-    public function getILS()
-    {
-        return $this->serviceLocator->get('PAIA\ILS\Connection');
-    }
-}
+	}

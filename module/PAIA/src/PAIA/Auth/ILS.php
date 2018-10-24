@@ -43,21 +43,6 @@ use VuFind\Exception\ILS as ILSException;
  */
 class ILS extends \VuFind\Auth\ILS
 {
-
-    /**
-     * Set the ILS connection for this object.
-     *
-     * @param \VuFind\ILS\Connection    $connection    ILS connection to set
-     * @param \VuFind\ILS\Authenticator $authenticator ILS authenticator
-     */
-    public function __construct(
-        \PAIA\ILS\Connection $connection,
-        \PAIA\Auth\ILSAuthenticator $authenticator
-    ) {
-        $this->setCatalog($connection);
-        $this->authenticator = $authenticator;
-    }
-
     /**
      * Attempt to authenticate the current user.  Throws exception if login fails.
      *
@@ -78,8 +63,6 @@ class ILS extends \VuFind\Auth\ILS
 
         // Connect to catalog:
         try {
-            $catalog = $this->getCatalog();
-
             $patron = $this->getCatalog()->patronLogin($username, $password, $isil);
         } catch (AuthException $e) {
             // Pass Auth exceptions through
