@@ -1,10 +1,10 @@
 <?php
 /**
- * Factory for authentication services.
+ * Authentication Manager factory.
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Villanova University 2014.
+ * Copyright (C) Villanova University 2018.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -17,62 +17,56 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Authentication
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace PAIA\Auth;
-use Zend\ServiceManager\ServiceManager;
+
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Factory for authentication services.
+ * Authentication Manager factory.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Authentication
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
-class Factory
+class ManagerFactory implements FactoryInterface
 {
     /**
-     * Construct the ILS plugin.
+     * Create an object
      *
-     * @param ServiceManager $sm Service manager.
+     * @param ContainerInterface $container     Service manager
+     * @param string             $requestedName Service being created
+     * @param null|array         $options       Extra options (optional)
      *
-     * @return ILS
+     * @return object
+     *
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     * creating a service.
+     * @throws ContainerException if any other error occurs
      */
-    public static function getILS(ServiceManager $sm)
-    {
-        $connection = $sm->get('PAIA\ILS\Connection');
-        $authenticator = $sm->get('PAIA\Auth\ILSAuthenticator');
-
-
-        return new ILS(
-            $sm->get('PAIA\ILS\Connection'),
-            $sm->get('PAIA\Auth\ILSAuthenticator')
-        );
-    }
-
-    /**
-     * Construct the authentication manager.
-     *
-     * @param ServiceManager $sm Service manager.
-     *
-     * @return Manager
-     */
-    public static function getManager(ServiceManager $sm)
-    {
+    public function __invoke(ContainerInterface $container, $requestedName,
+        array $options = null
+    ) {
+        if (!empty($options)) {
+            throw new \Exception('Unexpected options sent to factory.');
+        }
         // Set up configuration:
-        $config = $sm->get('VuFind\Config')->get('config');
+        $config = $container->get('VuFind\Config\PluginManager')->get('config');
         try {
             // Check if the catalog wants to hide the login link, and override
             // the configuration if necessary.
-            $catalog = $sm->get('VuFind\ILSConnection');
+            $catalog = $container->get('PAIA\ILS\Connection');
             if ($catalog->loginIsHidden()) {
                 $config = new \Zend\Config\Config($config->toArray(), true);
                 $config->Authentication->hideLogin = true;
@@ -86,14 +80,18 @@ class Factory
         }
 
         // Load remaining dependencies:
-        $userTable = $sm->get('VuFind\DbTablePluginManager')->get('user');
-        $sessionManager = $sm->get('VuFind\SessionManager');
-        $pm = $sm->get('VuFind\AuthPluginManager');
-        $cookies = $sm->get('VuFind\CookieManager');
-        $ilsConnection = $sm->get('VuFind\ILSConnection');
+        $userTable = $container->get('VuFind\Db\Table\PluginManager')->get('user');
+        $sessionManager = $container->get('Zend\Session\SessionManager');
+        $pm = $container->get('PAIA\Auth\PluginManager');
+        $cookies = $container->get('VuFind\Cookie\CookieManager');
+        $csrf = $container->get('VuFind\Validator\Csrf');
+        $ilsConnection = $container->get('VuFind\ILSConnection');
 
         // Build the object and make sure account credentials haven't expired:
-        $manager = new Manager($config, $userTable, $sessionManager, $pm, $cookies, $ilsConnection);
+        $manager = new $requestedName(
+            $config, $userTable, $sessionManager, $pm, $cookies, $csrf, $ilsConnection
+        );
+
         $manager->checkForExpiredCredentials();
         return $manager;
     }

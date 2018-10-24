@@ -1,10 +1,10 @@
 <?php
 /**
- * Factory for controllers.
+ * Auth handler plugin factory
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Villanova University 2014.
+ * Copyright (C) Villanova University 2010.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -20,42 +20,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Controller
+ * @package  Authentication
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace PAIA\Controller;
-
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+namespace PAIA\Auth;
 
 /**
- * Factory for controllers.
+ * Auth handler plugin factory
  *
  * @category VuFind
- * @package  Controller
+ * @package  Authentication
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
- *
- * @codeCoverageIgnore
  */
-class Factory implements FactoryInterface
+class PluginFactory extends \VuFind\ServiceManager\AbstractPluginFactory
 {
-    public function __invoke(ContainerInterface $container, $requestedName,
-                             array $options = null
-    ) {
-        if (!empty($options)) {
-            throw new \Exception('Unexpected options sent to factory.');
-        }
-        return new MyResearchController(
-            $container,
-            $container->get('VuFind\Tags'),
-            $container->get('VuFind\SearchResultsPluginManager'),
-            $container->get('VuFind\RecordLoader'),
-            $container->get('VuFind\Mailer'),
-            $container->get('VuFind\SessionManager')
-        );
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->defaultNamespace = 'PAIA\Auth';
     }
 }

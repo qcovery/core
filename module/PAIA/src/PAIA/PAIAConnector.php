@@ -19,7 +19,7 @@ class PAIAConnector
     {
         $this->paiaConfigService = $paiaConfigService;
         $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-        $this->http_client = new \Zend\Http\Client(null, array('adapter' => 'Zend\Http\Client\Adapter\Socket', 'sslverifypeer' => false, 'timeout' => $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['timeout']));
+        $this->http_client = new \Zend\Http\Client(null, array('adapter' => 'Zend\Http\Client\Adapter\Curl', 'curloptions' => array(CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false), 'timeout' => $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['timeout']));
         $this->debug = true;
         $this->base_url = $paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['baseUrl'];
         $this->isil = '';
