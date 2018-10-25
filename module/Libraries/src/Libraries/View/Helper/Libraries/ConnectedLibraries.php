@@ -27,9 +27,11 @@ class ConnectedLibraries extends \Zend\View\Helper\AbstractHelper
         if (!empty($driver)) {
             $collectionDetails = $driver->getMarcData('CollectionDetails');
             $holdingCodes = [];
-            foreach ($collectionDetails as $collectionDetail) {
-                if (isset($collectionDetail['code'])) {
-                    $holdingCodes[] = $collectionDetail['code'];
+            if (is_array($collectionDetails)) {
+                foreach ($collectionDetails as $collectionDetail) {
+                    if (isset($collectionDetail['code'])) {
+                        $holdingCodes[] = $collectionDetail['code'];
+                    }
                 }
             }
             $libraryCodes = array_intersect($libraryCodes, $holdingCodes);

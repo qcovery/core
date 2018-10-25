@@ -21,7 +21,9 @@ endif;
                         <?php if (!is_int($key)): ?>
                             <?=$this->transEsc($key) ?>:
                         <?php endif; ?>
-                        <?=$value['data'] ?><br />
+                        <?php if (isset($value['data'])): ?>
+                            <?=$value['data'] ?><br />
+                        <?php endif; ?>
                         <?php if (!empty($value['originalLetters']) && $value['originalLetters'] != $value['data']): ?>
                             <?=$this->transEsc('Original Letters') ?>: <?=$value['originalLetters'] ?><br />
                          <?php endif; ?>
