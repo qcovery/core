@@ -124,11 +124,9 @@
 
 <? /* Narrow Search Options */ ?>
 <div class="<?=$this->layoutClass('sidebar')?>">
-    <? if ($this->configreader()->getConfigData('Global', 'showLibraryFacet')): ?>
-        <!-- Module Libraries -->
-            <?=$this->render('search/libraries-results.phtml'); ?>
-        <!-- Module Libraries -->
-    <? endif; ?>
+<!-- Module Libraries -->
+      <?=$this->render('search/libraries-results.phtml'); ?>
+<!-- Module Libraries -->
   <? foreach ($this->results->getRecommendations('side') as $current): ?>
     <?=$this->recommend($current)?>
   <? endforeach; ?>
