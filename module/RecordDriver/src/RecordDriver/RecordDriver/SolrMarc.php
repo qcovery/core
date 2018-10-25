@@ -396,4 +396,46 @@ class SolrMarc extends SolrDefault
             return "Unknown";
         }
     }
+
+    /**
+     * Return an XML representation of the record using the specified format.
+     * Return false if the format is unsupported.
+     *
+     * @param string     $format     Name of format to use (corresponds with OAI-PMH
+     * metadataPrefix parameter).
+     * @param string     $baseUrl    Base URL of host containing VuFind (optional;
+     * may be used to inject record URLs into XML when appropriate).
+     * @param RecordLink $recordLink Record link helper (optional; may be used to
+     * inject record URLs into XML when appropriate).
+     *
+     * @return mixed         XML, or false if format unsupported.
+     */
+    public function getXML($format, $baseUrl = null, $recordLink = null)
+    {
+        // Special case for MARC:
+        if ($format == 'marc21') {
+            $xml = $this->getMarcRecord()->toXML();
+            $xml = str_replace(
+                [chr(27), chr(28), chr(29), chr(30), chr(31)], ' ', $xml
+            );
+            $xml = simplexml_load_string($xml);
+            if (!$xml || !isset($xml->record)) {
+                return false;
+            }
+
+            // Set up proper namespacing and extract just the <record> tag:
+            $xml->record->addAttribute('xmlns', "http://www.loc.gov/MARC21/slim");
+            $xml->record->addAttribute(
+                'xsi:schemaLocation',
+                'http://www.loc.gov/MARC21/slim ' .
+                'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
+                'http://www.w3.org/2001/XMLSchema-instance'
+            );
+            $xml->record->addAttribute('type', 'Bibliographic');
+            return $xml->record->asXML();
+        }
+
+        // Try the parent method:
+        return parent::getXML($format, $baseUrl, $recordLink);
+    }
 }
