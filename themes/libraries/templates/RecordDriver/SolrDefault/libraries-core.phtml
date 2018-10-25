@@ -1,8 +1,4 @@
-<?
-
-$libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId, $this->driver);
-
-?>
+<?php $libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId, $this->driver); ?>
 
 <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
   <tr><th><?=$this->transEsc('Libraries')?>:</th><td>
