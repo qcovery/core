@@ -111,7 +111,7 @@ Series:
     w:
       - [name, ppn]
       - [match, '\(DE-601\)([0-9xX]+)', 1]
-Person:
+Persons:
   category: person
   100:
     a:
@@ -139,7 +139,7 @@ Person:
       - [name, description]
       - [replace, 'in( |$)$', 'In ']
       - [function, 'ucfirst']
-Cooperation:
+Cooperations:
   category: person
   110:
     a:
@@ -165,7 +165,7 @@ Cooperation:
     e:
       - [name, description]
       - [function, 'ucfirst']
-CongressData:
+Congresses:
   category: person
   111:
     a:
