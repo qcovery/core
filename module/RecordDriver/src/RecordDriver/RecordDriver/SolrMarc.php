@@ -159,8 +159,17 @@ class SolrMarc extends SolrDefault
             if (!empty($solrMarcSpec['originalletters']) && $solrMarcSpec['originalletters'] == 'no') {
                 $solrMarcSpecs[$item]['originalletters'] = 'no';
             }
-            unset($solrMarcSpec['originalletters']);
-            foreach ($solrMarcSpec as $marcField => $fieldSpec) {
+	    unset($solrMarcSpec['originalletters']);
+	    if (!empty($solrMarcSpec['mandatory-field'])) {
+                $solrMarcSpecs[$item]['mandatory-field'] = $solrMarcSpec['mandatory-field'];
+            }
+            unset($solrMarcSpec['mandatory-field']);
+            $solrMarcSpecs[$item]['view-method'] = 'default';
+	    if (!empty($solrMarcSpec['view-method'])) {
+                $solrMarcSpecs[$item]['view-method'] = $solrMarcSpec['view-method'];
+            }
+            unset($solrMarcSpec['view-method']);
+	    foreach ($solrMarcSpec as $marcField => $fieldSpec) {
                 $solrMarcSpecs[$item][$marcField] = [];
                 $conditions = $subfields = $parentMethods = $description = [];
                 foreach ($fieldSpec as $subField => $subFieldSpec) {
@@ -216,7 +225,10 @@ class SolrMarc extends SolrDefault
             return call_user_func([$this, 'get' . $dataName]);
         }
         $title = $solrMarcSpecs['title'];
-        unset($solrMarcSpecs['title']);
+	unset($solrMarcSpecs['title']);
+	$mandatoryField = $solrMarcSpecs['mandatory-field'];
+	unset($solrMarcSpecs['mandatory-field']);
+        $mandatoryFieldSet = (empty($mandatoryField));
         if (is_array($solrMarcSpecs)) {
             foreach ($solrMarcSpecs as $field => $subFieldSpecs) {
                 $indexData = [];
@@ -320,7 +332,11 @@ class SolrMarc extends SolrDefault
                                         if (!empty($this->originalLetters[$field][$index][$subfield])) {
                                             $data[$name]['originalLetters'] = $this->originalLetters[$field][$index][$subfield];
                                         }
+				    }
+                                    if ($name == $mandatoryField) {
+                                        $mandatoryFieldSet = true;
                                     }
+                                    $data['view-method'] = $solrMarcSpecs['view-method'];
                                 }
                             }
 
@@ -335,6 +351,10 @@ class SolrMarc extends SolrDefault
         }
         if (!empty($returnData)) {
             $returnData['title'] = $title;
+            $returnData['view-method'] = $solrMarcSpecs['view-method'];
+	}
+        if (!$mandatoryFieldSet) {
+            return [];
         }
         return $returnData;
     }

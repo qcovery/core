@@ -1,6 +1,6 @@
 <?php
 if (empty($this->coreFieldCategories)):
-    $coreFieldList = [$this->solrDetails()->getCoreFields($this->driver, $this->coreFieldCategories)];
+    $coreFieldList = [$this->solrDetails()->getCoreFields($this->driver, [])];
 else:
     $coreFieldList = [];
     foreach ($this->coreFieldCategories as $category):
@@ -8,6 +8,7 @@ else:
     endforeach;
 endif;
 ?>
+<?php //print_r($coreFieldList); ?>
 <?php foreach ($coreFieldList as $coreFields): ?>
     <?php if (!empty($coreFields)): ?>
       <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
@@ -17,6 +18,7 @@ endif;
                 <?php foreach ($items as $item): ?>
              <p style="margin:0px">
                  <?php if (is_array($item)): ?>
+                  <?php print_r($item); ?>
                     <?php foreach ($item as $key => $value): ?>
                         <?php if (!is_int($key)): ?>
                             <?=$this->transEsc($key) ?>:

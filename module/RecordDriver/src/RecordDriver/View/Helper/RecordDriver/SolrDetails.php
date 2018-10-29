@@ -55,7 +55,11 @@ public function getCoreFields(RecordDriver $driver, $categories = [])
         if (!empty($categories)) {
             foreach ($categories as $category) {
                 foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
-                    $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+                    if ($solrMarcData['view-method'] == 'description-link') {
+                        $solrMarcData[$solrMarcKey] = $this->makeDescriptionLink();
+                    } else {
+                        $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+                    }
                 }
             }
         } else {
@@ -65,4 +69,30 @@ public function getCoreFields(RecordDriver $driver, $categories = [])
         }
         return $solrMarcData;
     }
+
+    private function makeDescriptionLink() {
+        return '';
+    }
+
+    /**
+     * Render the link of the specified type.
+     *
+     * @param string $type    Link type
+     * @param string $lookfor String to search for at link
+     *
+     * @return string
+     */
+    private function getLink($type, $lookfor, $driver)
+    {
+        $link = $this->renderTemplate(
+            'link-' . $type . '.phtml',
+            ['driver' => $driver, 'lookfor' => $lookfor]
+        );
+/*
+        $link .= $this->getView()->plugin('searchTabs')
+            ->getCurrentHiddenFilterParams($this->driver->getSourceIdentifier());
+*/
+        return $link;
+    }
+
 }
