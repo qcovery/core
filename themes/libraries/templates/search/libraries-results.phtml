@@ -5,7 +5,7 @@
   $searchLink = $this->url($this->searchOptions($this->searchClassId)->getSearchAction());
 ?>
     <div id="LibrarySelector">
-<? if ($selectedLibrary['show-library'] != 'n' || count($libraryList) > 1): ?>
+<? if (empty($selectedLibrary['show-library']) || $selectedLibrary['show-library'] != 'n' || count($libraryList) > 1): ?>
       <div id="LibraryData">
           <div class="" uk-grid>
               <div class="uk-width-3-4">

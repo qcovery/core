@@ -15,6 +15,8 @@ return [
         'belugax.js',
     ],
     'mixins' => [
+        'paia',
+        'daiaplus',
         'belugaconfig',
         'delivery',
         'libraries',
@@ -22,8 +24,6 @@ return [
         'dependentworks',
         'recorddriver',
         'beluga-core-base',
-        'daiaplus',
-        'paia',
     ],
     "less" => [
         "active" => false,

@@ -49,8 +49,10 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'deleteRecordComment' => 'VuFind\AjaxHandler\DeleteRecordComment',
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
-        'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-        'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
+        'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
+	'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
+	'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
+	'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
         'getRecordCommentsAsHTML' => 'VuFind\AjaxHandler\GetRecordCommentsAsHTML',
@@ -76,6 +78,10 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
      * @var array
      */
     protected $factories = [
+	'DependentWorks\AjaxHandler\GetDependentWorks' =>
+	   'DependentWorks\AjaxHandler\GetDependentWorksFactory',
+	'Libraries\AjaxHandler\GetLibraries' =>
+	   'Libraries\AjaxHandler\GetLibrariesFactory',
         'VuFind\AjaxHandler\CheckRequestIsValid' =>
             'VuFind\AjaxHandler\AbstractIlsAndUserActionFactory',
         'VuFind\AjaxHandler\CommentRecord' =>
