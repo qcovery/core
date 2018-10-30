@@ -205,7 +205,7 @@ class SolrMarc extends SolrDefault
                     $solrMarcSpecs[$item][$marcField]['parent'] = $parentMethods;
                 }
             }
-            $solrMarcSpecs[$item]['title'] = (array_key_exists('title', $solrMarcSpec)) ? $solrMarcSpec['title'] : $item;
+//            $solrMarcSpecs[$item]['title'] = (array_key_exists('title', $solrMarcSpec)) ? $solrMarcSpec['title'] : $item;
         }
         $this->solrMarcSpecs = $solrMarcSpecs;
         if (empty($this->originalLetters)) {
@@ -350,7 +350,7 @@ class SolrMarc extends SolrDefault
             }
         }
         if (!empty($returnData)) {
-            $returnData['title'] = $title;
+//            $returnData['title'] = $title;
             $returnData['view-method'] = $solrMarcSpecs['view-method'];
 	}
         if (!$mandatoryFieldSet) {

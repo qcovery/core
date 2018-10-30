@@ -27,7 +27,7 @@
  */
 namespace RecordDriver\View\Helper\RecordDriver;
 
-use Zend\View\Helper\AbstractHelper;
+use VuFind\View\Helper\Root\AbstractClassBasedTemplateRenderer;
 use RecordDriver\RecordDriver\SolrMarc as RecordDriver;
 
 /**
@@ -39,8 +39,12 @@ use RecordDriver\RecordDriver\SolrMarc as RecordDriver;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class SolrDetails extends AbstractHelper
+class SolrDetails extends AbstractClassBasedTemplateRenderer
 {
+
+
+    protected $driver;
+
     /**
      * Get the core field entries
      *
@@ -49,16 +53,30 @@ class SolrDetails extends AbstractHelper
      *
      * @return array
      */
-public function getCoreFields(RecordDriver $driver, $categories = [])
+    public function getCoreFields(RecordDriver $driver, $categories = [])
     {
+        $this->driver = $driver;
         $solrMarcData = [];
         if (!empty($categories)) {
             foreach ($categories as $category) {
                 foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
-                    if ($solrMarcData['view-method'] == 'description-link') {
-                        $solrMarcData[$solrMarcKey] = $this->makeDescriptionLink();
+                    $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+                    $viewMethod = $solrMarcData[$solrMarcKey]['view-method'];
+                    unset($solrMarcData[$solrMarcKey]['view-method']);
+                    $templateData = [];
+                    if ($viewMethod == 'description-link') {
+                        foreach ($solrMarcData[$solrMarcKey] as $data) {
+                            $templateData[] = $this->makeDescriptionLink($data, $category);
+                        }
+                        $solrMarcData[$solrMarcKey] = $templateData;
+                    } elseif ($viewMethod == 'ppn-link') {
+//print_r($solrMarcData[$solrMarcKey]);
+                        foreach ($solrMarcData[$solrMarcKey] as $data) {
+                            $templateData[] = $this->makePpnLink($data);
+                        }
+                        $solrMarcData[$solrMarcKey] = $templateData;
                     } else {
-                        $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+                        $solrMarcData[$solrMarcKey] = $solrMarcData[$solrMarcKey];
                     }
                 }
             }
@@ -70,9 +88,39 @@ public function getCoreFields(RecordDriver $driver, $categories = [])
         return $solrMarcData;
     }
 
-    private function makeDescriptionLink() {
-        return '';
-    }
+    private function makeDescriptionLink($data, $key) {
+        $key = strtolower($key);
+        $string = '<a href="' . $this->getLink($key, $data['name']['data']) . '" title="' . $data['name']['data'] . '">' . $data['name']['data'] . '</a>';
+        $additionalData = [];
+        foreach ($data as $item => $date) {
+            if ($item != 'view-method' && $item != 'name' && $item != 'description') {
+                $additionalData[] = $date['data'];
+            }
+        }
+        if (!empty($additionalData)) {
+            $string .= ' (' . implode(', ', $additionalData) . ')';
+        }
+        if (!empty($data['description']['data'])) {
+            $string .= ' [' . $data['description']['data'] . ']';
+        }
+        return $string;
+     }
+
+    private function makePpnLink($data) {
+        $additionalData = [];
+        foreach ($data as $item => $date) {
+            if ($item != 'view-method' && $item != 'ppn') {
+                $collectedData[] = $date['data'];
+            }
+        }
+        $dateString = implode(', ', $collectedData);
+        if (!empty($data['ppn']['data'])) {
+            $string = '<a href="' . $this->getLink('ppn', $data['ppn']['data']) . '" title="' . $dateString . '">' . $dateString . '</a>';
+        } else {
+            $string = $dateString;
+        }
+        return $string;
+     }
 
     /**
      * Render the link of the specified type.
@@ -82,11 +130,12 @@ public function getCoreFields(RecordDriver $driver, $categories = [])
      *
      * @return string
      */
-    private function getLink($type, $lookfor, $driver)
+    private function getLink($type, $lookfor)
     {
-        $link = $this->renderTemplate(
-            'link-' . $type . '.phtml',
-            ['driver' => $driver, 'lookfor' => $lookfor]
+        $template = 'RecordDriver/%s/' . 'link-' . $type . '.phtml';
+        $className = get_class($this->driver);
+        $link = $this->renderClassTemplate(
+            $template, $className, ['driver' => $this->driver, 'lookfor' => $lookfor]
         );
 /*
         $link .= $this->getView()->plugin('searchTabs')

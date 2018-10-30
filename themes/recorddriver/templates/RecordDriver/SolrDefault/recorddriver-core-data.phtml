@@ -18,7 +18,6 @@ endif;
                 <?php foreach ($items as $item): ?>
              <p style="margin:0px">
                  <?php if (is_array($item)): ?>
-                  <?php print_r($item); ?>
                     <?php foreach ($item as $key => $value): ?>
                         <?php if (!is_int($key)): ?>
                             <?=$this->transEsc($key) ?>:
@@ -30,6 +29,8 @@ endif;
                             <?=$this->transEsc('Original Letters') ?>: <?=$value['originalLetters'] ?><br />
                          <?php endif; ?>
                     <?php endforeach; ?>
+                 <?php else: ?>
+                    <?=$item ?>
                  <?php endif; ?>
              </p>
                 <?php endforeach; ?>
