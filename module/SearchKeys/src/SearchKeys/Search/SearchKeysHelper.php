@@ -26,8 +26,14 @@ class SearchKeysHelper
     public function processSearchKeys($request, $options, $config, $searchClassId)
     {
         $id = strtolower($searchClassId);
-        $keywords = $config->get('keys-' . $id)->toArray();
-        $phrasedKeywords = $config->get('phrasedKeys-' . $id)->toArray();
+        $keywords = [];
+        if ($config->get('keys-' . $id)) {
+            $keywords = $config->get('keys-' . $id)->toArray();
+        }
+        $phrasedKeywords = [];
+        if ($config->get('phrasedKeys-' . $id)) {
+            $phrasedKeywords = $config->get('phrasedKeys-' . $id)->toArray();
+        }
         $defaultType = $options->getDefaultHandler();
 
         $lookfor = $lookfor = preg_replace('/\s+/', ' ', $request->get('lookfor'));
