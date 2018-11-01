@@ -165,7 +165,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                     $current['daiaplus'] = $this->renderer->render(
                         'ajax/daiaplus.phtml', [
                             'daiaResult' => $record[0],
-                            'callnumberHandler' => $this->getCallnumberHandler()
+                            'callnumberHandler' => $this->getCallnumberHandler(),
+                            'list' => $list === 'true'? true: false,
                         ]
                     );
                 }
