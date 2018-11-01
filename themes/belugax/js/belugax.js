@@ -75,4 +75,16 @@ $(document).ready(function() {
        $(this).find('i').toggleClass('bel-pfeil-u01').toggleClass('bel-pfeil-o01');
     });
 
+    /*
+     * Copy permalink to clipboard.
+     */
+    $('.permalinkCopy').on('click', function(e){
+        e.preventDefault();
+        var getUrl = window.location;
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val(getUrl.protocol+"//"+getUrl.host+$(this).attr('href').trim()).select();
+        document.execCommand("copy");
+        $temp.remove();
+    });
 });
