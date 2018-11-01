@@ -29,4 +29,12 @@ return [
         "active" => false,
         "compiled.less"
     ],
+    'helpers' => [
+        'factories' => [
+            'RecordDriver\View\Helper\RecordDriver\SearchMemory' => 'RecordDriver\View\Helper\RecordDriver\SearchMemoryFactory',
+        ],
+        'aliases' => [
+            'searchMemory' => 'RecordDriver\View\Helper\RecordDriver\SearchMemory',
+        ]
+    ],
 ];
