@@ -1,32 +1,33 @@
 <?
-/* $language = $this->layout()->userLang;
-$ppn = $_GET['ppn'];
-$list = $_GET['list'];
-$mediatype = $_GET['mediatype'];
-$marcField951aValue = urldecode($_GET['marcField951aValue']);
+//$language = $this->layout()->userLang;
+//$ppn = $_GET['ppn'];
+//$list = $_GET['list'];
+//$mediatype = $_GET['mediatype'];
+//$marcField951aValue = urldecode($_GET['marcField951aValue']);
 
 echo '<div id="paia-availability">';
-if ($list == 1) {
-    $daiaResults_org =  $this->paia()->getDaiaResults($ppn, true, $language, $mediatype);
-    if($daiaResults_org['document'][0]['daiaplus_best_result']) {
+if ($list) {
+    if(isset($daiaResults_org['daiaplus_best_result'])) {
         echo '<div class="delimiter"></div>';
     }
-    $daiaResults['document'][0]['item'][] = $daiaResults_org['document'][0]['daiaplus_best_result'];
+    $daiaResults[] = $daiaResults_org['daiaplus_best_result'];
 } else {
-    $daiaResults_org =  $this->paia()->getDaiaResults($ppn, false, $language, $mediatype);
+    if(isset($daiaResults_org['daiaplus_best_result'])) {
+        unset($daiaResults_org['daiaplus_best_result']);
+    }
+
     if(!empty($daiaResults_org)) {
-        $useDaia = True;
+        $useDaia = true;
         $daiaResults = $daiaResults_org;
     } else {
-        $useDaia = False;
+        $useDaia = false;
     }
 
     echo '<div id="daia_results">';
     echo '<a name="availability"></a>';
-    echo'<b>'.$this->transEsc('holdings_and_availability').'</b>';
     echo'<table>';
     echo'<tbody>';
-    if($useDaia == false) {
+    if(!$useDaia) {
         echo'<tr>';
         echo'<td valign="top">';
         echo $this->transEsc('please select a volume');
@@ -36,11 +37,11 @@ if ($list == 1) {
 
 }
 
-foreach ($daiaResults['document'][0]['item'] as $daiaResult) { */
+foreach ($daiaResults as $daiaResult) {
 
 echo'<table>';
-    if($list != 1) {
-        echo'<tr>';
+    if(!$list) {
+        echo'<tr class="daiaplus-entry">';
         echo'<td valign="top">';
     }
 
@@ -103,7 +104,7 @@ echo'<table>';
         echo '</span>';
     }
 
-    if($list == 1) {
+    if($list) {
         if ($daiaResult['daiaplus']['list_more_link']) {
             echo '<br><a href="'.$this->recordLink()->getUrl($this->driver).$ppn.'#availability">'.$this->transEsc('additional_copies').'...</a>';
         }
@@ -136,10 +137,10 @@ echo'<table>';
         echo'</td>';
         echo'</tr>';
     }
-//}
+}
 echo'</table>';
 
-/* if ($list != 1) {
+ if (!$list) {
     echo'</tbody>';
     echo'</table>';
     echo'</div>';
@@ -151,4 +152,4 @@ echo '</pre></div>';
 echo '<div style="display:none;"><pre>';
 echo json_encode($daiaResults_org, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 echo '</pre></div>';
-echo '</div>'; */
+echo '</div>';
