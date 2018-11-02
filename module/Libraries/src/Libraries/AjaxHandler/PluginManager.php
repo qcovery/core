@@ -62,6 +62,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'getRequestGroupPickupLocations' =>
             'VuFind\AjaxHandler\GetRequestGroupPickupLocations',
         'getResolverLinks' => 'VuFind\AjaxHandler\GetResolverLinks',
+        'getResultCount' => 'BelugaConfig\AjaxHandler\GetResultCount',
         'getSaveStatuses' => 'VuFind\AjaxHandler\GetSaveStatuses',
         'getVisData' => 'VuFind\AjaxHandler\GetVisData',
         'keepAlive' => 'VuFind\AjaxHandler\KeepAlive',
@@ -79,6 +80,8 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
      * @var array
      */
     protected $factories = [
+        'BelugaConfig\AjaxHandler\GetResultCount' =>
+            'BelugaConfig\AjaxHandler\GetResultCountFactory',
         'DependentWorks\AjaxHandler\GetDependentWorks' =>
             'DependentWorks\AjaxHandler\GetDependentWorksFactory',
         'Libraries\AjaxHandler\GetLibraries' =>

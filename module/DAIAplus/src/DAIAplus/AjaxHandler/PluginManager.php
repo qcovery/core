@@ -50,9 +50,9 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
-	'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-	'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
-	'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
+	    'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
+	    'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
+	    'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
         'getRecordCommentsAsHTML' => 'VuFind\AjaxHandler\GetRecordCommentsAsHTML',
@@ -61,6 +61,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'getRequestGroupPickupLocations' =>
             'VuFind\AjaxHandler\GetRequestGroupPickupLocations',
         'getResolverLinks' => 'VuFind\AjaxHandler\GetResolverLinks',
+        'getResultCount' => 'BelugaConfig\AjaxHandler\GetResultCount',
         'getSaveStatuses' => 'VuFind\AjaxHandler\GetSaveStatuses',
         'getVisData' => 'VuFind\AjaxHandler\GetVisData',
         'keepAlive' => 'VuFind\AjaxHandler\KeepAlive',
@@ -78,10 +79,12 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
      * @var array
      */
     protected $factories = [
-	'DependentWorks\AjaxHandler\GetDependentWorks' =>
-	   'DependentWorks\AjaxHandler\GetDependentWorksFactory',
-	'Libraries\AjaxHandler\GetLibraries' =>
-	   'Libraries\AjaxHandler\GetLibrariesFactory',
+        'BelugaConfig\AjaxHandler\GetResultCount' =>
+            'BelugaConfig\AjaxHandler\GetResultCountFactory',
+	    'DependentWorks\AjaxHandler\GetDependentWorks' =>
+	        'DependentWorks\AjaxHandler\GetDependentWorksFactory',
+	    'Libraries\AjaxHandler\GetLibraries' =>
+	        'Libraries\AjaxHandler\GetLibrariesFactory',
         'VuFind\AjaxHandler\CheckRequestIsValid' =>
             'VuFind\AjaxHandler\AbstractIlsAndUserActionFactory',
         'VuFind\AjaxHandler\CommentRecord' =>

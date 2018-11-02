@@ -2,6 +2,11 @@
 namespace BelugaConfig\Module\Configuration;
 
 $config = [
+    /* 'controllers' => [
+        'factories' => [
+            'VuFind\Controller\AjaxController' => 'BelugaConfig\Controller\AjaxControllerFactory',
+        ],
+    ], */
     'service_manager' => [
         'allow_override' => true,
         'factories' => [

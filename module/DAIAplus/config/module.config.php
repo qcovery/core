@@ -2,11 +2,6 @@
 namespace DAIAplus\Module\Configuration;
 
 $config = [
-    'controllers' => [
-        'factories' => [
-            'VuFind\Controller\AjaxController' => 'DAIAplus\Controller\AjaxControllerFactory',
-        ],
-    ],
     'service_manager' => [
         'allow_override' => true,
         'factories' => [
