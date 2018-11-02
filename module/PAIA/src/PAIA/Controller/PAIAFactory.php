@@ -1,10 +1,10 @@
 <?php
 /**
- * PAIA Controller
+ * Factory for controllers.
  *
  * PHP version 5
  *
- * Copyright (C) Villanova University 2010.
+ * Copyright (C) Villanova University 2014.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -17,40 +17,39 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace PAIA\Controller;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use VuFind\Controller\AbstractSearch;
-use CaLief\Classes\DodOrder;
-use PAIA\PAIAHelper;
+
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Controller for the user account area.
+ * Factory for controllers.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org/wiki/development Wiki
+ *
+ * @codeCoverageIgnore
  */
-class PAIAController extends AbstractSearch
+class PAIAFactory implements FactoryInterface
 {
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-    }
-
-	function electronicavailabilityAction() {
-        return $this->createViewModel();
+    public function __invoke(ContainerInterface $container, $requestedName,
+                             array $options = null
+    ) {
+        if (!empty($options)) {
+            throw new \Exception('Unexpected options sent to factory.');
+        }
+        return new PAIAController(
+        );
     }
 }

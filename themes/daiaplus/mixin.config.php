@@ -1,5 +1,8 @@
 <?php
 return [
     'css' => ['daiaplus.css'],
-    'js' => ['check_item_statuses.js'],
+    'js' => [
+        'check_item_statuses.js',
+        'daia.js',
+    ],
 ];

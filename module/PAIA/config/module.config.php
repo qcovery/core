@@ -5,10 +5,13 @@ $config = array(
     'controllers' => array(
         'factories' => [
             'PAIA\Controller\MyResearchController' => 'PAIA\Controller\Factory',
+            'PAIA\Controller\PAIAController' => 'PAIA\Controller\PAIAFactory',
         ],
         'aliases' => [
             'MyResearch' => 'PAIA\Controller\MyResearchController',
             'myresearch' => 'PAIA\Controller\MyResearchController',
+            'PAIA' => 'PAIA\Controller\PAIAController',
+            'paia' => 'PAIA\Controller\PAIAController',
         ],
     ),
     'service_manager' => array(
