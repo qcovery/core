@@ -70,12 +70,22 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                         }
                         $solrMarcData[$solrMarcKey] = $templateData;
                     } elseif ($viewMethod == 'ppn-link') {
-//print_r($solrMarcData[$solrMarcKey]);
                         foreach ($solrMarcData[$solrMarcKey] as $data) {
                             $templateData[] = $this->makePpnLink($data);
                         }
                         $solrMarcData[$solrMarcKey] = $templateData;
-                    } else {
+		    } elseif ($viewMethod == 'plain') {
+                        $collectedData = [];
+                        print_r($solrMarcData[$solrMarcKey]);
+                        foreach ($solrMarcData[$solrMarcKey] as $key => $value) {
+                            if ($key != 'view-method') {
+                                $collectedData[] = $value;
+                            }
+                        }
+			//$solrMarcData[$solrMarcKey] = [implode(', ', $collectedData)];
+			$solrMarcData[$solrMarcKey] = [$solrMarcData[$solrMarcKey][0]['ppn']['data']];
+                        //print_r($solrMarcData[$solrMarcKey]);
+		    } else {
                         $solrMarcData[$solrMarcKey] = $solrMarcData[$solrMarcKey];
                     }
                 }
@@ -104,16 +114,19 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             $string .= ' [' . $data['description']['data'] . ']';
         }
         return $string;
-     }
+    }
 
     private function makePpnLink($data) {
-        $additionalData = [];
+        $collectedData = [];
         foreach ($data as $item => $date) {
             if ($item != 'view-method' && $item != 'ppn') {
                 $collectedData[] = $date['data'];
             }
         }
-        $dateString = implode(', ', $collectedData);
+	$dateString = implode(', ', $collectedData);
+        if (empty($dateString)) {
+            $dateString = $data['ppn']['data'];
+        }
         if (!empty($data['ppn']['data'])) {
             $string = '<a href="' . $this->getLink('ppn', $data['ppn']['data']) . '" title="' . $dateString . '">' . $dateString . '</a>';
         } else {

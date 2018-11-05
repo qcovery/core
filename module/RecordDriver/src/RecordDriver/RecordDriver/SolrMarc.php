@@ -242,23 +242,23 @@ class SolrMarc extends SolrDefault
                                 $indexValues = call_user_func([$this, 'parent::' . $method]);
                                 if (is_array($indexValues)) {
                                     foreach ($indexValues as $indexKey => $value) {
-                                        $tmpData[$indexKey] = $value;
+                                        $tmpData[$indexKey] = ['data'=> $value];
                                     }
                                 } else {
-                                    $tmpData[] = $value;
-                                }
+                                    $tmpData = $indexValues;
+				}
                             }
                         } elseif ($subFieldSpec[0] == 'name') {
                             $tmpKey = $subFieldSpec[1];
                         }
-                    }
-                    if (!empty($tmpData)) {
-                        if (!empty($tmpKey)) {
-                            foreach ($tmpData as $value) {
-                                $indexData[] = [$tmpKey => $value];
-                            }
+		    }
+		    if (!empty($tmpData)) {
+                        if (is_array($tmpData)) {
+                            $indexData = $tmpData;
+			} elseif (!empty($tmpKey)) {
+                            $indexData[] = [$tmpKey => ['data' => $tmpData]];
                         } else {
-                            $indexData[] = $tmpData;
+                            $indexData[] = [['data' => $tmpData]];
                         }
                     }
                 }
