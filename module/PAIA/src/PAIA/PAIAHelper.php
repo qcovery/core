@@ -582,6 +582,15 @@ class PAIAHelper extends AbstractHelper
      */
 	//TODO: Complete function once external service is available
 	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $GVKlink, $doi, $list, $mediatype, $language) {
+		$ppn = ($ppn !== 'undefined' ? $ppn : '');
+		$openUrl = ($openUrl !== 'undefined' ? $openUrl : '');
+		$url_access = ($url_access !== 'undefined' ? $url_access : '');
+		$url_access_level = ($url_access_level !== 'undefined' ? $url_access_level : '');
+		$GVKlink = ($GVKlink !== 'undefined' ? $GVKlink : '');
+		$doi = ($doi !== 'undefined' ? $doi : '');
+		$list = ($list !== 'undefined' ? $list : 0);
+		$language = ($language !== 'undefined' ? $language : 'de');
+		
 		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
 			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
 		} else {
