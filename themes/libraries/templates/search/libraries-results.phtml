@@ -1,11 +1,11 @@
-<?
+<?php
   $Libraries = $this->params->getLibraries();
   $selectedLibrary = $Libraries->selectLibrary();
   $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
   $searchLink = $this->url($this->searchOptions($this->searchClassId)->getSearchAction());
 ?>
     <div id="LibrarySelector">
-<? if (empty($selectedLibrary['show-library']) || $selectedLibrary['show-library'] != 'n' || count($libraryList) > 1): ?>
+<?php if (empty($selectedLibrary['show-library']) || $selectedLibrary['show-library'] != 'no' || count($libraryList) > 1): ?>
       <div id="LibraryData">
           <div class="" uk-grid>
               <div class="uk-width-3-4">
@@ -13,13 +13,13 @@
                       <img id="infoimage" src="/vufind/themes/libraries/images/library_icons/<?=$selectedLibrary['logo'] ?>" height="40" alt="Library Logo" /><br/>
                   </a>
               </div>
-              <? if (!empty($selectedLibrary['infosite'])): ?>
+              <?php if (!empty($selectedLibrary['infosite'])): ?>
                   <div class="uk-width-1-4">
                       <div class="">
                           <a href="<?=$selectedLibrary['infosite'] ?>" id="infoopen" target="_blank"><i class="bel-auskunft" aria-hidden="true" title="<?=$this->transEsc('Library Informations') ?>"></i></a>
                       </div>
                   </div>
-              <? endif; ?>
+              <?php endif; ?>
               <div class="uk-width-1-1 uk-margin-remove-top uk-margin-bottom">
                   <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
                       <div class="uk-margin-top"><?=$this->transEsc($selectedLibrary['fullname']) ?></div>
@@ -27,7 +27,7 @@
               </div>
           </div>
       </div>
-<? endif; ?>
+<?php endif; ?>
       <div class="facet-group" id="side-panel-library">
           <button class="title" data-toggle="collapse" href="#side-collapse-library"><?=$this->transEsc("Library")?></button>
           <div id="side-collapse-library" class="collapse out">

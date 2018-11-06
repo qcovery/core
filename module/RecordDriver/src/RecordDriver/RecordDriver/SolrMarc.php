@@ -110,21 +110,19 @@ class SolrMarc extends SolrDefault
      *
      * @return array
      */
-    public function getSolrMarcKeys($category = '', $others = true)
+    public function getSolrMarcKeys($category = '', $others = false)
     {
         if (empty($this->solrMarcSpecs)) {
             $this->parseSolrMarcSpecs();
         }
         $specKeys = array_keys($this->solrMarcSpecs);
         if (empty($category)) {
-            if ($others) {
-                return $specKeys;
-            } else {
-                $solrMarcKeys = $this->solrMarcKeys;
-                unset($solrMarcKeys['other']);
-                $keys = array_reduce($solrMarcKeys, 'array_merge', []);
-                return array_intersect($keys, $specKeys);
+            if (!$others) {
+                if (($key = array_search('other', $specKeys)) !== false) {
+                    unset($specKeys[$key]);
+                }
             }
+            return $specKeys;
         } else {
             if (is_array($this->solrMarcKeys[$category])) {
                 return array_intersect($this->solrMarcKeys[$category], $specKeys);
@@ -205,7 +203,6 @@ class SolrMarc extends SolrDefault
                     $solrMarcSpecs[$item][$marcField]['parent'] = $parentMethods;
                 }
             }
-//            $solrMarcSpecs[$item]['title'] = (array_key_exists('title', $solrMarcSpec)) ? $solrMarcSpec['title'] : $item;
         }
         $this->solrMarcSpecs = $solrMarcSpecs;
         if (empty($this->originalLetters)) {
@@ -225,9 +222,9 @@ class SolrMarc extends SolrDefault
             return call_user_func([$this, 'get' . $dataName]);
         }
         $title = $solrMarcSpecs['title'];
-	unset($solrMarcSpecs['title']);
-	$mandatoryField = $solrMarcSpecs['mandatory-field'];
-	unset($solrMarcSpecs['mandatory-field']);
+        unset($solrMarcSpecs['title']);
+        $mandatoryField = $solrMarcSpecs['mandatory-field'];
+        unset($solrMarcSpecs['mandatory-field']);
         $mandatoryFieldSet = (empty($mandatoryField));
         if (is_array($solrMarcSpecs)) {
             foreach ($solrMarcSpecs as $field => $subFieldSpecs) {
@@ -246,16 +243,16 @@ class SolrMarc extends SolrDefault
                                     }
                                 } else {
                                     $tmpData = $indexValues;
-				}
+                                }
                             }
                         } elseif ($subFieldSpec[0] == 'name') {
                             $tmpKey = $subFieldSpec[1];
                         }
-		    }
-		    if (!empty($tmpData)) {
+                    }
+                    if (!empty($tmpData)) {
                         if (is_array($tmpData)) {
                             $indexData = $tmpData;
-			} elseif (!empty($tmpKey)) {
+                    } elseif (!empty($tmpKey)) {
                             $indexData[] = [$tmpKey => ['data' => $tmpData]];
                         } else {
                             $indexData[] = [['data' => $tmpData]];
@@ -300,6 +297,7 @@ class SolrMarc extends SolrDefault
                                 }
                             }
                         }
+                        $dataIndex = 0;
                         foreach ($subFieldList as $subfield => $properties) {
                             $fieldData = [];
                             if (strpos($subfield, 'indicator') !== false) {
@@ -313,10 +311,12 @@ class SolrMarc extends SolrDefault
                                 }
                             }
                             if (!empty($fieldData)) {
-                                foreach ($fieldData as $dataIndex => $fieldDate) {
+                                foreach ($fieldData as $fieldDate) {
                                     if (isset($properties['filter']) && isset($properties['match'])) {
                                         if (preg_match('/' . $properties['filter'] . '/', $fieldDate, $matches)) {
                                             $fieldDate = $matches[$properties['match']];
+                                        } else {
+                                            $fieldDate = '';
                                         }
                                     }
                                     if (isset($properties['toReplace']) && isset($properties['replacement'])) {
@@ -326,7 +326,10 @@ class SolrMarc extends SolrDefault
                                         $function = $properties['function'];
                                         $fieldDate = $function($fieldDate);
                                     }
-                                    $name = $properties['name'] ?? $dataIndex;
+                                    if (empty($fieldDate)) {
+                                        continue;
+                                    }
+                                    $name = $properties['name'] ?? $dataIndex++;
                                     $data[$name] = ['data' => trim($fieldDate)];
                                     if (empty($solrMarcSpecs['originalletters']) || $solrMarcSpecs['originalletters'] != 'no') {
                                         if (!empty($this->originalLetters[$field][$index][$subfield])) {
@@ -336,7 +339,7 @@ class SolrMarc extends SolrDefault
                                     if ($name == $mandatoryField) {
                                         $mandatoryFieldSet = true;
                                     }
-                                    $data['view-method'] = $solrMarcSpecs['view-method'];
+                                    //$data['view-method'] = $solrMarcSpecs['view-method'];
                                 }
                             }
 
