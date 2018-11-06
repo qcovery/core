@@ -251,8 +251,8 @@ class SolrMarc extends SolrDefault
                     }
                     if (!empty($tmpData)) {
                         if (is_array($tmpData)) {
-                            $indexData = $tmpData;
-                    } elseif (!empty($tmpKey)) {
+                            $indexData = [$tmpData];
+                        } elseif (!empty($tmpKey)) {
                             $indexData[] = [$tmpKey => ['data' => $tmpData]];
                         } else {
                             $indexData[] = [['data' => $tmpData]];
@@ -269,7 +269,7 @@ class SolrMarc extends SolrDefault
                                 }
                             } elseif ($condition[0] == 'field') {
                                 $subField = $fieldObject->getSubfield($condition[1]);
-                                if (!is_object($subField) || ($subField->getData() != $condition[2] && $condition[2] != '*')) {
+                                if (!is_object($subField) || (!preg_match('/'.$condition[2].'/', $subField->getData()) && $condition[2] != '*')) {
                                     continue 2;
                                 }
                             }
