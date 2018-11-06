@@ -57,6 +57,7 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
      */
     protected $apiKey;
     protected $list;
+    protected $language;
 
     /**
      * Initialize the driver.
@@ -234,7 +235,7 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
             'apikey' => $this->apiKey,
             //'id' => $id,
             'format' => $this->daiaResponseFormat,
-            'language' => 'de',
+            'language' => $this->language,
             'list' => $this->list,
         ];
 
@@ -394,5 +395,9 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
 
     public function setList ($list) {
         $this->list = $list;
+    }
+
+    public function setLanguage ($language) {
+        $this->language = $language;
     }
 }
