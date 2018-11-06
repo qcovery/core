@@ -71,6 +71,12 @@ class DriverWithDateConverterFactory extends \VuFind\ILS\Driver\DriverWithDateCo
             );
         }
 
+        if (method_exists($driver, 'setLanguage')) {
+            $driver->setLanguage(
+                $container->get('ViewManager')->getViewModel()->getVariable('userLang')
+            );
+        }
+
         return $driver;
     }
 }
