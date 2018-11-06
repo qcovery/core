@@ -57,53 +57,40 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
     {
         $this->driver = $driver;
         $solrMarcData = [];
-        if (!empty($categories)) {
-            foreach ($categories as $category) {
-                foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
-                    $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
-                    $viewMethod = $solrMarcData[$solrMarcKey]['view-method'];
-                    unset($solrMarcData[$solrMarcKey]['view-method']);
-                    $templateData = [];
-                    if ($viewMethod == 'description-link') {
-                        foreach ($solrMarcData[$solrMarcKey] as $data) {
-                            $templateData[] = $this->makeDescriptionLink($data, $category);
-                        }
-                        $solrMarcData[$solrMarcKey] = $templateData;
-                    } elseif ($viewMethod == 'ppn-link') {
-                        foreach ($solrMarcData[$solrMarcKey] as $data) {
-                            $templateData[] = $this->makePpnLink($data);
-                        }
-                        $solrMarcData[$solrMarcKey] = $templateData;
-		    } elseif ($viewMethod == 'plain') {
-                        $collectedData = [];
-                        print_r($solrMarcData[$solrMarcKey]);
-                        foreach ($solrMarcData[$solrMarcKey] as $key => $value) {
-                            if ($key != 'view-method') {
-                                $collectedData[] = $value;
-                            }
-                        }
-			//$solrMarcData[$solrMarcKey] = [implode(', ', $collectedData)];
-			$solrMarcData[$solrMarcKey] = [$solrMarcData[$solrMarcKey][0]['ppn']['data']];
-                        //print_r($solrMarcData[$solrMarcKey]);
-		    } else {
-                        $solrMarcData[$solrMarcKey] = $solrMarcData[$solrMarcKey];
-                    }
-                }
-            }
-        } else {
-            foreach ($driver->getSolrMarcKeys([], false) as $solrMarcKey) {
+        if (empty($categories)) {
+            $categories = [[]];
+        }
+        foreach ($categories as $category) {
+            foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
                 $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+                $viewMethod = $solrMarcData[$solrMarcKey]['view-method'];
+                unset($solrMarcData[$solrMarcKey]['view-method']);
+                $templateData = [];
+                if (strpos($viewMethod, '-link') > 0) {
+                    list($key, ) = explode('-', $viewMethod);
+                    foreach ($solrMarcData[$solrMarcKey] as $data) {
+                        $templateData[] = $this->makeLink($data, $key);
+                    }
+                    $solrMarcData[$solrMarcKey] = $templateData;
+                } elseif ($viewMethod == 'default') {
+                    foreach ($solrMarcData[$solrMarcKey] as $data) {
+                        $templateData[] = $this->makeText($data);
+                    }
+                    $solrMarcData[$solrMarcKey] = $templateData;
+		} else {
+                    $solrMarcData[$solrMarcKey] = $solrMarcData[$solrMarcKey];
+                }
             }
         }
         return $solrMarcData;
     }
 
-    private function makeDescriptionLink($data, $key) {
-        $key = strtolower($key);
-        $string = '<a href="' . $this->getLink($key, $data['name']['data']) . '" title="' . $data['name']['data'] . '">' . $data['name']['data'] . '</a>';
+    private function makeLink($data, $key) {
+        $linkname = $data['linkname']['data'] ?? $data['link']['data'];
+        $string = '<a href="' . $this->getLink($key, $data['link']['data']) . '" title="' . $linkname . '">' . $linkname . '</a>';
         $additionalData = [];
         foreach ($data as $item => $date) {
-            if ($item != 'view-method' && $item != 'name' && $item != 'description') {
+            if ($item != 'link' && $item != 'linkname' && $item != 'description') {
                 $additionalData[] = $date['data'];
             }
         }
@@ -116,21 +103,18 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $string;
     }
 
-    private function makePpnLink($data) {
-        $collectedData = [];
-        foreach ($data as $item => $date) {
-            if ($item != 'view-method' && $item != 'ppn') {
-                $collectedData[] = $date['data'];
+    private function makeText($data) {
+        $string = '';
+        if (array_keys($data) == range(0, count($data)-1)) {
+            foreach ($data as $date) {
+                $string .= $date['data'] . ', ';
             }
-        }
-	$dateString = implode(', ', $collectedData);
-        if (empty($dateString)) {
-            $dateString = $data['ppn']['data'];
-        }
-        if (!empty($data['ppn']['data'])) {
-            $string = '<a href="' . $this->getLink('ppn', $data['ppn']['data']) . '" title="' . $dateString . '">' . $dateString . '</a>';
+            $string = substr_replace($string, '', -2);
         } else {
-            $string = $dateString;
+            foreach ($data as $item => $date) {
+                $string .= '<strong>' . $item . ':</strong> ' . $date['data'] . '<br />';
+            }
+            $string = substr_replace($string, '', -6);
         }
         return $string;
      }
@@ -150,10 +134,6 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         $link = $this->renderClassTemplate(
             $template, $className, ['driver' => $this->driver, 'lookfor' => $lookfor]
         );
-/*
-        $link .= $this->getView()->plugin('searchTabs')
-            ->getCurrentHiddenFilterParams($this->driver->getSourceIdentifier());
-*/
         return $link;
     }
 
