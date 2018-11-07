@@ -138,12 +138,12 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
     private function makeChain($dataList, $separator = ' / ') {
         $result = $items = [];
         foreach ($dataList as $data) {
-            $link = $data['link']['data'][0];
-            $items[] = '<a href="' . $this->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
-            if (isset($data['sequence']) && $data['sequence']['data'][0] === 0) {
+            if (!empty($items) && isset($data['sequence']) && $data['sequence']['data'][0] == 0) {
                 $result[] = implode($separator, $items);
                 $items = [];
             }
+            $link = $data['link']['data'][0];
+            $items[] = '<a href="' . $this->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
         }
         $result[] = implode($separator, $items);
         return $result;
