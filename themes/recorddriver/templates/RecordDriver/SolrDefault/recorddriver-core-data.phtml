@@ -17,18 +17,10 @@ endif;
           <tr><th><?=$this->transEsc($field)?>:</th><td>
                 <?php foreach ($items as $item): ?>
              <p style="margin:0px">
-                 <?php if (is_array($item)): ?>
-                    <?php foreach ($item as $key => $value): ?>
-                        <?php if (!is_int($key)): ?>
-                            <?=$this->transEsc($key) ?>:
-                        <?php endif; ?>
-                        <?php if (isset($value['data'])): ?>
-                            <?=$value['data'] ?><br />
-                        <?php endif; ?>
+                 <?php if (false): ?>
                         <?php if (!empty($value['originalLetters']) && $value['originalLetters'] != $value['data']): ?>
                             <?=$this->transEsc('Original Letters') ?>: <?=$value['originalLetters'] ?><br />
                          <?php endif; ?>
-                    <?php endforeach; ?>
                  <?php else: ?>
                     <?=$item ?>
                  <?php endif; ?>

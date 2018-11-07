@@ -167,9 +167,11 @@ class SolrMarc extends SolrDefault
                 $solrMarcSpecs[$item]['view-method'] = $solrMarcSpec['view-method'];
             }
             unset($solrMarcSpec['view-method']);
+            $conditions = $subfields = $parentMethods = $description = [];
 	    foreach ($solrMarcSpec as $marcField => $fieldSpec) {
-                $solrMarcSpecs[$item][$marcField] = [];
-                $conditions = $subfields = $parentMethods = $description = [];
+                if (!empty($fieldSpec)) {
+                    $conditions = $subfields = $parentMethods = $description = [];
+                }
                 foreach ($fieldSpec as $subField => $subFieldSpec) {
                     if (is_array($subFieldSpec)) {
                         if ($subField == 'conditions') {
@@ -198,10 +200,10 @@ class SolrMarc extends SolrDefault
                             }
                         }
                     }
-                    $solrMarcSpecs[$item][$marcField]['conditions'] = $conditions;
-                    $solrMarcSpecs[$item][$marcField]['subfields'] = $subfields;
-                    $solrMarcSpecs[$item][$marcField]['parent'] = $parentMethods;
                 }
+                $solrMarcSpecs[$item][$marcField]['conditions'] = $conditions;
+                $solrMarcSpecs[$item][$marcField]['subfields'] = $subfields;
+                $solrMarcSpecs[$item][$marcField]['parent'] = $parentMethods;
             }
         }
         $this->solrMarcSpecs = $solrMarcSpecs;
@@ -263,14 +265,31 @@ class SolrMarc extends SolrDefault
                     $data = $indexData;
                     if (!empty($subFieldSpecs['conditions'])) {
                         foreach ($subFieldSpecs['conditions'] as $condition) {
-                            if ($condition[0] == 'indicator') {
-                                if ($fieldObject->getIndicator($condition[1]) != $condition[2]) {
-                                    continue 2;
+                            list($type, $key, $val) = $condition;
+                            if (substr($val, 0, 1) == '!') {
+                                $val = substr($val, 1);
+                                if ($type == 'indicator') {
+                                    $indicator = $fieldObject->getIndicator($key);
+                                    if (!empty($indicator) && ($val == '*' || $indicator == $val)) {
+                                        continue 2;
+                                    }
+                                } elseif ($type == 'field') {
+                                    $subField = $fieldObject->getSubfield($key);
+                                    if (is_object($subField) && ($val == '*' || preg_match('/'.$val.'/', $subField->getData()))) {
+                                        continue 2;
+                                    }
                                 }
-                            } elseif ($condition[0] == 'field') {
-                                $subField = $fieldObject->getSubfield($condition[1]);
-                                if (!is_object($subField) || (!preg_match('/'.$condition[2].'/', $subField->getData()) && $condition[2] != '*')) {
-                                    continue 2;
+                            } else {
+                                if ($type == 'indicator') {
+                                    $indicator = $fieldObject->getIndicator($key);
+                                    if (!isset($indicator) || $val != '*' && $indicator != $val) {
+                                        continue 2;
+                                    }
+                                } elseif ($type == 'field') {
+                                    $subField = $fieldObject->getSubfield($key);
+                                    if (!is_object($subField) || $val != '*' && !preg_match('/'.$val.'/', $subField->getData())) {
+                                        continue 2;
+                                    }
                                 }
                             }
                         }
@@ -326,11 +345,15 @@ class SolrMarc extends SolrDefault
                                         $function = $properties['function'];
                                         $fieldDate = $function($fieldDate);
                                     }
-                                    if (empty($fieldDate)) {
+                                    $fieldDate = trim($fieldDate);
+                                    if (empty($fieldDate) && $fieldDate !== '0' && $fieldDate !== 0) {
                                         continue;
                                     }
                                     $name = $properties['name'] ?? $dataIndex++;
-                                    $data[$name] = ['data' => trim($fieldDate)];
+                                    if (!isset($data[$name]['data'])) {
+                                        $data[$name]['data'] = [];
+                                    }
+                                    $data[$name]['data'][] = $fieldDate;
                                     if (empty($solrMarcSpecs['originalletters']) || $solrMarcSpecs['originalletters'] != 'no') {
                                         if (!empty($this->originalLetters[$field][$index][$subfield])) {
                                             $data[$name]['originalLetters'] = $this->originalLetters[$field][$index][$subfield];
@@ -345,7 +368,9 @@ class SolrMarc extends SolrDefault
 
                         }
                     }
-                    $returnData[] = $data;
+                    if (!empty($data)) {
+                        $returnData[] = $data;
+                    }
                 }
                 if (empty($returnData)) {
                     $returnData = $indexData;

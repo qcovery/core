@@ -71,48 +71,94 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeLink($data, $key);
                     }
-                    $solrMarcData[$solrMarcKey] = $templateData;
-                } elseif ($viewMethod == 'default') {
+                } elseif ($viewMethod == 'directlink') {
+                    foreach ($solrMarcData[$solrMarcKey] as $data) {
+                        $templateData[] = $this->makeDirectLink($data);
+                    }
+                } elseif ($viewMethod == 'chain') {
+                    $templateData = $this->makeChain($solrMarcData[$solrMarcKey]);
+                } else {
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeText($data);
                     }
-                    $solrMarcData[$solrMarcKey] = $templateData;
-		} else {
-                    $solrMarcData[$solrMarcKey] = $solrMarcData[$solrMarcKey];
                 }
+                $solrMarcData[$solrMarcKey] = array_unique($templateData);
             }
         }
         return $solrMarcData;
     }
 
-    private function makeLink($data, $key) {
-        $linkname = $data['linkname']['data'] ?? $data['link']['data'];
-        $string = '<a href="' . $this->getLink($key, $data['link']['data']) . '" title="' . $linkname . '">' . $linkname . '</a>';
+    private function makeLink($data, $key, $separator = ', ') {
+        if (empty($data['link'])) {
+            return '';
+        }
+        $link = $linkname = implode($separator, $data['link']['data']);
+        if (!empty($data['linkname'])) {
+            $linkname = implode($separator, $data['linkname']['data']);
+        }
+
+        $string = '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
         $additionalData = [];
         foreach ($data as $item => $date) {
             if ($item != 'link' && $item != 'linkname' && $item != 'description') {
-                $additionalData[] = $date['data'];
+                $additionalData[] = implode($separator, $date['data']);
             }
         }
         if (!empty($additionalData)) {
-            $string .= ' (' . implode(', ', $additionalData) . ')';
+            $string .= ' (' . implode($separator, $additionalData) . ')';
         }
         if (!empty($data['description']['data'])) {
-            $string .= ' [' . $data['description']['data'] . ']';
+            $string .= ' [' . implode($separator, $data['description']['data']) . ']';
         }
         return $string;
     }
 
-    private function makeText($data) {
-        $string = '';
-        if (array_keys($data) == range(0, count($data)-1)) {
-            foreach ($data as $date) {
-                $string .= $date['data'] . ', ';
+    private function makeDirectLink($data) {
+        if (empty($data['link'])) {
+            return '';
+        }
+        $link = implode($separator, $data['link']['data']);
+
+        $string = '<a href="' . $link . '" title="' . $link . '">' . $link . '</a>';
+        $additionalData = [];
+        foreach ($data as $item => $date) {
+            if ($item != 'link' && $item != 'linkname' && $item != 'description') {
+                $additionalData[] = implode($separator, $date['data']);
             }
-            $string = substr_replace($string, '', -2);
+        }
+        if (!empty($additionalData)) {
+            $string .= ' (' . implode($separator, $additionalData) . ')';
+        }
+        if (!empty($data['description']['data'])) {
+            $string .= ' [' . implode($separator, $data['description']['data']) . ']';
+        }
+        return $string;
+    }
+
+    private function makeChain($dataList, $separator = ' / ') {
+        $result = $items = [];
+        foreach ($dataList as $data) {
+            $link = $data['link']['data'][0];
+            $items[] = '<a href="' . $this->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
+            if (isset($data['sequence']) && $data['sequence']['data'][0] === 0) {
+                $result[] = implode($separator, $items);
+                $items = [];
+            }
+        }
+        $result[] = implode($separator, $items);
+        return $result;
+     }
+
+    private function makeText($data, $separator = ', ') {
+        $string = '';
+        if (array_keys($data) === array_filter(array_keys($data), 'is_int')) {
+            foreach ($data as $date) {
+                $string .= implode($separator, $date['data']) . $separator;
+            }
+            $string = substr_replace($string, '', -1 * strlen($separator));
         } else {
             foreach ($data as $item => $date) {
-                $string .= '<strong>' . $item . ':</strong> ' . $date['data'] . '<br />';
+                $string .= '<strong>' . $item . ':</strong> ' . implode($separator, $date['data']) . '<br />';
             }
             $string = substr_replace($string, '', -6);
         }
