@@ -39,8 +39,13 @@ class SearchBox extends \VuFind\View\Helper\Root\SearchBox
         $keyClass = 'keys-' . strtolower($activeSearchClass);
         $searchKeys = [];
         if (isset($this->searchkeysConfig[$keyClass])) {
-            $searchKeys = array_unique($this->searchkeysConfig[$keyClass]);
+            $searchKeys = $this->searchkeysConfig[$keyClass];
         }
+        $keyClass = 'phrasedKeys-' . strtolower($activeSearchClass);
+        foreach ($this->searchkeysConfig[$keyClass] as $searchKey) {
+            $searchKeys[] = $searchKey;
+        }
+        $searchKeys = array_unique($searchKeys);
         foreach( $searchKeys as $key => $value) {
             $handlers[] = [
                 'value' => $value, 'label' => $value, 'indent' => false, 'selected' => ($activeHandler == $value)

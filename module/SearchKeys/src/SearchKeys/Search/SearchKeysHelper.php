@@ -44,7 +44,6 @@ class SearchKeysHelper
         $searchBoolean = ['AND'];
         $limit = 10;
 
-        $type = '';
         while (!empty($lookfor) && $limit-- > 0) {
             $item = $key = '';
             foreach (array_merge($keywords, $phrasedKeywords) as $keyword => $searchType) {
