@@ -241,7 +241,7 @@ class SolrMarc extends SolrDefault
                                 $indexValues = call_user_func([$this, 'parent::' . $method]);
                                 if (is_array($indexValues)) {
                                     foreach ($indexValues as $indexKey => $value) {
-                                        $tmpData[$indexKey] = ['data'=> $value];
+                                        $tmpData[$indexKey] = ['data'=> [$value]];
                                     }
                                 } else {
                                     $tmpData = $indexValues;
@@ -255,9 +255,9 @@ class SolrMarc extends SolrDefault
                         if (is_array($tmpData)) {
                             $indexData = [$tmpData];
                         } elseif (!empty($tmpKey)) {
-                            $indexData[] = [$tmpKey => ['data' => $tmpData]];
+                            $indexData[] = [$tmpKey => ['data' => [$tmpData]]];
                         } else {
-                            $indexData[] = [['data' => $tmpData]];
+                            $indexData[] = [['data' => [$tmpData]]];
                         }
                     }
                 }
