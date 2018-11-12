@@ -1,5 +1,5 @@
 <?php $libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId, $this->driver); ?>
-
+<?php if (!empty($libraryList)): ?>
 <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
   <tr><th><?=$this->transEsc('Libraries')?>:</th><td>
     <p style="margin:0px">
@@ -9,3 +9,4 @@
     </p>
   </td></tr>
 </table>
+<?php endif; ?>
