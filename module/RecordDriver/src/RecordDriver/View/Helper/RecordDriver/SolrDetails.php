@@ -88,6 +88,43 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $solrMarcData;
     }
 
+    public function getTitleLine(RecordDriver $driver) {
+        $title = array_shift($driver->getMarcData('Title'));
+        $titleLine = $title[0]['data'][0];
+        if (!empty($title[1]['data'][0])) {
+            $titleLine .= ' / ' . $title[1]['data'][0];
+        }
+        $titleLine = substr($titleLine, 0, 180);
+        if (!empty($title[3]['data'][0])) {
+            $titleLine .= ' ' . $title[3]['data'][0];
+        }
+        if (!empty($title[4]['data'][0])) {
+            $titleLine .= ' ' . $title[4]['data'][0];
+        }
+        $titleLine = substr($titleLine, 0, 220);
+        $titleArray['title'] = $titleLine;
+        
+        $edition = array_shift($driver->getMarcData('Edition'));
+        $editionLine = $edition[0]['data'][0] ?? '';
+        $titleArray['edition'] = $editionLine;
+
+        $author = array_shift($driver->getMarcData('Persons'));
+        $authorLine = $author['link']['data'][0] ?? '';
+        $titleArray['author'] = $authorLine;
+
+        $publicationData = array_shift($driver->getMarcData('PublicationDetails'));
+//print_r($publicationData);
+        $publisher = $publicationData[0]['data'][0] ?? '';
+        if (!empty($publicationData[1]['data'][0])) {
+            $publisher .= ', ' . $publicationData[1]['data'][0];
+        }
+        $publicationYear = $publicationData[2]['data'][0] ?? '';
+        $titleArray['publisher'] = $publisher;
+        $titleArray['year'] = $publicationYear;
+
+        return $titleArray;
+    }
+
     private function makeLink($data, $key, $separator = ', ') {
         if (empty($data['link'])) {
             return '';
@@ -182,5 +219,4 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         );
         return $link;
     }
-
 }
