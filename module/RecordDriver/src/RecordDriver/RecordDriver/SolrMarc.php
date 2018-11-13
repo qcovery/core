@@ -362,7 +362,6 @@ class SolrMarc extends SolrDefault
                                     if ($name == $mandatoryField) {
                                         $mandatoryFieldSet = true;
                                     }
-                                    //$data['view-method'] = $solrMarcSpecs['view-method'];
                                 }
                             }
 
