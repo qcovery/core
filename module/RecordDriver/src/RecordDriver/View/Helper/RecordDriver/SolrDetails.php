@@ -65,13 +65,20 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
                 $viewMethod = $solrMarcData[$solrMarcKey]['view-method'];
                 unset($solrMarcData[$solrMarcKey]['view-method']);
+                $originalLetters = '';
+                foreach ($solrMarcData[$solrMarcKey] as $data) {
+                    foreach ($data as $date) {
+                        if (isset($date['originalLetters'])) {
+                            $originalLetters = $date['originalLetters'];
+                            break 2;
+                        }
+                    }
+                }
                 $templateData = [];
                 if (strpos($viewMethod, '-link') > 0) {
                     list($key, ) = explode('-', $viewMethod);
-                    foreach ($solrMarcData[$solrMarcKey] as $data) {
-                        $templateData[] = $this->makeLink($data, $key);
-                    }
-                } elseif ($viewMethod == 'directlink') {
+                    $templateData = $this->makeLink($solrMarcData[$solrMarcKey], $key);
+                 } elseif ($viewMethod == 'directlink') {
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeDirectLink($data);
                     }
@@ -83,6 +90,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                     }
                 }
                 $solrMarcData[$solrMarcKey] = array_unique($templateData);
+                if (!empty($originalLetters)) {
+                    $solrMarcData[$solrMarcKey]['originalLetters'] = $originalLetters;
+                }
             }
         }
         return $solrMarcData;
@@ -100,6 +110,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         }
         if (!empty($title[4]['data'][0])) {
             $titleLine .= ' ' . $title[4]['data'][0];
+        }
+        if (empty($titleLine)) {
+            $titleLine = 'no title';
         }
         $titleLine = substr($titleLine, 0, 220);
         $titleArray['title'] = $titleLine;
@@ -125,32 +138,52 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $titleArray;
     }
 
-    private function makeLink($data, $key, $separator = ', ') {
-        if (empty($data['link'])) {
-            return '';
-        }
-        $link = $linkname = implode($separator, $data['link']['data']);
-        if (!empty($data['linkname'])) {
-            $linkname = implode($separator, $data['linkname']['data']);
-        }
-
-        $string = '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
-        $additionalData = [];
-        foreach ($data as $item => $date) {
-            if ($item != 'link' && $item != 'linkname' && $item != 'description') {
-                $additionalData[] = implode($separator, $date['data']);
+    private function makeLink($solrMarcData, $key, $separator = ', ') {
+        $links = $linknames = $descriptions = $additionals = [];
+        foreach ($solrMarcData as $data) {
+            if (!empty($data['link'])) {
+                $links[] = implode($separator, $data['link']['data']);
             }
+            if (!empty($data['linkname'])) {
+                $linknames[] = implode($separator, $data['linkname']['data']);
+            }
+            if (!empty($data['description']['data'])) {
+                $descriptions[] = implode($separator, $data['description']['data']);
+            }
+            $additional = [];
+            foreach ($data as $item => $date) {
+                if ($item != 'link' && $item != 'linkname' && $item != 'description') {
+                    $additional[] = implode($separator, $date['data']);
+                }
+            }
+            $additionals[] = $additional;
         }
-        if (!empty($additionalData)) {
-            $string .= ' (' . implode($separator, $additionalData) . ')';
+//        $links = array_unique($links);
+//        $linknames = array_unique($linknames);
+
+        $strings = [];
+        foreach ($links as $link) {
+            if (count($linknames) > 0) {
+                $linkname = array_shift($linknames);
+            } else {
+                $linkname = $link;
+            }
+            $string = '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
+            if (count($additionals) > 0) {
+                $additional = array_shift($additionals);
+                if (!empty($additional)) {
+                    $string .= ' (' . implode($separator, $additional) . ')';
+                }
+            }
+            if (count($descriptions) > 0) {
+                $string .= ' [' . array_shift($descriptions) . ']';
+            }
+            $strings[] = $string;
         }
-        if (!empty($data['description']['data'])) {
-            $string .= ' [' . implode($separator, $data['description']['data']) . ']';
-        }
-        return $string;
+        return $strings;
     }
 
-    private function makeDirectLink($data) {
+    private function makeDirectLink($data, $separator = ', ') {
         if (empty($data['link'])) {
             return '';
         }
@@ -180,7 +213,11 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 $items = [];
             }
             $link = $data['link']['data'][0];
-            $items[] = '<a href="' . $this->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
+            $item = '<a href="' . $this->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
+            if (!empty($data['description']['data'])) {
+                $item .= ' [' . implode(', ', $data['description']['data']) . ']';
+            }
+            $items[] = $item;
         }
         $result[] = implode($separator, $items);
         return $result;
@@ -188,17 +225,14 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
 
     private function makeText($data, $separator = ', ') {
         $string = '';
-        if (array_keys($data) === array_filter(array_keys($data), 'is_int')) {
-            foreach ($data as $date) {
+        foreach ($data as $key => $date) {
+            if (true || $key != 'description') {
                 $string .= implode($separator, $date['data']) . $separator;
+            } else {
+                $string .= ' [' . implode($separator, $date['data']) . ']';
             }
-            $string = substr_replace($string, '', -1 * strlen($separator));
-        } else {
-            foreach ($data as $item => $date) {
-                $string .= '<strong>' . $item . ':</strong> ' . implode($separator, $date['data']) . '<br />';
-            }
-            $string = substr_replace($string, '', -6);
         }
+        $string = substr_replace($string, '', -1 * strlen($separator));
         return $string;
      }
 

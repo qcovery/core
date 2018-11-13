@@ -15,13 +15,12 @@ endif;
         <?php foreach ($coreFields as $field => $items): ?>
             <?php if (!empty($items[0])): ?>
           <tr><th><?=$this->transEsc($field)?>:</th><td>
-                <?php foreach ($items as $item): ?>
+                <?php foreach ($items as $key => $item): ?>
              <p style="margin:0px">
-                 <?php if (false): ?>
-                        <?php if (!empty($value['originalLetters']) && $value['originalLetters'] != $value['data']): ?>
-                            <?=$this->transEsc('Original Letters') ?>: <?=$value['originalLetters'] ?><br />
-                         <?php endif; ?>
-                 <?php else: ?>
+                 <?php if(!empty($item)): ?>
+                    <?php if ($key === 'originalLetters'): ?>
+                 <strong><?=$this->transEsc('Original Letters') ?>:</strong>
+                    <?php endif; ?>
                     <?=$item ?>
                  <?php endif; ?>
              </p>

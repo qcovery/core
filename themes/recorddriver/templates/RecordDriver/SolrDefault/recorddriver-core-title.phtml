@@ -1,9 +1,13 @@
-<?php $titleFields = $this->solrDetails()->getCoreFields($this->driver, ['title']); ?>
+<?php $titleFields = $this->solrDetails()->getCoreFields($this->driver, ['title']); //print_r($titleFields); ?>
 <h3 property="name">
-    <?= $titleFields['ShortTitle'][0] . ' ' ?? '' ?>
-    <?= $titleFields['SubTitle'][0] . ' ' ?? '' ?>
-    <?= $titleFields['TitleSection'][0] . ' ' ?? '' ?>
-    <?= (!empty($titleFields['TitleStatement'][0])) ? '/ ' . $this->transEsc($titleFields['TitleStatement'][0]) : '' ?>
+<?php if (!empty($titleFields['ShortTitle'][0])): ?>
+    <?=$titleFields['ShortTitle'][0] ?>
+    <?=$titleFields['SubTitle'][0] ?? '' ?>
+    <?=$titleFields['TitleSection'][0] ?? '' ?>
+    <?= !empty($titleFields['TitleStatement'][0]) ? '/ ' . $this->transEsc($titleFields['TitleStatement'][0]) : '' ?>
+<?php else: ?>
+    <?=$this->transEsc('no title')?>
+<?php endif; ?>
 </h3>
 <?php if (!empty($titleFields['Summary'][0])): ?>
     <?php $summary = $titleFields['Summary'][0]; ?>
@@ -12,6 +16,6 @@
         <p><a href='<?=$this->recordLink()->getTabUrl($this->driver, 'Description')?>#tabnav'><?=$this->transEsc('Full description')?></a></p>
     <?php endif; ?>
 <?php endif; ?>
-<?php if (!empty($titleFields['ShortTitle'][0][0]['originalLetters'])): ?>
-    <p><?=$this->transEsc('Original Letters')?>: <?=$titleFields['ShortTitle'][0][0]['originalLetters']?></p>
+<?php if (!empty($titleFields['ShortTitle']['originalLetters'])): ?>
+        <p><strong><?=$this->transEsc('Original Letters')?>:</strong> <?=$titleFields['ShortTitle']['originalLetters']?></p>
 <?php endif; ?>
