@@ -99,8 +99,14 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
     }
 
     public function getTitleLine(RecordDriver $driver) {
-        $title = array_shift($driver->getMarcData('Title'));
-        $titleLine = $title[0]['data'][0];
+        if (is_array($driver->getMarcData('Title'))) {
+            $title = array_shift($driver->getMarcData('Title'));
+        } else {
+            $title = $driver->getMarcData('Title');
+        }
+        if (isset($title[0]['data'])) {
+            $titleLine = $title[0]['data'][0];
+        }
         if (!empty($title[1]['data'][0])) {
             $titleLine .= ' / ' . $title[1]['data'][0];
         }
@@ -116,15 +122,26 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         }
         $titleLine = substr($titleLine, 0, 220);
         $titleArray['title'] = $titleLine;
-        
-        $edition = array_shift($driver->getMarcData('Edition'));
+
+        if (is_array($driver->getMarcData('Edition'))) {
+            $edition = array_shift($driver->getMarcData('Edition'));
+        } else {
+            $edition = $driver->getMarcData('Edition');
+        }
         $editionLine = $edition[0]['data'][0] ?? '';
         $titleArray['edition'] = $editionLine;
 
-        $author = array_shift($driver->getMarcData('Persons'));
+        if (is_array($driver->getMarcData('Persons'))) {
+            $author = array_shift($driver->getMarcData('Persons'));
+        } else {
+            $author = $driver->getMarcData('Persons');
+        }
         $authorLine = $author['link']['data'][0] ?? '';
         $titleArray['author'] = $authorLine;
 
+/*
+ * Bugfix needed: 'Cannot use object of type VuFind\RecordDriver\Response\PublicationDetails as array'
+ *
         $publicationData = array_shift($driver->getMarcData('PublicationDetails'));
 //print_r($publicationData);
         $publisher = $publicationData[0]['data'][0] ?? '';
@@ -134,6 +151,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         $publicationYear = $publicationData[2]['data'][0] ?? '';
         $titleArray['publisher'] = $publisher;
         $titleArray['year'] = $publicationYear;
+ *
+ *
+ */
 
         return $titleArray;
     }
