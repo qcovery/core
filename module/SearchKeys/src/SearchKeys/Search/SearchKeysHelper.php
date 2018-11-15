@@ -47,11 +47,12 @@ class SearchKeysHelper
         while (!empty($lookfor) && $limit-- > 0) {
             $item = $key = '';
             foreach (array_merge($keywords, $phrasedKeywords) as $keyword => $searchType) {
+                $upperKey = strtoupper($keyword);
                 $searchName = $options->getHumanReadableFieldName($searchtype);
-                $keyRegex = '(('.$keyword.'\s)|('.$searchType.':)|('.$searchName.':))';
+                $keyRegex = '(('.$keyword.'\s)|('.$upperKey.'\s)|('.$searchType.':)|('.$searchName.':))';
                 if (preg_match('#^'.$keyRegex.'([^"\s]*|("[^"]*"))((?=\s)|(?=$))#', $lookfor, $matches)) {
                     $key = $matches[1];
-                    $item = $matches[5];
+                    $item = $matches[6];
                     $type = $searchType;
                     $pos = strpos($lookfor, $key);
                     $lookfor = trim(substr_replace($lookfor, '', $pos, strlen($key)));
@@ -75,12 +76,12 @@ class SearchKeysHelper
             }
         }
 
-        $lookfors = $types = array();
+        $lookfors = $types = [];
         foreach ($searchItems as $type => $items) {
             $types[] = $type;
             $lookfor = implode(' ', $items);
             if (in_array($type, $phrasedKeywords)) {
-                $lookfor = '"' . $lookfor . '"';
+                $lookfor = '"' . str_replace('"', '', $lookfor) . '"';
             }
             $lookfors[] = $lookfor;
         }
@@ -93,7 +94,7 @@ class SearchKeysHelper
                 $request->set('bool0', $searchBoolean);
             }
             if (empty($request->get('op0'))) {
-                $request->set('op0', array('AND'));
+                $request->set('op0', ['AND']);
             }
             if (empty($request->get('join'))) {
                 $request->set('join', 'OR');
