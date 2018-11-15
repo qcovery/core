@@ -63,7 +63,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         foreach ($categories as $category) {
             foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
                 $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
-                $viewMethod = $solrMarcData[$solrMarcKey]['view-method'];
+                $viewMethod = $solrMarcData[$solrMarcKey]['view-method'] ?? '';
                 unset($solrMarcData[$solrMarcKey]['view-method']);
                 $originalLetters = '';
                 foreach ($solrMarcData[$solrMarcKey] as $data) {
@@ -124,7 +124,8 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         $titleArray['title'] = $titleLine;
 
         if (is_array($driver->getMarcData('Edition'))) {
-            $edition = array_shift($driver->getMarcData('Edition'));
+            $editions = $driver->getMarcData('Edition');
+            $edition = array_shift($editions);
         } else {
             $edition = $driver->getMarcData('Edition');
         }
@@ -132,7 +133,8 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         $titleArray['edition'] = $editionLine;
 
         if (is_array($driver->getMarcData('Persons'))) {
-            $author = array_shift($driver->getMarcData('Persons'));
+            $authors = $driver->getMarcData('Persons');
+            $author = array_shift($authors);
         } else {
             $author = $driver->getMarcData('Persons');
         }
@@ -141,9 +143,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
 
 /*
  * Bugfix needed: 'Cannot use object of type VuFind\RecordDriver\Response\PublicationDetails as array'
- *
+ * DEie hier abgerufenen Felder müssen auch konfiguriert werden, sonst greift das Modul auf eine evtl. vorhandene Methode zurück, die dann irgendetwas liefert.
+ */
         $publicationData = array_shift($driver->getMarcData('PublicationDetails'));
-//print_r($publicationData);
         $publisher = $publicationData[0]['data'][0] ?? '';
         if (!empty($publicationData[1]['data'][0])) {
             $publisher .= ', ' . $publicationData[1]['data'][0];
@@ -151,7 +153,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         $publicationYear = $publicationData[2]['data'][0] ?? '';
         $titleArray['publisher'] = $publisher;
         $titleArray['year'] = $publicationYear;
- *
+/*
  *
  */
 
@@ -253,7 +255,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             }
         }
         $string = substr_replace($string, '', -1 * strlen($separator));
-        return $string;
+        return $this->view->transEsc($string);
      }
 
     /**

@@ -171,32 +171,32 @@ class SolrMarc extends SolrDefault
 	    foreach ($solrMarcSpec as $marcField => $fieldSpec) {
                 if (!empty($fieldSpec)) {
                     $conditions = $subfields = $parentMethods = $description = [];
-                }
-                foreach ($fieldSpec as $subField => $subFieldSpec) {
-                    if (is_array($subFieldSpec)) {
-                        if ($subField == 'conditions') {
-                            foreach ($subFieldSpec as $spec) {
-                                $conditions[] = $spec;
-                            }
-                        } elseif ($subField == 'parent') {
-                            foreach ($subFieldSpec as $spec) {
-                                $parentMethods[] = $spec;
-                            }
-                        } elseif ($subField == 'description') {
-                            $descriptions[] = $subFieldSpec;
-                        } elseif ($subField == 'subfields') {
-                            $specs = [];
-                            foreach ($subFieldSpec as $index => $spec) {
-                                if ($index != 0) {
-                                    $specs[] = $spec;
+                    foreach ($fieldSpec as $subField => $subFieldSpec) {
+                        if (is_array($subFieldSpec)) {
+                            if ($subField == 'conditions') {
+                                foreach ($subFieldSpec as $spec) {
+                                    $conditions[] = $spec;
                                 }
-                            }
-                            foreach ($subFieldSpec[0] as $subField) {
-                                $subfields[$subField] = $specs;
-                            }
-                        } else {
-                            foreach ($subFieldSpec as $index => $spec) {
-                                $subfields[$subField][$index] = $spec;
+                            } elseif ($subField == 'parent') {
+                                foreach ($subFieldSpec as $spec) {
+                                    $parentMethods[] = $spec;
+                                }
+                            } elseif ($subField == 'description') {
+                                $descriptions[] = $subFieldSpec;
+                            } elseif ($subField == 'subfields') {
+                                $specs = [];
+                                foreach ($subFieldSpec as $index => $spec) {
+                                    if ($index != 0) {
+                                        $specs[] = $spec;
+                                    }
+                                }
+                                foreach ($subFieldSpec[0] as $subField) {
+                                    $subfields[$subField] = $specs;
+                                }
+                            } else {
+                                foreach ($subFieldSpec as $index => $spec) {
+                                    $subfields[$subField][$index] = $spec;
+                                }
                             }
                         }
                     }
@@ -223,9 +223,9 @@ class SolrMarc extends SolrDefault
         if (empty($solrMarcSpecs) && method_exists($this, 'get' . $dataName)) { 
             return call_user_func([$this, 'get' . $dataName]);
         }
-        $title = $solrMarcSpecs['title'];
+        $title = $solrMarcSpecs['title'] ?? '';
         unset($solrMarcSpecs['title']);
-        $mandatoryField = $solrMarcSpecs['mandatory-field'];
+        $mandatoryField = $solrMarcSpecs['mandatory-field'] ?? '';
         unset($solrMarcSpecs['mandatory-field']);
         $mandatoryFieldSet = (empty($mandatoryField));
         if (is_array($solrMarcSpecs)) {
