@@ -144,15 +144,22 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
 /*
  * Bugfix needed: 'Cannot use object of type VuFind\RecordDriver\Response\PublicationDetails as array'
  * DEie hier abgerufenen Felder müssen auch konfiguriert werden, sonst greift das Modul auf eine evtl. vorhandene Methode zurück, die dann irgendetwas liefert.
+ * Dann bitte Tests einbauen, die das System bei fehlender Konfiguration nicht abtürzen lassen.
  */
-        $publicationData = array_shift($driver->getMarcData('PublicationDetails'));
-        $publisher = $publicationData[0]['data'][0] ?? '';
-        if (!empty($publicationData[1]['data'][0])) {
-            $publisher .= ', ' . $publicationData[1]['data'][0];
+        $publicationDetails = $driver->getMarcData('PublicationDetails');
+        if (is_array($publicationDetails)) {
+            $publicationData = array_shift($publicationDetails);
+            if (is_array($publicationData)) {
+                // hier ggf. noch isset()-Aufrufe.
+                $publisher = $publicationData[0]['data'][0] ?? '';
+                if (!empty($publicationData[1]['data'][0])) {
+                    $publisher .= ', ' . $publicationData[1]['data'][0];
+                }
+                $publicationYear = $publicationData[2]['data'][0] ?? '';
+                $titleArray['publisher'] = $publisher;
+                $titleArray['year'] = $publicationYear;
+            }
         }
-        $publicationYear = $publicationData[2]['data'][0] ?? '';
-        $titleArray['publisher'] = $publisher;
-        $titleArray['year'] = $publicationYear;
 /*
  *
  */
