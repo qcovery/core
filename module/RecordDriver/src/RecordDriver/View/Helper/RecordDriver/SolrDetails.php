@@ -110,7 +110,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 }
             }
         } else {
-            $resultList['title'] = $this->view->transEsc('no title');
+            $resultList[$resultKey] = $this->view->transEsc('no title');
         }
         return $resultList;
     }
