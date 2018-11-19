@@ -98,66 +98,21 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $solrMarcData;
     }
 
-    public function getTitleLine(RecordDriver $driver) {
-        if (is_array($driver->getMarcData('Title'))) {
-            $title = array_shift($driver->getMarcData('Title'));
+    public function getResultListLine(RecordDriver $driver) {
+        $resultList = [];
+        $resultListData = $driver->getMarcData('ResultList');
+        if (is_array($resultListData)) {
+            foreach ($resultListData as $resultListDate) {
+                foreach ($resultListDate as $resultKey => $resultListArray) {
+                    if (!isset($resultList[$resultKey])) {
+                        $resultList[$resultKey] = $resultListArray['data'][0];
+                    }
+                }
+            }
         } else {
-            $title = $driver->getMarcData('Title');
+            $resultList['title'] = $this->view->transEsc('no title');
         }
-        if (isset($title[0]['data'])) {
-            $titleLine = $title[0]['data'][0];
-        }
-        if (!empty($title[1]['data'][0])) {
-            $titleLine .= ' / ' . $title[1]['data'][0];
-        }
-        $titleLine = substr($titleLine, 0, 180);
-        if (!empty($title[3]['data'][0])) {
-            $titleLine .= ' ' . $title[3]['data'][0];
-        }
-        if (!empty($title[4]['data'][0])) {
-            $titleLine .= ' ' . $title[4]['data'][0];
-        }
-        if (empty($titleLine)) {
-            $titleLine = 'no title';
-        }
-        $titleLine = substr($titleLine, 0, 220);
-        $titleArray['title'] = $titleLine;
-
-        if (is_array($driver->getMarcData('Edition'))) {
-            $editions = $driver->getMarcData('Edition');
-            $edition = array_shift($editions);
-        } else {
-            $edition = $driver->getMarcData('Edition');
-        }
-        $editionLine = $edition[0]['data'][0] ?? '';
-        $titleArray['edition'] = $editionLine;
-
-        if (is_array($driver->getMarcData('Persons'))) {
-            $authors = $driver->getMarcData('Persons');
-            $author = array_shift($authors);
-        } else {
-            $author = $driver->getMarcData('Persons');
-        }
-        $authorLine = $author['link']['data'][0] ?? '';
-        $titleArray['author'] = $authorLine;
-
-/*
- * Bugfix needed: 'Cannot use object of type VuFind\RecordDriver\Response\PublicationDetails as array'
- * DEie hier abgerufenen Felder müssen auch konfiguriert werden, sonst greift das Modul auf eine evtl. vorhandene Methode zurück, die dann irgendetwas liefert.
- */
-        $publicationData = array_shift($driver->getMarcData('PublicationDetails'));
-        $publisher = $publicationData[0]['data'][0] ?? '';
-        if (!empty($publicationData[1]['data'][0])) {
-            $publisher .= ', ' . $publicationData[1]['data'][0];
-        }
-        $publicationYear = $publicationData[2]['data'][0] ?? '';
-        $titleArray['publisher'] = $publisher;
-        $titleArray['year'] = $publicationYear;
-/*
- *
- */
-
-        return $titleArray;
+        return $resultList;
     }
 
     private function makeLink($solrMarcData, $key, $separator = ', ') {
