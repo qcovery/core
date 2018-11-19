@@ -116,22 +116,27 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
     }
 
     private function makeLink($solrMarcData, $key, $separator = ', ') {
-        $links = $linknames = $descriptions = $additionals = [];
+        $prefixes = $links = $linknames = $descriptions = $additionals = [];
         foreach ($solrMarcData as $data) {
+            if (!empty($data['prefix'])) {
+                $prefixes[] = implode($separator, $data['prefix']['data']);
+                unset($data['prefix']);
+            }
             if (!empty($data['link'])) {
                 $links[] = implode($separator, $data['link']['data']);
+                unset($data['link']);
             }
             if (!empty($data['linkname'])) {
                 $linknames[] = implode($separator, $data['linkname']['data']);
+                unset($data['linkname']);
             }
             if (!empty($data['description']['data'])) {
                 $descriptions[] = implode($separator, $data['description']['data']);
+                unset($data['description']);
             }
             $additional = [];
             foreach ($data as $item => $date) {
-                if ($item != 'link' && $item != 'linkname' && $item != 'description') {
-                    $additional[] = implode($separator, $date['data']);
-                }
+                $additional[] = implode($separator, $date['data']);
             }
             $additionals[] = $additional;
         }
@@ -140,12 +145,17 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
 
         $strings = [];
         foreach ($links as $link) {
+            if (count($prefixes) > 0) {
+                $string = array_shift($prefixes) . ': ';
+            } else {
+                $string = '';
+            }
             if (count($linknames) > 0) {
                 $linkname = array_shift($linknames);
             } else {
                 $linkname = $link;
             }
-            $string = '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
+            $string .= '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
             if (count($additionals) > 0) {
                 $additional = array_shift($additionals);
                 if (!empty($additional)) {
