@@ -99,8 +99,13 @@ class GetDependentWorks extends AbstractBase
         $data = [];
         foreach ($records as $record) {
             $publishDates = $record->getPublicationDates();
+            $shortTitle = $record->getShortTitle();
+            $title = $record->getTitle();
+            if (strpos($shortTitle, $title) !== false) {
+                $title = $shortTitle;
+            }
             $data[] = ['id' => $record->getUniqueID(), 
-                       'title' => $record->getTitle(), 
+                       'title' => $title, 
                        'publishDate' => $publishDates[0]];
         }
         return $this->formatResponse($data);
