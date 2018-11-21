@@ -103,9 +103,11 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         $resultListData = $driver->getMarcData('ResultList');
         if (is_array($resultListData)) {
             foreach ($resultListData as $resultListDate) {
-                foreach ($resultListDate as $resultKey => $resultListArray) {
-                    if (!isset($resultList[$resultKey])) {
-                        $resultList[$resultKey] = $resultListArray['data'][0];
+                if (is_array($resultListDate)) {
+                    foreach ($resultListDate as $resultKey => $resultListArray) {
+                        if (!isset($resultList[$resultKey]) && isset($resultListArray['data'][0])) {
+                            $resultList[$resultKey] = $resultListArray['data'][0];
+                        }
                     }
                 }
             }

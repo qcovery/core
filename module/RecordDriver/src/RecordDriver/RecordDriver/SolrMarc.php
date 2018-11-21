@@ -102,7 +102,7 @@ class SolrMarc extends SolrDefault
         if (empty($this->solrMarcSpecs)) {
             $this->parseSolrMarcSpecs();
         }
-        return $this->solrMarcSpecs[$item];
+        return $this->solrMarcSpecs[$item] ?? [];
     }
 
     /**
@@ -383,7 +383,7 @@ class SolrMarc extends SolrDefault
         if (!$mandatoryFieldSet) {
             return [];
         }
-        return $returnData;
+        return $returnData ?? [];
     }
 
     /**
