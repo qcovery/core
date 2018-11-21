@@ -3,7 +3,7 @@
         <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>">
         <?=$resultList['title'] ?>
     <?php if(!empty($resultList['subtitle'])): ?>
-        <?=$resultList['subtitle'] ?>
+        : <?=$resultList['subtitle'] ?>
     <?php endif; ?>
     <?php if(!empty($resultList['partnumber'])): ?>
         <?=$resultList['partnumber'] ?>
