@@ -24,6 +24,7 @@ return [
         'dependentworks',
         'recorddriver',
         'beluga-core-base',
+        'ims',
     ],
     "less" => [
         "active" => false,
