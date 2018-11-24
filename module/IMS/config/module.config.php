@@ -1,13 +1,26 @@
 <?php
-namespace IMSExport\Module\Configuration;
 
 return array (
-    'controllers' => array(
-        'factories' => [
-            'IMS\Controller\IMSController' => 'IMS\Controller\IMSFactory',
-        ],
-        'invokables' => [
-            'IMS' => 'IMS\Controller\IMSController',
-        ],
+  'controllers' => 
+  array (
+    'factories' => 
+    array (
+      'IMS\\Controller\\CartController' => 'IMS\\Controller\\CartControllerFactory',
     ),
+    'aliases' => 
+    array (
+      'VuFind\\Controller\\CartController' => 'IMS\\Controller\\CartController',
+    ),
+  ),
+  'service_manager' => 
+  array (
+    'factories' => 
+    array (
+      'IMS\\Cart' => 'IMS\\CartFactory',
+    ),
+    'aliases' => 
+    array (
+      'VuFind\\Cart' => 'IMS\\Cart',
+    ),
+  ),
 );
