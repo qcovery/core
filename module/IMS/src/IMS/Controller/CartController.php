@@ -43,14 +43,18 @@ class CartController extends \VuFind\Controller\CartController
 
         // We use abbreviated parameters here to keep the URL short (there may
         // be a long list of IDs, and we don't want to run out of room):
-        $id = $this->params()->fromQuery('id');
+        $imsid = $this->params()->fromPost('imsid');
+        $ids = $this->params()->fromPost('ids');
+
+        $records = $this->getRecordLoader()->loadBatch($ids);
+
+        //error_log(print_r($records, true));
 
         // Send appropriate HTTP headers for requested format:
         $response = $this->getResponse();
-        $response->getHeaders()->addHeaders($this->getExport()->getHeaders($format));
 
         // Process and display the exported records
-        $response->setContent(json_encode(['imsDownloadUrl' => urlencode('http://localhost:8080/vufind/Cart/imsdownload?id='.$id)]));
+        $response->setContent(json_encode(['imsDownloadUrl' => urlencode('http://localhost:8080/vufind/Cart/imsdownload?id='.$imsid)]));
         return $response;
     }
 

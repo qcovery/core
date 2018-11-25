@@ -5,7 +5,17 @@
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = '<li>' . $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '', '</li> ')
 ?>
-<h2><?=$this->transEsc('Book Bag') ?></h2>
+<div>
+    <div style="float:left;">
+        <h2><?=$this->transEsc('Book Bag') ?></h2>
+    </div>
+    <!-- Module IMS -->
+    <div style="float:right;">
+        <?=$this->render('cart/cart-ims-export.phtml', []) ?>
+    </div>
+    <!-- Module IMS -->
+    <div style="clear:both;"></div>
+</div>
 <?=$this->flashmessages()?>
 <form class="form-inline" action="<?=$this->url('cart-processor')?>" method="post"  name="cartForm" data-lightbox-onsubmit="cartFormHandler">
   <input type="hidden" id="dropdown_value"/>
@@ -57,9 +67,6 @@
           <li><a onClick="$('.fa.fa-spinner').remove()"><?=$this->transEsc('confirm_dialog_no')?></a></li>
         </ul>
       </div>
-      <!-- Module IMS -->
-      <?=$this->render('cart/cart-ims-export.phtml', []) ?>
-      <!-- Module IMS -->
     </div>
   <? endif; ?>
   <?=$this->render('cart/contents.phtml')?>
