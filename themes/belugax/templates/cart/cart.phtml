@@ -57,6 +57,9 @@
           <li><a onClick="$('.fa.fa-spinner').remove()"><?=$this->transEsc('confirm_dialog_no')?></a></li>
         </ul>
       </div>
+      <!-- Module IMS -->
+      <?=$this->render('cart/cart-ims-export.phtml', []) ?>
+      <!-- Module IMS -->
     </div>
   <? endif; ?>
   <?=$this->render('cart/contents.phtml')?>

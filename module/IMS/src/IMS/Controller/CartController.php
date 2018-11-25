@@ -13,6 +13,21 @@ class CartController extends \VuFind\Controller\CartController
      *
      * @return mixed
      */
+    public function searchimsAction()
+    {
+        $id = $this->params()->fromQuery('id');
+        $lookfor = $this->params()->fromQuery('lookfor');
+        $this->session->imsId = $id;
+
+        header('Location: /vufind/Search/Results?lookfor='.$lookfor.'&type=AllFields&limit=20');
+        die();
+    }
+
+    /**
+     * IMS action to export file.
+     *
+     * @return mixed
+     */
     public function imsAction()
     {
         // Bail out if cart is disabled.
@@ -35,7 +50,7 @@ class CartController extends \VuFind\Controller\CartController
         $response->getHeaders()->addHeaders($this->getExport()->getHeaders($format));
 
         // Process and display the exported records
-        $response->setContent('IMS for id: '.$id);
+        $response->setContent(json_encode(['imsDownloadUrl' => urlencode('http://localhost:8080/vufind/Cart/imsdownload?id='.$id)]));
         return $response;
     }
 
