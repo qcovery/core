@@ -48,15 +48,28 @@ class CartController extends \VuFind\Controller\CartController
 
         $records = $this->getRecordLoader()->loadBatch($ids);
 
+        $results = [];
+        foreach ($records as $record) {
+            $temp = tmpfile();
+            fwrite($temp, $record->getXML('marc21'));
+            fseek($temp, 0);
+
+            $command = 'yaz-marcdump -i marcxml -o turbomarc '.stream_get_meta_data($temp)['uri'];
+            exec($command, $execResults);
+
+            fclose($temp); // dies entfernt die Datei
+
+            $results[] = $execResults;
+        }
+
         //error_log(print_r($records, true));
 
         // Send appropriate HTTP headers for requested format:
         $response = $this->getResponse();
 
         // Process and display the exported records
-        $response->setContent(json_encode(['imsDownloadUrl' => urlencode('http://localhost:8080/vufind/Cart/imsdownload?id='.$imsid)]));
+        $response->setContent(json_encode(['imsDownloadUrl' => urlencode('http://localhost:8080/vufind/Cart/imsdownload?id='.$imsid), 'results' => $results]));
         return $response;
     }
-
 }
 
