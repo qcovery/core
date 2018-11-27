@@ -27,7 +27,7 @@ jQuery(document).ready(function() {
                 }
                 if (data.data.length > visibleItems) {
                     jQuery('p#ToggleDependentWorksMore').attr('style', 'display:block');
-                    for (var i = 0; i < data.data.length; i++) {
+                    for (var i = visibleItems; i < data.data.length; i++) {
                         var title = data.data[i]['title'] + ' (' + data.data[i]['publishDate'] + ')';
                         var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
                         jQuery('ul#DependentWorksHidden').append('<li>' + href + '</li>');                
@@ -38,3 +38,19 @@ jQuery(document).ready(function() {
         }
     });
 });
+
+function toggleDependentWorks() {
+    var dependentWorksLayer = document.getElementById('DependentWorksHidden');
+    var toggleMore = document.getElementById('ToggleDependentWorksMore');
+    var toggleLess = document.getElementById('ToggleDependentWorksLess');
+    if (dependentWorksLayer.style.display == 'none') {
+        dependentWorksLayer.style.display = 'block';
+        toggleMore.style.display = 'none';
+        toggleLess.style.display = 'block';
+    } else {
+        dependentWorksLayer.style.display = 'none';
+        toggleMore.style.display = 'block';
+        toggleLess.style.display = 'none';
+    }
+}
+
