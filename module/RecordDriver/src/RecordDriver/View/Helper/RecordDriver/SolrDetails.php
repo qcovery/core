@@ -177,9 +177,10 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         if (empty($data['link'])) {
             return '';
         }
-        $link = implode($separator, $data['link']['data']);
+        $link = array_shift($data['link']['data']);
+        $linkname = array_shift($data['linkname']['data']) ?? $link;
 
-        $string = '<a href="' . $link . '" title="' . $link . '">' . $link . '</a>';
+        $string = '<a href="' . $link . '" title="' . $link . '">' . $linkname . '</a>';
         $additionalData = [];
         foreach ($data as $item => $date) {
             if ($item != 'link' && $item != 'linkname' && $item != 'description') {
