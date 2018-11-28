@@ -23,3 +23,5 @@ logs/*
 themes/belugax_*
 /local*
 .DS_Store
+
+/var/ims/*
