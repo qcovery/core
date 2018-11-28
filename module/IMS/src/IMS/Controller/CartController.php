@@ -73,8 +73,9 @@ class CartController extends \VuFind\Controller\CartController
         // Send appropriate HTTP headers for requested format:
         $response = $this->getResponse();
 
-        // Process and display the exported records
-        $response->setContent(json_encode(['imsDownloadUrl' => urlencode('http://localhost:8080/vufind/Cart/imsdownload?imsid='.$imsid)]));
+        $config = $this->serviceLocator->get('VuFind\Config')->get('config');
+
+        $response->setContent(json_encode(['imsDownloadUrl' => urlencode($config['Site']['url'].'/Cart/imsdownload?imsid='.$imsid)]));
         return $response;
     }
 
