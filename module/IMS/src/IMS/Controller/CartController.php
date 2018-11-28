@@ -60,13 +60,25 @@ class CartController extends \VuFind\Controller\CartController
                 fseek($temp, 0);
 
                 $command = 'yaz-marcdump -i marcxml -o turbomarc '.stream_get_meta_data($temp)['uri'];
+                $execResults = [];
                 exec($command, $execResults);
 
-                fclose($temp); // dies entfernt die Datei
+                fclose($temp);
 
+				foreach ($execResults as $index => $execResult) {
+					if ($execResult == '</collection>' || $execResult == '<collection xmlns="http://www.indexdata.com/turbomarc">') {
+						unset($execResults[$index]);
+					}
+				}
+
+				if ($turbomarcData != '') {
+					$turbomarcData .= "\n";
+				}
                 $turbomarcData .= implode("\n", $execResults);
             }
-            fwrite($fileDownload, $turbomarcData);
+            $turbomarcData = '<collection xmlns="http://www.indexdata.com/turbomarc">'."\n".$turbomarcData."\n".'</collection>';
+            
+            $writeResult = fwrite($fileDownload, $turbomarcData);
             fclose($fileDownload);
         }
 
@@ -75,7 +87,7 @@ class CartController extends \VuFind\Controller\CartController
 
         $config = $this->serviceLocator->get('VuFind\Config')->get('config');
 
-        $response->setContent(json_encode(['imsDownloadUrl' => urlencode($config['Site']['url'].'/Cart/imsdownload?imsid='.$imsid)]));
+        $response->setContent(json_encode(['imsDownloadUrl' => urlencode($config['Site']['url'].'/Cart/imsdownload?imsid='.$imsid), 'filepath' => $imsBaseDir.$imsid.'-turbomarc.xml', 'writeResult' => error_get_last()]));
         return $response;
     }
 
