@@ -20,8 +20,7 @@
             $('#cart-ims-export-icon').removeClass('bel-laden01');
             $('#cart-ims-export-icon').addClass('bel-link01');
             if (data.imsDownloadUrl) {
-                console.log(data);
-                //window.location = Cookies.getItem('vufind_cart_ims_url')+'?ims-download='+data.imsDownloadUrl;
+                window.location = Cookies.getItem('vufind_cart_ims_url')+'?ims-download='+data.imsDownloadUrl;
             }
         })
     });
