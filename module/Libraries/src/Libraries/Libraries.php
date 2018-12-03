@@ -255,6 +255,23 @@ class Libraries
     }
 
     /**
+     * Get the facet values identifying includes libraries
+     *
+     * @param string        $searchClassId           Searchclass id
+     *
+     * @return array
+     */
+    public function getFacetSearch($searchClassId) {
+        $searchClassId = strtolower($searchClassId);
+         foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library => $data) {
+            if (isset($data[$searchClassId.'-facetsearch'])) {
+                return $data['code'];
+            }
+        }
+        return '';
+    }
+
+    /**
      * Generate the filters to select libraries
      *
      * @param string        $libraryCode             code of the selected library

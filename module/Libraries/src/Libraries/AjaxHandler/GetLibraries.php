@@ -114,6 +114,7 @@ class GetLibraries extends AbstractBase
         $locationFilter = $this->Libraries->getLocationFilter();
         $libraryFacet = $this->Libraries->getLibraryFacetField($backend);
         $libraryFacetValues = $this->Libraries->getLibraryFacetValues($backend);
+        $facetSearch = $this->Libraries->getFacetSearch($backend);
 
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
@@ -126,7 +127,14 @@ class GetLibraries extends AbstractBase
         $paramsObj->getOptions()->disableHighlighting();
         $paramsObj->getOptions()->spellcheckEnabled(false);
 //print_r($searchParams);
+
+        if (!empty($facetSearch)) {
+            $this->Libraries->selectLibrary($facetSearch);
+        }
         $paramsObj->initFromRequest(new Parameters($searchParams));
+        if (!empty($facetSearch)) {
+            $this->Libraries->selectLibrary($libraryCode);
+        }
 
         $facetList = $results->getFacetList();
         $libraryList = $facetList[$libraryFacet]['list'];
