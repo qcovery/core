@@ -41,20 +41,6 @@ namespace RecordDriver\Search;
 class BackendRegistry extends \VuFind\Search\BackendRegistry
 {
     /**
-     * Default plugin aliases.
-     *
-     * @var array
-     */
-    protected $aliases = [
-        // Allow Solr core names to be used as aliases for services:
-        'authority' => 'SolrAuth',
-        'biblio' => 'Solr',
-        'reserves' => 'SolrReserves',
-        // Legacy:
-        'VuFind' => 'Solr',
-    ];
-
-    /**
      * Default plugin factories.
      *
      * @var array
@@ -74,15 +60,4 @@ class BackendRegistry extends \VuFind\Search\BackendRegistry
         'Summon' => 'VuFind\Search\Factory\SummonBackendFactory',
         'WorldCat' => 'VuFind\Search\Factory\WorldCatBackendFactory',
     ];
-
-    /**
-     * Return the name of the base class or interface that plug-ins must conform
-     * to.
-     *
-     * @return string
-     */
-    protected function getExpectedInterface()
-    {
-        return 'VuFindSearch\Backend\BackendInterface';
-    }
 }

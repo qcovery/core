@@ -32,6 +32,7 @@ use VuFindSearch\Backend\Solr\Backend;
 use VuFindSearch\Backend\Solr\Connector;
 use VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory;
 use VuFind\Search\Factory\AbstractSolrBackendFactory;
+use DismaxMunge\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
 
 /**
  * Factory for the default SOLR backend.
@@ -43,16 +44,8 @@ use VuFind\Search\Factory\AbstractSolrBackendFactory;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class SolrDefaultBackendFactory extends \VuFind\Search\Factory\SolrDefaultBackendFactory
+class SolrDefaultBackendFactory extends BackendFactory
 {
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Create the SOLR backend.
      *
