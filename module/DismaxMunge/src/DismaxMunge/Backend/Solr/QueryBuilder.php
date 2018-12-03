@@ -140,7 +140,6 @@ class QueryBuilder extends \VuFindSearch\Backend\Solr\QueryBuilder implements Qu
             $params->add('hl.fl', $this->getFieldsToHighlight($filter));
         }
         $params->set('q', $string);
-print_r( $params->get('q') );
         return $params;
     }
 }
