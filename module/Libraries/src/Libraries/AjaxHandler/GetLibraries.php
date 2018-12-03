@@ -84,16 +84,13 @@ class GetLibraries extends AbstractBase
      */
     public function handleRequest(Params $params)
     {
-        $queryString = $params->fromQuery('querystring');
-        $queryString = urldecode(
-            str_replace('&amp;', '&',
-                substr_replace(
-                    trim($queryString), '', 0, 1
-                )
+        $queryString = urldecode($params->fromQuery('querystring'));
+        $queryString = str_replace('&amp;', '&',
+            substr_replace(
+                trim($queryString), '', 0, 1
             )
         );
         $queryArray = explode('&', $queryString);
-
         $searchParams = [];
         foreach ($queryArray as $queryItem) {
             $arrayKey = false;
@@ -115,8 +112,9 @@ class GetLibraries extends AbstractBase
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $selectedLibrary = $this->Libraries->selectLibrary($libraryCode);
         $locationFilter = $this->Libraries->getLocationFilter();
-        $libraryFacet = array_shift($this->Libraries->getLibraryFacetFields($backend));
-        $libraryCodes = array_flip($this->Libraries->getLibraryFacetValues($backend));
+        $libraryFacet = $this->Libraries->getLibraryFacetField($backend);
+        $libraryFacetValues = $this->Libraries->getLibraryFacetValues($backend);
+
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
         $paramsObj->addFacet($libraryFacet, null, false);
@@ -127,22 +125,32 @@ class GetLibraries extends AbstractBase
         $paramsObj->setFacetLimit(2000); 
         $paramsObj->getOptions()->disableHighlighting();
         $paramsObj->getOptions()->spellcheckEnabled(false);
-        
+//print_r($searchParams);
         $paramsObj->initFromRequest(new Parameters($searchParams));
 
         $facetList = $results->getFacetList();
-        $libraryList = $facetList['collection_details']['list'];
-        $locationList = $facetList['standort_iln_str_mv']['list'];
+        $libraryList = $facetList[$libraryFacet]['list'];
+        $locationList = $facetList[$locationFilter['field']]['list'];
 
-//print_r($facetList);
         $defaultLibraryCode = $this->Libraries->getDefaultLibraryCode($backend);
         array_unshift($libraryList, ['value' => $defaultLibraryCode, 'count' => $results->getResultTotal()]);
         $libraryData = [];
-        foreach ($libraryList as $libraryItem) {
-            $library = $this->Libraries->getLibrary($libraryItem['value']);
-            $libraryData[$libraryItem['value']] = ['fullname' => $library['fullname'], 'count' => $libraryItem['count']];
+
+        foreach ($libraryFacetValues as $libraryCode => $libraryFacetValue) {
+            $library = $this->Libraries->getLibrary($libraryCode);
+            $facetValues = explode(',', $libraryFacetValue);
+            $count = 0;
+            foreach ($facetValues as $facetValue) {
+                foreach ($libraryList as $libraryItem) {
+                    if ($facetValue == '*' || $libraryItem['value'] == $facetValue) {
+                        $count += $libraryItem['count'];
+                    }
+                }
+            }
+            $libraryData[$libraryCode] = ['fullname' => $library['fullname'], 'count' => $count];
         }
-        $libraryData = array_intersect_key($libraryData, $libraryCodes);
+
+//print_r($libraryData);
 
         $locationFacets = [];
 

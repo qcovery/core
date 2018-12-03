@@ -63,7 +63,8 @@ jQuery(document).ready(function() {
                     var libraryCount = Object.keys(data.data.libraryData).length;
                     if (libraryCount > 1) {
                         jQuery.each(data.data.libraryData, function(thisLibraryCode, libraryData) {
-                            newQueryString = queryString.replace(/&library=.+$/, '');
+                            newQueryString = decodeURIComponent(queryString).replace(/&amp;/g, '&');
+                            newQueryString = newQueryString.replace(/&library=.+$/, '');
                             jQuery('div#library-list').append(libraryTemplate);
                             jQuery('div#library-list .library-item-text').last().html(libraryData.fullname);
                             jQuery('div#library-list .library-item-count').last().html(formatNumber(libraryData.count));

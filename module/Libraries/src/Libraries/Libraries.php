@@ -227,15 +227,13 @@ class Libraries
      *
      * @return array
      */
-    public function getLibraryFacetFields($searchClassId) {
+    public function getLibraryFacetField($searchClassId) {
         $searchClassId = strtolower($searchClassId);
-        $facets = [];
-         foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library) {
-            if (isset($library[$searchClassId.'-field'])) {
-                $facets[] = $library[$searchClassId.'-field'];
-            }
+        $selectedLibrary = $this->selectLibrary();
+        if (isset($selectedLibrary[$searchClassId.'-field'])) {
+            return $selectedLibrary[$searchClassId.'-field'];
         }
-        return array_unique($facets);
+        return '';
     }
 
     /**
@@ -281,19 +279,29 @@ class Libraries
         if (!empty($libraryCode) && in_array($libraryCode, array_keys($libraries))) {
             $data = $libraries[$libraryCode];
             if (!empty($data[$searchClassId])) {
+                $filterValues = explode(',', $data[$searchClassId]);
                 if (!empty($data[$searchClassId.'-field'])) {
-                    $libraryFilters[] = $data[$searchClassId.'-field'].':'.$data[$searchClassId];
+                    foreach ($filterValues as $filterValue) {
+                        $libraryFilters[] = $data[$searchClassId.'-field'] . ':' . $filterValue;
+                    }
                 } else {
-                    $libraryFilters[] = $data[$searchClassId];
+                    foreach ($filterValues as $filterValue) {
+                        $libraryFilters[] = $filterValue;
+                    }
                 }
             }
         } else {
             foreach ($libraries as $library => $data) {
                 if (!empty($data[$searchClassId])) {
+                    $filterValues = explode(',', $data[$searchClassId]);
                     if (!empty($data[$searchClassId.'-field'])) {
-                        $libraryFilters[] = $data[$searchClassId.'-field'].':'.$data[$searchClassId];
+                        foreach ($filterValues as $filterValue) {
+                            $libraryFilters[] = $data[$searchClassId.'-field'] . ':' . $filterValue;
+                        }
                     } else {
-                        $libraryFilters[] = $data[$searchClassId];
+                        foreach ($filterValues as $filterValue) {
+                            $libraryFilters[] = $filterValue;
+                        }
                     }
                 }
             }
