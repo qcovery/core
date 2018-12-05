@@ -98,16 +98,25 @@ class GetDependentWorks extends AbstractBase
         $records = $results->getResults();
         $data = [];
         foreach ($records as $record) {
-            $publishDates = $record->getPublicationDates();
-            $shortTitle = $record->getShortTitle();
-            $title = $record->getTitle();
-            if (strpos($shortTitle, $title) !== false) {
-                $title = $shortTitle;
+            $dependentWorksData = $record->getMarcData('DependentWorksData');
+            $title = $part = $date = '';
+            foreach ($dependentWorksData as $dependentWorksDate) {
+                if (empty($title) && !empty($dependentWorksDate['title']['data'][0])) {
+                    $title = $dependentWorksDate['title']['data'][0];
+                }
+                if (empty($part) && !empty($dependentWorksDate['part']['data'][0])) {
+                    $part = $dependentWorksDate['part']['data'][0];
+                }
+                if (!empty($dependentWorksDate['date']['data'][0])) {
+                    $date = $dependentWorksDate['date']['data'][0];
+                }
             }
-            $data[] = ['id' => $record->getUniqueID(), 
+            $data[$date] = ['id' => $record->getUniqueID(), 
                        'title' => $title, 
-                       'publishDate' => $publishDates[0]];
+                       'part' => $part, 
+                       'date' => $date];
         }
-        return $this->formatResponse($data);
+        krsort($data);
+        return $this->formatResponse(array_values($data));
     }
 } 
