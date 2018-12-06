@@ -1,0 +1,35 @@
+.navbar-header {
+    display:none;
+}
+
+ul.navbar-nav li:nth-child(2),
+ul.navbar-nav li:nth-child(3) {
+    display:none;
+}
+
+footer {
+    display:none;
+}
+
+#beluga-home-content .belugx-ph-content {
+    display:none;
+}
+
+#beluga-home-content, #belugx-follow-frame {
+    background:#5597D4;
+}
+
+.searchtools a {
+    display:none;
+}
+
+.belugax-end-of-results {
+    background:none;
+}
+
+.not-found-contact {
+    display:none;
+}
+
+.cart-controls {
+}
