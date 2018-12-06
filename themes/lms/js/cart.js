@@ -244,12 +244,12 @@ VuFind.register('cart', function Cart() {
   }
 
   function checkImsActivation () {
-    var imsId = getUrlParameter('imsid');
-    var imsUrl = getUrlParameter('imsurl');
+    var lmsId = getUrlParameter('lmsid');
+    var lmsUrl = getUrlParameter('lmsurl');
 
-    if (imsId && imsUrl) {
-      Cookies.setItem(_COOKIE_LMS_ID, imsId, false, _COOKIE_PATH, _COOKIE_DOMAIN);
-      Cookies.setItem(_COOKIE_LMS_URL, imsUrl, false, _COOKIE_PATH, _COOKIE_DOMAIN);
+    if (lmsId && lmsUrl) {
+      Cookies.setItem(_COOKIE_LMS_ID, lmsId, false, _COOKIE_PATH, _COOKIE_DOMAIN);
+      Cookies.setItem(_COOKIE_LMS_URL, lmsUrl, false, _COOKIE_PATH, _COOKIE_DOMAIN);
     }
   }
 

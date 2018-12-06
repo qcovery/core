@@ -30,6 +30,8 @@ class CartController extends \VuFind\Controller\CartController
      */
     public function lmsAction()
     {
+        $response = $this->getResponse();
+
         // Bail out if cart is disabled.
         if (!$this->getCart()->isActive()) {
             return $this->redirect()->toRoute('home');
@@ -46,48 +48,22 @@ class CartController extends \VuFind\Controller\CartController
         $lmsid = $this->params()->fromPost('lmsid');
         $ids = $this->params()->fromPost('ids');
 
-        $records = $this->getRecordLoader()->loadBatch($ids);
-
-        $lmsBaseDir = getcwd().'/var/lms/';
-        if (!is_dir($lmsBaseDir)) {
-            mkdir($lmsBaseDir);
-        }
-        if ($fileDownload = fopen($lmsBaseDir.$lmsid.'-turbomarc.xml', 'w')) {
-            $turbomarcData = '';
-            foreach ($records as $record) {
-                $temp = tmpfile();
-                fwrite($temp, $record->getXML('marc21'));
-                fseek($temp, 0);
-
-                $command = 'yaz-marcdump -i marcxml -o turbomarc '.stream_get_meta_data($temp)['uri'];
-                $execResults = [];
-                exec($command, $execResults);
-
-                fclose($temp);
-
-				foreach ($execResults as $index => $execResult) {
-					if ($execResult == '</collection>' || $execResult == '<collection xmlns="http://www.indexdata.com/turbomarc">') {
-						unset($execResults[$index]);
-					}
-				}
-
-				if ($turbomarcData != '') {
-					$turbomarcData .= "\n";
-				}
-                $turbomarcData .= implode("\n", $execResults);
+        if (!empty($ids)) {
+            $lmsBaseDir = getcwd() . '/var/lms/';
+            if (!is_dir($lmsBaseDir)) {
+                mkdir($lmsBaseDir);
             }
-            $turbomarcData = '<collection xmlns="http://www.indexdata.com/turbomarc">'."\n".$turbomarcData."\n".'</collection>';
-            
-            $writeResult = fwrite($fileDownload, $turbomarcData);
-            fclose($fileDownload);
+            if ($file = fopen($lmsBaseDir . $lmsid . '-lms.xml', 'w')) {
+                $writeResult = fwrite($file, implode(';', $ids));
+                fclose($file);
+            }
+
+            $config = $this->serviceLocator->get('VuFind\Config')->get('config');
+            $response->setContent(json_encode(['lmsDownloadUrl' => urlencode($config['Site']['url'] . '/Cart/lmsdownload?lmsid=' . $lmsid), 'filepath' => $lmsBaseDir . $lmsid . '-turbomarc.xml', 'writeResult' => error_get_last()]));
+        } else {
+            $response->setContent();
         }
 
-        // Send appropriate HTTP headers for requested format:
-        $response = $this->getResponse();
-
-        $config = $this->serviceLocator->get('VuFind\Config')->get('config');
-
-        $response->setContent(json_encode(['lmsDownloadUrl' => urlencode($config['Site']['url'].'/Cart/lmsdownload?lmsid='.$lmsid), 'filepath' => $lmsBaseDir.$lmsid.'-turbomarc.xml', 'writeResult' => error_get_last()]));
         return $response;
     }
 
@@ -112,20 +88,52 @@ class CartController extends \VuFind\Controller\CartController
         // We use abbreviated parameters here to keep the URL short (there may
         // be a long list of IDs, and we don't want to run out of room):
         $lmsid = $this->params()->fromQuery('lmsid');
+        $format = $this->params()->fromQuery('format');
 
         $response = $this->getResponse();
 
         $result = '';
 
         $lmsBaseDir = getcwd().'/var/lms/';
-        $lmsFile = $lmsBaseDir . $lmsid . '-turbomarc.xml';
+        $lmsFile = $lmsBaseDir . $lmsid . '-lms.xml';
+
         if (file_exists($lmsFile)) {
             if ($fileDownload = fopen($lmsFile, 'r')) {
-                $result = fread($fileDownload, filesize($lmsFile));
+                $ids = explode(';', fread($fileDownload, filesize($lmsFile)));
                 fclose($fileDownload);
+                if (!empty($ids)) {
+                    if ($format == 'turbomarc') {
+                        $records = $this->getRecordLoader()->loadBatch($ids);
+                        $turbomarcData = '';
+                        foreach ($records as $record) {
+                            $temp = tmpfile();
+                            fwrite($temp, $record->getXML('marc21'));
+                            fseek($temp, 0);
+
+                            $command = 'yaz-marcdump -i marcxml -o turbomarc ' . stream_get_meta_data($temp)['uri'];
+                            $execResults = [];
+                            exec($command, $execResults);
+
+                            fclose($temp);
+
+                            foreach ($execResults as $index => $execResult) {
+                                if ($execResult == '</collection>' || $execResult == '<collection xmlns="http://www.indexdata.com/turbomarc">') {
+                                    unset($execResults[$index]);
+                                }
+                            }
+
+                            if ($turbomarcData != '') {
+                                $turbomarcData .= "\n";
+                            }
+                            $turbomarcData .= implode("\n", $execResults);
+                        }
+                        $result = '<collection xmlns="http://www.indexdata.com/turbomarc">' . "\n" . $turbomarcData . "\n" . '</collection>';
+                    } else {
+                        $result = json_encode($ids);
+                    }
+                }
             }
         }
-
         // Process and display the exported records
         $response->setContent($result);
         return $response;
