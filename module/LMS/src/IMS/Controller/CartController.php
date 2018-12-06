@@ -1,6 +1,6 @@
 <?php
 
-namespace IMS\Controller;
+namespace LMS\Controller;
 
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Session\Container;
@@ -13,11 +13,11 @@ class CartController extends \VuFind\Controller\CartController
      *
      * @return mixed
      */
-    public function searchimsAction()
+    public function searchlmsAction()
     {
         $id = $this->params()->fromQuery('id');
         $lookfor = $this->params()->fromQuery('lookfor');
-        $this->session->imsId = $id;
+        $this->session->lmsId = $id;
 
         header('Location: /vufind/Search/Results?lookfor='.$lookfor.'&type=AllFields&limit=20');
         die();
@@ -28,7 +28,7 @@ class CartController extends \VuFind\Controller\CartController
      *
      * @return mixed
      */
-    public function imsAction()
+    public function lmsAction()
     {
         // Bail out if cart is disabled.
         if (!$this->getCart()->isActive()) {
@@ -43,16 +43,16 @@ class CartController extends \VuFind\Controller\CartController
 
         // We use abbreviated parameters here to keep the URL short (there may
         // be a long list of IDs, and we don't want to run out of room):
-        $imsid = $this->params()->fromPost('imsid');
+        $lmsid = $this->params()->fromPost('lmsid');
         $ids = $this->params()->fromPost('ids');
 
         $records = $this->getRecordLoader()->loadBatch($ids);
 
-        $imsBaseDir = getcwd().'/var/ims/';
-        if (!is_dir($imsBaseDir)) {
-            mkdir($imsBaseDir);
+        $lmsBaseDir = getcwd().'/var/lms/';
+        if (!is_dir($lmsBaseDir)) {
+            mkdir($lmsBaseDir);
         }
-        if ($fileDownload = fopen($imsBaseDir.$imsid.'-turbomarc.xml', 'w')) {
+        if ($fileDownload = fopen($lmsBaseDir.$lmsid.'-turbomarc.xml', 'w')) {
             $turbomarcData = '';
             foreach ($records as $record) {
                 $temp = tmpfile();
@@ -87,7 +87,7 @@ class CartController extends \VuFind\Controller\CartController
 
         $config = $this->serviceLocator->get('VuFind\Config')->get('config');
 
-        $response->setContent(json_encode(['imsDownloadUrl' => urlencode($config['Site']['url'].'/Cart/imsdownload?imsid='.$imsid), 'filepath' => $imsBaseDir.$imsid.'-turbomarc.xml', 'writeResult' => error_get_last()]));
+        $response->setContent(json_encode(['lmsDownloadUrl' => urlencode($config['Site']['url'].'/Cart/lmsdownload?lmsid='.$lmsid), 'filepath' => $lmsBaseDir.$lmsid.'-turbomarc.xml', 'writeResult' => error_get_last()]));
         return $response;
     }
 
@@ -96,7 +96,7 @@ class CartController extends \VuFind\Controller\CartController
      *
      * @return mixed
      */
-    public function imsdownloadAction()
+    public function lmsdownloadAction()
     {
         // Bail out if cart is disabled.
         if (!$this->getCart()->isActive()) {
@@ -111,17 +111,17 @@ class CartController extends \VuFind\Controller\CartController
 
         // We use abbreviated parameters here to keep the URL short (there may
         // be a long list of IDs, and we don't want to run out of room):
-        $imsid = $this->params()->fromQuery('imsid');
+        $lmsid = $this->params()->fromQuery('lmsid');
 
         $response = $this->getResponse();
 
         $result = '';
 
-        $imsBaseDir = getcwd().'/var/ims/';
-        $imsFile = $imsBaseDir . $imsid . '-turbomarc.xml';
-        if (file_exists($imsFile)) {
-            if ($fileDownload = fopen($imsFile, 'r')) {
-                $result = fread($fileDownload, filesize($imsFile));
+        $lmsBaseDir = getcwd().'/var/lms/';
+        $lmsFile = $lmsBaseDir . $lmsid . '-turbomarc.xml';
+        if (file_exists($lmsFile)) {
+            if ($fileDownload = fopen($lmsFile, 'r')) {
+                $result = fread($fileDownload, filesize($lmsFile));
                 fclose($fileDownload);
             }
         }

@@ -23,7 +23,7 @@ return [
         'searchkeys',
         'dependentworks',
         'recorddriver',
-        'ims',
+        'lms',
         'beluga-core-base',
     ],
     "less" => [

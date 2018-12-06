@@ -1,7 +1,7 @@
 <?php
 return [
     'css' => [
-        'ims.css',
+        'lms.css',
     ],
     'js' => [
         'cart.js',

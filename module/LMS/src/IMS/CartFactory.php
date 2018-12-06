@@ -1,6 +1,6 @@
 <?php
 
-namespace IMS;
+namespace LMS;
 
 class CartFactory extends \VuFind\CartFactory
 {

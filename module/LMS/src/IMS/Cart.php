@@ -1,14 +1,14 @@
 <?php
 
-namespace IMS;
+namespace LMS;
 
 class Cart extends \VuFind\Cart
 {
-    const CART_COOKIE_IMS_ID =  'vufind_cart_ims_id';
-    const CART_COOKIE_IMS_URL =  'vufind_cart_ims_url';
+    const CART_COOKIE_LMS_ID =  'vufind_cart_lms_id';
+    const CART_COOKIE_LMS_URL =  'vufind_cart_lms_url';
 
-    public function isImsActive() {
-        if($this->cookieManager->get(self::CART_COOKIE_IMS_ID) && $this->cookieManager->get(self::CART_COOKIE_IMS_URL)) {
+    public function isLmsActive() {
+        if($this->cookieManager->get(self::CART_COOKIE_LMS_ID) && $this->cookieManager->get(self::CART_COOKIE_LMS_URL)) {
             return true;
         }
         return false;

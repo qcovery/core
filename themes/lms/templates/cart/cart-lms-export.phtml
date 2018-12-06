@@ -1,0 +1,28 @@
+<? if ($this->cart()->isLmsActive()): ?>
+<a id="cart-lms-export" class="btn btn-default dropdown-toggle" title="<?=$this->transEsc('LMS')?>" value="1">
+    <i id="cart-lms-export-icon" class="bel-link01"></i>
+    <?=$this->transEsc('LMS')?>
+</a>
+<script type="text/javascript">
+    $('#cart-lms-export').on('click', function(e){
+        e.preventDefault();
+        $('#cart-lms-export-icon').removeClass('bel-link01');
+        $('#cart-lms-export-icon').addClass('bel-laden01');
+        $('#cart-lms-export-icon').addClass('spinner');
+        $.ajax({
+            dataType: 'json',
+            method: 'POST',
+            url: VuFind.path + '/Cart/lms',
+            data: { 'lmsid': Cookies.getItem('vufind_cart_lms_id'), 'ids': VuFind.cart.getFullItems() }
+        })
+        .done(function (data) {
+            $('#cart-lms-export-icon').removeClass('spinner');
+            $('#cart-lms-export-icon').removeClass('bel-laden01');
+            $('#cart-lms-export-icon').addClass('bel-link01');
+            if (data.lmsDownloadUrl) {
+                window.location = Cookies.getItem('vufind_cart_lms_url')+'?lms-download='+data.lmsDownloadUrl;
+            }
+        })
+    });
+</script>
+<? endif; ?>

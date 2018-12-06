@@ -7,8 +7,8 @@ VuFind.register('cart', function Cart() {
   var _COOKIE_DELIM = "\t";
   var _COOKIE_DOMAIN = false;
   var _COOKIE_PATH = '/';
-  var _COOKIE_IMS_ID = 'vufind_cart_ims_id';
-  var _COOKIE_IMS_URL = 'vufind_cart_ims_url';
+  var _COOKIE_LMS_ID = 'vufind_cart_lms_id';
+  var _COOKIE_LMS_URL = 'vufind_cart_lms_url';
 
   function setDomain(domain) {
     _COOKIE_DOMAIN = domain;
@@ -248,8 +248,8 @@ VuFind.register('cart', function Cart() {
     var imsUrl = getUrlParameter('imsurl');
 
     if (imsId && imsUrl) {
-      Cookies.setItem(_COOKIE_IMS_ID, imsId, false, _COOKIE_PATH, _COOKIE_DOMAIN);
-      Cookies.setItem(_COOKIE_IMS_URL, imsUrl, false, _COOKIE_PATH, _COOKIE_DOMAIN);
+      Cookies.setItem(_COOKIE_LMS_ID, imsId, false, _COOKIE_PATH, _COOKIE_DOMAIN);
+      Cookies.setItem(_COOKIE_LMS_URL, imsUrl, false, _COOKIE_PATH, _COOKIE_DOMAIN);
     }
   }
 

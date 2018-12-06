@@ -5,22 +5,22 @@ return array (
   array (
     'factories' => 
     array (
-      'IMS\\Controller\\CartController' => 'IMS\\Controller\\CartControllerFactory',
+      'LMS\\Controller\\CartController' => 'LMS\\Controller\\CartControllerFactory',
     ),
     'aliases' => 
     array (
-      'VuFind\\Controller\\CartController' => 'IMS\\Controller\\CartController',
+      'VuFind\\Controller\\CartController' => 'LMS\\Controller\\CartController',
     ),
   ),
   'service_manager' => 
   array (
     'factories' => 
     array (
-      'IMS\\Cart' => 'IMS\\CartFactory',
+      'LMS\\Cart' => 'LMS\\CartFactory',
     ),
     'aliases' => 
     array (
-      'VuFind\\Cart' => 'IMS\\Cart',
+      'VuFind\\Cart' => 'LMS\\Cart',
     ),
   ),
 );
