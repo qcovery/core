@@ -4,7 +4,7 @@
 $modules = [
     'Zend\Router', 'ZfcRbac',
     'VuFindTheme', 'VuFindSearch', 'VuFind', 'VuFindAdmin', 'VuFindApi',
-    'RecordDriver', 'SearchKeys', 'DependentWorks', 'Libraries', 'Delivery', 'ExtendedFacets', 'BelugaConfig', 'DAIAplus', 'PAIA', 'IMS',
+    'DismaxMunge', 'RecordDriver', 'SearchKeys', 'DependentWorks', 'Libraries', 'Delivery', 'ExtendedFacets', 'BelugaConfig', 'DAIAplus', 'PAIA', 'LMS',
 ];
 if (PHP_SAPI == 'cli' && !defined('VUFIND_PHPUNIT_RUNNING')) {
     $modules[] = 'Zend\Mvc\Console';

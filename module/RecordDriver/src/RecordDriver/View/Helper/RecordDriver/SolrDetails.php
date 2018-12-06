@@ -143,8 +143,6 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             }
             $additionals[] = $additional;
         }
-//        $links = array_unique($links);
-//        $linknames = array_unique($linknames);
 
         $strings = [];
         foreach ($links as $link) {
@@ -178,8 +176,11 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             return '';
         }
         $link = array_shift($data['link']['data']);
-        $linkname = array_shift($data['linkname']['data']) ?? $link;
-
+        if (!empty($data['$linkname'])) {
+            $linkname = array_shift($data['linkname']['data']);
+        } else {
+            $linkname = $link;
+        }
         $string = '<a href="' . $link . '" title="' . $link . '">' . $linkname . '</a>';
         $additionalData = [];
         foreach ($data as $item => $date) {
