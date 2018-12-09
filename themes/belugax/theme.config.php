@@ -24,6 +24,7 @@ return [
         'dependentworks',
         'recorddriver',
         'lms',
+        'sfx',
         'beluga-core-base',
     ],
     "less" => [

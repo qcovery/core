@@ -1,0 +1,19 @@
+@keyframes anim-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+.spinner {
+    animation: anim-rotate 2s infinite linear reverse;
+}
+
+.result-links .sfx-status {
+    font-size:24px !important;
+}
+
+.belugaSFXLink {
+    font-size: 12px;
+}
