@@ -1,5 +1,5 @@
 <?
-    if ($_SERVER['REDIRECT_URL'] == '/vufind/Search2/Results') {
+    if ($_SERVER['REDIRECT_URL'] == '/vufind/Search2/Results' || stristr($_SERVER['REDIRECT_URL'], '/vufind/Search2Record')) {
         echo '<a href="" class="bu_fulltext button-sfx" data-id="'.$this->driver->getUniqueID().'"><b>SFX</b></a>';
         echo '<div id="bu_fulltext_links_'.$this->driver->getUniqueID().'" style="display:none;">';
 
