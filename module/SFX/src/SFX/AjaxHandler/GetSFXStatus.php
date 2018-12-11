@@ -85,11 +85,11 @@ class GetSFXStatus extends \VuFind\AjaxHandler\GetItemStatuses
         $this->disableSessionWrites();  // avoid session write timing bug
         $data = file_get_contents($_GET['link']);
         if (stristr($data, '<service_type>getFullTxt</service_type>')) {
-            return $this->formatResponse(compact('fullText'));
+            return $this->formatResponse('fullText');
         } else if (stristr($data, '<target_name>MESSAGE_NO_FULLTXT</target_name>') || stristr($data, '<service_type>getMessageNoFullTxt</service_type> ')) {
-            return $this->formatResponse(compact('noFullText'));
+            return $this->formatResponse('noFullText');
         } else {
-            return $this->formatResponse(compact('noFullText'));
+            return $this->formatResponse('noFullText');
         }
     }
 }
