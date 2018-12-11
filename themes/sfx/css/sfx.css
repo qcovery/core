@@ -17,3 +17,9 @@
 .belugaSFXLink {
     font-size: 12px;
 }
+
+.sfx-no-fulltext,
+.sfx-no-fulltext:hover {
+    cursor: default;
+    color: #777777 !important;
+}

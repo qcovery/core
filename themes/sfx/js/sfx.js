@@ -24,7 +24,6 @@ $(document).ready(function() {
         jQuery('#bu_fulltext_links_'+jQuery(this).attr('data-id')).find('.belugaSFXLink').each(function(){
             var link = jQuery(this);
             link.css('display', 'inline');
-            link.css('color', '#B0B0B0');
             link.css('cursor', 'default');
             link.find('.sfx-status').addClass('spinner');
             link.find('.sfx-status').addClass('bel-laden01');
@@ -33,14 +32,17 @@ $(document).ready(function() {
                 url:'/vufind/AJAX/JSON?method=getSFXStatus&link='+link.attr('data-link'),
                 dataType:'json',
                 success:function(data, textStatus, jqXHR){
-                    link.css('color', '#1D1D1D');
-                    link.css('cursor', 'pointer');
                     if (data.data == 'fullText') {
+                        link.css('cursor', 'pointer');
                         link.find('.sfx-status').removeClass('spinner');
                         link.find('.sfx-status').removeClass('bel-laden01');
-                        link.find('.sfx-status').addClass('bel-papier');
+                        link.find('.sfx-status').addClass('bel-ok02');
                     } else {
-                        link.remove();
+                        link.removeAttr("href");
+                        link.addClass('sfx-no-fulltext');
+                        link.find('.sfx-status').removeClass('spinner');
+                        link.find('.sfx-status').removeClass('bel-laden01');
+                        link.find('.sfx-status').addClass('bel-ende03');
                     }
                 }
             });
