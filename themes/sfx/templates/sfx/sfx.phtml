@@ -6,7 +6,7 @@
         $sfx_domains = array('haw', 'hcu', 'hsu', 'tuhh', 'subhh');
         $sfx_domains_display_array = array('haw' => 'HAW', 'hcu' => 'HCU', 'hsu' => 'HSU', 'subhh' => 'UHH', 'tuhh' => 'TUHH');
 
-        $urls = $this->driver->getURLs();
+        $urls[] = ['url' => $this->driver->getOpenUrl()];
 
         echo('<!--');
         print_r($urls);
@@ -15,7 +15,13 @@
         $first = true;
         foreach ($sfx_domains as $sfx_domain) {
             $url = $urls[0]['url'];
-            if (stristr($url, '1.1.1.1')) {
+
+            $url = str_ireplace('rfr_', '', $url);
+            $url = str_ireplace('rft.', '', $url);
+
+            $url = 'http://sfx.gbv.de/sfx_'.$sfx_domain.'?'.$url;
+
+            /* if (stristr($url, '1.1.1.1')) {
                 $url = str_ireplace('1.1.1.1?', 'sfx.gbv.de/sfx_' . $sfx_domain . '?', $url);
             } else {
                 if (stristr($url, '/sfx_tuhh?')) {
@@ -26,7 +32,7 @@
             }
             if ($sfx_domain == 'tuhh') {
                 $url = str_ireplace(':9004', '', $url);
-            }
+            } */
             $result_url_link = $url . '&sfx.service_type';
             $result_url_check_fulltext = $url . '&sfx.service_type=getFullTxt&sfx.response_type=simplexml';
             $issns = $this->driver->getISSNs();
