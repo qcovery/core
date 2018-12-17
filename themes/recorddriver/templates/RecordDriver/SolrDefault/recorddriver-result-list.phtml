@@ -23,7 +23,23 @@
         </a>
       </div>
     <?php endif; ?>
-    <?php if(!empty($resultList['publisher']) || !empty($resultList['publishdate'])): ?>
+    <?php if(!empty($resultList['journal'])): ?>
+      <div>
+        <?php if(!empty($resultList['relation'])): ?>
+          <?=strtolower($this->transEsc($resultList['relation']))?>:
+        <?php endif; ?>
+        <?php if(!empty($resultList['journallink'])): ?>
+          <a href="<?=$this->record($this->driver)->getLink('ppn', $resultList['journallink'])?>">
+            <?=$resultList['journal'] ?>
+          </a>
+        <?php else: ?>
+          <?=$resultList['journal'] ?>
+        <?php endif; ?>
+        <?php if(!empty($resultList['publishdate'])): ?>
+            <?=$resultList['publishdate'] ?>
+        <?php endif; ?>
+      </div>
+    <?php elseif(!empty($resultList['publisher']) || !empty($resultList['publishdate'])): ?>
        <div>
             <?=$this->transEsc('Published')?>:
         <?php if(!empty($resultList['publisher'])): ?>
@@ -35,19 +51,5 @@
         <?php if(!empty($resultList['publishdate'])): ?>
             <?=$resultList['publishdate'] ?>
         <?php endif; ?>
-      </div>
-    <?php endif; ?>
-    <?php if(!empty($resultList['journal'])): ?>
-      <div>
-      <?php if(!empty($resultList['relation'])): ?>
-        <?=strtolower($this->transEsc($resultList['relation']))?>:
-      <?php endif; ?>
-      <?php if(!empty($resultList['journallink'])): ?>
-        <a href="<?=$this->record($this->driver)->getLink('ppn', $resultList['journallink'])?>">
-          <?=$resultList['journal'] ?>
-        </a>
-      <?php else: ?>
-        <?=$resultList['journal'] ?>
-      <?php endif; ?>
       </div>
     <?php endif; ?>
