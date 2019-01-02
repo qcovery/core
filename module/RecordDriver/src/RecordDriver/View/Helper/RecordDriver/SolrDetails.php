@@ -120,51 +120,49 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
 
     private function makeLink($solrMarcData, $key, $separator = ', ') {
         $prefixes = $links = $linknames = $descriptions = $additionals = [];
-        foreach ($solrMarcData as $data) {
+        foreach ($solrMarcData as $index => $data) {
             if (!empty($data['prefix'])) {
-                $prefixes[] = implode($separator, $data['prefix']['data']);
+                $prefixes[$index] = implode($separator, $data['prefix']['data']);
                 unset($data['prefix']);
             }
             if (!empty($data['link'])) {
-                $links[] = implode($separator, $data['link']['data']);
+                $links[$index] = implode($separator, $data['link']['data']);
                 unset($data['link']);
             }
             if (!empty($data['linkname'])) {
-                $linknames[] = implode($separator, $data['linkname']['data']);
+                $linknames[$index] = implode($separator, $data['linkname']['data']);
                 unset($data['linkname']);
             }
             if (!empty($data['description']['data'])) {
-                $descriptions[] = implode($separator, $data['description']['data']);
+                $descriptions[$index] = implode($separator, $data['description']['data']);
                 unset($data['description']);
             }
             $additional = [];
             foreach ($data as $item => $date) {
                 $additional[] = implode($separator, $date['data']);
             }
-            $additionals[] = $additional;
+            $additionals[$index] = $additional;
         }
 
         $strings = [];
-        foreach ($links as $link) {
-            if (count($prefixes) > 0) {
-                $string = array_shift($prefixes) . ': ';
+        foreach ($links as $index => $link) {
+            if (!empty($prefixes[$index]) > 0) {
+                $string = $prefixes[$index] . ': ';
             } else {
                 $string = '';
             }
-            if (count($linknames) > 0) {
-                $linkname = array_shift($linknames);
+            if (!empty($linknames[$index]) > 0) {
+                $linkname = $linknames[$index];
             } else {
                 $linkname = $link;
             }
             $string .= '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
-            if (count($additionals) > 0) {
-                $additional = array_shift($additionals);
-                if (!empty($additional)) {
-                    $string .= ' (' . implode($separator, $additional) . ')';
-                }
+            if (!empty($additionals[$index]) > 0) {
+                $additional = $additionals[$index];
+                $string .= ' (' . implode($separator, $additional) . ')';
             }
-            if (count($descriptions) > 0) {
-                $string .= ' [' . array_shift($descriptions) . ']';
+            if (!empty($descriptions[$index]) > 0) {
+                $string .= ' [' . $descriptions[$index] . ']';
             }
             $strings[] = $string;
         }
@@ -216,6 +214,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
      }
 
     private function makeText($data, $separator = ', ') {
+print_r($data);
         $string = '';
         foreach ($data as $key => $date) {
             if (true || $key != 'description') {
