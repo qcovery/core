@@ -216,10 +216,14 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
     private function makeText($data, $separator = ', ') {
         $string = '';
         foreach ($data as $key => $date) {
+            $translatedData = [];
+            foreach ($date['data'] as $value) {
+                $translatedData[] = $this->view->transEsc($value);
+            }
             if (true || $key != 'description') {
-                $string .= implode($separator, $date['data']) . $separator;
+                $string .= implode($separator, $translatedData) . $separator;
             } else {
-                $string .= ' [' . implode($separator, $date['data']) . ']';
+                $string .= ' [' . implode($separator, $translatedData) . ']';
             }
         }
         $string = substr_replace($string, '', -1 * strlen($separator));
