@@ -214,7 +214,6 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
      }
 
     private function makeText($data, $separator = ', ') {
-print_r($data);
         $string = '';
         foreach ($data as $key => $date) {
             if (true || $key != 'description') {
