@@ -16,6 +16,19 @@
         foreach ($sfx_domains as $sfx_domain) {
             $url = $urls[0]['url'];
 
+            $linkParams = [];
+            $linkParams['rft.jtitle'] = $driver->tryMethod('getContainerTitle');
+            //$linkParams['rft.date'] =  $this->driver->tryMethod('getContainerIssue');
+            $linkParams['rft.volume'] =  $this->driver->tryMethod('getContainerVolume');
+            $linkParams['rft.issue'] =  $this->driver->tryMethod('getContainerIssue');
+            $linkParams['rft.spage'] = $this->driver->tryMethod('getContainerStartPage');
+            $linkParams['rft.epage'] = $this->driver->tryMethod('getContainerEndPage');
+            $linkParams['rft.pages'] = $this->driver->tryMethod('getContainerStartPage').'-'.$this->driver->tryMethod('getContainerEndPage');
+            //$linkParams['rft.eissn'] =  $this->driver->tryMethod('getContainerIssue');
+            foreach ($linkParams as $key => $value) {
+                $url .= '&'.$key.'='.urlencode($value);
+            }
+
             $url = str_ireplace('rfr_', '', $url);
             $url = str_ireplace('rft.', '', $url);
 
@@ -39,6 +52,7 @@
             //echo '<a class="belugaSFXLink bib_button" style="display:none;" data-link="'.urlencode($result_url_check_fulltext).'" data-lookfor="'.$this->driver->getContainerTitle().'" data-institution="'.$institution.'" href="'.$result_url_link.'" target="_blank">';
 
             echo '<a class="belugaSFXLink button-sfx" style="display:none;" data-link="' . urlencode($result_url_check_fulltext) . '" data-lookfor="' . $issns[0] . '" data-sfxdomain="' . $sfx_domain . '" data-volume="' . $this->driver->tryMethod('getVolume') . '" href="' . $result_url_link . '" target="_blank">';
+            echo '<!-- '.urlencode($result_url_check_fulltext).' -->';
             echo '<span><i class="sfx-status"></i>' . strtoupper($sfx_domains_display_array[$sfx_domain]) . '</span>';
             echo '</a>';
         }
