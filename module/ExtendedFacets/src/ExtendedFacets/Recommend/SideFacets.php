@@ -106,6 +106,28 @@ class SideFacets extends \VuFind\Recommend\SideFacets
     }
 
     /**
+     * Process show facet value
+     *
+     * @return array
+     */
+    protected function showFacetValue($facetSet)
+    {
+        $facetSettings = $this->configLoader->get('facets');
+
+        foreach ($facetSettings->ShowFacetValue as $showFacet => $showFacetValues) {
+            if (isset($facetSet[$showFacet]['list'])) {
+                foreach ($facetSet[$showFacet]['list'] as $facet => $value) {
+                    if (!in_array($value['value'], $showFacetValues->toArray())) {
+                        unset($facetSet[$showFacet]['list'][$facet]);
+                    }
+                }
+            }
+        }
+
+        return $facetSet;
+    }
+
+    /**
      * Get facet information from the search results.
      *
      * @return array
@@ -116,6 +138,9 @@ class SideFacets extends \VuFind\Recommend\SideFacets
         if (isset($facetSet['publishDate'])) {
             $facetSet['publishDate']['list'] = $this->getYearFacets($facetSet['publishDate']['list'], $facetSet['publishDate']['label']);
         }
+
+        $facetSet = $this->showFacetValue($facetSet);
+
         return $facetSet;
     }
 }
