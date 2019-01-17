@@ -25,6 +25,7 @@ return [
         'recorddriver',
         'lms',
         'sfx',
+        'extendedfacets',
         'beluga-core-base',
     ],
     "less" => [
