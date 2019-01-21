@@ -61,7 +61,7 @@ class CartController extends \VuFind\Controller\CartController
             $config = $this->serviceLocator->get('VuFind\Config')->get('config');
             $response->setContent(json_encode(['lmsDownloadUrl' => urlencode($config['Site']['url'] . '/Cart/lmsdownload?lmsid=' . $lmsid), 'filepath' => $lmsBaseDir . $lmsid . '-turbomarc.xml', 'writeResult' => error_get_last()]));
         } else {
-            $response->setContent();
+            $response->setContent('No ids available');
         }
 
         return $response;
