@@ -302,7 +302,11 @@ class SolrMarc extends SolrDefault
                                 foreach ($specs as $spec) {
                                     if (isset($spec[0])) {
                                         if ($spec[0] == 'name') {
-                                            $subFieldList[$subField]['name'] = $spec[1];
+                                            if (!empty($subFieldList[$subField]['name'])) {
+                                                $subFieldList[$subField]['name'] .= '#' . $spec[1];
+                                            } else {
+                                                $subFieldList[$subField]['name'] = $spec[1];
+                                            }
                                         } elseif ($spec[0] == 'match') {
                                             $subFieldList[$subField]['filter'] = $spec[1];
                                             $subFieldList[$subField]['match'] = intval($spec[2]);
@@ -349,18 +353,21 @@ class SolrMarc extends SolrDefault
                                     if (empty($fieldDate) && $fieldDate !== '0' && $fieldDate !== 0) {
                                         continue;
                                     }
-                                    $name = $properties['name'] ?? $dataIndex++;
-                                    if (!isset($data[$name]['data'])) {
-                                        $data[$name]['data'] = [];
-                                    }
-                                    $data[$name]['data'][] = $fieldDate;
-                                    if (empty($solrMarcSpecs['originalletters']) || $solrMarcSpecs['originalletters'] != 'no') {
-                                        if (!empty($this->originalLetters[$field][$index][$subfield])) {
-                                            $data[$name]['originalLetters'] = $this->originalLetters[$field][$index][$subfield];
+                                    $tmpName = $properties['name'] ?? $dataIndex++;
+                                    $names = explode('#', $tmpName);
+                                    foreach ($names as $name) {
+                                        if (!isset($data[$name]['data'])) {
+                                            $data[$name]['data'] = [];
                                         }
-				    }
-                                    if ($name == $mandatoryField) {
-                                        $mandatoryFieldSet = true;
+                                        $data[$name]['data'][] = $fieldDate;
+                                        if (empty($solrMarcSpecs['originalletters']) || $solrMarcSpecs['originalletters'] != 'no') {
+                                            if (!empty($this->originalLetters[$field][$index][$subfield])) {
+                                                $data[$name]['originalLetters'] = $this->originalLetters[$field][$index][$subfield];
+                                            }
+                                        }
+                                        if ($name == $mandatoryField) {
+                                            $mandatoryFieldSet = true;
+                                        }
                                     }
                                 }
                             }
