@@ -12,7 +12,7 @@
         : <?=$titleFields['SubTitle'][0] ?>
     <?php endif; ?>
     <?=$titleFields['TitleSection'][0] ?? '' ?>
-    <?= !empty($titleFields['TitleStatement'][0]) ? '/ ' . $this->transEsc($titleFields['TitleStatement'][0]) : '' ?>
+    <?= !empty($titleFields['TitleStatement'][0]) ? '/ ' . $titleFields['TitleStatement'][0] : '' ?>
 <?php else: ?>
     <?=$this->transEsc('no title') ?>
 <?php endif; ?>
