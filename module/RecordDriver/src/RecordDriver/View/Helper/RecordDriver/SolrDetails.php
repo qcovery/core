@@ -45,6 +45,11 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
 
     protected $driver;
 
+    protected $separatorSet = [
+                  [', ', ' / ', ' - '],
+                  [', ', ' ', ' ']
+              ];
+
     /**
      * Get the core field entries
      *
@@ -63,6 +68,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         foreach ($categories as $category) {
             foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
                 $solrMarcData[$solrMarcKey] = $driver->getMarcData($solrMarcKey);
+                if (empty($solrMarcData[$solrMarcKey])) {
+                    continue;
+                }
                 $viewMethod = $solrMarcData[$solrMarcKey]['view-method'] ?? '';
                 unset($solrMarcData[$solrMarcKey]['view-method']);
                 $originalLetters = '';
@@ -76,8 +84,11 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 }
                 $templateData = [];
                 if (strpos($viewMethod, '-link') > 0) {
-                    list($key, ) = explode('-', $viewMethod);
-                    $templateData = $this->makeLink($solrMarcData[$solrMarcKey], $key);
+                    list($key, , $separators) = explode('-', $viewMethod);
+                    if (empty($separators)) {
+                        $separators = 0;
+                    }
+                    $templateData = $this->makeLink($solrMarcData[$solrMarcKey], $key, $separators);
                  } elseif ($viewMethod == 'directlink') {
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeDirectLink($data);
@@ -118,50 +129,53 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $resultList;
     }
 
-    private function makeLink($solrMarcData, $key, $separator = ', ') {
+    private function makeLink($solrMarcData, $key, $separators = 0) {
         $prefixes = $links = $linknames = $descriptions = $additionals = [];
+        list($sep0, $sep1, $sep2) = $this->separatorSet[$separators];
         foreach ($solrMarcData as $index => $data) {
             if (!empty($data['prefix'])) {
-                $prefixes[$index] = implode($separator, $data['prefix']['data']);
+                $prefixes[$index] = implode(': ', $data['prefix']['data']);
                 unset($data['prefix']);
             }
             if (!empty($data['link'])) {
-                $links[$index] = implode($separator, $data['link']['data']);
+                $links[$index] = implode($sep0, $data['link']['data']);
                 unset($data['link']);
             }
             if (!empty($data['linkname'])) {
-                $linknames[$index] = implode($separator, $data['linkname']['data']);
+                $linknames[$index] = implode($sep1, $data['linkname']['data']);
                 unset($data['linkname']);
             }
-            if (!empty($data['description']['data'])) {
-                $descriptions[$index] = implode($separator, $data['description']['data']);
+            if (!isset($links[$index])) {
+                $index--;
+            }
+            if (!empty($data['description'])) {
+                $descriptions[$index] = implode($sep0, $data['description']['data']);
                 unset($data['description']);
             }
             $additional = [];
             foreach ($data as $item => $date) {
-                $additional[] = implode($separator, $date['data']);
+                $additional[] = implode($sep0, $date['data']);
             }
             $additionals[$index] = $additional;
         }
-
         $strings = [];
         foreach ($links as $index => $link) {
-            if (!empty($prefixes[$index]) > 0) {
+            if (!empty($prefixes[$index])) {
                 $string = $prefixes[$index] . ': ';
             } else {
                 $string = '';
             }
-            if (!empty($linknames[$index]) > 0) {
+            if (!empty($linknames[$index])) {
                 $linkname = $linknames[$index];
             } else {
                 $linkname = $link;
             }
             $string .= '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
-            if (!empty($additionals[$index]) > 0) {
+            if (!empty($additionals[$index])) {
                 $additional = $additionals[$index];
-                $string .= ' (' . implode($separator, $additional) . ')';
+                $string .= $sep2 . implode($sep0, $additional);
             }
-            if (!empty($descriptions[$index]) > 0) {
+            if (!empty($descriptions[$index])) {
                 $string .= ' [' . $descriptions[$index] . ']';
             }
             $strings[] = $string;
@@ -195,17 +209,23 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $string;
     }
 
-    private function makeChain($dataList, $separator = ' / ') {
-        $result = $items = [];
-        foreach ($dataList as $data) {
-            if (!empty($items) && isset($data['sequence']) && $data['sequence']['data'][0] == 0) {
+    private function makeChain($solrMarcData, $separator = ' / ') {
+        $result = $items = $links = $sequences = $descriptions = [];
+        foreach ($solrMarcData as $index => $data) {
+            $links[$index] = implode(', ', $data['link']['data']);
+            $sequences[$index] = intval($data['sequence']['data'][0]);
+            if (!empty($data['description']['data'])) {
+                $descriptions[$index] = implode(', ', $data['description']['data']);
+            }
+        }
+        foreach ($links as $index => $link) {
+            if (!empty($items) && $sequences[$index] == 0) {
                 $result[] = implode($separator, $items);
                 $items = [];
             }
-            $link = $data['link']['data'][0];
             $item = '<a href="' . $this->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
-            if (!empty($data['description']['data'])) {
-                $item .= ' [' . implode(', ', $data['description']['data']) . ']';
+            if (!empty($descriptions[$index])) {
+                $item .= ' [' . implode(', ', $description[$index]) . ']';
             }
             $items[] = $item;
         }

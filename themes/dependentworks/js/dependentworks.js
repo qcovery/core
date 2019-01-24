@@ -21,7 +21,13 @@ jQuery(document).ready(function() {
             if (data.data.length > 0) {
                 var visibleItems = (data.data.length < 3) ? data.data.length : 3;
                 for (var i = 0; i < visibleItems; i++) {
-                    var title = data.data[i]['title'] + ' ' + data.data[i]['part'] + ' (' + data.data[i]['date'] + ')';
+                    var title = data.data[i]['title'];
+                    if (data.data[i]['part'] != '') {
+                        title = title + ' ' + data.data[i]['part'];
+                    }
+                    if (data.data[i]['date'] != '') {
+                        title = title + ' (' + data.data[i]['date'] + ')';
+                    }
                     var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
                     jQuery('ul#DependentWorks').append('<li>' + href + '</li>');                
                 }

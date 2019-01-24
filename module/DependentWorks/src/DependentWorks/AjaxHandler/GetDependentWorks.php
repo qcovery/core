@@ -97,7 +97,7 @@ class GetDependentWorks extends AbstractBase
 
         $records = $results->getResults();
         $data = [];
-        foreach ($records as $record) {
+        foreach ($records as $i => $record) {
             $dependentWorksData = $record->getMarcData('DependentWorksData');
             $title = $part = $date = '';
             foreach ($dependentWorksData as $dependentWorksDate) {
@@ -111,7 +111,12 @@ class GetDependentWorks extends AbstractBase
                     $date = $dependentWorksDate['date']['data'][0];
                 }
             }
-            $data[$date] = ['id' => $record->getUniqueID(), 
+            if (!empty($date) && !isset($data[$date])) {
+                $sort = $date;
+            } else {
+                $sort = $i;
+            }
+            $data[$sort] = ['id' => $record->getUniqueID(), 
                        'title' => $title, 
                        'part' => $part, 
                        'date' => $date];
