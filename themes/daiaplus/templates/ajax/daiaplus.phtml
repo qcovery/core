@@ -74,12 +74,13 @@ echo'<table>';
 
     $status = $daiaResult['daiaplus']['status'];
     $action = $daiaResult['daiaplus']['action'];
+    $actionArray = $daiaResult['daiaplus']['actionArray'];
 
     if($status != '' && (empty($daiaResult['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
         echo '<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
     }
 
-    if (!empty($action)) {
+    /* if (!empty($action)) {
         if(!empty($action['generic'])) {
             $action_href = $action['generic']['href'];
             $action_label = $action['generic']['label'];
@@ -102,6 +103,33 @@ echo'<table>';
             echo $action_label;
         }
         echo '</span>';
+    } */
+
+    if (!empty($actionArray)) {
+        foreach ($actionArray as $actionEntry) {
+            if(!empty($actionEntry['generic'])) {
+                $action_href = $actionEntry['generic']['href'];
+                $action_label = $actionEntry['generic']['label'];
+            } else if (!empty($actionEntry['beluga_core'])) {
+                $action_href = $actionEntry['beluga_core']['href'];
+                $action_label = $actionEntry['beluga_core']['label'];
+            }
+
+            if($actionEntry['link_status']) {
+                $action_label .= ' '.$this->transEsc($actionEntry['link_status']);
+            }
+
+            if($status != '' && (empty($daiaResult['daiaplus']['action']) || in_array($daiaResult['daiaplus']['action']['service'],array("loan","presentation")))) {
+                echo ' &#10141;';
+            }
+            echo ' <span class="daia_action">';
+            if($action_href) {
+                echo '<a class="'.$actionEntry['link_status'].'" href="'.$action_href.'" target="_blank">'.$action_label.'</a>';
+            } else {
+                echo $action_label;
+            }
+            echo '</span>';
+        }
     }
 
     if($list) {
