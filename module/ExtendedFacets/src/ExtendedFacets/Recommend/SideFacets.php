@@ -114,11 +114,13 @@ class SideFacets extends \VuFind\Recommend\SideFacets
     {
         $facetSettings = $this->configLoader->get('facets');
 
-        foreach ($facetSettings->ShowFacetValue as $showFacet => $showFacetValues) {
-            if (isset($facetSet[$showFacet]['list'])) {
-                foreach ($facetSet[$showFacet]['list'] as $facet => $value) {
-                    if (!in_array($value['value'], $showFacetValues->toArray())) {
-                        unset($facetSet[$showFacet]['list'][$facet]);
+        if ($facetSettings->ShowFacetValue && is_array($facetSettings->ShowFacetValue)) {
+            foreach ($facetSettings->ShowFacetValue as $showFacet => $showFacetValues) {
+                if (isset($facetSet[$showFacet]['list'])) {
+                    foreach ($facetSet[$showFacet]['list'] as $facet => $value) {
+                        if (!in_array($value['value'], $showFacetValues->toArray())) {
+                            unset($facetSet[$showFacet]['list'][$facet]);
+                        }
                     }
                 }
             }
