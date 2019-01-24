@@ -3,7 +3,7 @@
 	$list = $_GET['list'];
 	$language = $this->layout()->userLang;
 	
-	$e_availability = $this->paia()->getElectronicAvailability($_GET['ppn'], urldecode($_GET['openurl']), urldecode($_GET['url-access']),$_GET['url-access-level'], $_GET['first-matching-issn'], $_GET['gvklink'],$_GET['doi'], $list, $_GET['mediatype'], $language);
+	$e_availability = $this->paia()->getElectronicAvailability($_GET['ppn'], urldecode($_GET['openurl']), urldecode($_GET['url-access']),$_GET['url-access-level'], $_GET['first-matching-issn'], $_GET['gvklink'],$_GET['doi'], $list, $_GET['mediatype'], $language, $_GET['sfx']);
 	
 	echo '<div style="display:none;">';
 		print_r($e_availability);
@@ -34,7 +34,7 @@
 				echo '<a name="availability"></a>';
 				//echo'<b>'.$this->transEsc('electronic_availability').'</b><br>';
 				foreach ($e_availability['items'] as $link) {
-					if($link['url_access']) {
+					if(isset($link['url_access']) && $link['url_access']) {
 						$url_access = $link['url_access'];
 						if(is_array($url_access)) {
 							$url_access = $url_access[0];
@@ -66,6 +66,9 @@
 	} else if (!$e_availability && $list != 1 ) {
 		echo $this->transEsc('no_electronic_availability');
 	}
+	if (isset($e_availability['items']['sfx'])) {
+	    echo '<br/><a href="'.$e_availability['items']['sfx'].'" class="article_access_level" target="_blank">'.SFX.'</a>';
+    }
 	
 
 ?>
