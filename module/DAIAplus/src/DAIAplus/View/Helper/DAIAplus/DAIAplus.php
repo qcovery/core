@@ -2,22 +2,25 @@
 /**
  *
  */
-namespace SFX\View\Helper\SFX;
+namespace DAIAplus\View\Helper\DAIAplus;
 
-class SFX extends \Zend\View\Helper\AbstractHelper
+class DAIAplus extends \Zend\View\Helper\AbstractHelper
 {
-    protected $config;
+    protected $paiaConfig;
 
     /**
      *
      */
     public function __construct($config, \VuFind\Search\Memory $memory)
     {
-        $this->config = $config;
+        $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
     }
 
     public function getSfxLink($driver) {
-        $sfx_domain = 'haw';
+        $sfx_domain = '';
+        if (isset($this->paiaConfig['DAIA']['sfxDomain'])) {
+            $sfx_domain = $this->paiaConfig['DAIA']['sfxDomain'];
+        }
 
         $urls[] = ['url' => $driver->getOpenUrl()];
 

@@ -80,7 +80,7 @@ echo'<table>';
         echo '<span class="'.$daiaResult['daiaplus']['status_class'].'">'.$this->transEsc($status).'</span>';
     }
 
-    /* if (!empty($action)) {
+    if (!empty($action)) {
         if(!empty($action['generic'])) {
             $action_href = $action['generic']['href'];
             $action_label = $action['generic']['label'];
@@ -103,7 +103,7 @@ echo'<table>';
             echo $action_label;
         }
         echo '</span>';
-    } */
+    }
 
     if (!empty($actionArray)) {
         foreach ($actionArray as $actionEntry) {

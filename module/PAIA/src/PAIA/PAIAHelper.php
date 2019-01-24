@@ -581,7 +581,7 @@ class PAIAHelper extends AbstractHelper
      * @return Array
      */
 	//TODO: Complete function once external service is available
-	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $GVKlink, $doi, $list, $mediatype, $language) {
+	public function getElectronicAvailability($ppn, $openUrl, $url_access, $url_access_level, $first_matching_issn, $GVKlink, $doi, $list, $mediatype, $language, $sfx) {
 		$ppn = ($ppn !== 'undefined' ? $ppn : '');
 		$openUrl = ($openUrl !== 'undefined' ? $openUrl : '');
 		$url_access = ($url_access !== 'undefined' ? $url_access : '');
@@ -590,13 +590,14 @@ class PAIAHelper extends AbstractHelper
 		$doi = ($doi !== 'undefined' ? $doi : '');
 		$list = ($list !== 'undefined' ? $list : 0);
 		$language = ($language !== 'undefined' ? $language : 'de');
+        $sfx = ($sfx !== 'undefined' ? $sfx : '');
 		
 		if(!empty($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'])) {
 			$site = $this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['isil'];
 		} else {
 			$site = 'Default';
 		}
-        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.urlencode($url_access).'&url_access_level='.$url_access_level.'&GVKlink='.$GVKlink.'&doi='.urlencode($doi).'&list='.$list.'&mediatype='.urlencode($mediatype).'&language='.$language.'&site='.$site.'&format=json';
+        $url_path = $this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['url'].'electronicavailability/'.$ppn.'?apikey='.$this->paiaConfig['DAIA_'.$this->paiaConfigService->getIsil()]['daiaplus_api_key'].'&openurl='.urlencode($openUrl).'&url_access='.urlencode($url_access).'&url_access_level='.$url_access_level.'&GVKlink='.$GVKlink.'&doi='.urlencode($doi).'&list='.$list.'&mediatype='.urlencode($mediatype).'&language='.$language.'&site='.$site.'&sfx='.urlencode($sfx).'&format=json';
 
         echo "<span style='display:none;'>".$url_path."</span>";
 
