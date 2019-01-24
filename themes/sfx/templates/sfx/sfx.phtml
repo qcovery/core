@@ -3,8 +3,8 @@
         echo '<a href="" class="bu_fulltext button-sfx" data-id="'.$this->driver->getUniqueID().'"><b>SFX</b></a>';
         echo '<div id="bu_fulltext_links_'.$this->driver->getUniqueID().'" style="display:none;">';
 
-        $sfx_domains = array('haw', 'hcu', 'hsu', 'tuhh', 'subhh');
-        $sfx_domains_display_array = array('haw' => 'HAW', 'hcu' => 'HCU', 'hsu' => 'HSU', 'subhh' => 'UHH', 'tuhh' => 'TUHH');
+        $sfx_domains = array('haw');
+        $sfx_domains_display_array = array('haw' => 'HAW');
 
         $urls[] = ['url' => $this->driver->getOpenUrl()];
 
@@ -16,29 +16,29 @@
         foreach ($sfx_domains as $sfx_domain) {
             $url = $urls[0]['url'];
 
+            $linkParams = [];
+            $sfxData = $driver->getMarcData('SFX');
+            if (is_array($sfxData)) {
+                foreach ($sfxData as $sfx) {
+                    if (is_array($sfx)) {
+                        foreach ($sfx as $key => $value) {
+                            $url .= '&rft.' . $key . '=' . urlencode($value['data'][0]);
+                        }
+                    }
+                }
+            }
+
             $url = str_ireplace('rfr_', '', $url);
             $url = str_ireplace('rft.', '', $url);
 
             $url = 'http://sfx.gbv.de/sfx_'.$sfx_domain.'?'.$url;
 
-            /* if (stristr($url, '1.1.1.1')) {
-                $url = str_ireplace('1.1.1.1?', 'sfx.gbv.de/sfx_' . $sfx_domain . '?', $url);
-            } else {
-                if (stristr($url, '/sfx_tuhh?')) {
-                    $url = str_ireplace('/sfx_tuhh?', '/sfx_' . $sfx_domain . '?', $url);
-                } else {
-                    $url = str_ireplace('/sfx_subhh?', '/sfx_' . $sfx_domain . '?', $url);
-                }
-            }
-            if ($sfx_domain == 'tuhh') {
-                $url = str_ireplace(':9004', '', $url);
-            } */
             $result_url_link = $url . '&sfx.service_type';
             $result_url_check_fulltext = $url . '&sfx.service_type=getFullTxt&sfx.response_type=simplexml';
             $issns = $this->driver->getISSNs();
-            //echo '<a class="belugaSFXLink bib_button" style="display:none;" data-link="'.urlencode($result_url_check_fulltext).'" data-lookfor="'.$this->driver->getContainerTitle().'" data-institution="'.$institution.'" href="'.$result_url_link.'" target="_blank">';
 
             echo '<a class="belugaSFXLink button-sfx" style="display:none;" data-link="' . urlencode($result_url_check_fulltext) . '" data-lookfor="' . $issns[0] . '" data-sfxdomain="' . $sfx_domain . '" data-volume="' . $this->driver->tryMethod('getVolume') . '" href="' . $result_url_link . '" target="_blank">';
+            echo '<!-- '.urlencode($result_url_check_fulltext).' -->';
             echo '<span><i class="sfx-status"></i>' . strtoupper($sfx_domains_display_array[$sfx_domain]) . '</span>';
             echo '</a>';
         }
