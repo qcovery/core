@@ -15,8 +15,7 @@
         $first = true;
         foreach ($sfx_domains as $sfx_domain) {
             $url = $urls[0]['url'];
-
-            $linkParams = [];
+            
             $sfxData = $driver->getMarcData('SFX');
             if (is_array($sfxData)) {
                 foreach ($sfxData as $sfx) {
