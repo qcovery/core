@@ -73,6 +73,23 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 }
                 $viewMethod = $solrMarcData[$solrMarcKey]['view-method'] ?? '';
                 unset($solrMarcData[$solrMarcKey]['view-method']);
+                $matchKey = $solrMarcData[$solrMarcKey]['match-key'] ?? '';
+                unset($solrMarcData[$solrMarcKey]['match-key']);
+                if (!empty($matchKey)) {
+                    $tmpData = [];
+                    foreach ($solrMarcData[$solrMarcKey] as $index => $data) {
+                        if (!empty($data[$matchKey]['data'][0])) {
+                            foreach ($solrMarcData[$solrMarcKey] as $index2 => $data2) {
+                                if ($index2 > $index && !empty($data2[$matchKey]['data'][0]) && $data2[$matchKey]['data'][0] == $data[$matchKey]['data'][0]) {
+                                    foreach ($solrMarcData[$solrMarcKey][$index2] as $name => $entry) {
+                                        $solrMarcData[$solrMarcKey][$index][$name] = $entry;
+                                    }
+                                    unset($solrMarcData[$solrMarcKey][$index2]);
+                                }
+                            }
+                        }
+                    }
+                }
                 $originalLetters = '';
                 foreach ($solrMarcData[$solrMarcKey] as $data) {
                     foreach ($data as $date) {
@@ -240,10 +257,12 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             foreach ($date['data'] as $value) {
                 $translatedData[] = $this->view->transEsc($value);
             }
-            if (true || $key != 'description') {
-                $string .= implode($separator, $translatedData) . $separator;
-            } else {
+            if ($key === 'description') {
                 $string .= ' [' . implode($separator, $translatedData) . ']';
+            } elseif ($key === 'prefix') {
+                $string = $translatedData[0] . ': ' . $string;
+            } else {
+                $string .= implode($separator, $translatedData) . $separator;
             }
         }
         $string = substr_replace($string, '', -1 * strlen($separator));

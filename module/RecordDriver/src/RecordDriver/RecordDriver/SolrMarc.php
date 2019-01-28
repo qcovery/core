@@ -167,6 +167,11 @@ class SolrMarc extends SolrDefault
                 $solrMarcSpecs[$item]['view-method'] = $solrMarcSpec['view-method'];
             }
             unset($solrMarcSpec['view-method']);
+            $solrMarcSpecs[$item]['match-key'] = '';
+	    if (!empty($solrMarcSpec['match-key'])) {
+                $solrMarcSpecs[$item]['match-key'] = $solrMarcSpec['match-key'];
+            }
+            unset($solrMarcSpec['match-key']);
             $conditions = $subfields = $parentMethods = $description = [];
 	    foreach ($solrMarcSpec as $marcField => $fieldSpec) {
                 if (!empty($fieldSpec)) {
@@ -384,8 +389,8 @@ class SolrMarc extends SolrDefault
             }
         }
         if (!empty($returnData)) {
-//            $returnData['title'] = $title;
             $returnData['view-method'] = $solrMarcSpecs['view-method'];
+            $returnData['match-key'] = $solrMarcSpecs['match-key'];
 	}
         if (!$mandatoryFieldSet) {
             return [];
