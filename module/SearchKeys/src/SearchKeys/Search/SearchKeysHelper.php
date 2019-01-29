@@ -36,7 +36,7 @@ class SearchKeysHelper
         }
         $defaultType = $options->getDefaultHandler();
 
-        $lookfor = $lookfor = preg_replace('/\s+/', ' ', $request->get('lookfor'));
+        $lookfor = trim(preg_replace('/\s+/', ' ', $request->get('lookfor')));
         $lookfor = preg_replace('/""+/', '"', $lookfor);
         $type = $request->get('type');
 
