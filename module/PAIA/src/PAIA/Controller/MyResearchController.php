@@ -706,7 +706,8 @@ class MyResearchController extends AbstractBase
                     $recordSource . '|' . $recordId, 'Save'
                 );
                 return $this
-                    ->lightboxAwareRedirect($details['route'], $details['params']);
+                    ->$this->redirect()->toRoute($details['route'], $details['params']);
+#                    ->lightboxAwareRedirect($details['route'], $details['params']);
             }
 
             // Similarly, if the user is in the process of bulk-saving records,
@@ -719,13 +720,13 @@ class MyResearchController extends AbstractBase
                 foreach ($bulkIds as $id) {
                     $params[] = urlencode('ids[]') . '=' . urlencode($id);
                 }
-                $saveUrl = $this->getLightboxAwareUrl('cart-save');
+                $saveUrl = $this->url()->fromRoute('cart-save');
                 $saveUrl .= (strpos($saveUrl, '?') === false) ? '?' : '&';
                 return $this->redirect()
                     ->toUrl($saveUrl . implode('&', $params));
             }
 
-            return $this->lightboxAwareRedirect('userList', array('id' => $finalId));
+            return $this->$this->redirect()->toRoute('userList', array('id' => $finalId));
         } catch (\Exception $e) {
             switch(get_class($e)) {
             case 'VuFind\Exception\ListPermission':
