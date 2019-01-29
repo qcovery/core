@@ -726,7 +726,7 @@ class MyResearchController extends AbstractBase
                     ->toUrl($saveUrl . implode('&', $params));
             }
 
-            return $this->$this->redirect()->toRoute('userList', array('id' => $finalId));
+            return $this->redirect()->toRoute('userList', array('id' => $finalId));
         } catch (\Exception $e) {
             switch(get_class($e)) {
             case 'VuFind\Exception\ListPermission':
