@@ -255,7 +255,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         foreach ($data as $key => $date) {
             $translatedData = [];
             foreach ($date['data'] as $value) {
-                $translatedData[] = $this->view->transEsc($value);
+                $translatedData[] = $value;
             }
             if ($key === 'description') {
                 $string .= ' [' . implode($separator, $translatedData) . ']';
