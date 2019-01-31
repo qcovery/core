@@ -255,7 +255,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         foreach ($data as $key => $date) {
             $translatedData = [];
             foreach ($date['data'] as $value) {
-                $translatedData[] = $value;
+                $translatedData[] = $this->view->transEsc($value);
             }
             if ($key === 'description') {
                 $string .= ' [' . implode($separator, $translatedData) . ']';
@@ -265,8 +265,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 $string .= implode($separator, $translatedData) . $separator;
             }
         }
-        $string = substr_replace($string, '', -1 * strlen($separator));
-        return $this->view->transEsc($string);
+        return substr_replace($string, '', -1 * strlen($separator));
      }
 
     /**
