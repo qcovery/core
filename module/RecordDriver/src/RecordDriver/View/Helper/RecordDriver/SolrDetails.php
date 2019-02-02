@@ -242,7 +242,11 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             }
             $item = '<a href="' . $this->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
             if (!empty($descriptions[$index])) {
-                $item .= ' [' . implode(', ', $description[$index]) . ']';
+                if (is_array($descriptions[$index])) {
+                    $item .= ' [' . implode(', ', $descriptions[$index]) . ']';
+                } else {
+                    $item .= ' [' . $descriptions[$index] . ']';
+                }
             }
             $items[] = $item;
         }
