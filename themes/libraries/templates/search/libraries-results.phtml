@@ -1,7 +1,11 @@
 <?php
-  $Libraries = $this->params->getLibraries();
-  $selectedLibrary = $Libraries->selectLibrary();
-  $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
+  $selectedLibrary = [];
+  $libraryList = [];
+  if (method_exists($this->params, 'getLibraries')) {
+      $Libraries = $this->params->getLibraries();
+      $selectedLibrary = $Libraries->selectLibrary();
+      $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
+  }
   $searchLink = $this->url($this->searchOptions($this->searchClassId)->getSearchAction());
 ?>
     <div id="LibrarySelector">
