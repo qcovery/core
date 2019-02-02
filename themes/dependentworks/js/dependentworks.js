@@ -34,7 +34,13 @@ jQuery(document).ready(function() {
                 if (data.data.length > visibleItems) {
                     jQuery('p#ToggleDependentWorksMore').attr('style', 'display:block');
                     for (var i = visibleItems; i < data.data.length; i++) {
-                        var title = data.data[i]['title'] + ' ' + data.data[i]['part'] + ' (' + data.data[i]['date'] + ')';
+                        var title = data.data[i]['title'];
+                        if (data.data[i]['part'] != '') {
+                            title = title + ' ' + data.data[i]['part'];
+                        }
+                        if (data.data[i]['date'] != '') {
+                            title = title + ' (' + data.data[i]['date'] + ')';
+                        }
                         var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
                         jQuery('ul#DependentWorksHidden').append('<li>' + href + '</li>');                
                     }

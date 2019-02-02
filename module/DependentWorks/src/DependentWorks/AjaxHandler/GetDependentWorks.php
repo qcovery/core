@@ -111,8 +111,12 @@ class GetDependentWorks extends AbstractBase
                     $date = $dependentWorksDate['date']['data'][0];
                 }
             }
+            $sortFlag = SORT_REGULAR;
             if (!empty($date) && !isset($data[$date])) {
                 $sort = $date;
+            } else if (!empty($part) && !isset($data[$part])) {
+                $sort = $part;
+                $sortFlag = SORT_NUMERIC;
             } else {
                 $sort = $i;
             }
@@ -121,7 +125,7 @@ class GetDependentWorks extends AbstractBase
                        'part' => $part, 
                        'date' => $date];
         }
-        krsort($data);
+        krsort($data, $sortFlag);
         return $this->formatResponse(array_values($data));
     }
 } 
