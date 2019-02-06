@@ -93,11 +93,12 @@ class GetDependentWorks extends AbstractBase
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn, 'rows' => 100]));
 
         $records = $results->getResults();
         $data = [];
         foreach ($records as $i => $record) {
+echo $i . ' - ';
             $dependentWorksData = $record->getMarcData('DependentWorksData');
             $title = $part = $date = '';
             foreach ($dependentWorksData as $dependentWorksDate) {
@@ -113,10 +114,10 @@ class GetDependentWorks extends AbstractBase
             }
             $sortFlag = SORT_REGULAR;
             if (!empty($date) && !isset($data[$date])) {
-                $sort = $date;
-            } else if (!empty($part) && !isset($data[$part])) {
                 $sort = $part;
-                $sortFlag = SORT_NUMERIC;
+            } else if (!empty($part) && !isset($data[$part])) {
+                $sort = $date;
+                //$sortFlag = SORT_NUMERIC;
             } else {
                 $sort = $i;
             }
