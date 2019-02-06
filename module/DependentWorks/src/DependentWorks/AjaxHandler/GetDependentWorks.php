@@ -113,11 +113,11 @@ class GetDependentWorks extends AbstractBase
                 }
             }
             $sortFlag = SORT_REGULAR;
-            if (!empty($date) && !isset($data[$date])) {
+            if (!empty($part) && !isset($data[$part])) {
                 $sort = $part;
-            } else if (!empty($part) && !isset($data[$part])) {
+            } elseif (!empty($date) && !isset($data[$date])) {
                 $sort = $date;
-                //$sortFlag = SORT_NUMERIC;
+                $sortFlag = SORT_NUMERIC;
             } else {
                 $sort = $i;
             }
