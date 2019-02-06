@@ -64,6 +64,7 @@
 			<? endif; ?>
 			<th class="mobile_hide"><?=$this->transEsc('Call Number')?></th>
 			<th><?=$this->transEsc('Title');?></th>
+			<th><?=$this->transEsc('Location');?></th>
 			<th><?=$this->transEsc('Remark');?></th>
 			</tr>
 		</thead>
@@ -105,6 +106,11 @@
                 echo $this->transEsc('Title not available');
               }
             ?></td>
+
+            <!-- Location -->
+            <td data-th = "<?=$this->transEsc('Location'); ?>">
+              <?=$ilsDetails['location'] ?>
+           </td>
 			
 			<!--- Remarks -->
             <td data-th = "<?=$this->transEsc('Remark'); ?>">
