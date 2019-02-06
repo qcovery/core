@@ -92,13 +92,13 @@ class GetDependentWorks extends AbstractBase
         $ppn = $params->fromQuery('ppn');
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $results = $this->resultsManager->get($backend);
+        $results->getOptions()->setLimitOptions([20, 1000]);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn, 'rows' => 100]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn, 'limit' => 1000]));
 
         $records = $results->getResults();
         $data = [];
         foreach ($records as $i => $record) {
-echo $i . ' - ';
             $dependentWorksData = $record->getMarcData('DependentWorksData');
             $title = $part = $date = '';
             foreach ($dependentWorksData as $dependentWorksDate) {
