@@ -62,20 +62,36 @@ foreach ($daiaResults as $daiaResult) {
         if ($marcField951aValue == 'AI') {
             $label = $this->transEsc("Containing Work") . ": " . $label;
         }
-        foreach ($actionArray as $actionEntry) {
-            if (empty($actionEntry) || in_array($actionEntry['service'], array("loan", "presentation"))) {
-                if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
-                    if ($daiaResult['daiaplus']['showDepartment']) {
-                        echo $this->transEsc('department') . ':<br/>' . $daiaResult['daiaplus']['department'] . ' - ' . $storage . '<br/><b>' . $label . '</b><br/>';
-                    } else {
-                        echo $this->transEsc('department') . ':<br/>' . $storage . '<br/><b>' . $label . '</b><br/>';
+        if (!empty($actionArray)) {
+            foreach ($actionArray as $actionEntry) {
+                if (empty($actionEntry) || in_array($actionEntry['service'], array("loan", "presentation"))) {
+                    if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
+                        if ($daiaResult['daiaplus']['showDepartment']) {
+                            echo $this->transEsc('department') . ':<br/>' . $daiaResult['daiaplus']['department'] . ' - ' . $storage . '<br/><b>' . $label . '</b><br/>';
+                        } else {
+                            echo $this->transEsc('department') . ':<br/>' . $storage . '<br/><b>' . $label . '</b><br/>';
+                        }
                     }
+                }
+            }
+        } else {
+            if (($daiaResult['daiaplus']['department'] != '' || $daiaResult['daiaplus']['storage'] != '' || $daiaResult['daiaplus']['label'] != '')) {
+                if ($daiaResult['daiaplus']['showDepartment']) {
+                    echo $this->transEsc('department') . ':<br/>' . $daiaResult['daiaplus']['department'] . ' - ' . $storage . '<br/><b>' . $label . '</b><br/>';
+                } else {
+                    echo $this->transEsc('department') . ':<br/>' . $storage . '<br/><b>' . $label . '</b><br/>';
                 }
             }
         }
     }
 
-    foreach ($actionArray as $actionEntry) {
+    if (!empty($actionArray)) {
+        foreach ($actionArray as $actionEntry) {
+            if ($status != '' && (empty($actionEntry) || in_array($actionEntry['service'], array("loan", "presentation")))) {
+                echo '<span class="' . $daiaResult['daiaplus']['status_class'] . '">' . $this->transEsc($status) . '</span>';
+            }
+        }
+    } else {
         if ($status != '' && (empty($actionEntry) || in_array($actionEntry['service'], array("loan", "presentation")))) {
             echo '<span class="' . $daiaResult['daiaplus']['status_class'] . '">' . $this->transEsc($status) . '</span>';
         }
