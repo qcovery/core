@@ -49,6 +49,16 @@ jQuery(document).ready(function() {
             }
         }
     });
+
+    jQuery('#ToggleDependentWorksMore').on('click', function(event) {
+        event.preventDefault();
+        toggleDependentWorks();
+    });
+
+    jQuery('#ToggleDependentWorksLess').on('click', function(event) {
+        event.preventDefault();
+        toggleDependentWorks();
+    });
 });
 
 function toggleDependentWorks() {
