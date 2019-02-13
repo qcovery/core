@@ -115,6 +115,7 @@ class GetLibraries extends AbstractBase
         $libraryFacet = $this->Libraries->getLibraryFacetField($backend);
         $libraryFacetValues = $this->Libraries->getLibraryFacetValues($backend);
         $facetSearch = $this->Libraries->getFacetSearch($backend);
+        $selectedLibraryCode = $libraryCode;
 
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
@@ -172,6 +173,7 @@ class GetLibraries extends AbstractBase
             'libraryData' => $libraryData,
             'locationFacets' => $locationFacets,
             'locationFilter' => ['field' => $locationFilter['field'], 'value' => ''],
+            'selectedLibraryCode' => $selectedLibraryCode,
         ];
         return $this->formatResponse($data);
     }

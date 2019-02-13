@@ -73,6 +73,9 @@ jQuery(document).ready(function() {
                             } else {
                                 jQuery('div#library-list .library-item').last().attr('href', searchLink + newQueryString + '&library=' + thisLibraryCode);
                             }
+                            if(thisLibraryCode == data.data.selectedLibraryCode) {
+                                jQuery('div#library-list .library-item').last().addClass('library-item-selected');
+                            }
                         });
                         jQuery('div#side-panel-library').attr('style', 'display:block');
                     } else {
