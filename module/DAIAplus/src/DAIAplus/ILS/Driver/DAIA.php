@@ -356,6 +356,10 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
                     $result_item['daiaplus'] = $item['daiaplus'];
                 }
 
+                if (isset($item['chronology'])) {
+                    $result_item['chronology'] = $item['chronology'];
+                }
+
                 $result[] = $result_item;
             } // end iteration on item
         }
