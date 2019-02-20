@@ -47,6 +47,10 @@
       <tr style="font-weight:bold"><td colspan="3"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue) ?></td></tr>
     </table>
   <? endif; ?>
+
+    <div id="paiaHint">
+        <?= $this->translate('finesHint'); ?>
+    </div>
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
