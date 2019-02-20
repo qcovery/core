@@ -26,7 +26,10 @@
 		<? if(isset($record['amount'])) { ?>
 			  <tr>
 				<td><?=isset($record['feetype']) ? $this->escapeHtml($record['feetype']) : ''?></td>
-				<td><?=isset($record['duedate']) ? $this->escapeHtml(substr($record['duedate'],0,strpos($record['duedate'],"T"))) : ''?></td>
+				<td>
+                    <? $dueDate = new \DateTime($record['duedate']); ?>
+                    <?=isset($record['duedate']) ? $this->escapeHtml($dueDate->format('d.m.Y')) : ''?>
+                </td>
 				<td>
 				  <? if (empty($record['title'])): ?>
 					<?=$this->transEsc('not_applicable')?>
