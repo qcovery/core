@@ -390,6 +390,7 @@ class PAIA extends AbstractBase
         $name_array = explode(', ', $json_array['name']);
         $expiresDate = new \DateTime($json_array['expires']);
         $patron = array(
+            'id' => $patron['id'],
             'firstname' => $name_array[1],
             'lastname' => $name_array[0],
             'email' => $json_array['email'],
