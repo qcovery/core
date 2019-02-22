@@ -112,6 +112,12 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                     }
                 } elseif ($viewMethod == 'chain') {
                     $templateData = $this->makeChain($solrMarcData[$solrMarcKey]);
+                } elseif (strpos($viewMethod, '-template') > 0) {
+                    list($key, , $separators) = explode('-', $viewMethod);
+                    if (empty($separators)) {
+                        $separators = 0;
+                    }
+                    $templateData[] = $this->makeTemplate($solrMarcData[$solrMarcKey], $key, $separators);
                 } else {
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeText($data);
@@ -288,5 +294,14 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             $template, $className, ['driver' => $this->driver, 'lookfor' => $lookfor]
         );
         return $link;
+    }
+
+
+    private function makeTemplate($solrMarcData, $key, $separators = 0) {
+        $template = 'RecordDriver/%s/' . 'template-' . $key . '.phtml';
+        $className = get_class($this->driver);
+        return $this->renderClassTemplate(
+            $template, $className, ['driver' => $this->driver, 'solrMarcData' => $solrMarcData, 'separators' => $separators, 'className' => $className]
+        );
     }
 }

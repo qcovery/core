@@ -27,6 +27,7 @@ return [
         'sfx',
         'extendedfacets',
         'beluga-core-base',
+        'rvk',
     ],
     "less" => [
         "active" => false,
