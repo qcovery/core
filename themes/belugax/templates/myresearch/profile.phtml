@@ -22,6 +22,7 @@
       echo $this->renderArray(
         $arrTemplate, $this->profile,
         [
+          $this->transEsc('id') => 'id',
           //$this->transEsc('First Name') => 'firstname',
           $this->transEsc('Name') => 'lastname'
         ]
@@ -79,6 +80,10 @@
 		  </div>
 	  <?}
 	?>
+
+    <div id="paiaHint">
+        <?= $this->translate('profileHint'); ?>
+    </div>
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
