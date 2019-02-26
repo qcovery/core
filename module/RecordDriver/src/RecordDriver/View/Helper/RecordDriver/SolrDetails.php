@@ -76,7 +76,6 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 $matchKey = $solrMarcData[$solrMarcKey]['match-key'] ?? '';
                 unset($solrMarcData[$solrMarcKey]['match-key']);
                 if (!empty($matchKey)) {
-                    $tmpData = [];
                     foreach ($solrMarcData[$solrMarcKey] as $index => $data) {
                         if (!empty($data[$matchKey]['data'][0])) {
                             foreach ($solrMarcData[$solrMarcKey] as $index2 => $data2) {

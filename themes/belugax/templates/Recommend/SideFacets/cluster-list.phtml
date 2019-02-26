@@ -62,7 +62,7 @@
     <i class="fa <?=$thisFacet['isApplied'] ? 'fa-check-square-o' : 'fa-square-o' ?>" aria-hidden="true"></i>
   <? endif; ?>
 
-  <?=$this->escapeHtml($thisFacet['displayText'])?>
+  <?=$this->transEsc($thisFacet['displayText'])?>
 
   <? if (!$thisFacet['isApplied'] && $this->allowExclude): ?>
       </a>
