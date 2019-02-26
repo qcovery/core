@@ -227,6 +227,7 @@ class PAIA extends AbstractBase
            $user['firstname']    = $profile['firstname'];
            $user['lastname']     = $profile['lastname'];
            $user['email']        = $profile['email'];
+           $user['type']         = $profile['type'];
         }
         return $user;
     }
