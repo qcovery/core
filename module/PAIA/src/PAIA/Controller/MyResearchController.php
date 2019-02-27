@@ -705,8 +705,7 @@ class MyResearchController extends AbstractBase
                 $details = $this->getRecordRouter()->getActionRouteDetails(
                     $recordSource . '|' . $recordId, 'Save'
                 );
-                return $this
-                    ->$this->redirect()->toRoute($details['route'], $details['params']);
+                return $this->redirect()->toRoute($details['route'], $details['params']);
 #                    ->lightboxAwareRedirect($details['route'], $details['params']);
             }
 
