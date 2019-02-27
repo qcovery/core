@@ -424,7 +424,8 @@ class MyResearchController extends AbstractBase
             $this->favorites()->delete($ids, $listID, $user);
             $this->flashMessenger()->setNamespace('info')
                 ->addMessage('fav_delete_success');
-            return $this->redirect()->toUrl($newUrl);
+            //return $this->redirect()->toUrl($newUrl);
+            return $this->forwardTo('MyResearch', 'deleteConfirm');
         }
 
         // If we got this far, the operation has not been confirmed yet; show
@@ -441,6 +442,9 @@ class MyResearchController extends AbstractBase
                 'records' => $this->getRecordLoader()->loadBatch($ids)
             )
         );
+    }
+
+    public function deleteConfirmAction () {
     }
 
     /**
