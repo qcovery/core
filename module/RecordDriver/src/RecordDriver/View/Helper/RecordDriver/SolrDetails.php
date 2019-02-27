@@ -93,8 +93,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 foreach ($solrMarcData[$solrMarcKey] as $data) {
                     foreach ($data as $date) {
                         if (isset($date['originalLetters'])) {
-                            $originalLetters = $date['originalLetters'];
-                            break 2;
+                            $originalLetters .= ' ' . $date['originalLetters'];
                         }
                     }
                 }
@@ -105,7 +104,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                         $separators = 0;
                     }
                     $templateData = $this->makeLink($solrMarcData[$solrMarcKey], $key, $separators);
-                 } elseif ($viewMethod == 'directlink') {
+                } elseif ($viewMethod == 'directlink') {
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeDirectLink($data);
                     }
