@@ -14,6 +14,14 @@ $config = array(
             'paia' => 'PAIA\Controller\PAIAController',
         ],
     ),
+    'controller_plugins' => [
+        'factories' => [
+            'PAIA\Controller\Plugin\Renewals' => 'Zend\ServiceManager\Factory\InvokableFactory',
+        ],
+        'aliases' => [
+            'renewals' => 'PAIA\Controller\Plugin\Renewals',
+        ],
+    ],
     'service_manager' => array(
         'allow_override' => true,
         'factories' => array(
