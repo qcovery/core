@@ -13,13 +13,21 @@ $config = [
             'VuFind\Controller\DeliveryController' => 'Delivery\Controller\DeliveryController',
         ],
     ],
-/*
     'service_manager' => [
+        'allow_override' => true,
         'factories' => [
-            'Delivery\DbTablePluginManager' => 'Delivery\Service\Factory::getDbTablePluginManager',
+            'Delivery\Db\Table\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
+            'Delivery\Db\Row\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
+            'Delivery\Auth\DeliveryAuthenticator' => 'Delivery\Auth\DeliveryAuthenticatorFactory',
+        ],
+        'aliases' => [
+            'VuFind\Db\Table\PluginManager' => 'Delivery\Db\Table\PluginManager',
+            'VuFind\Db\Row\PluginManager' => 'Delivery\Db\Row\PluginManager',
+            'VuFind\ILSAuthenticator' => 'Delivery\Auth\DeliveryAuthenticator',
         ],
     ],
-    'vufind' => [
+/*
+   'vufind' => [
         'plugin_managers' => [
             'db_table' => [
                 'factories' => [
@@ -40,7 +48,7 @@ $config = [
 
 // Define static routes -- Controller/Action strings
 $staticRoutes = [
-   'Delivery/Home', 'Delivery/Edit', 'Delivery/Register', 'Delivery/Admin', 'Delivery/Order'
+   'Delivery/Home', 'Delivery/Edit', 'Delivery/Order'
 ];
 
 $routeGenerator = new \VuFind\Route\RouteGenerator();

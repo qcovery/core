@@ -15,20 +15,26 @@
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_delivery` (
+CREATE TABLE IF NOT EXISTS `user_delivery` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
-  `sex` char(1),
-  `title` varchar(31),
-  `library` varchar(63),
-  `card_number` varchar(31) NOT NULL DEFAULT '',
-  `delivery_email` varchar(63) NOT NULL DEFAULT '',
-  `is_admin` char(1) NOT NULL DEFAULT 'n',
-  `authorized` char(1),
-  `last_order` datetime,
+  `delivery_email` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `user_delivery_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+CREATE TABLE `delivery` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_delivery_id` int(11) NOT NULL DEFAULT '0',
+  `item_id` varchar(63) NOT NULL DEFAULT '',
+  `item_title` varchar(255) NOT NULL DEFAULT '',
+  `ordered` datetime,
+  `delivered` datetime,
+  `rejected` datetime,
+  PRIMARY KEY (`id`),
+  KEY `user_delivery_id` (`user_delivery_id`),
+  CONSTRAINT `delivery_ibfk_1` FOREIGN KEY (`user_delivery_id`) REFERENCES `user_delivery` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

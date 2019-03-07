@@ -46,6 +46,7 @@ use Delivery\DataHandler;
 class DeliveryController extends AbstractBase
 {
 
+    protected $deliveryAuthenticator;
     protected $userDelivery;
     protected $deliveryGlobalConfig;
 
@@ -53,14 +54,13 @@ class DeliveryController extends AbstractBase
 
     /**
      * Constructor
+     */
     public function __construct(ServiceLocatorInterface $sm)
     {
         parent::__construct($sm);
-        $this->user = $this->getUser();
-        $this->userDelivery = $this->getTable('user_delivery');
-        $this->deliveryGlobalConfig = $this->getConfig('deliveryGlobal');
+        $this->deliveryAuthenticator = $sm->get('Delivery\Auth\DeliveryAuthenticator');
+        $this->deliveryGlobalConfig = $this->getConfig('deliveryGlobal')->toArray();
     }
-     */
 
     /**
      * Get a database table object.
@@ -73,7 +73,7 @@ class DeliveryController extends AbstractBase
     {
         return $this->serviceLocator->get('Delivery\Db\Table\PluginManager')->get($table);
     }
-
+    
     /**
      * Home action
      *
@@ -81,6 +81,8 @@ class DeliveryController extends AbstractBase
      */
     public function homeAction()
     {
+        $message = $this->deliveryAuthenticator->authenticate();
+        /*
         // First make sure user is logged in to VuFind:
         if (!$this->getAuthManager()->isLoggedIn()) {
             return $this->forceLogin();
@@ -91,10 +93,13 @@ class DeliveryController extends AbstractBase
 
         $deliveryUser = (array) $this->getTable('userdelivery')->get($this->user->id);
         $deliveryUser['name'] = $this->user->firstname . ' ' . $this->user->lastname;
-        // Make view
+*/
+         // Make view
+
         $view = $this->createViewModel();
 
-        $view->deliveryUser = $deliveryUser;
+        $view->message = $message;
+//        $view->deliveryUser = $deliveryUser;
  
         return $view;
     }

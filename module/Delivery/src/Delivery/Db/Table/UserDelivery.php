@@ -44,7 +44,6 @@ class UserDelivery extends Gateway
 {
     protected $userId;
 
-
     /**
      * Constructor
      *
@@ -55,21 +54,29 @@ class UserDelivery extends Gateway
      * @param string        $table   Name of database table to interface with
      */
     public function __construct(Adapter $adapter, PluginManager $tm, $cfg,
-        RowGateway $rowObj = null, $table = 'user_delivery'
+        RowGateway $rowObj, $table = 'user_delivery'
     ) {
         parent::__construct($adapter, $tm, $cfg, $rowObj, $table);
     }
 
-    public function get($user_id) {
-
+    public function get($user_id)
+    {
         if (!$user_id) {
             throw new LoginRequiredException('Login required');
         }
-
         $result = $this->select(['user_id' => $user_id])->current();
         if (empty($result)) {
             return null;
         }
         return $result;
+    }
+
+    public function createRowForUserId($user_id, $email)
+    {
+        $row = $this->createRow();
+        $row->user_id = $user_id;
+        $row->delivery_email = $email;
+        $row->save();
+        return $row;
     }
 }
