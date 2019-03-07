@@ -211,7 +211,7 @@ class PAIA extends AbstractBase
         $this->paiaConnector->setIsil($isil);
         $json = $this->paiaConnector->login($barcode, $password);
         $json_array = json_decode($json, true);
-        if (!isset($json_array['error'])) {
+	if (!isset($json_array['error'])) {
            $user['id']           = trim($barcode);
            $user['access_token'] = $json_array['access_token'];
            $user['token_type']   = $json_array['token_type'];
@@ -229,7 +229,7 @@ class PAIA extends AbstractBase
            $user['email']        = $profile['email'];
            $user['type']         = $profile['type'];
         }
-        return $user;
+	return $user;
     }
     	
    /**
@@ -388,9 +388,9 @@ class PAIA extends AbstractBase
         $this->paiaConnector->setIsil($patron['cat_isil']);
         $json = $this->paiaConnector->patron($patron['id'], $patron['access_token']);
         $json_array = json_decode($json, true);
-        $name_array = explode(', ', $json_array['name']);
-        $expiresDate = new \DateTime($json_array['expires']);
-        $patron = array(
+	$name_array = explode(', ', $json_array['name']);
+	$expiresDate = new \DateTime($json_array['expires']);
+	$patron = array(
             'id' => $patron['id'],
             'firstname' => $name_array[1],
             'lastname' => $name_array[0],
@@ -398,9 +398,8 @@ class PAIA extends AbstractBase
             'expires' => $expiresDate->format('d.m.Y'),
             'status' => $json_array['status'],
             'address' => $json_array['address'],
-            'type' => $json_array['type'][0],
+            'type' => implode(', ', $json_array['type']),
         );
-		
 		
 		if ($this->paiaConfig[$this->paiaConfigService->getPaiaGlobalKey()]['show_profile_note'] == 1) {
 			$patron += array(
@@ -408,7 +407,7 @@ class PAIA extends AbstractBase
 			);
 		}
 		
-        return $patron;
+	return $patron;
     }
 
 
