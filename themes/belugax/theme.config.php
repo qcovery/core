@@ -23,7 +23,6 @@ return [
         'searchkeys',
         'dependentworks',
         'recorddriver',
-        'lms',
         'sfx',
         'extendedfacets',
         'beluga-core-base',
