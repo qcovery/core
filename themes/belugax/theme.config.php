@@ -15,7 +15,6 @@ return [
         'belugax.js',
     ],
     'mixins' => [
-        'paia',
         'daiaplus',
         'belugaconfig',
         'delivery',
@@ -23,10 +22,9 @@ return [
         'searchkeys',
         'dependentworks',
         'recorddriver',
-        'sfx',
         'extendedfacets',
-        'beluga-core-base',
         'rvk',
+        'beluga-core-base',
     ],
     "less" => [
         "active" => false,
