@@ -1,6 +1,3 @@
-<!--Modul PAIA-->
-<?=$this->render('Auth/AbstractBase/paia-loginfields.phtml'); ?>
-<!--Modul PAIA-->
 <div class="form-group">
   <label class="control-label" for="login_<?=$this->escapeHtmlAttr($topClass)?>_username"><?=$this->transEsc('Username')?>:</label>
   <input type="text" name="username" id="login_<?=$this->escapeHtmlAttr($topClass)?>_username" value="<?=$this->escapeHtmlAttr($this->request->get('username'))?>" class="form-control"/>
@@ -9,17 +6,3 @@
   <label class="control-label" for="login_<?=$this->escapeHtmlAttr($topClass)?>_password"><?=$this->transEsc('Password')?>:</label>
   <input type="password" name="password" id="login_<?=$this->escapeHtmlAttr($topClass)?>_password" class="form-control"/>
 </div>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#paia-multilogin-select').on('change', function(){
-            var isil = $('#paia-multilogin-select option:selected').val();
-            $('#paia-multilogin-icons img').each(function(){
-                if ($(this).data('isil') == isil) {
-                    $(this).removeClass('hidden');
-                } else {
-                    $(this).addClass('hidden');
-                }
-            });
-        })
-    });
-</script>
