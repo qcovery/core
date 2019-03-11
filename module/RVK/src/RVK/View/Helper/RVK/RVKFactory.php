@@ -62,9 +62,8 @@ class RVKFactory implements FactoryInterface
             throw new \Exception('Unexpected options sent to factory.');
         }
         $config = $container->get('VuFind\Config\PluginManager');
-        $memory = $container->get('VuFind\Search\Memory');
         return new $requestedName(
-            $config, $memory
+            $config
         );
     }
 }

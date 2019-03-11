@@ -29,14 +29,8 @@
  */
 namespace RVK\AjaxHandler;
 
-use VuFind\Exception\ILS as ILSException;
-use VuFind\I18n\Translator\TranslatorAwareInterface;
-use VuFind\ILS\Connection;
-use VuFind\ILS\Logic\Holds;
-use VuFind\Session\Settings as SessionSettings;
-use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
-use Zend\View\Renderer\RendererInterface;
+use VuFind\AjaxHandler\AbstractBase;
 
 /**
  * "Get Item Status" AJAX handler
@@ -52,27 +46,8 @@ use Zend\View\Renderer\RendererInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetRVKStatus extends \VuFind\AjaxHandler\GetItemStatuses
+class GetRVKStatus extends \VuFind\AjaxHandler\AbstractBase
 {
-    /**
-     * Constructor
-     *
-     * @param SessionSettings   $ss        Session settings
-     * @param Config            $config    Top-level configuration
-     * @param Connection        $ils       ILS connection
-     * @param RendererInterface $renderer  View renderer
-     * @param Holds             $holdLogic Holds logic
-     */
-    public function __construct(SessionSettings $ss, Config $config, Connection $ils,
-                                RendererInterface $renderer, Holds $holdLogic
-    ) {
-        $this->sessionSettings = $ss;
-        $this->config = $config;
-        $this->ils = $ils;
-        $this->renderer = $renderer;
-        $this->holdLogic = $holdLogic;
-    }
-
     /**
      * Handle a request.
      *

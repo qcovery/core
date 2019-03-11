@@ -11,7 +11,7 @@ class RVK extends \Zend\View\Helper\AbstractHelper
     /**
      *
      */
-    public function __construct($config, \VuFind\Search\Memory $memory)
+    public function __construct($config)
     {
         $this->config = $config;
     }
