@@ -46,6 +46,8 @@ class DeliveryAuthenticator extends ILSAuthenticator
 
     protected $table;
 
+    protected $user;
+
     /**
      * Constructor
      *
@@ -65,7 +67,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
      *
      * @return \VuFind\Db\Table\User
      */
-    public function setConfig($config)
+    protected function setConfig($config)
     {
         $this->config = $config;
     }
@@ -75,7 +77,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
      *
      * @return \VuFind\Db\Table\User
      */
-    public function getConfig()
+    protected function getConfig()
     {
         return $this->config;
     }
@@ -85,7 +87,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
      *
      * @return \VuFind\Db\Table\User
      */
-    public function setTable($table)
+    protected function setTable($table)
     {
         $this->table = $table;
     }
@@ -95,7 +97,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
      *
      * @return \VuFind\Db\Table\User
      */
-    public function getTable()
+    protected function getTable()
     {
         return $this->table;
     }
@@ -137,9 +139,23 @@ class DeliveryAuthenticator extends ILSAuthenticator
             if (!is_object($userDeliveryTable->get($user->id))) {
                 $userDeliveryTable->createRowForUserId($user->id, $user->email);
             }
+            $this->user = $user;
             return 'authorized';
         }
         return 'not_authorized';
     }
 
+    /**
+     * Get stored catalog credentials for the current user.
+     *
+     * Returns associative array of cat_username and cat_password if they are
+     * available, false otherwise. This method does not verify that the credentials
+     * are valid.
+     *
+     * @return array|bool
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 }

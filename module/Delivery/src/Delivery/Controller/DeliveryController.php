@@ -82,25 +82,68 @@ class DeliveryController extends AbstractBase
     public function homeAction()
     {
         $message = $this->deliveryAuthenticator->authenticate();
-        /*
-        // First make sure user is logged in to VuFind:
-        if (!$this->getAuthManager()->isLoggedIn()) {
+        if ($message == 'not_logged_in') {
             return $this->forceLogin();
-        //} elseif (empty($this->userDelivery->get($this->user->id))) {
-        } elseif (empty($this->getTable('userdelivery')->get($this->user->id))) {
-            return $this->forwardTo('Delivery', 'Register');
         }
+        $user = $this->deliveryAuthenticator->getUser();
+        $this->user = $user;
 
-        $deliveryUser = (array) $this->getTable('userdelivery')->get($this->user->id);
-        $deliveryUser['name'] = $this->user->firstname . ' ' . $this->user->lastname;
-*/
-         // Make view
+        // Make view
+        $view = $this->createViewModel();
+        $view->message = $message;
+        $view->name = trim($user->firstname . ' ' . $user->lastname);;
+ 
+        return $view;
+    }
+
+    public function orderAction()
+    {
+        $message = $this->deliveryAuthenticator->authenticate();
+        if ($message != 'authorized') {
+            return $this->forwardTo('Delivery', 'Home');
+        }
+        $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
 
         $view = $this->createViewModel();
+        $view->deliveryUser = $this->userDelivery->get($this->user->id);
+        $orderDataConfig = $this->getConfig('deliveryOrderData');
+        $DataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
 
-        $view->message = $message;
-//        $view->deliveryUser = $deliveryUser;
+        $sendOrder = false;
+        if (!empty($this->params()->fromPost('order'))) {
+            $errors = $DataHandler->checkData();
+            if (empty($errors)) {
+                $orderNumber = 'CaLief:'.date('ymdHis').rand(0, 9);
+                $this->sendDeliveryMail('order', $orderNumber, $driver);
+                $date = new \DateTime();
+                $this->userDelivery->update(['last_order' => $date->format('Y-m-d H:i:s')], ['user_id' => $this->user->id]);
+                $sendOrder = true;
+            } else {
+                $view->errors = $errors;
+            }
+        }
  
+        if (!$sendOrder) {
+            $availabilityConfig = $this->getConfig('deliveryAvailability');
+            $driver = $this->getRecordLoader()->load($id, 'Solr');
+            $DataHandler->setSolrDriver($driver);
+            $Availability = new Availability($driver, $availabilityConfig['default']);
+            $signature = $Availability->getSignature();
+            if (empty($signature)) {
+                return $this->forwardTo('Delivery', 'Home');
+       	    }
+            $articleAvailable = ($Availability->checkPpnLink($this->getServiceLocator(), $id));
+            $DataHandler->collectData($signature, $articleAvailable);
+
+            $formData = $DataHandler->getFormData();
+            $infoData = $DataHandler->getInfoData();
+
+            $view->id = $id;
+            $view->formTitle = $formData['title'];
+            $view->formFields = $formData['fields'];
+            $view->infoTitle = $infoData['title'];
+            $view->infoFields = $infoData['fields'];
+        }
         return $view;
     }
 
@@ -216,60 +259,6 @@ class DeliveryController extends AbstractBase
         return $view;
     }
     
-    public function orderAction()
-    {
-        // First make sure user is logged in to VuFind:
-        if (!$this->getAuthManager()->isLoggedIn()) {
-            return $this->forceLogin();
-        }
-        if (!$this->checkAuthorization()) {
-            return $this->forwardTo('Delivery', 'Home');
-       	}
-        $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
-
-        $view = $this->createViewModel();
-        $view->deliveryUser = $this->userDelivery->get($this->user->id);
-        $orderDataConfig = $this->getConfig('deliveryOrderData');
-        $DataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
-
-        $sendOrder = false;
-        if (!empty($this->params()->fromPost('order'))) {
-            $errors = $DataHandler->checkData();
-            if (empty($errors)) {
-                $orderNumber = 'CaLief:'.date('ymdHis').rand(0, 9);
-                $this->sendDeliveryMail('order', $orderNumber, $driver);
-                $date = new \DateTime();
-                $this->userDelivery->update(['last_order' => $date->format('Y-m-d H:i:s')], ['user_id' => $this->user->id]);
-                $sendOrder = true;
-            } else {
-                $view->errors = $errors;
-            }
-        }
- 
-        if (!$sendOrder) {
-            $availabilityConfig = $this->getConfig('deliveryAvailability');
-            $driver = $this->getRecordLoader()->load($id, 'Solr');
-            $DataHandler->setSolrDriver($driver);
-            $Availability = new Availability($driver, $availabilityConfig['default']);
-            $signature = $Availability->getSignature();
-            if (empty($signature)) {
-                return $this->forwardTo('Delivery', 'Home');
-       	    }
-            $articleAvailable = ($Availability->checkPpnLink($this->getServiceLocator(), $id));
-            $DataHandler->collectData($signature, $articleAvailable);
-
-            $formData = $DataHandler->getFormData();
-            $infoData = $DataHandler->getInfoData();
-
-            $view->id = $id;
-            $view->formTitle = $formData['title'];
-            $view->formFields = $formData['fields'];
-            $view->infoTitle = $infoData['title'];
-            $view->infoFields = $infoData['fields'];
-        }
-        return $view;
-    }
-
     private function sendDeliveryMail($emailType)
     {
         $mailer = $this->serviceLocator->get('VuFind\Mailer');
