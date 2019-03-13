@@ -1,3 +1,5 @@
-<? if ($this->availabilityChecker()->check($this->driver) == 'available'): ?>
-        <a href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>"><?=$this->transEsc('deliver') ?></a>
+<? if ($this->authenticator()->isAuthorized()): ?>
+    <? if ($this->availabilitychecker()->check($this->driver) == 'available'): ?>
+        <a href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>" aria-expanded="false" data-uk-tooltip="<?=$this->transEsc('Deliver')?>" title="<?=$this->transEsc('Deliver')?>"><i class="bel-ok03" aria-hidden="true"></i></a>
+    <? endif; ?>
 <? endif; ?>
