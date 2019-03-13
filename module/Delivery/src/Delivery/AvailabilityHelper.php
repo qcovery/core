@@ -31,6 +31,20 @@ class AvailabilityHelper {
         }
     }
 
+    private function getMarcData($item)
+    {
+        $data = $this->solrDriver->getMarcData($item);
+        $flatData = [];
+        foreach ($data as $date) {
+            $tmpData = [];
+            foreach ($date as $key => $value) {
+                $tmpData[$key] = $value['data'][0];
+            }
+            $flatData[] = $tmpData;
+        }
+        return $flatData;
+    }
+
     public function setSolrDriver($driver)
     {
         $this->solrDriver = $driver;
@@ -44,10 +58,9 @@ class AvailabilityHelper {
     public function getSignature() 
     {
         $deliveryConfig = $this->deliveryConfig;
-        $iln = $deliveryConfig['iln'];
-        $format = array_shift($this->solrDriver->getFormats());
-        $signatureData = $this->solrDriver->getMarcData('Signature');
-        $licenceData = $this->solrDriver->getMarcData('Licence');
+        $format = array_shift(array_shift($this->getMarcData('Format')));
+        $signatureData = $this->getMarcData('Signature');
+        $licenceData = $this->getMarcData('Licence');
 
         $sigel = '';
         $signature = '';
@@ -93,11 +106,9 @@ class AvailabilityHelper {
     {
         $deliveryConfig = $this->deliveryConfig;
         $iln = $deliveryConfig['iln'];
-        $formats = $this->solrDriver->getFormats();
-        $format = array_shift($formats);
-        $signatureData = $this->solrDriver->getMarcData('Signature');
-        $licenceData = $this->solrDriver->getMarcData('Licence');
-
+        $format = array_shift(array_shift($this->getMarcData('Format')));
+        $signatureData = $this->getMarcData('Signature');
+        $licenceData = $this->getMarcData('Licence');
         if (in_array($format, $deliveryConfig['formats'])) {
             if (empty($signatureData) && $this->checkSigel(array(), $format)) {
                 return true;
@@ -155,20 +166,20 @@ class AvailabilityHelper {
             if ($sigelOnly) {
                 return true;
             } else {
-                $sigelOk = $this->performCheck('licencenote', $signatureDate['licence_note'], $format);
+                $sigelOk = $this->performCheck('licencenote', $signatureDate['licencenote'], $format);
             }
         }
         if ($sigelOk) {
-            $sigelOk = $this->performCheck('footnote', $signatureDate['foot_note'], $format);
+            $sigelOk = $this->performCheck('footnote', $signatureDate['footnote'], $format);
         }
         if ($sigelOk) {
-            $sigelOk = $this->performCheck('location', $signatureDate['location_note'], $format);
+            $sigelOk = $this->performCheck('location', $signatureDate['locationnote'], $format);
         }
         return $sigelOk;
     }
 
     private function checkLicence($licenceDate, $format) {
-	return $this->performCheck('licence', $licenceDate['licence_type'], $format);
+	return $this->performCheck('licence', $licenceDate['licencetype'], $format);
     }
 
     public function checkPpnLink($serviceLocator, $ppn) {

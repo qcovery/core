@@ -70,13 +70,9 @@ class DeliveryAuthenticatorFactory implements FactoryInterface
             // Generate wrapped object:
             $auth = $container->get('PAIA\Auth\Manager');
             $catalog = $container->get('PAIA\ILS\Connection');
-            $wrapped = new $requestedName($auth, $catalog);
-
             $config = $container->get('VuFind\Config\PluginManager')->get('deliveryGlobal');
-            $wrapped->setConfig($config);
-            
             $table = $container->get('Delivery\Db\Table\PluginManager')->get('userDelivery');
-            $wrapped->setTable($table);
+            $wrapped = new $requestedName($auth, $catalog, $config, $table);
             
             // Indicate that initialization is complete to avoid reinitialization:
             $proxy->setProxyInitializer(null);

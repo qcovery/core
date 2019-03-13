@@ -1,5 +1,5 @@
-<? if ($this->user): ?>
-      <a href="<?=$this->url('delivery-home')?>" <?=$this->active == 'delivery' ? ' class="active"' : ''?>>
-         <i class="bel-postin" aria-hidden="true"></i> <?=$this->transEsc('Delivery')?>
-      </a>
+<? if ($this->authenticator()->isAuthorized()): ?>
+    <a href="<?=$this->url('delivery-home')?>" <?=$this->active == 'delivery' ? ' class="active"' : ''?>>
+        <i class="bel-ok03" aria-hidden="true"></i> <?=$this->transEsc('Delivery')?>
+    </a>
 <? endif; ?>

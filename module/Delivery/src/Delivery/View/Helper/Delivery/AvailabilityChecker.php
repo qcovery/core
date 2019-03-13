@@ -20,6 +20,7 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
      *
      */
     public function check($driver) {
+
         $this->AvailabilityHelper->setSolrDriver($driver);
         return ($this->AvailabilityHelper->checkItem()) ? 'available' : 'not available'; 
     }

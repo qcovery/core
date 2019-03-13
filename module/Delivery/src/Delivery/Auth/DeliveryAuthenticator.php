@@ -44,14 +44,19 @@ class DeliveryAuthenticator extends ILSAuthenticator
 {
     protected $config;
 
+    protected $table;
+
     /**
      * Constructor
      *
      * @param Manager       $auth    Auth manager
      * @param ILSConnection $catalog ILS connection
      */
-    public function __construct(Manager $auth, ILSConnection $catalog)
+    public function __construct(Manager $auth, ILSConnection $catalog, 
+        $config, $table)
     {
+        $this->setConfig($config);
+        $this->setTable($table);
         parent::__construct($auth, $catalog);
     }
 
@@ -129,11 +134,8 @@ class DeliveryAuthenticator extends ILSAuthenticator
 
         if (!empty(array_intersect($patronTypes, $allowedTypes))) {
             $userDeliveryTable = $this->getTable();
-            $userDeliveryData = $userDeliveryTable->get($user->id)->toArray();
-            if (empty($userDeliveryData)) {
+            if (!is_object($userDeliveryTable->get($user->id))) {
                 $userDeliveryTable->createRowForUserId($user->id, $user->email);
-            } elseif (empty($userDeliveryData['delivery_email'])) {
-                $userDeliveryTable->saveEmail($user->email);
             }
             return 'authorized';
         }
