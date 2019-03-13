@@ -21,7 +21,6 @@
     <?
       $profile = $this->profile;
       $profile['name'] = $profile['firstname'] . ' ' . $profile['lastname'];
-    print_r($profile);
       echo $this->renderArray(
         $arrTemplate, $profile,
         [
