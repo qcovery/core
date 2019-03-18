@@ -18,7 +18,7 @@
       </div>
     <?php if(!empty($resultList['author'])): ?>
       <div>
-        <?=$this->transEsc('by')?> <a href="<?=$this->record($this->driver)->getLink('author', $resultList['author'])?>">
+        <?=$this->transEsc('by')?> <a href="<?=$this->record($this->driver)->getLink('person', $resultList['author'])?>">
             <?=$resultList['author'] ?>
         </a>
       </div>
