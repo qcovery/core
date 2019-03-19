@@ -30,8 +30,7 @@ namespace Delivery\Controller;
 # use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use VuFind\Controller\AbstractBase;
-//use Delivery\Db\Table\PluginManager;
-use Delivery\Availability;
+use Delivery\AvailabilityHelper;
 use Delivery\DataHandler;
 
 /**
@@ -103,9 +102,10 @@ class DeliveryController extends AbstractBase
             return $this->forwardTo('Delivery', 'Home');
         }
         $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
+        $searchClassId = $this->params()->fromQuery('searchClassId');
 
         $view = $this->createViewModel();
-        $view->deliveryUser = $this->userDelivery->get($this->user->id);
+
         $orderDataConfig = $this->getConfig('deliveryOrderData');
         $DataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
 
@@ -125,14 +125,15 @@ class DeliveryController extends AbstractBase
  
         if (!$sendOrder) {
             $availabilityConfig = $this->getConfig('deliveryAvailability');
-            $driver = $this->getRecordLoader()->load($id, 'Solr');
+            $driver = $this->getRecordLoader()->load($id, $searchClassId);
             $DataHandler->setSolrDriver($driver);
-            $Availability = new Availability($driver, $availabilityConfig['default']);
-            $signature = $Availability->getSignature();
+            $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
+            $signature = $AvailabilityHelper->getSignature();
             if (empty($signature)) {
                 return $this->forwardTo('Delivery', 'Home');
        	    }
-            $articleAvailable = ($Availability->checkPpnLink($this->getServiceLocator(), $id));
+            //$articleAvailable = ($AvailabilityHelper->checkPpnLink($this->getServiceLocator(), $id));
+            $articleAvailable = false;
             $DataHandler->collectData($signature, $articleAvailable);
 
             $formData = $DataHandler->getFormData();

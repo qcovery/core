@@ -75,14 +75,33 @@ class DataHandler {
 
     public function collectData($signature, $articleAvailable = false)
     {
-        $formats = $this->solrDriver->getFormats();
-        $format = $formats[0];
+        $formats = $this->solrDriver->getMarcData('Format');
+        $format = $formats[0][0]['data'][0];
+
+        if ($format == 'Article' || $format == 'electronic Article') {
+            $deliveryData = $this->solrDriver->getMarcData('DeliveryDataArticle');
+        } elseif ($format == 'Journal' || $format == 'eJournal') {
+            $deliveryData = $this->solrDriver->getMarcData('DeliveryDataJournal');
+        } elseif ($format == 'Serial Volume') {
+            $deliveryData = $this->solrDriver->getMarcData('DeliveryDataSerialVolume');
+        } else {
+            $deliveryData = $this->solrDriver->getMarcData('DeliveryData');
+        }
+
+        $flatData = [];
+        foreach ($deliveryData as $deliveryDate) {
+            foreach ($deliveryDate as $key => $item) {
+                $flatData[$key] = $item['data'][0];
+            }
+        }
+        $flatData['format'] = $format;
 
         foreach ($this->dataFields as $fieldKey => $fieldSpecs) {
             if (in_array('all', $fieldSpecs['formats']) || in_array($format, $fieldSpecs['formats'])) {
-                $data = $this->params->fromPost($fieldSpecs['name']);
-                if (empty($data)) {
-                    $data = $this->getData($fieldKey, $format, $signature);
+                $key = $fieldSpecs['form_name'];
+                $data = $this->params->fromQuery($key);
+                if (empty($data) && !empty($flatData[$fieldKey])) {
+                    $data = $flatData[$fieldKey];
                 }
                 $dataArray = array_merge($this->dataFields[$fieldKey], ['value' => $data]);
                 if ($fieldSpecs['type'] == 'info') {
@@ -109,67 +128,6 @@ class DataHandler {
         } else {
             return ($type == 'info') ? 'Book' : 'Copy';
         }
-    }
-
-
-    private function getData($fieldName, $format, $signature = '')
-    {
-
-        $driver = $this->solrDriver;
-        if ($fieldName == 'ppn') {
-            if ($format == 'Article' || $format == 'electronic Article') {
-                $containingWorks = $driver->getContainingWork();
-                $data = $containingWorks[0]['ppn'];
-            } else {
-                $data = $driver->getUniqueID();
-            }
-        } elseif ($fieldName == 'article-ppn') {
-            $data = $driver->getUniqueID();
-        } elseif ($fieldName == 'format') {
-            $data = $format;
-        } elseif ($fieldName == 'article-author') {
-            $dataList = $driver->getTitleStatement();
-            $data = implode(', ', $dataList[0]);
-        } elseif ($fieldName == 'title') {
-            if ($format == 'Article' || $format == 'electronic Article') {
-                $containingWorks = $driver->getContainingWork();
-                $data = $containingWorks[0]['title'];
-            } else {
-                $data = $driver->getTitle();
-                if ($format == 'Journal' || $format == 'eJournal' || $format = 'Serial Volume') {
-                    $section = $driver->getTitleSection();
-                    $data .= $section[0][0];
-                }
-            }
-        } elseif ($fieldName == 'article-title') {
-            $data = $driver->getTitle();
-        } elseif ($fieldName == 'volume-issue') {
-            if ($format == 'Article' || $format == 'electronic Article') {
-                $containingWorks = $driver->getContainingWork();
-                $data = $containingWorks[0]['issue'];
-            } elseif ($format == 'Serial Volume') {
-                $data = $driver->getVolumeTitle();
-            } elseif ($format == 'Book' || $format == 'eBook') {
-                $edition = $driver->getEdition();
-                $data = $edition[0][0];
-            }
-        } elseif ($fieldName == 'publication-place') {
-            if ($format == 'Article' || $format == 'electronic Article' || $format == 'Serial Volume') {
-                $containingWorks = $driver->getContainingWork();
-                $data = $containingWorks[0]['location'];
-            } else {
-                $publicationDetails = $driver->getPublicationDetailsFromMarc();
-                $data = $publicationDetails[0]['location'];
-            }
-        } elseif ($fieldName == 'university') {
-            $universityNotes = $driver->getUniversityNotes();
-            $data = $universityNotes[0][0];
-        } elseif ($fieldName == 'signature') {
-            $data = $signature;
-        } else {
-            $data = '';
-        }
-        return $data;
     }
 
     public function getFormData()

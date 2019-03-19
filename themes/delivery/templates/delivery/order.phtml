@@ -1,4 +1,4 @@
-<?
+<?php
   // Set up page title:
   $this->headTitle($this->translate('Delivery Order'));
 
@@ -9,24 +9,26 @@
 <h2 class="lightbox-header"><?=$this->transEsc('Delivery Order')?></h2>
 <?=$this->flashmessages()?>
 
-<h4><?=$this->formTitle ?></h4>
+<h4><?=$this->transEsc($this->formTitle) ?></h4>
 
   <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-login">
     <input type="hidden" name="order" value="y"/>
     <input type="hidden" name="id" value="<?=$this->id ?>"/>
-<? foreach ($this->formFields as $formField): ?>
-  <? $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
+<?php foreach ($this->formFields as $formField): ?>
+  <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
     <div class="form-group">
-      <label class="control-label" for="<?=$formField['name'] ?>"><?=$formField['display'] ?><?=$mandatory ?></label>
+      <label class="control-label" for="<?=$formField['name'] ?>"><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
       <input type="text" name="<?=$formField['name'] ?>" id="<?=$formField['name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
     </div>
-<? endforeach; ?>
+<?php endforeach; ?>
 
-<h4><?=$this->infoTitle ?></h4>
-<? foreach ($this->infoFields as $infoField): ?>
-  <p><?=$infoField['display'] ?>: <?=$infoField['value'] ?>
-  <input type="hidden" name="<?=$infoField['name'] ?>" value="<?=$infoField['value'] ?>"/></p>
-<? endforeach; ?>
+<h4><?=$this->transEsc($this->infoTitle) ?></h4>
+<?php foreach ($this->infoFields as $infoField): ?>
+  <?php if (!empty($infoField['value'])): ?>
+    <p><?=$this->transEsc($infoField['display']) ?>: <?=$this->transEsc($infoField['value']) ?>
+    <input type="hidden" name="<?=$infoField['name'] ?>" value="<?=$infoField['value'] ?>"/></p>
+  <?php endif; ?>
+<?php endforeach; ?>
 
     <div class="form-group">
       <input class="btn btn-primary" type="submit" name="processRegister" value="<?=$this->transEsc('Order')?>">
