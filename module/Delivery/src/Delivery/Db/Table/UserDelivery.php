@@ -79,4 +79,13 @@ class UserDelivery extends Gateway
         $row->save();
         return $row;
     }
+
+    public function updateEmail($id, $email)
+    {
+        $deliveryUser = $this->select(['id' => $id])->current();
+        $deliveryUser->delivery_email = $email;
+        $this->email = $email;
+        $deliveryUser->save();
+        return $deliveryUser;
+    }
 }
