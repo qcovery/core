@@ -25,11 +25,13 @@ CREATE TABLE IF NOT EXISTS `user_delivery` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE `delivery` (
+DROP TABLE IF EXISTS `delivery`;
+CREATE TABLE IF NOT EXISTS `delivery` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_delivery_id` int(11) NOT NULL DEFAULT '0',
   `item_id` varchar(63) NOT NULL DEFAULT '',
   `item_title` varchar(255) NOT NULL DEFAULT '',
+  `comment` varchar(255),
   `ordered` datetime,
   `delivered` datetime,
   `rejected` datetime,
