@@ -60,12 +60,6 @@ class UserDelivery extends RowGateway implements \VuFind\Db\Table\DbTableAwareIn
         parent::__construct('id', 'user_delivery', $adapter);
     }
 
-    public function saveEmail($email)
-    {
-        $this->email = $email;
-        return $this->save();
-    }
-
     /**
      * Get the list of roles of this identity
      *
