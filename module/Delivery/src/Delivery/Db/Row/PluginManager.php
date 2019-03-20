@@ -36,7 +36,7 @@ namespace Delivery\Db\Row;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:database_gateways Wiki
  */
-class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
+class PluginManager extends \VuFind\Db\Row\PluginManager
 {
     /**
      * Default plugin aliases.
@@ -46,6 +46,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
     protected $aliases = [
         'changetracker' => 'VuFind\Db\Row\ChangeTracker',
         'comments' => 'VuFind\Db\Row\Comments',
+        'delivery' => 'Delivery\Db\Row\Delivery',
         'externalsession' => 'VuFind\Db\Row\ExternalSession',
         'oairesumption' => 'VuFind\Db\Row\OaiResumption',
         'record' => 'VuFind\Db\Row\Record',
@@ -67,6 +68,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
+        'Delivery\Db\Row\Delivery' => 'VuFind\Db\Row\RowGatewayFactory',
         'Delivery\Db\Row\UserDelivery' => 'VuFind\Db\Row\RowGatewayFactory',
         'VuFind\Db\Row\ChangeTracker' => 'VuFind\Db\Row\RowGatewayFactory',
         'VuFind\Db\Row\Comments' => 'VuFind\Db\Row\RowGatewayFactory',
@@ -83,15 +85,4 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'VuFind\Db\Row\UserList' => 'VuFind\Db\Row\UserListFactory',
         'VuFind\Db\Row\UserResource' => 'VuFind\Db\Row\RowGatewayFactory',
     ];
-
-    /**
-     * Return the name of the base class or interface that plug-ins must conform
-     * to.
-     *
-     * @return string
-     */
-    protected function getExpectedInterface()
-    {
-        return 'VuFind\Db\Row\RowGateway';
-    }
 }

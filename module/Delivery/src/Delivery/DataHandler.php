@@ -99,7 +99,7 @@ class DataHandler {
         foreach ($this->dataFields as $fieldKey => $fieldSpecs) {
             if (in_array('all', $fieldSpecs['formats']) || in_array($format, $fieldSpecs['formats'])) {
                 $key = $fieldSpecs['form_name'];
-                $data = $this->params->fromQuery($key);
+                $data = $this->params->fromPost($key);
                 if (empty($data) && !empty($flatData[$fieldKey])) {
                     $data = $flatData[$fieldKey];
                 }
@@ -119,15 +119,19 @@ class DataHandler {
         }
     }
 
-    private function getTitle($format, $type = 'info')
+    public function prepareOrderMail($user)
     {
-        if ($format == 'Article' || $format == 'electronic Article') {
-            return ($type == 'info') ? 'Journal' : 'Article';
-        } elseif ($format == 'Journal' || $format == 'eJournal' || $format == 'Serial Volume') {
-            return ($type == 'info') ? 'Journal' : 'Article';
-        } else {
-            return ($type == 'info') ? 'Book' : 'Copy';
+        $email = $this->params->fromPost('email') ?: $user->delivery_email;
+        $mailData = [];
+        $mailData['clientName'] = $user->firstname . ' ' . $user->lastname;
+        $mailData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
+        $mailData['clientIdentifier'] = $user->cat_id;
+        $mailData['delEmailAddress'] = $email;
+        foreach ($this->dataFields as $fieldSpecs) {
+            $entry = $fieldSpecs['orderfieldprefix'] ?? '';
+            $mailData[$fieldSpecs['orderfield']] .= $entry . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
         }
+        return $mailData;
     }
 
     public function getFormData()
@@ -143,6 +147,17 @@ class DataHandler {
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    private function getTitle($format, $type = 'info')
+    {
+        if ($format == 'Article' || $format == 'electronic Article') {
+            return ($type == 'info') ? 'Journal' : 'Article';
+        } elseif ($format == 'Journal' || $format == 'eJournal' || $format == 'Serial Volume') {
+            return ($type == 'info') ? 'Journal' : 'Article';
+        } else {
+            return ($type == 'info') ? 'Book' : 'Copy';
+        }
     }
 }
 

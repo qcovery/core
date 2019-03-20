@@ -46,6 +46,7 @@ class DeliveryController extends AbstractBase
 {
 
     protected $deliveryAuthenticator;
+    protected $dataHandler;
     protected $userDelivery;
     protected $deliveryGlobalConfig;
 
@@ -73,6 +74,16 @@ class DeliveryController extends AbstractBase
         return $this->serviceLocator->get('Delivery\Db\Table\PluginManager')->get($table);
     }
     
+    private function authenticate()
+    {
+        $message = $this->deliveryAuthenticator->authenticate();
+        if ($message != 'not_logged_in') {
+            $user = $this->deliveryAuthenticator->getUser();
+            $this->user = $user;
+        }
+        return $message;
+    }
+
     /**
      * Home action
      *
@@ -80,53 +91,48 @@ class DeliveryController extends AbstractBase
      */
     public function homeAction()
     {
-        $message = $this->deliveryAuthenticator->authenticate();
+        $message = $this->authenticate();
         if ($message == 'not_logged_in') {
             return $this->forceLogin();
         }
-        $user = $this->deliveryAuthenticator->getUser();
-        $this->user = $user;
 
-        // Make view
         $view = $this->createViewModel();
         $view->message = $message;
-        $view->name = trim($user->firstname . ' ' . $user->lastname);;
- 
+        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);;
         return $view;
     }
 
     public function orderAction()
     {
-        $message = $this->deliveryAuthenticator->authenticate();
+        $message = $this->authenticate();
         if ($message != 'authorized') {
             return $this->forwardTo('Delivery', 'Home');
         }
         $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
-        $searchClassId = $this->params()->fromQuery('searchClassId');
-
-        $view = $this->createViewModel();
+        $searchClassId = $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId');
+        if (empty($id)) {
+            return $this->forwardTo('Delivery', 'Home');
+        }
 
         $orderDataConfig = $this->getConfig('deliveryOrderData');
-        $DataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
+        $this->dataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
 
         $sendOrder = false;
         if (!empty($this->params()->fromPost('order'))) {
-            $errors = $DataHandler->checkData();
+            $errors = $this->dataHandler->checkData();
             if (empty($errors)) {
-                $orderNumber = 'CaLief:'.date('ymdHis').rand(0, 9);
-                $this->sendDeliveryMail('order', $orderNumber, $driver);
-                $date = new \DateTime();
-                $this->userDelivery->update(['last_order' => $date->format('Y-m-d H:i:s')], ['user_id' => $this->user->id]);
+                $this->sendDeliveryMail('order');
                 $sendOrder = true;
-            } else {
-                $view->errors = $errors;
             }
         }
  
-        if (!$sendOrder) {
+        $view = $this->createViewModel();
+
+        if (!empty($errors)) {
+            $view->errors = $errors;
+        } elseif (!$sendOrder) {
             $availabilityConfig = $this->getConfig('deliveryAvailability');
             $driver = $this->getRecordLoader()->load($id, $searchClassId);
-            $DataHandler->setSolrDriver($driver);
             $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
             $signature = $AvailabilityHelper->getSignature();
             if (empty($signature)) {
@@ -134,10 +140,11 @@ class DeliveryController extends AbstractBase
        	    }
             //$articleAvailable = ($AvailabilityHelper->checkPpnLink($this->getServiceLocator(), $id));
             $articleAvailable = false;
-            $DataHandler->collectData($signature, $articleAvailable);
+            $this->dataHandler->setSolrDriver($driver);
+            $this->dataHandler->collectData($signature, $articleAvailable);
 
-            $formData = $DataHandler->getFormData();
-            $infoData = $DataHandler->getInfoData();
+            $formData = $this->dataHandler->getFormData();
+            $infoData = $this->dataHandler->getInfoData();
 
             $view->id = $id;
             $view->formTitle = $formData['title'];
@@ -184,89 +191,12 @@ class DeliveryController extends AbstractBase
         return $view;
     }
     
-    /**
-     * register action
-     *
-     * @return mixed
-     */
-    public function registerAction()
-    {
-        // First make sure user is logged in to VuFind:
-        if ($this->getAuthManager()->isLoggedIn() == false) {
-            return $this->forceLogin();
-        }
-
-        // Make view
-        $view = $this->createViewModel();
-        $view->request = $this->getRequest()->getPost();
-        $view->libraryCodes = $this->getLibraryCodes();
-        $view->userName = $this->user->firstname . ' ' . $this->user->lastname;
-
-        if (!empty($this->params()->fromPost('register'))) {
-            $cardNumberCorrect = $this->checkCardNumber($this->params()->fromPost('card_number'));
-            $deliveryEmailCorrect = $this->checkEmail($this->params()->fromPost('delivery_email'));
-            if (!$deliveryEmailCorrect) {
-                $view->checkDeliveryEmail = 'check';
-            } elseif (!$cardNumberCorrect) {
-                $view->checkCardNumber = 'check';
-            } else {
-                $this->userDelivery->insert([
-                    'user_id' => $this->user->id,
-                    'sex' => $this->params()->fromPost('sex'),
-                    'title' => $this->params()->fromPost('title'), 
-                    'delivery_email' => $this->params()->fromPost('delivery_email'),
-                    'library' => $this->params()->fromPost('library'),
-                    'card_number' => $this->params()->fromPost('card_number'), 
-                    'authorized' => -1
-                ]);
-                $this->sendDeliveryMail('request');
-                return $this->forwardTo('Delivery', 'Home');
-            }
-        }
-        return $view;
-    }
-    
-    public function adminAction()
-    {
-        // First make sure user is logged in to VuFind:
-        if (!$this->getAuthManager()->isLoggedIn()) {
-            return $this->forceLogin();
-        }
-
-        $view = $this->createViewModel();
-        $deliveryAdmin = $this->userDelivery->get($this->user->id);
-        if ($deliveryAdmin->is_admin == 'y') {
-            $id = $this->params()->fromPost('id');
-            $action = $this->params()->fromPost('action');
-            if (!empty($id)) {
-                $this->authorize($id, ($action == 'revoke') || ($action == 'refuse'));
-                $this->sendDeliveryMail($action, $id);
-            }
-
-            $deliveryUsers = $this->userDelivery->select(function (\Zend\Db\Sql\Select $select) {
-                 $select->order('authorized ASC');
-            });
-
-            foreach ($deliveryUsers as $key => $value) {
-                if ($deliveryAdmin->library != '*' && $deliveryAdmin->library != $value->library) {
-                    unset($deliveryUsers[$key]);
-                }
-            }
-            $view->deliveryUsers = array_values($deliveryUsers);
-        } else {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-
-        return $view;
-    }
-    
     private function sendDeliveryMail($emailType)
     {
         $mailer = $this->serviceLocator->get('VuFind\Mailer');
         $mailConfig = $this->deliveryGlobalConfig['Email'];
 
-        $deliveryUser = $this->userDelivery->get($this->user->id);
-        $mailTo = $deliveryUser->delivery_email;
+        $mailTo = $this->user->delivery_email;
         $mailFrom = $mailConfig['mailFrom'];
         $admin = $mailConfig['deliveryAdmin'];
         if ($emailType == 'request') {
@@ -282,85 +212,23 @@ class DeliveryController extends AbstractBase
             $mailer->send($mailTo, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
             $mailer->send($admin, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
         } elseif ($emailType == 'order') {
-            $containingPpn = $this->params()->fromPost('containing_ppn');
-            $articlePpn = $this->params()->fromPost('article_ppn');
-            $university = $this->params()->fromPost('university_notes');
-            if (isset($containingPpn)) {
-                $itemAdditionalNoLetters = 'PPN (Werk): ' . $containingPpn;
-            } elseif (isset($articlePpn)) {
-                $itemAdditionalNoLetters = 'PPN (Artikel): ' . $articlePpn;
-            } elseif (isset($university)) {
-                $itemAdditionalNoLetters = 'Hochschule: ' . $university;
-            }
-
+            $mailData = $this->dataHandler->prepareOrderMail($this->user);
             $renderer = $this->getViewRenderer();
-            $message = $renderer->render('Email/delivery-order.phtml',
-                [
-                    'clientName' => $this->user->firstname . ' ' . $this->user->lastname,
-                    'contactPersonName' => $this->user->firstname . ' ' . $this->user->lastname,
-                    'clientIdentifier' => $deliveryUser->card_number,
-                    'delEmailAddress' => (!empty($this->params()->fromPost('email'))) ? $this->params()->fromPost('email') : $this->user->email,
-                    'itemSystemNo' => (!empty($this->params()->fromPost('ppn'))) ? $this->params()->fromPost('ppn') : '',
-                    'itemTitleOfArticle' => (!empty($this->params()->fromPost('article_title'))) ? $this->params()->fromPost('article_title') : '',
-                    'itemAuthorOfArticle' => (!empty($this->params()->fromPost('article_author'))) ? $this->params()->fromPost('article_author') : '',
-                    'itemTitle' => (!empty($this->params()->fromPost('title'))) ? $this->params()->fromPost('title') : '',
-                    'itemAuthor' => (!empty($this->params()->fromPost('author'))) ? $this->params()->fromPost('author') : '',
-                    'itemPublicationDate' => (!empty($this->params()->fromPost('publication_year'))) ? $this->params()->fromPost('publication_year') : '',
-                    'itemPlaceOfPublication' => (!empty($this->params()->fromPost('publication_place'))) ? $this->params()->fromPost('publication_place') : '',
-                    'itemPagination' => (!empty($this->params()->fromPost('pages'))) ? $this->params()->fromPost('pages') : '',
-                    'itemVolumeIssue' => (!empty($this->params()->fromPost('volume_issue'))) ? $this->params()->fromPost('volume_issue') : '',
-                    'itemHeldMediumType' => (!empty($this->params()->fromPost('format'))) ? $this->params()->fromPost('format') : '',
-                    'itemCallNumber' => (!empty($this->params()->fromPost('signature'))) ? $this->params()->fromPost('signature') : '',
-                    'itemAdditionalNoLetters' => (!empty($itemAdditionalNoLetters)) ? $itemAdditionalNoLetters : '',
-                    'requesterNote' => (!empty($this->params()->fromPost('comment'))) ? $this->params()->fromPost('comment') : '',
-                ]
-            );
-            $mailer->send($mailConfig['orderMailTo'], $mailConfig['orderMailFrom'], $mailConfig['orderSubject'], $message);
+            $message = $renderer->render('Email/delivery-order.phtml', $mailData);
+            //$mailer->send($mailConfig['orderMailTo'], $mailConfig['orderMailFrom'], $mailConfig['orderSubject'], $message);
+            $this->finishOrder($mailData['itemSystemNo'], $mailData['itemTitle']);
+            
         }
     }
     
-    private function authorize($id, $revoke)
+    private function finishOrder($itemId, $itemTitle)
     {
-        if ($revoke) {
-            $this->userDelivery->update(['authorized' => 0], ['id' => $id]);
-        } else {
-            $this->userDelivery->update(['authorized' => 1, 'last_order' => NULL], ['id' => $id]);
-        }
+        $deliveryTable = $this->getTable('delivery');
+        $deliveryTable->createRowForUserDeliveryId($this->user->user_delivery_id, $itemId, $itemTitle);
     }
     
-    private function checkAuthorization()
-    {
-        $date = new \DateTime();
-        $deliveryUser = $this->userDelivery->get($this->user->id);
-        $lastOrder = new \DateTime($deliveryUser->last_order);
-        $timeDiff = $date->diff($lastOrder);
-        if ($timeDiff->y >= 1) {
-            $this->authorize($deliveryUser->id, true);
-            return false;
-        } else {
-            return ($deliveryUser->authorized == '1');
-        }
-    }
-    
-    private function getLibraryCodes()
-    {
-        $libraryCodes = [];
-        if (is_array($this->deliveryConfig)) {
-            $libraryCodes = array_keys($this->deliveryConfig); //!!
-            unset($libraryCodes['global']);
-        }
-        return $libraryCodes;
-    }
-
-
     private function checkEmail($email)
     {
         return (preg_match('/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,31}$/', $email));
     }
-
-    private function checkCardNumber($cardNumber)
-    {
-        return (strlen($cardNumber) == $this->deliveryGlobalConfig[Card]['numberLength']);
-    }
-
 }

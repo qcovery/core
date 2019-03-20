@@ -139,6 +139,9 @@ class DeliveryAuthenticator extends ILSAuthenticator
             if (!is_object($userDeliveryTable->get($user->id))) {
                 $userDeliveryTable->createRowForUserId($user->id, $user->email);
             }
+            $deliveryUser = $userDeliveryTable->get($user->id);
+            $user->delivery_email = $deliveryUser->delivery_email;
+            $user->user_delivery_id = $deliveryUser->id;
             $this->user = $user;
             return 'authorized';
         }

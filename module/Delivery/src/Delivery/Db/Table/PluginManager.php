@@ -46,6 +46,7 @@ class PluginManager extends \VuFind\Db\Table\PluginManager
     protected $aliases = [
         'changetracker' => 'VuFind\Db\Table\ChangeTracker',
         'comments' => 'VuFind\Db\Table\Comments',
+        'delivery' => 'Delivery\Db\Table\Delivery',
         'externalsession' => 'VuFind\Db\Table\ExternalSession',
         'oairesumption' => 'VuFind\Db\Table\OaiResumption',
         'record' => 'VuFind\Db\Table\Record',
@@ -67,6 +68,7 @@ class PluginManager extends \VuFind\Db\Table\PluginManager
      * @var array
      */
     protected $factories = [
+        'Delivery\Db\Table\Delivery' => 'VuFind\Db\Table\GatewayFactory',
         'Delivery\Db\Table\UserDelivery' => 'VuFind\Db\Table\GatewayFactory',
         'VuFind\Db\Table\ChangeTracker' => 'VuFind\Db\Table\GatewayFactory',
         'VuFind\Db\Table\Comments' => 'VuFind\Db\Table\GatewayFactory',

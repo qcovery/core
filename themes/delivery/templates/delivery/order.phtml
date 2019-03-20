@@ -17,8 +17,8 @@
 <?php foreach ($this->formFields as $formField): ?>
   <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
     <div class="form-group">
-      <label class="control-label" for="<?=$formField['name'] ?>"><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
-      <input type="text" name="<?=$formField['name'] ?>" id="<?=$formField['name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
+      <label class="control-label" for="<?=$formField['form_name'] ?>"><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
+      <input type="text" name="<?=$formField['form_name'] ?>" id="<?=$formField['form_name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
     </div>
 <?php endforeach; ?>
 
@@ -26,7 +26,7 @@
 <?php foreach ($this->infoFields as $infoField): ?>
   <?php if (!empty($infoField['value'])): ?>
     <p><?=$this->transEsc($infoField['display']) ?>: <?=$this->transEsc($infoField['value']) ?>
-    <input type="hidden" name="<?=$infoField['name'] ?>" value="<?=$infoField['value'] ?>"/></p>
+    <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/></p>
   <?php endif; ?>
 <?php endforeach; ?>
 
