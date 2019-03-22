@@ -14,6 +14,7 @@
   <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-login">
     <input type="hidden" name="order" value="y"/>
     <input type="hidden" name="id" value="<?=$this->id ?>"/>
+    <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>"/>
 <?php foreach ($this->formFields as $formField): ?>
   <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
     <div class="form-group">

@@ -29,14 +29,14 @@ DROP TABLE IF EXISTS `delivery`;
 CREATE TABLE IF NOT EXISTS `delivery` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_delivery_id` int(11) NOT NULL DEFAULT '0',
-  `item_id` varchar(63) NOT NULL DEFAULT '',
-  `item_title` varchar(255) NOT NULL DEFAULT '',
-  `comment` varchar(255),
+  `resource_id` int(11) NOT NULL DEFAULT 0,
+  `comment` text,
   `ordered` datetime,
   `delivered` datetime,
   `rejected` datetime,
   PRIMARY KEY (`id`),
   KEY `user_delivery_id` (`user_delivery_id`),
-  CONSTRAINT `delivery_ibfk_1` FOREIGN KEY (`user_delivery_id`) REFERENCES `user_delivery` (`id`) ON DELETE CASCADE
+  CONSTRAINT `delivery_ibfk_1` FOREIGN KEY (`user_delivery_id`) REFERENCES `user_delivery` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `delivery_ibfk_2` FOREIGN KEY (`resource_id`) REFERENCES `resource` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

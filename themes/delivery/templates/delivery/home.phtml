@@ -1,5 +1,4 @@
 <?php
-
   // Set up page title:
   $this->headTitle($this->translate('Delivery Home'));
 
@@ -12,8 +11,17 @@
 
 <div class="<?=$this->layoutClass('mainbody')?>">
     <h2 class="lightbox-header"><?=$this->transEsc('Delivery Home')?></h2>
-    <h3><?=$this->name?></h3>
-    <?=$this->message?>
+
+<?php if (!empty($this->error)): ?>
+    <?=$this->transEsc($this->error) ?>
+<?php endif; ?>
+    
+<?php if (!empty($this->message) && $this->message != 'authorized'): ?>
+    <?=$this->transEsc('You are not authorized to use our delivery service.') ?>
+<?php else: ?>
+    <h3><a href="<?=$this->url('delivery-list')?>"><?=$this->transEsc('View delivery list') ?></a></h3>
+    <?=$this->name . ', ' . $this->transEsc('welcome to our delivery service.') ?>
+<?php endif; ?>
 
 </div>
 <div class="<?=$this->layoutClass('sidebar')?>">

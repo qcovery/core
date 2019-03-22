@@ -29,6 +29,7 @@ namespace Delivery\Db\Table;
 use VuFind\Db\Table\Gateway;
 use VuFind\Db\Row\RowGateway;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\Expression;
 use VuFind\Exception\LoginRequired as LoginRequiredException;
 
 /**
@@ -57,27 +58,44 @@ class Delivery extends Gateway
         parent::__construct($adapter, $tm, $cfg, $rowObj, $table);
     }
 
-    public function get($user_delivery_id)
+    public function getDeliveryList($user_delivery_id)
     {
-        if (!$user_id) {
-            throw new LoginRequiredException('Login required');
-        }
-        $result = $this->select(['user_delivery_id' => $user_delivery_id])->current();
-        if (empty($result)) {
-            return null;
-        }
-        return $result;
+        $callback = function ($select) use ($user_delivery_id) {
+            $select->columns(['*']);
+            $select->join(
+                ['d' => 'delivery'],
+                'resource.id = d.resource_id',
+                ['*']
+            );
+            $select->where->equalTo('d.user_delivery_id', $user_delivery_id);
+        };
+        $resource = $this->getDbTable('Resource');
+        return $resource->select($callback)->toArray();
     }
 
-    public function createRowForUserDeliveryId($user_delivery_id, $itemId, $itemTitle)
+    public function createRowForUserDeliveryId($user_delivery_id, $data)
     {
+        if (empty($data['record_id']) || empty($user_delivery_id)) {
+            return false;
+        }
+        $resource = $this->getDbTable('Resource');
+        $resourceRow = $resource->createRow();
+        $resourceRow->record_id = $data['record_id'];
+        $resourceRow->title = $data['title'] ?? '';
+        $resourceRow->author = $data['author'] ?? '';
+        if (!empty($data['year'])) {
+            $resourceRow->year = intval($data['year']);
+        }
+        $resourceRow->source = $data['source'] ?? 'Solr';
+        $resourceRow->save();
+        $resource_id = $resourceRow->id;
+
         $date = new \DateTime();
         $row = $this->createRow();
         $row->user_delivery_id = $user_delivery_id;
-        $row->item_id = $itemId;
-        $row->item_title = $itemTitle;
+        $row->resource_id = $resource_id;
         $row->ordered = $date->format('Y-m-d H:i:s');
         $row->save();
-        return $row;
+        return $row->id;
     }
 }

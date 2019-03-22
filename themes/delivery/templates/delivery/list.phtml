@@ -1,0 +1,50 @@
+<?php
+  // Set up page title:
+  $this->headTitle($this->translate('Delivery Home'));
+
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Home') . '</li><li><a href="' . $this->url('delivery-edit') . '">' . $this->transEsc('Delivery Edit') . '</a></li>';
+  if ($deliverUser['is_admin'] == 'y'):
+    $this->layout()->breadcrumbs .= '<li><a href="' . $this->url('delivery-admin') . '">' . $this->transEsc('Delivery Admin') . '</a></li> ';
+  endif;
+?>
+
+<div class="<?=$this->layoutClass('mainbody')?>">
+    <h2 class="lightbox-header"><?=$this->transEsc('Delivery List')?></h2>
+<?php if (!empty($this->error)): ?>
+    <?=$this->transEsc($this->error) ?>
+<?php endif; ?>
+    
+<?php if (!empty($this->message) && $this->message != 'authorized'): ?>
+    <?=$this->transEsc('You are not authorized to use our delivery service.') ?>
+<?php else: ?>
+    <h3><a href="<?=$this->url('delivery-home')?>"><?=$this->transEsc('Delivery Home') ?></a></h3>
+    <table>
+        <tr>
+            <td><?=$this->transEsc('Title') ?></td>
+            <td><?=$this->transEsc('Author') ?></td>
+            <td><?=$this->transEsc('Year') ?></td>
+            <td><?=$this->transEsc('Status') ?></td>
+            <td><?=$this->transEsc('Date') ?></td>
+            <td><?=$this->transEsc('Comment') ?></td>
+        </tr>
+<?php foreach ($this->listData as $listItem): ?>
+    <?php $status = (!empty($listItem['rejected'])) ? 'rejected' : (!empty($listItem['delivered'])) ? 'delivered' : 'ordered'; ?>
+        <tr>
+            <td><?=$listItem['title'] ?></td>
+            <td><?=$listItem['author'] ?></td>
+            <td><?=$listItem['year'] ?></td>
+            <td><?=$status ?></td>
+            <td><?=$listItem[$status] ?></td>
+            <td><?=$listItem['comment'] ?></td>
+        </tr>
+<?php endforeach; ?>
+    </table>
+<?php endif; ?>
+
+</div>
+<div class="<?=$this->layoutClass('sidebar')?>">
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery'])?>
+</div>
+
+
