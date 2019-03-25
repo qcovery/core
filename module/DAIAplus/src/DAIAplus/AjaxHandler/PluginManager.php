@@ -44,15 +44,16 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
      * @var array
      */
     protected $aliases = [
+        'checkAvailability' => 'Delivery\AjaxHandler\CheckAvailability',
         'checkRequestIsValid' => 'VuFind\AjaxHandler\CheckRequestIsValid',
         'commentRecord' => 'VuFind\AjaxHandler\CommentRecord',
         'deleteRecordComment' => 'VuFind\AjaxHandler\DeleteRecordComment',
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
-	    'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-	    'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
-	    'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
+        'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
+        'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
+        'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
         'getRecordCommentsAsHTML' => 'VuFind\AjaxHandler\GetRecordCommentsAsHTML',
@@ -61,7 +62,6 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'getRequestGroupPickupLocations' =>
             'VuFind\AjaxHandler\GetRequestGroupPickupLocations',
         'getResolverLinks' => 'VuFind\AjaxHandler\GetResolverLinks',
-        'getResultCount' => 'BelugaConfig\AjaxHandler\GetResultCount',
         'getSaveStatuses' => 'VuFind\AjaxHandler\GetSaveStatuses',
         'getVisData' => 'VuFind\AjaxHandler\GetVisData',
         'keepAlive' => 'VuFind\AjaxHandler\KeepAlive',
@@ -79,12 +79,12 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
      * @var array
      */
     protected $factories = [
-        'BelugaConfig\AjaxHandler\GetResultCount' =>
-            'BelugaConfig\AjaxHandler\GetResultCountFactory',
-	    'DependentWorks\AjaxHandler\GetDependentWorks' =>
-	        'DependentWorks\AjaxHandler\GetDependentWorksFactory',
-	    'Libraries\AjaxHandler\GetLibraries' =>
-	        'Libraries\AjaxHandler\GetLibrariesFactory',
+        'Delivery\AjaxHandler\CheckAvailability' =>
+            'Delivery\AjaxHandler\CheckAvailabilityFactory',
+        'DependentWorks\AjaxHandler\GetDependentWorks' =>
+            'DependentWorks\AjaxHandler\GetDependentWorksFactory',
+        'Libraries\AjaxHandler\GetLibraries' =>
+            'Libraries\AjaxHandler\GetLibrariesFactory',
         'VuFind\AjaxHandler\CheckRequestIsValid' =>
             'VuFind\AjaxHandler\AbstractIlsAndUserActionFactory',
         'VuFind\AjaxHandler\CommentRecord' =>
@@ -126,15 +126,4 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
             'VuFind\AjaxHandler\SystemStatusFactory',
         'VuFind\AjaxHandler\TagRecord' => 'VuFind\AjaxHandler\TagRecordFactory',
     ];
-
-    /**
-     * Return the name of the base class or interface that plug-ins must conform
-     * to.
-     *
-     * @return string
-     */
-    protected function getExpectedInterface()
-    {
-        return 'VuFind\AjaxHandler\AjaxHandlerInterface';
-    }
 }
