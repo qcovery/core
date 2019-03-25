@@ -113,7 +113,6 @@ class DeliveryController extends AbstractBase
         if (empty($id)) {
             return $this->forwardTo('Delivery', 'Home');
         }
-        $driver = $this->getRecordLoader()->load($id, $searchClassId);
 
         $orderDataConfig = $this->getConfig('deliveryOrderData');
         $this->dataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
@@ -132,6 +131,7 @@ class DeliveryController extends AbstractBase
         if (!empty($errors)) {
             $view->errors = $errors;
         } elseif (!$sendOrder) {
+            $driver = $this->getRecordLoader()->load($id, $searchClassId);
             $availabilityConfig = $this->getConfig('deliveryAvailability');
             $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
             $signature = $AvailabilityHelper->getSignature();

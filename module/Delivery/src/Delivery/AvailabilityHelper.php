@@ -105,12 +105,11 @@ class AvailabilityHelper {
     public function checkItem()
     {
         $deliveryConfig = $this->deliveryConfig;
-        $iln = $deliveryConfig['iln'];
         $format = array_shift(array_shift($this->getMarcData('Format')));
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
         if (in_array($format, $deliveryConfig['formats'])) {
-            if (empty($signatureData) && $this->checkSigel(array(), $format)) {
+            if (empty($signatureData) && $this->checkSigel([], $format)) {
                 return true;
             }
             foreach ($signatureData as $signatureDate) {
@@ -128,12 +127,14 @@ class AvailabilityHelper {
                         return true;
                     }
                 }
+                $sigelOk = $this->checkParent('sigel', $signatureDate['sigel'], $format);
+
             }
         }
         return false;
     }
 
-    private function performCheck($item, $data, $format, $extraFullMatch = '') 
+    private function performCheck($item, $data, $format) 
     {
         if (empty($this->deliveryConfig[$item.'_'.$format])) {
             $format = 'all';
@@ -148,7 +149,7 @@ class AvailabilityHelper {
                     $regex = substr($regex, 1);
                     $noMatch = true;
                 }
-                if ($regex == $extraFullMatch || (!$noMatch && preg_match('#'.$regex.'$#', $data)) || ($noMatch && !preg_match('#'.$regex.'$#', $data))) {
+                if ((!$noMatch && preg_match('#'.$regex.'$#', $data)) || ($noMatch && !preg_match('#'.$regex.'$#', $data))) {
                     return true;
                 }
             }
@@ -161,7 +162,7 @@ class AvailabilityHelper {
     private function checkSigel($signatureDate, $format, $sigelOnly = false) 
     {
         $format = str_replace(' ', '_', $format);
-        $sigelOk = $this->performCheck('sigel', $signatureDate['sigel'], $format, 'ppnlink');
+        $sigelOk = $this->performCheck('sigel', $signatureDate['sigel'], $format);
         if ($sigelOk) {
             if ($sigelOnly) {
                 return true;
@@ -182,7 +183,7 @@ class AvailabilityHelper {
 	return $this->performCheck('licence', $licenceDate['licencetype'], $format);
     }
 
-    public function checkPpnLink($serviceLocator, $ppn) {
+    public function checkParent($serviceLocator, $ppn) {
         return false;
         $deliveryConfig = $this->deliveryConfig;
         $request = 'id:'.$ppn.' AND collection_details:GBV_ILN_'.$deliveryConfig['iln'].' -format:Article';

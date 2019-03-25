@@ -19,9 +19,18 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
     /**
      *
      */
-    public function check($driver) {
-
+    public function check($driver)
+    {
         $this->AvailabilityHelper->setSolrDriver($driver);
         return ($this->AvailabilityHelper->checkItem()) ? 'available' : 'not available'; 
+    }
+
+    /**
+     *
+     */
+    public function getHierarchyTopID($driver)
+    {
+        $deliveryArticleData = $driver->getMarcData('DeliveryDataArticle');
+        return $deliveryArticleData[2]['ppn']['data'][0] ?? '';
     }
 }
