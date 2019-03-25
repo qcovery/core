@@ -30,7 +30,6 @@ namespace DependentWorks\AjaxHandler;
 //use DependentWorks\DependentWorks;
 use VuFind\AjaxHandler\AbstractBase;
 use VuFind\Search\Results\PluginManager as ResultsManager;
-use VuFind\Record\Loader;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\Stdlib\Parameters;
@@ -61,23 +60,15 @@ class GetDependentWorks extends AbstractBase
     protected $resultsManager;
 
     /**
-     * Record loader
-     *
-     * @var Loader
-     */
-    protected $recordLoader;
-
-    /**
      * Constructor
      *
      * @param array             $config   ZF configuration
      * @param Request           $request  HTTP request
      */
-    public function __construct(array $config, ResultsManager $resultsManager, Loader $loader)
+    public function __construct(array $config, ResultsManager $resultsManager)
     {
         $this->config = $config;
         $this->resultsManager = $resultsManager;
-        $this->recordLoader = $loader;
     }
 
     /**

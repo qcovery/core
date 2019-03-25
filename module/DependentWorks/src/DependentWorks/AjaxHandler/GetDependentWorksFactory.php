@@ -65,8 +65,7 @@ class GetDependentWorksFactory
         }
         return new $requestedName(
             $container->get('Config'),
-            $container->get('VuFind\Search\Results\PluginManager'),
-            $container->get('VuFind\Record\Loader')
+            $container->get('VuFind\Search\Results\PluginManager')
         );
     }
 }
