@@ -70,8 +70,8 @@ class GetLibraries extends AbstractBase
     {
         $this->resultsManager = $resultsManager;
         $this->Libraries = new Libraries(
-        	$config,
-        	$searchMemory
+            $config,
+            $searchMemory
         );
     }
 
