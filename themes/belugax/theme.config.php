@@ -15,27 +15,18 @@ return [
         'belugax.js',
     ],
     'mixins' => [
-        'daiaplus',
         'belugaconfig',
+	'daiaplus',
+        'extendedfacets',
         'delivery',
         'libraries',
         'searchkeys',
         'dependentworks',
         'recorddriver',
-        'extendedfacets',
-        'rvk',
         'beluga-core-base',
     ],
     "less" => [
         "active" => false,
         "compiled.less"
-    ],
-    'helpers' => [
-        'factories' => [
-            'RecordDriver\View\Helper\RecordDriver\SearchMemory' => 'RecordDriver\View\Helper\RecordDriver\SearchMemoryFactory',
-        ],
-        'aliases' => [
-            'searchMemory' => 'RecordDriver\View\Helper\RecordDriver\SearchMemory',
-        ]
     ],
 ];
