@@ -38,7 +38,7 @@ use Interop\Container\ContainerInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetItemStatusesFactory extends \VuFind\AjaxHandler\GetItemStatusesFactory
+class GetItemStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
@@ -62,7 +62,7 @@ class GetItemStatusesFactory extends \VuFind\AjaxHandler\GetItemStatusesFactory
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
-        return new GetItemStatuses(
+        return new $requestedName(
             $container->get('VuFind\Session\Settings'),
             $container->get('VuFind\Config\PluginManager')->get('config'),
             $container->get('DAIAplus\ILS\Connection'),
