@@ -106,7 +106,7 @@ function runItemAjaxForQueue() {
   itemStatusRunning = true;
   $.ajax({
     dataType: 'json',
-    method: 'POST',
+    method: 'get',
     url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
     data: { 'id': itemStatusIds, 'list': itemDAIAplusList }
   })
@@ -138,41 +138,84 @@ function itemQueueAjax(id, el) {
   el.find('.status').removeClass('hidden');
 }
 
+//Listenansicht
 function checkItemStatus(el) {
   var $item = $(el);
-  if ($item.data('daiaplus-list') !== 'undefined') {
-    itemDAIAplusList = true;
+  var id = $item.attr('data-id');
+  var source = $item.attr('data-src');
+  var list =  $item.attr('data-list');
+//alert(id + ' _ ' + source);
+  if (list == 1) {
+     itemDAIAplusList = true;
   }
+  if (source == 'Solr') {
+    itemQueueAjax(id + '', $item);
+  }
+/*
   if ($item.find('.hiddenId').length === 0) {
     return false;
   }
   var id = $item.find('.hiddenId').val();
   itemQueueAjax(id + '', $item);
+*/
 }
 
 var itemStatusObserver = null;
+//Einzelansicht
 function checkItemStatuses(_container) {
   var container = typeof _container === 'undefined'
     ? document.body
     : _container;
 
-  var ajaxItems = $(container).find('.ajaxItem');
-  for (var i = 0; i < ajaxItems.length; i++) {
-    var id = $(ajaxItems[i]).find('.hiddenId').val();
-    itemQueueAjax(id, $(ajaxItems[i]));
+  var availabilityItems = $(container).find('.availabilityItem');
+//alert(ajaxItems.attr('data-id'));
+  for (var i = 0; i < availabilityItems.length; i++) {
+//alert(ajaxItems[i].find('.hiddenId').val());
+    //var id = $(ajaxItems[i]).find('.hiddenId').val();
+    var id = $(availabilityItems[i]).attr('data-id');
+    var source = $(availabilityItems[i]).attr('data-src');
+alert(id + ' - ' + source);
+    //itemQueueAjax(id, $(ajaxItems[i]));
+    if (source == 'Solr') {
+      itemQueueAjax(id, $(availabilityItem[i]));
+    }
   }
   // Stop looking for a scroll loader
   if (itemStatusObserver) {
     itemStatusObserver.disconnect();
   }
 }
-$(document).ready(function checkItemStatusReady() {
-  if (typeof Hunt === 'undefined') {
-    checkItemStatuses();
-  } else {
-    itemStatusObserver = new Hunt(
-      $('.ajaxItem').toArray(),
-      { enter: checkItemStatus }
-    );
+$(document).ready(function() {
+  function checkItemStatusReady() {
+    if (typeof Hunt === 'undefined') {
+      checkItemStatuses();
+    } else {
+      itemStatusObserver = new Hunt(
+        $('.availabilityItem').toArray(),
+        { enter: checkItemStatus }
+      );
+    }
   }
+  function checkArticleStatusReady() {
+    $('.availabilityItem').each(function(){
+      var element = $(this);
+      var id = $(this).attr('data-id');
+      var list =  $(this).attr('data-list');
+      var source = $(this).attr('data-src');
+      if (source == 'Search2') {
+        $.ajax({
+          dataType:'json',
+          method:'get',
+          url:'/vufind/AJAX/JSON?method=getArticleStatuses',
+          data:{id:id, list:list, source:source},
+          success:function(data, textStatus) {
+            element.html(data);
+          }
+        });
+      }
+    });
+  }
+
+  checkItemStatusReady();
+  checkArticleStatusReady();
 });
