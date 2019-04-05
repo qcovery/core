@@ -302,7 +302,7 @@ class MyResearchController extends AbstractBase
             $this->flashMessenger()->setNamespace('info')
                 ->addMessage('search_save_success');
         } else if (($id = $this->params()->fromQuery('delete', false)) !== false) {
-            $this->setSavedFlagSecurely($id, false);
+            $this->setSavedFlagSecurely($id, false, $user->id);
             $this->flashMessenger()->setNamespace('info')
                 ->addMessage('search_unsave_success');
         } else {
