@@ -298,11 +298,11 @@ class MyResearchController extends AbstractBase
         // Check for the save / delete parameters and process them appropriately:
         $search = $this->getTable('Search');
         if (($id = $this->params()->fromQuery('save', false)) !== false) {
-            $search->setSavedFlag($id, true, $user->id);
+            $this->setSavedFlagSecurely($id, true, $user->id);
             $this->flashMessenger()->setNamespace('info')
                 ->addMessage('search_save_success');
         } else if (($id = $this->params()->fromQuery('delete', false)) !== false) {
-            $search->setSavedFlag($id, false);
+            $this->setSavedFlagSecurely($id, false);
             $this->flashMessenger()->setNamespace('info')
                 ->addMessage('search_unsave_success');
         } else {
@@ -1732,5 +1732,29 @@ class MyResearchController extends AbstractBase
     public function getILS()
     {
         return $this->serviceLocator->get('PAIA\ILS\Connection');
+    }
+
+    /**
+     * Support method for savesearchAction(): set the saved flag in a secure
+     * fashion, throwing an exception if somebody attempts something invalid.
+     *
+     * @param int  $searchId The search ID to save/unsave
+     * @param bool $saved    The new desired state of the saved flag
+     * @param int  $userId   The user ID requesting the change
+     *
+     * @throws \Exception
+     * @return void
+     */
+    protected function setSavedFlagSecurely($searchId, $saved, $userId)
+    {
+        $searchTable = $this->getTable('Search');
+        $sessId = $this->serviceLocator->get('Zend\Session\SessionManager')->getId();
+        $row = $searchTable->getOwnedRowById($searchId, $sessId, $userId);
+        if (empty($row)) {
+            throw new ForbiddenException('Access denied.');
+        }
+        $row->saved = $saved ? 1 : 0;
+        $row->user_id = $userId;
+        $row->save();
     }
 }
