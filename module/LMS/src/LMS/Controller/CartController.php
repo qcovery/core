@@ -130,9 +130,11 @@ class CartController extends \VuFind\Controller\CartController
                         $result = '<collection xmlns="http://www.indexdata.com/turbomarc">' . "\n" . $turbomarcData . "\n" . '</collection>';
                     } else if ($format == 'marc21') {
                         $records = $this->getRecordLoader()->loadBatch($ids);
+                        $marc21Data = [];
                         foreach ($records as $record) {
-                            $result .= $record->getXML('marc21');
+                            $marc21Data[] = $record->getXML('marc21');
                         }
+                        $result = '<collection>' . "\n" . implode("\n", $marc21Data) . "\n" . '</collection>';
                     } else {
                         $result = json_encode($ids);
                     }
