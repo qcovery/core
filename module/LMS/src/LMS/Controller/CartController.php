@@ -128,6 +128,11 @@ class CartController extends \VuFind\Controller\CartController
                             $turbomarcData .= implode("\n", $execResults);
                         }
                         $result = '<collection xmlns="http://www.indexdata.com/turbomarc">' . "\n" . $turbomarcData . "\n" . '</collection>';
+                    } else if ($format == 'marc21') {
+                        $records = $this->getRecordLoader()->loadBatch($ids);
+                        foreach ($records as $record) {
+                            $result .= $record->getXML('marc21');
+                        }
                     } else {
                         $result = json_encode($ids);
                     }
