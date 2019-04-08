@@ -22,3 +22,7 @@
 .rvk-details-hide {
     display:none;
 }
+
+.rvk-tree-search-link i {
+    font-size: 24px;
+}

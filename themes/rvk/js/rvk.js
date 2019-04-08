@@ -38,4 +38,58 @@ $(document).ready(function() {
             }
         });
     });
+
+    (function ($, undefined) {
+        "use strict";
+
+        var searchLinkSpan = document.createElement('span');
+        $(searchLinkSpan).html('<a href="" title="'+'" class="rvk-tree-search-link" target="_blank"><i class="bel-link01"></i></a>');
+
+        $.jstree.plugins.rvkSearchLink = function (options, parent) {
+            this.bind = function () {
+                parent.bind.call(this);
+                this.element
+                    .on('click.jstree', '.jstree-rvkSearchLink', $.proxy(function (e) {
+                        console.log('bind-click');
+                    }, this));
+            };
+            this.teardown = function () {
+                this.element.find('.jstree-rvkSearchLink').remove();
+                parent.teardown.call(this);
+            };
+            this.redraw_node = function(obj, deep, callback, force_draw) {
+                var rvkId = obj;
+                rvkId = rvkId.replace(/_/g, '+');
+                obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
+                if(obj) {
+                    var tempSearchLinkSpan = searchLinkSpan.cloneNode(true);
+                    $(tempSearchLinkSpan).find('a').attr('href', '/vufind/Search/Results?lookfor="'+rvkId+' rvk"');
+                    obj.insertBefore(tempSearchLinkSpan, obj.childNodes[2]);
+                }
+                return obj;
+            };
+        };
+    })(jQuery);
+
+    jQuery('.rvk-tree').each(function(event){
+        $(this).jstree({
+            'core' : {
+                'data' : function (node, callback) {
+                    $.ajax({
+                        url : '/vufind/AJAX/JSON?method=getRVKTree&rvk='+encodeURIComponent(node.id),
+                        dataType:'json',
+                        success : function(data) {
+                            callback(data.data);
+                        }
+                    });
+                }
+            },
+            'plugins' : ['rvkSearchLink']
+        });
+
+        $(this).on('click', '.jstree-anchor', function (e) {
+            $(this).jstree(true).toggle_node(e.target);
+        });
+    });
+
 });
