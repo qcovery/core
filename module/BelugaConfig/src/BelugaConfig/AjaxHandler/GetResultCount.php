@@ -78,13 +78,13 @@ class GetResultCount extends AbstractBase
                 )
             )
         );
-        $queryArray = explode('&', $queryString);
 
+        $queryArray = explode('&', $queryString);
         $searchParams = [];
         foreach ($queryArray as $queryItem) {
             $arrayKey = false;
             list($key, $value) = explode('=', $queryItem, 2);
-            if (preg_match('/([0-9]\[\]$)/', $key, $matches)) {
+            if (preg_match('/[0-9](\[\]$)/', $key, $matches)) {
                 $key = str_replace($matches[1], '', $key);
                 $arrayKey = true;
             }
@@ -94,12 +94,12 @@ class GetResultCount extends AbstractBase
                 $searchParams[$key] = $value;
             }
         }
+
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
         $paramsObj->getOptions()->disableHighlighting();
         $paramsObj->getOptions()->spellcheckEnabled(false);
-        
         $paramsObj->initFromRequest(new Parameters($searchParams));
 
         $total = $results->getResultTotal();

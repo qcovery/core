@@ -82,7 +82,7 @@ class Params extends \VuFind\Search\Solr\Params
                 $query = preg_replace('/{'.$translateTo.'}/', $translateFrom, $query);
             }
         }
-        return preg_replace('/^\((.*?)\)?/', '$1', $query);
+        return preg_replace('/^\((.*?)\)/', '$1', $query);
     }
 
     public function returnIdentic($item) {
