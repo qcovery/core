@@ -11,6 +11,24 @@ function linkCallnumbers(callnumber, callnumber_handler) {
   }
   return callnumber;
 }
+
+function displayArticleStatus(results, $item) {
+  $item.removeClass('js-item-pending');
+  $item.find('.ajax-availability').removeClass('ajax-availability hidden');
+//alert(result[0].level);
+//alert(Object.keys(result[1]));
+  $.each(results, function(index, result){
+    if (typeof(result.error) != 'undefined'
+      && result.error.length > 0
+    ) {
+      $item.find('.status').empty().append('error');
+    } else {
+alert(result.level);
+      $item.find('.status').empty().append(result.level);
+    }
+  });
+}
+
 function displayItemStatus(result, $item) {
   $item.removeClass('js-item-pending');
   $item.find('.status').empty().append(result.availability_message);
@@ -95,7 +113,8 @@ var itemStatusEls = {};
 var itemStatusTimer = null;
 var itemStatusDelay = 200;
 var itemStatusRunning = false;
-var itemDAIAplusList = false;
+var itemStatusList = false;
+var itemStatusSource = '';
 
 function runItemAjaxForQueue() {
   // Only run one item status AJAX request at a time:
@@ -104,16 +123,26 @@ function runItemAjaxForQueue() {
     return;
   }
   itemStatusRunning = true;
+  if (itemStatusSource == 'Search2') {
+    var method = 'getArticleStatuses';
+  } else {
+    var method = 'getItemStatuses';
+  }
+
   $.ajax({
+    url: VuFind.path + '/AJAX/JSON?method=' + method,
     dataType: 'json',
     method: 'get',
-    url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
-    data: { 'id': itemStatusIds, 'list': itemDAIAplusList }
+    data: {id:itemStatusIds, list:itemStatusList, source:itemStatusSource}
   })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
         var status = response.data.statuses[j];
-        displayItemStatus(status, itemStatusEls[status.id]);
+        if (method == 'getItemStatuses') {
+          displayItemStatus(status, itemStatusEls[status.id]);
+        } else {
+          displayArticleStatus(status, itemStatusEls[status.id]);
+        }
         itemStatusIds.splice(itemStatusIds.indexOf(status.id), 1);
       }
       itemStatusRunning = false;
@@ -142,15 +171,10 @@ function itemQueueAjax(id, el) {
 function checkItemStatus(el) {
   var $item = $(el);
   var id = $item.attr('data-id');
-  var source = $item.attr('data-src');
-  var list =  $item.attr('data-list');
+  itemStatusSource = $item.attr('data-src');
+  itemStatusList = ($item.attr('data-list') == 1);
 //alert(id + ' _ ' + source);
-  if (list == 1) {
-     itemDAIAplusList = true;
-  }
-  if (source == 'Solr') {
-    itemQueueAjax(id + '', $item);
-  }
+  itemQueueAjax(id + '', $item);
 /*
   if ($item.find('.hiddenId').length === 0) {
     return false;
@@ -173,12 +197,11 @@ function checkItemStatuses(_container) {
 //alert(ajaxItems[i].find('.hiddenId').val());
     //var id = $(ajaxItems[i]).find('.hiddenId').val();
     var id = $(availabilityItems[i]).attr('data-id');
-    var source = $(availabilityItems[i]).attr('data-src');
-alert(id + ' - ' + source);
+    itemStatusSource = $(availabilityItems[i]).attr('data-src');
+    itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
+//alert(id + ' - ' + source);
     //itemQueueAjax(id, $(ajaxItems[i]));
-    if (source == 'Solr') {
-      itemQueueAjax(id, $(availabilityItem[i]));
-    }
+    itemQueueAjax(id, $(availabilityItem[i]));
   }
   // Stop looking for a scroll loader
   if (itemStatusObserver) {
