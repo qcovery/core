@@ -49,11 +49,12 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'checkRequestIsValid' => 'VuFind\AjaxHandler\CheckRequestIsValid',
         'commentRecord' => 'VuFind\AjaxHandler\CommentRecord',
         'deleteRecordComment' => 'VuFind\AjaxHandler\DeleteRecordComment',
+        'getArticleStatuses' => 'DAIAplus\AjaxHandler\GetArticleStatuses',
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-        'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
+        'getItemStatuses' => 'DAIAplus\AjaxHandler\GetItemStatuses',
         'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
@@ -81,6 +82,10 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
      * @var array
      */
     protected $factories = [
+        'DAIAplus\AjaxHandler\GetArticleStatuses' =>
+            'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
+        'DAIAplus\AjaxHandler\GetItemStatuses' =>
+            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
         'BelugaConfig\AjaxHandler\GetResultCount' =>
             'BelugaConfig\AjaxHandler\GetResultCountFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>
@@ -101,8 +106,6 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
             'VuFind\AjaxHandler\GetFacetDataFactory',
         'VuFind\AjaxHandler\GetIlsStatus' =>
             'VuFind\AjaxHandler\GetIlsStatusFactory',
-        'VuFind\AjaxHandler\GetItemStatuses' =>
-            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
         'VuFind\AjaxHandler\GetLibraryPickupLocations' =>
             'VuFind\AjaxHandler\AbstractIlsAndUserActionFactory',
         'VuFind\AjaxHandler\GetRecordCommentsAsHTML' =>
