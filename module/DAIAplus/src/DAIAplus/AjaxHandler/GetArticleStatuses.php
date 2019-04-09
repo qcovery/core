@@ -166,11 +166,11 @@ print_r($sfxData);
                     ];
                 } else {
                     foreach ($rawData['items'] as $item) {
-                        if (!empty($item)) {
+                        if (!empty($item) && !empty($item['url_access'])) {
                             $urlAccess = (is_array($item['url_access'])) ? $item['url_access'][0] : $item['url_access'];
                             $data[] = [
                                 'href' => $urlAccess,
-                                'level' => $item['url_access_label'],
+                                'level' => $item['url_access_level'],
                                 'label' => $item['url_access_label'],
                                 'notification' => $item['access_notification'],
                                 'doi' => $item['doi']

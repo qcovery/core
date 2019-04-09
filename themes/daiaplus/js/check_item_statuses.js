@@ -15,16 +15,16 @@ function linkCallnumbers(callnumber, callnumber_handler) {
 function displayArticleStatus(results, $item) {
   $item.removeClass('js-item-pending');
   $item.find('.ajax-availability').removeClass('ajax-availability hidden');
-//alert(result[0].level);
-//alert(Object.keys(result[1]));
   $.each(results, function(index, result){
     if (typeof(result.error) != 'undefined'
       && result.error.length > 0
     ) {
       $item.find('.status').empty().append('error');
     } else {
-alert(result.level);
-      $item.find('.status').empty().append(result.level);
+      if (typeof(result.href) != 'undefined') {
+        var html = '<a href="' + result.href + '" class="' + result.level + '">' + result.level + ' ' + result.label + '</a>';
+        $item.find('.status').empty().append(html);
+      }
     }
   });
 }
@@ -173,34 +173,21 @@ function checkItemStatus(el) {
   var id = $item.attr('data-id');
   itemStatusSource = $item.attr('data-src');
   itemStatusList = ($item.attr('data-list') == 1);
-//alert(id + ' _ ' + source);
   itemQueueAjax(id + '', $item);
-/*
-  if ($item.find('.hiddenId').length === 0) {
-    return false;
-  }
-  var id = $item.find('.hiddenId').val();
-  itemQueueAjax(id + '', $item);
-*/
 }
 
 var itemStatusObserver = null;
-//Einzelansicht
+
 function checkItemStatuses(_container) {
   var container = typeof _container === 'undefined'
     ? document.body
     : _container;
 
   var availabilityItems = $(container).find('.availabilityItem');
-//alert(ajaxItems.attr('data-id'));
   for (var i = 0; i < availabilityItems.length; i++) {
-//alert(ajaxItems[i].find('.hiddenId').val());
-    //var id = $(ajaxItems[i]).find('.hiddenId').val();
     var id = $(availabilityItems[i]).attr('data-id');
     itemStatusSource = $(availabilityItems[i]).attr('data-src');
     itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
-//alert(id + ' - ' + source);
-    //itemQueueAjax(id, $(ajaxItems[i]));
     itemQueueAjax(id, $(availabilityItem[i]));
   }
   // Stop looking for a scroll loader
@@ -219,26 +206,5 @@ $(document).ready(function() {
       );
     }
   }
-  function checkArticleStatusReady() {
-    $('.availabilityItem').each(function(){
-      var element = $(this);
-      var id = $(this).attr('data-id');
-      var list =  $(this).attr('data-list');
-      var source = $(this).attr('data-src');
-      if (source == 'Search2') {
-        $.ajax({
-          dataType:'json',
-          method:'get',
-          url:'/vufind/AJAX/JSON?method=getArticleStatuses',
-          data:{id:id, list:list, source:source},
-          success:function(data, textStatus) {
-            element.html(data);
-          }
-        });
-      }
-    });
-  }
-
   checkItemStatusReady();
-  checkArticleStatusReady();
 });
