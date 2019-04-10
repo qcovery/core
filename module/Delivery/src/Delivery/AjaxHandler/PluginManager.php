@@ -49,10 +49,11 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'commentRecord' => 'VuFind\AjaxHandler\CommentRecord',
         'deleteRecordComment' => 'VuFind\AjaxHandler\DeleteRecordComment',
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
+        'getArticleStatuses' => 'DAIAplus\AjaxHandler\GetArticleStatuses',
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-        'getItemStatuses' => 'VuFind\AjaxHandler\GetItemStatuses',
+        'getItemStatuses' => 'DAIAplus\AjaxHandler\GetItemStatuses',
         'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
@@ -79,6 +80,10 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
+        'DAIAplus\AjaxHandler\GetArticleStatuses' =>
+            'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
+        'DAIAplus\AjaxHandler\GetItemStatuses' =>
+            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>
             'Delivery\AjaxHandler\CheckAvailabilityFactory',
         'DependentWorks\AjaxHandler\GetDependentWorks' =>

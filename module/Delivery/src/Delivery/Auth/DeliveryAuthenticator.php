@@ -27,9 +27,9 @@
  */
 namespace Delivery\Auth;
 
-use PAIA\Auth\ILSAuthenticator;
-use PAIA\Auth\Manager;
-use PAIA\ILS\Connection as ILSConnection;
+use VuFind\Auth\ILSAuthenticator;
+use VuFind\Auth\Manager;
+use VuFind\ILS\Connection as ILSConnection;
 
 /**
  * Class for managing ILS-specific authentication.
@@ -37,6 +37,7 @@ use PAIA\ILS\Connection as ILSConnection;
  * @category VuFind
  * @package  Authentication
  * @author   Demian Katz <demian.katz@villanova.edu>
+ *  
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
@@ -111,7 +112,8 @@ class DeliveryAuthenticator extends ILSAuthenticator
      */
     private function extractUserType($rawType)
     {
-        return (preg_replace('/^.+;type=([0-9]+)$/', '$1', $rawType));
+        list(,,$type) = explode(':', $rawType);
+        return $type;
     }
 
     /**
@@ -132,7 +134,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
         $allowedTypes = $config['Patron']['allowed'];
 
         $patron = $this->storedCatalogLogin();
-        $patronTypes = array_map([$this, 'extractUserType'], explode(', ', $patron['type']));
+        $patronTypes = array_map([$this, 'extractUserType'], $patron['type']);
 
         if (!empty(array_intersect($patronTypes, $allowedTypes))) {
             $userDeliveryTable = $this->getTable();
