@@ -92,10 +92,7 @@ class GetArticleStatuses extends AbstractBase
 
                 $sfxLink = $openUrl;
                 $sfxData = $driver->getMarcData('SFX');
-/*
-echo $sfxLink . '<br>';
-print_r($sfxData);
-*/
+
                 if (is_array($sfxData)) {
                     foreach ($sfxData as $sfxDate) {
                         if (is_array($sfxDate)) {
@@ -105,7 +102,7 @@ print_r($sfxData);
                         }
                     }
                 }
-    //print_r($this->config);
+
                 $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
                 $sfxLink = urlencode('http://sfx.gbv.de/sfx_' . $sfxDomain . '?' . $sfxLink);
 
@@ -116,7 +113,6 @@ print_r($sfxData);
                 $url .= '&openurl=' . urlencode($openUrl);
                 $url .= '&list=' . $listView;
                 $url .= '&mediatype=' . urlencode($format);
-                //$url .= '&sfx=' . urlencode($sfxLink);
                 $url .= '&sfx=' . $sfxLink;
                 $url .= '&language=de';
                 $url .= '&format=json';
@@ -126,7 +122,6 @@ print_r($sfxData);
                 $responses[] = $response;
             }
         }
-//print_r($responses);
         return $this->formatResponse(['statuses' => $responses]);
     }
 
