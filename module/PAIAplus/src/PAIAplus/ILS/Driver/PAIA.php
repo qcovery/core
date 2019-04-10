@@ -31,7 +31,9 @@
  */
 namespace PAIAplus\ILS\Driver;
 
+use VuFind\Exception\ILS as ILSException;
 use VuFind\ILS\Driver\PAIA as PAIAbase;
+//use DAIAplus\ILS\Driver\DAIA as PAIAbase;
 
 /**
  * PAIA ILS Driver for VuFind to get patron information
@@ -51,4 +53,76 @@ use VuFind\ILS\Driver\PAIA as PAIAbase;
 class PAIA extends PAIAbase
 {
 
+    /**
+     * Initialize the driver.
+     *
+     * Validate configuration and perform all resource-intensive tasks needed to
+     * make the driver active.
+     *
+     * @throws ILSException
+     * @return void
+     */
+    public function init()
+    {
+        parent::init();
+        $domain = $this->getPAIADomain();
+
+        if (!(isset($this->config[$domain]['baseUrl']))) {
+            throw new ILSException('PAIA/baseUrl configuration needs to be set.');
+        }
+        $this->paiaURL = $this->config[$domain]['baseUrl'];
+
+        // use PAIA specific timeout setting for http requests if configured
+        if ((isset($this->config[$domain]['timeout']))) {
+            $this->paiaTimeout = $this->config[$domain]['timeout'];
+        }
+
+        // do we have caching enabled for PAIA
+        if (isset($this->config[$domain]['paiaCache'])) {
+            $this->paiaCacheEnabled = $this->config[$domain]['paiaCache'];
+        } else {
+            $this->debug('Caching not enabled, disabling it by default.');
+        }
+    }
+
+    /**
+     * Get Patron Profile
+     *
+     * This is responsible for retrieving the profile for a specific patron.
+     *
+     * @param array $patron The patron array
+     *
+     * @return array Array of the patron's profile data on success,
+     */
+    public function getMyProfile($patron)
+    {
+        $profile = parent::getMyProfile($patron);
+        if (!empty($profile)) {
+            $profile['email'] = $patron['email'];
+            $profile['name'] = $patron['name'];
+            $profile['address1'] = $patron['address'];
+            $profile['username'] = $patron['cat_username'];
+        }
+        return $profile;
+    }
+
+    public function setPAIADomain($domain) {
+        $session = $this->getSession();
+        if (
+               empty($this->config[$domain])
+            || !is_array($this->config[$domain])
+            || empty($this->config[$domain]['baseUrl'])
+        ) {
+            $domain = 'PAIA';
+        }
+        $session->paia_domain = $domain;
+    }
+        
+    protected function getPAIADomain() {
+        $session = $this->getSession();
+        if (empty($session->paia_domain)) {
+            $session->paia_domain  = 'PAIA';
+        }
+        return $session->paia_domain;
+    }
 }
