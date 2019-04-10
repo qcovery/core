@@ -16,9 +16,9 @@ return [
     ],
     'mixins' => [
         'belugaconfig',
+	'delivery',
 	'daiaplus',
         'extendedfacets',
-        'delivery',
         'libraries',
         'searchkeys',
         'dependentworks',
