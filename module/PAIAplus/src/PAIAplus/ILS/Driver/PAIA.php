@@ -106,16 +106,27 @@ class PAIA extends PAIAbase
         return $profile;
     }
 
-    public function setPAIADomain($domain) {
+    public function setPAIADomain($paiaDomain, $daiaDomain = '') {
         $session = $this->getSession();
         if (
-               empty($this->config[$domain])
-            || !is_array($this->config[$domain])
-            || empty($this->config[$domain]['baseUrl'])
+               empty($this->config[$paiaDomain])
+            || !is_array($this->config[$paiaDomain])
+            || empty($this->config[$paiaDomain]['baseUrl'])
         ) {
-            $domain = 'PAIA';
+            $paiaDomain = 'PAIA';
         }
-        $session->paia_domain = $domain;
+        $session->paia_domain = $paiaDomain;
+
+        if (
+               !empty($daiaDomain) && (
+                   empty($this->config[$daiaDomain])
+                || !is_array($this->config[$daiaDomain])
+                || empty($this->config[$daiaDomain]['baseUrl'])
+                )
+        ) {
+            $paiaDomain = 'DAIA';
+        }
+        $session->daia_domain = $paiaDomain;
     }
         
     protected function getPAIADomain() {

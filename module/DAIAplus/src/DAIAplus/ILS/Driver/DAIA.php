@@ -320,18 +320,6 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
         $this->language = $language;
     }
 
-    public function setDAIADomain($domain) {
-        $session = $this->getSession();
-        if (
-               empty($this->config[$domain])
-            || !is_array($this->config[$domain])
-            || empty($this->config[$domain]['baseUrl'])
-        ) {
-            $domain = 'DAIA';
-        }
-        $session->daia_domain = $domain;
-    }
-        
     protected function getDAIADomain() {
         $session = $this->getSession();
         if (empty($session->daia_domain)) {
