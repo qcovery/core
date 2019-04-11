@@ -122,7 +122,7 @@ class DeliveryController extends AbstractBase
             $errors = $this->dataHandler->checkData();
             if (empty($errors)) {
                 $this->sendDeliveryMail('order');
-                $sendOrder = true;
+                return $this->forwardTo('Delivery', 'List');
             }
         }
  
@@ -130,7 +130,7 @@ class DeliveryController extends AbstractBase
 
         if (!empty($errors)) {
             $view->errors = $errors;
-        } elseif (!$sendOrder) {
+        } else {
             $driver = $this->getRecordLoader()->load($id, $searchClassId);
             $availabilityConfig = $this->getConfig('deliveryAvailability');
             $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
