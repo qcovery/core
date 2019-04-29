@@ -106,7 +106,13 @@ class PAIA extends PAIAbase
         return $profile;
     }
 
-    public function setPAIADomain($paiaDomain, $daiaDomain = '') {
+    public function setILSDomain($paiaDomain, $daiaDomain = '')
+    {
+        return $this->setPAIADomain($paiaDomain, $daiaDomain);
+    }
+
+    public function setPAIADomain($paiaDomain, $daiaDomain = '')
+    {
         $session = $this->getSession();
         if (
                empty($this->config[$paiaDomain])
@@ -124,12 +130,13 @@ class PAIA extends PAIAbase
                 || empty($this->config[$daiaDomain]['baseUrl'])
                 )
         ) {
-            $paiaDomain = 'DAIA';
+            $daiaDomain = 'DAIA';
         }
-        $session->daia_domain = $paiaDomain;
+        $session->daia_domain = $daiaDomain;
     }
         
-    protected function getPAIADomain() {
+    protected function getPAIADomain()
+    {
         $session = $this->getSession();
         if (empty($session->paia_domain)) {
             $session->paia_domain  = 'PAIA';
