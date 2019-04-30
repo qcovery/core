@@ -188,7 +188,7 @@ function checkItemStatuses(_container) {
     var id = $(availabilityItems[i]).attr('data-id');
     itemStatusSource = $(availabilityItems[i]).attr('data-src');
     itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
-    itemQueueAjax(id, $(availabilityItem[i]));
+    itemQueueAjax(id, $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader
   if (itemStatusObserver) {
