@@ -125,7 +125,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
      *
      * @return array|bool
      */
-    public function authenticate()
+    public function authenticate($asAdmin = false)
     {
         if (!$user = $this->auth->isLoggedIn()) {
             return 'not_logged_in';
@@ -144,8 +144,13 @@ class DeliveryAuthenticator extends ILSAuthenticator
             $deliveryUser = $userDeliveryTable->get($user->id);
             $user->delivery_email = $deliveryUser->delivery_email;
             $user->user_delivery_id = $deliveryUser->id;
+            if ($asAdmin) {
+                $user->is_admin = $deliveryUser->is_admin;
+            }
             $this->user = $user;
-            return 'authorized';
+            if (!$asAdmin || $user->is_admin == 'y') {
+                return 'authorized';
+            }
         }
         return 'not_authorized';
     }

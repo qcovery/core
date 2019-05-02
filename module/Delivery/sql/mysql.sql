@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `user_delivery` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `delivery_email` varchar(255) NOT NULL DEFAULT '',
+  `is_admin` char(1) NOT NULL DEFAULT 'n',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `user_delivery_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
