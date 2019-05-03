@@ -92,7 +92,7 @@ function displayItemStatus(result, $item) {
         : result.location
     );
   }
-  if (typeof(result.daiaplus) != 'undefined'
+  if (!itemStatusList && typeof(result.daiaplus) != 'undefined'
     && result.daiaplus.length > 0) {
     $item.find('.callnumAndLocation').addClass('hidden');
     $item.find('.status').empty().append(result.daiaplus);
