@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace Delivery\Auth;
+namespace PAIAplus\Auth;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -39,7 +39,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class DeliveryAuthenticatorFactory implements FactoryInterface
+class ILSAuthenticatorFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -70,10 +70,8 @@ class DeliveryAuthenticatorFactory implements FactoryInterface
             // Generate wrapped object:
             $auth = $container->get('VuFind\Auth\Manager');
             $catalog = $container->get('PAIAplus\ILS\Connection');
-            $config = $container->get('VuFind\Config\PluginManager')->get('deliveryGlobal');
-            $table = $container->get('Delivery\Db\Table\PluginManager')->get('userDelivery');
-            $wrapped = new $requestedName($auth, $catalog, $config, $table);
-            
+            $wrapped = new $requestedName($auth, $catalog);
+
             // Indicate that initialization is complete to avoid reinitialization:
             $proxy->setProxyInitializer(null);
         };

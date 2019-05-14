@@ -294,12 +294,12 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $link;
     }
 
-
-    private function makeTemplate($solrMarcData, $key, $separators = 0) {
+    private function makeTemplate($solrMarcData, $key)
+    {
         $template = 'RecordDriver/%s/' . 'template-' . $key . '.phtml';
         $className = get_class($this->driver);
         return $this->renderClassTemplate(
-            $template, $className, ['driver' => $this->driver, 'solrMarcData' => $solrMarcData, 'separators' => $separators, 'className' => $className]
+            $template, $className, ['solrMarcData' => $solrMarcData]
         );
     }
 }

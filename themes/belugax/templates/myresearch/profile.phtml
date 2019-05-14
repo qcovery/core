@@ -1,4 +1,4 @@
-<?
+<?php
     // Set up page title:
     $this->headTitle($this->translate('My Profile'));
 
@@ -20,7 +20,6 @@
   <table class="table table-striped">
     <?
       $profile = $this->profile;
-      $profile['name'] = $profile['firstname'] . ' ' . $profile['lastname'];
       echo $this->renderArray(
         $arrTemplate, $profile,
         [
@@ -59,7 +58,7 @@
           $this->transEsc('Mobile Number') => 'mobile_phone',
           $this->transEsc('Group') => 'group',
           $this->transEsc('Expires') => 'expiration_date'*/
-          $this->transEsc('Address') => 'address',
+          $this->transEsc('Address') => 'address1',
           $this->transEsc('E-Mail') => 'email',
           $this->transEsc('Expires') => 'expires',
         ]

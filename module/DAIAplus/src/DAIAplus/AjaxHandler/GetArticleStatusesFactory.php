@@ -1,6 +1,6 @@
 <?php
 /**
- * ILS Authenticator factory.
+ * Factory for GetItemStatus AJAX handler.
  *
  * PHP version 7
  *
@@ -20,26 +20,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Authentication
+ * @package  AJAX
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace Delivery\Auth;
+namespace DAIAplus\AjaxHandler;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * ILS Authenticator factory.
+ * Factory for GetItemStatus AJAX handler.
  *
  * @category VuFind
- * @package  Authentication
+ * @package  AJAX
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class DeliveryAuthenticatorFactory implements FactoryInterface
+class GetArticleStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
@@ -54,31 +53,18 @@ class DeliveryAuthenticatorFactory implements FactoryInterface
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
      * @throws ContainerException if any other error occurs
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
-            throw new \Exception('Unexpected options sent to factory.');
+            throw new \Exception('Unexpected options passed to factory.');
         }
-        // Construct the ILS authenticator as a lazy loading value holder so that
-        // the object is not instantiated until it is called. This helps break a
-        // potential circular dependency with the MultiBackend driver as well as
-        // saving on initialization costs in cases where the authenticator is not
-        // actually utilized.
-        $callback = function (& $wrapped, $proxy) use ($container, $requestedName) {
-            // Generate wrapped object:
-            $auth = $container->get('VuFind\Auth\Manager');
-            $catalog = $container->get('PAIAplus\ILS\Connection');
-            $config = $container->get('VuFind\Config\PluginManager')->get('deliveryGlobal');
-            $table = $container->get('Delivery\Db\Table\PluginManager')->get('userDelivery');
-            $wrapped = new $requestedName($auth, $catalog, $config, $table);
-            
-            // Indicate that initialization is complete to avoid reinitialization:
-            $proxy->setProxyInitializer(null);
-        };
-        $cfg = $container->get('ProxyManager\Configuration');
-        $factory = new \ProxyManager\Factory\LazyLoadingValueHolderFactory($cfg);
-        return $factory->createProxy($requestedName, $callback);
+        return new $requestedName(
+            $container->get('VuFind\Record\Loader'),
+            $container->get('VuFind\Config\PluginManager')->get('PAIA')
+        );
     }
 }

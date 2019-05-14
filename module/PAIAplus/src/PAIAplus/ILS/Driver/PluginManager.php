@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-namespace DAIAplus\ILS\Driver;
+namespace PAIAplus\ILS\Driver;
 
 /**
  * ILS driver plugin manager
@@ -36,7 +36,7 @@ namespace DAIAplus\ILS\Driver;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-class PluginManager extends \VuFind\ILS\Driver\PluginManager
+class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
 {
     /**
      * Default plugin aliases.
@@ -47,7 +47,7 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
         'aleph' => 'VuFind\ILS\Driver\Aleph',
         'alma' => 'VuFind\ILS\Driver\Alma',
         'amicus' => 'VuFind\ILS\Driver\Amicus',
-        'daia' => 'DAIAplus\ILS\Driver\DAIA',
+        'daia' => 'VuFind\ILS\Driver\DAIA',
         'demo' => 'VuFind\ILS\Driver\Demo',
         'evergreen' => 'VuFind\ILS\Driver\Evergreen',
         'horizon' => 'VuFind\ILS\Driver\Horizon',
@@ -59,7 +59,7 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
         'multibackend' => 'VuFind\ILS\Driver\MultiBackend',
         'newgenlib' => 'VuFind\ILS\Driver\NewGenLib',
         'noils' => 'VuFind\ILS\Driver\NoILS',
-        'paia' => 'DAIAplus\ILS\Driver\PAIA',
+        'paia' => 'PAIAplus\ILS\Driver\PAIA',
         'polaris' => 'VuFind\ILS\Driver\Polaris',
         'sample' => 'VuFind\ILS\Driver\Sample',
         'sierra' => 'VuFind\ILS\Driver\Sierra',
@@ -78,12 +78,12 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
      * @var array
      */
     protected $factories = [
-        'DAIAplus\ILS\Driver\DAIA' =>
-            'DAIAplus\ILS\Driver\DriverWithDateConverterFactory',
-        'DAIAplus\ILS\Driver\PAIA' => 'DAIAplus\ILS\Driver\PAIAFactory',
+        'PAIAplus\ILS\Driver\PAIA' => 'PAIAplus\ILS\Driver\PAIAFactory',
         'VuFind\ILS\Driver\Aleph' => 'VuFind\ILS\Driver\AlephFactory',
         'VuFind\ILS\Driver\Alma' => 'VuFind\ILS\Driver\AlmaFactory',
         'VuFind\ILS\Driver\Amicus' => 'Zend\ServiceManager\Factory\InvokableFactory',
+        'VuFind\ILS\Driver\DAIA' =>
+            'VuFind\ILS\Driver\DriverWithDateConverterFactory',
         'VuFind\ILS\Driver\Demo' => 'VuFind\ILS\Driver\DemoFactory',
         'VuFind\ILS\Driver\Evergreen' =>
             'Zend\ServiceManager\Factory\InvokableFactory',
@@ -130,9 +130,20 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
      * container, this value will be passed to the parent constructor.
      */
     public function __construct($configOrContainerInstance = null,
-                                array $v3config = []
+        array $v3config = []
     ) {
-        $this->addAbstractFactory('DAIAplus\ILS\Driver\PluginFactory');
+        $this->addAbstractFactory('VuFind\ILS\Driver\PluginFactory');
         parent::__construct($configOrContainerInstance, $v3config);
+    }
+
+    /**
+     * Return the name of the base class or interface that plug-ins must conform
+     * to.
+     *
+     * @return string
+     */
+    protected function getExpectedInterface()
+    {
+        return 'VuFind\ILS\Driver\DriverInterface';
     }
 }

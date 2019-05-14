@@ -74,6 +74,11 @@
     <? foreach ($this->related()->getList($this->driver) as $current): ?>
       <?=$this->related()->render($current)?>
     <? endforeach; ?>
+
+<!--Module DAIAplus-->
+<?=$this->render('record/daiaplus-view.phtml', ['DAIAplus' => $this->DAIAplus, 'searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
+<!--Module DAIAplus-->
+
   </div>
 </div>
 <?=$this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, '$(document).ready(recordDocReady);', 'SET'); ?>

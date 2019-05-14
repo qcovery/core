@@ -74,9 +74,9 @@ class DeliveryController extends AbstractBase
         return $this->serviceLocator->get('Delivery\Db\Table\PluginManager')->get($table);
     }
     
-    private function authenticate()
+    private function authenticate($asAdmin = false)
     {
-        $message = $this->deliveryAuthenticator->authenticate();
+        $message = $this->deliveryAuthenticator->authenticate($asAdmin);
         if ($message != 'not_logged_in') {
             $user = $this->deliveryAuthenticator->getUser();
             $this->user = $user;
@@ -98,8 +98,38 @@ class DeliveryController extends AbstractBase
 
         $view = $this->createViewModel();
         $view->message = $message;
-        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);;
+        $view->catalog_id = $this->user->cat_id;
+        $view->delivery_email = $this->user->delivery_email;
+        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
         return $view;
+    }
+
+    /**
+     * Email action
+     *
+     * @return mixed
+     */
+    public function emailAction()
+    {
+        $message = $this->authenticate();
+        if ($message != 'authorized') {
+            return $this->forwardTo('Delivery', 'Home');
+        }
+
+        $deliveryEmail = $this->params()->fromPost('delivery_email');
+        $update = $this->params()->fromPost('update');
+        $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
+
+        if (!empty($update) && !empty($deliveryEmail)) {
+            if ($this->checkEmail($deliveryEmail)) {
+                $deliveryTable = $this->getTable('delivery');
+                $deliveryTable->update(['delivery_email' => $deliveryEmail], ['user_id' => $this->user->id]);
+                return $this->forwardTo('Delivery', 'Home');
+            } else {
+                return $this->forwardTo('Delivery', 'Home');
+            }
+        }
+        return $this->forwardTo('Delivery', 'Home');
     }
 
     public function orderAction()
@@ -122,7 +152,7 @@ class DeliveryController extends AbstractBase
             $errors = $this->dataHandler->checkData();
             if (empty($errors)) {
                 $this->sendDeliveryMail('order');
-                $sendOrder = true;
+                return $this->forwardTo('Delivery', 'List');
             }
         }
  
@@ -130,7 +160,7 @@ class DeliveryController extends AbstractBase
 
         if (!empty($errors)) {
             $view->errors = $errors;
-        } elseif (!$sendOrder) {
+        } else {
             $driver = $this->getRecordLoader()->load($id, $searchClassId);
             $availabilityConfig = $this->getConfig('deliveryAvailability');
             $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
@@ -172,41 +202,47 @@ class DeliveryController extends AbstractBase
     }
 
     /**
-     * Edit action
+     * Home action
      *
      * @return mixed
      */
-    public function editAction()
+    public function adminlistAction()
     {
-        // First make sure user is logged in to VuFind:
-        if (!$this->getAuthManager()->isLoggedIn()) {
-            return $this->forceLogin();
+        $message = $this->authenticate(true);
+        if ($message != 'authorized') {
+            return $this->forwardTo('Delivery', 'Home');
         }
 
-        // Make view
+// list nach status & Reihenfolge
+        $deliveryTable = $this->getTable('delivery');
+        $listData = $deliveryTable->getCompleteList();
+ 
         $view = $this->createViewModel();
-
-        $deliveryEmail = $this->params()->fromPost('delivery_email');
-        $cardNumber = $this->params()->fromPost('card_number');
-        $update = $this->params()->fromPost('update');
-
-        if (!empty($update) && !empty($deliveryEmail) && !empty($cardNumber)) {
-            if ($this->checkEmail($deliveryEmail)) {
-                if ($this->checkCardNumber($cardNumber)) {
-                    $this->userDelivery->update(['delivery_email' => $deliveryEmail, 'card_number' => $cardNumber], ['user_id' => $this->user->id]);
-                    return $this->forwardTo('Delivery', 'Home');
-                } else {
-                    $view->checkCardNumber = 'check';
-                }
-            } else {
-                $view->checkDeliveryEmail = 'check';
-            }
-        }
-        $view->deliveryUser = (array) $this->userDelivery->get($this->user->id);
-
+        $view->listData = $listData;
         return $view;
     }
-    
+
+    /**
+     * Home action
+     *
+     * @return mixed
+     */
+    public function admineditAction()
+    {
+        $message = $this->authenticate(true);
+        if ($message != 'authorized') {
+            return $this->forwardTo('Delivery', 'Home');
+        }
+
+// list nach status & Reihenfolge
+        $deliveryTable = $this->getTable('delivery');
+        $listData = $deliveryTable->getCompleteList();
+ 
+        $view = $this->createViewModel();
+        $view->listData = $listData;
+        return $view;
+    }
+
     private function sendDeliveryMail($emailType)
     {
         $mailer = $this->serviceLocator->get('VuFind\Mailer');

@@ -11,6 +11,24 @@ function linkCallnumbers(callnumber, callnumber_handler) {
   }
   return callnumber;
 }
+
+function displayArticleStatus(results, $item) {
+  $item.removeClass('js-item-pending');
+  $item.find('.ajax-availability').removeClass('ajax-availability hidden');
+  $.each(results, function(index, result){
+    if (typeof(result.error) != 'undefined'
+      && result.error.length > 0
+    ) {
+      $item.find('.status').empty().append('error');
+    } else {
+      if (typeof(result.href) != 'undefined') {
+        var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '">' + VuFind.translate(result.level) + '</a>';
+        $item.find('.status').empty().append(html);
+      }
+    }
+  });
+}
+
 function displayItemStatus(result, $item) {
   $item.removeClass('js-item-pending');
   $item.find('.status').empty().append(result.availability_message);
@@ -74,7 +92,7 @@ function displayItemStatus(result, $item) {
         : result.location
     );
   }
-  if (typeof(result.daiaplus) != 'undefined'
+  if (!itemStatusList && typeof(result.daiaplus) != 'undefined'
     && result.daiaplus.length > 0) {
     $item.find('.callnumAndLocation').addClass('hidden');
     $item.find('.status').empty().append(result.daiaplus);
@@ -95,7 +113,8 @@ var itemStatusEls = {};
 var itemStatusTimer = null;
 var itemStatusDelay = 200;
 var itemStatusRunning = false;
-var itemDAIAplusList = false;
+var itemStatusList = false;
+var itemStatusSource = '';
 
 function runItemAjaxForQueue() {
   // Only run one item status AJAX request at a time:
@@ -104,16 +123,26 @@ function runItemAjaxForQueue() {
     return;
   }
   itemStatusRunning = true;
+  if (itemStatusSource == 'Search2') {
+    var method = 'getArticleStatuses';
+  } else {
+    var method = 'getItemStatuses';
+  }
+
   $.ajax({
+    url: VuFind.path + '/AJAX/JSON?method=' + method,
     dataType: 'json',
-    method: 'POST',
-    url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
-    data: { 'id': itemStatusIds, 'list': itemDAIAplusList }
+    method: 'get',
+    data: {id:itemStatusIds, list:itemStatusList, source:itemStatusSource}
   })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
         var status = response.data.statuses[j];
-        displayItemStatus(status, itemStatusEls[status.id]);
+        if (method == 'getItemStatuses') {
+          displayItemStatus(status, itemStatusEls[status.id]);
+        } else {
+          displayArticleStatus(status, itemStatusEls[status.id]);
+        }
         itemStatusIds.splice(itemStatusIds.indexOf(status.id), 1);
       }
       itemStatusRunning = false;
@@ -138,41 +167,44 @@ function itemQueueAjax(id, el) {
   el.find('.status').removeClass('hidden');
 }
 
+//Listenansicht
 function checkItemStatus(el) {
   var $item = $(el);
-  if ($item.data('daiaplus-list') !== 'undefined') {
-    itemDAIAplusList = true;
-  }
-  if ($item.find('.hiddenId').length === 0) {
-    return false;
-  }
-  var id = $item.find('.hiddenId').val();
+  var id = $item.attr('data-id');
+  itemStatusSource = $item.attr('data-src');
+  itemStatusList = ($item.attr('data-list') == 1);
   itemQueueAjax(id + '', $item);
 }
 
 var itemStatusObserver = null;
+
 function checkItemStatuses(_container) {
   var container = typeof _container === 'undefined'
     ? document.body
     : _container;
 
-  var ajaxItems = $(container).find('.ajaxItem');
-  for (var i = 0; i < ajaxItems.length; i++) {
-    var id = $(ajaxItems[i]).find('.hiddenId').val();
-    itemQueueAjax(id, $(ajaxItems[i]));
+  var availabilityItems = $(container).find('.availabilityItem');
+  for (var i = 0; i < availabilityItems.length; i++) {
+    var id = $(availabilityItems[i]).attr('data-id');
+    itemStatusSource = $(availabilityItems[i]).attr('data-src');
+    itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
+    itemQueueAjax(id, $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader
   if (itemStatusObserver) {
     itemStatusObserver.disconnect();
   }
 }
-$(document).ready(function checkItemStatusReady() {
-  if (typeof Hunt === 'undefined') {
-    checkItemStatuses();
-  } else {
-    itemStatusObserver = new Hunt(
-      $('.ajaxItem').toArray(),
-      { enter: checkItemStatus }
-    );
+$(document).ready(function() {
+  function checkItemStatusReady() {
+    if (typeof Hunt === 'undefined') {
+      checkItemStatuses();
+    } else {
+      itemStatusObserver = new Hunt(
+        $('.availabilityItem').toArray(),
+        { enter: checkItemStatus }
+      );
+    }
   }
+  checkItemStatusReady();
 });

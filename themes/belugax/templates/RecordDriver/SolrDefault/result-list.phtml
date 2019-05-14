@@ -258,6 +258,11 @@
                 <? endforeach; ?>
             <? endif; ?>
         <? endif; ?>
+
+<!--Module DAIAplus-->
+<?=$this->render('RecordDriver/SolrDefault/daiaplus-result-list.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
+<!--Module DAIAplus-->
+
     </div>
   </div>
   <? if ($thumbnail && $thumbnailAlignment == 'right'): ?>
