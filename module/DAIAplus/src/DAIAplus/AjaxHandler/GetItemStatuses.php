@@ -66,11 +66,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
     public function __construct(SessionSettings $ss, Config $config, Connection $ils,
                                 RendererInterface $renderer, Holds $holdLogic
     ) {
-        $this->sessionSettings = $ss;
-        $this->config = $config;
-        $this->ils = $ils;
-        $this->renderer = $renderer;
-        $this->holdLogic = $holdLogic;
+        parent::__construct($ss, $config, $ils, $renderer, $holdLogic);
     }
 
     /**
@@ -84,9 +80,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
     {
         $this->disableSessionWrites();  // avoid session write timing bug
         $ids = $params->fromPost('id', $params->fromQuery('id', []));
+//neu V
         $list = $params->fromPost('list', $params->fromQuery('list', []));
+//neu A
         try {
+//neu V
             $this->ils->setList($list);
+//neu A
             $results = $this->ils->getStatuses($ids);
         } catch (ILSException $e) {
             // If the ILS fails, send an error response instead of a fatal
@@ -160,6 +160,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                         ]
                     );
                 }
+//neu V
                 // Add display for DAIA+ data
                 $current['daiaplus'] = $this->renderer->render(
                     'ajax/daiaplus.phtml', [
@@ -169,6 +170,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                         'ppn' => $current['id'],
                     ]
                 );
+//neu A
                 $current['record_number'] = array_search($current['id'], $ids);
                 $statuses[] = $current;
 
@@ -209,7 +211,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
     {
         static $hideHoldings = false;
         if ($hideHoldings === false) {
-            $hideHoldings = $this->holdLogic->getSuppressedLocations();
+//          $hideHoldings = $this->holdLogic->getSuppressedLocations();
+//in der VuFind-Methode gehen die "best results" verloren
+            $hideHoldings = [];
         }
 
         $filtered = [];

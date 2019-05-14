@@ -1,11 +1,6 @@
-    <div class="belugax-item-checkout">
-        <h3><?=$this->transEsc('Access & availability')?></h3>
-        <div class="ajaxItem" data-id="<?=$this->driver->getUniqueId() ?>">
-            <span class="status ajax-availability hidden">
-                <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
-            </span>
-        </div>
-        <div class="electronic-availability" data-ppn="<?=$this->driver->getUniqueID();?>" data-site="<?=$isil?>" data-openurl="<?=urlencode($this->driver->tryMethod('getOpenURL'));?>" data-first-matching-issn="" data-doi="<?=$doi;?>" data-list="0" data-mediatype="<?=$formats[0]?>" data-sfx="<?=$this->DAIAplus()->getSfxLink($this->driver)?>">
-            <span class="daia-loading"> <?=$this->transEsc('ft_availability_being_determined');?></span>
-        </div>
-    </div>
+<div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="0" data-src="<?=$this->searchClassId ?>">
+    <span class="status ajax-availability hidden">
+        <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
+    </span>
+</div>
+

@@ -48,7 +48,7 @@ use Zend\Log\LoggerAwareInterface as LoggerAwareInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-class DAIA extends \VuFind\ILS\Driver\DAIA
+class DAIA extends \VuFind\ILS\Driver\PAIA
 {
     /**
      * API key needed for DAIA+ Service
@@ -70,8 +70,10 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
      */
     public function init()
     {
-        if (isset($this->config['DAIA']['baseUrl'])) {
-            $this->baseUrl = $this->config['DAIA']['baseUrl'];
+        $domain = $this->getDAIADomain();
+
+        if (isset($this->config[$domain]['baseUrl'])) {
+            $this->baseUrl = $this->config[$domain]['baseUrl'];
         } elseif (isset($this->config['Global']['baseUrl'])) {
             throw new ILSException(
                 'Deprecated [Global] section in DAIA.ini present, but no [DAIA] ' .
@@ -80,140 +82,53 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
         } else {
             throw new ILSException('DAIA/baseUrl configuration needs to be set.');
         }
-        if (isset($this->config['DAIA']['daiaplus_api_key'])) {
-            $this->apiKey = $this->config['DAIA']['daiaplus_api_key'];
+        if (isset($this->config[$domain]['daiaplus_api_key'])) {
+            $this->apiKey = $this->config[$domain]['daiaplus_api_key'];
         } else {
             throw new ILSException('DAIA/daiaplus_api_key configuration needs to be set.');
         }
         // use DAIA specific timeout setting for http requests if configured
-        if ((isset($this->config['DAIA']['timeout']))) {
-            $this->daiaTimeout = $this->config['DAIA']['timeout'];
+        if ((isset($this->config[$domain]['timeout']))) {
+            $this->daiaTimeout = $this->config[$domain]['timeout'];
         }
-        if (isset($this->config['DAIA']['daiaResponseFormat'])) {
+        if (isset($this->config[$domain]['daiaResponseFormat'])) {
             $this->daiaResponseFormat = strtolower(
-                $this->config['DAIA']['daiaResponseFormat']
+                $this->config[$domain]['daiaResponseFormat']
             );
         } else {
             $this->debug('No daiaResponseFormat setting found, using default: xml');
             $this->daiaResponseFormat = 'xml';
         }
-        if (isset($this->config['DAIA']['daiaIdPrefix'])) {
-            $this->daiaIdPrefix = $this->config['DAIA']['daiaIdPrefix'];
+        if (isset($this->config[$domain]['daiaIdPrefix'])) {
+            $this->daiaIdPrefix = $this->config[$domain]['daiaIdPrefix'];
         } else {
             $this->debug('No daiaIdPrefix setting found, using default: ppn:');
             $this->daiaIdPrefix = 'ppn:';
         }
-        if (isset($this->config['DAIA']['multiQuery'])) {
-            $this->multiQuery = $this->config['DAIA']['multiQuery'];
+        if (isset($this->config[$domain]['multiQuery'])) {
+            $this->multiQuery = $this->config[$domain]['multiQuery'];
         } else {
             $this->debug('No multiQuery setting found, using default: false');
         }
-        if (isset($this->config['DAIA']['daiaContentTypes'])) {
-            $this->contentTypesResponse = $this->config['DAIA']['daiaContentTypes'];
+        if (isset($this->config[$domain]['daiaContentTypes'])) {
+            $this->contentTypesResponse = $this->config[$domain]['daiaContentTypes'];
         } else {
             $this->debug('No ContentTypes for response defined. Accepting any.');
         }
-        if (isset($this->config['DAIA']['daiaCache'])) {
-            $this->daiaCacheEnabled = $this->config['DAIA']['daiaCache'];
+        if (isset($this->config[$domain]['daiaCache'])) {
+            $this->daiaCacheEnabled = $this->config[$domain]['daiaCache'];
         } else {
             $this->debug('Caching not enabled, disabling it by default.');
         }
-        if (isset($this->config['General'])
-            && isset($this->config['General']['cacheLifetime'])
+        if (isset($this->config[$domain]['cacheLifetime'])
         ) {
-            $this->cacheLifetime = $this->config['General']['cacheLifetime'];
+            $this->cacheLifetime = $this->config[$domain]['cacheLifetime'];
         } else {
             $this->debug(
                 'Cache lifetime not set, using VuFind\ILS\Driver\AbstractBase ' .
                 'default value.'
             );
         }
-    }
-
-    /**
-     * Get Statuses
-     *
-     * This is responsible for retrieving the status information for a
-     * collection of records.
-     * As the DAIA Query API supports querying multiple ids simultaneously
-     * (all ids divided by "|") getStatuses(ids) would call getStatus(id) only
-     * once, id containing the list of ids to be retrieved. This would cause some
-     * trouble as the list of ids does not necessarily correspond to the VuFind
-     * Record-id. Therefore getStatuses(ids) has its own logic for multiQuery-support
-     * and performs the HTTPRequest itself, retrieving one DAIA response for all ids
-     * and uses helper functions to split this one response into documents
-     * corresponding to the queried ids.
-     *
-     * @param array $ids The array of record ids to retrieve the status for
-     *
-     * @return array    An array of status information values on success.
-     */
-    public function getStatuses($ids)
-    {
-        $status = [];
-
-        // check cache for given ids and skip these ids if availability data is found
-        foreach ($ids as $key => $id) {
-            if ($this->daiaCacheEnabled
-                && $item = $this->getCachedData($this->generateURI($id))
-            ) {
-                if ($item != null) {
-                    $status[] = $item;
-                    unset($ids[$key]);
-                }
-            }
-        }
-
-        // only query DAIA service if we have some ids left
-        if (count($ids) > 0) {
-            try {
-                if ($this->multiQuery) {
-                    // perform one DAIA query with multiple URIs
-                    $rawResult = $this
-                        ->doHTTPRequest($this->generateMultiURIs($ids));
-                    // the id used in VuFind can differ from the document-URI
-                    // (depending on how the URI is generated)
-                    foreach ($ids as $id) {
-                        // it is assumed that each DAIA document has a unique URI,
-                        // so get the document with the corresponding id
-                        $doc = $this->extractDaiaDoc($id, $rawResult);
-                        if (null !== $doc) {
-                            // a document with the corresponding id exists, which
-                            // means we got status information for that record
-                            $data = $this->parseDaiaDoc($id, $doc);
-                            // cache the status information
-                            if ($this->daiaCacheEnabled) {
-                                $this->putCachedData($this->generateURI($id), $data);
-                            }
-                            $status[] = $data;
-                        }
-                        unset($doc);
-                    }
-                } else {
-                    // multiQuery is not supported, so retrieve DAIA documents one by
-                    // one
-                    foreach ($ids as $id) {
-                        $rawResult = $this->doHTTPRequest($this->generateURI($id));
-                        // extract the DAIA document for the current id from the
-                        // HTTPRequest's result
-                        $doc = $this->extractDaiaDoc($id, $rawResult);
-                        if (null !== $doc) {
-                            // parse the extracted DAIA document and save the status
-                            // info
-                            $data = $this->parseDaiaDoc($id, $doc);
-                            // cache the status information
-                            if ($this->daiaCacheEnabled) {
-                                $this->putCachedData($this->generateURI($id), $data);
-                            }
-                            $status[] = $data;
-                        }
-                    }
-                }
-            } catch (ILSException $e) {
-                $this->debug($e->getMessage());
-            }
-        }
-        return $status;
     }
 
     /**
@@ -404,4 +319,13 @@ class DAIA extends \VuFind\ILS\Driver\DAIA
     public function setLanguage ($language) {
         $this->language = $language;
     }
+
+    protected function getDAIADomain() {
+        $session = $this->getSession();
+        if (empty($session->daia_domain)) {
+            $session->daia_domain  = 'DAIA';
+        }
+        return $session->daia_domain;
+    }
+
 }

@@ -78,11 +78,12 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
      * @var array
      */
     protected $factories = [
+        'DAIAplus\ILS\Driver\DAIA' =>
+            'DAIAplus\ILS\Driver\DriverWithDateConverterFactory',
+        'DAIAplus\ILS\Driver\PAIA' => 'DAIAplus\ILS\Driver\PAIAFactory',
         'VuFind\ILS\Driver\Aleph' => 'VuFind\ILS\Driver\AlephFactory',
         'VuFind\ILS\Driver\Alma' => 'VuFind\ILS\Driver\AlmaFactory',
         'VuFind\ILS\Driver\Amicus' => 'Zend\ServiceManager\Factory\InvokableFactory',
-        'DAIAplus\ILS\Driver\DAIA' =>
-            'DAIAplus\ILS\Driver\DriverWithDateConverterFactory',
         'VuFind\ILS\Driver\Demo' => 'VuFind\ILS\Driver\DemoFactory',
         'VuFind\ILS\Driver\Evergreen' =>
             'Zend\ServiceManager\Factory\InvokableFactory',
@@ -102,7 +103,6 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
         'VuFind\ILS\Driver\NewGenLib' =>
             'Zend\ServiceManager\Factory\InvokableFactory',
         'VuFind\ILS\Driver\NoILS' => 'VuFind\ILS\Driver\NoILSFactory',
-        'DAIAplus\ILS\Driver\PAIA' => 'DAIAplus\ILS\Driver\PAIAFactory',
         'VuFind\ILS\Driver\Polaris' =>
             'Zend\ServiceManager\Factory\InvokableFactory',
         'VuFind\ILS\Driver\Sample' => 'Zend\ServiceManager\Factory\InvokableFactory',

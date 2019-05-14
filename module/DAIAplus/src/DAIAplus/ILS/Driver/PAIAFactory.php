@@ -27,6 +27,7 @@
  */
 namespace DAIAplus\ILS\Driver;
 
+use VuFind\ILS\Driver\DriverWithDateConverterFactory;
 use Interop\Container\ContainerInterface;
 
 /**

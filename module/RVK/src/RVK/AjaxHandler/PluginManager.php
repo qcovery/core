@@ -64,6 +64,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'getResultCount' => 'BelugaConfig\AjaxHandler\GetResultCount',
         'getSaveStatuses' => 'VuFind\AjaxHandler\GetSaveStatuses',
         'getRVKStatus' => 'RVK\AjaxHandler\GetRVKStatus',
+        'getRVKTree' => 'RVK\AjaxHandler\GetRVKTree',
         'getVisData' => 'VuFind\AjaxHandler\GetVisData',
         'keepAlive' => 'VuFind\AjaxHandler\KeepAlive',
         'recommend' => 'VuFind\AjaxHandler\Recommend',
@@ -88,6 +89,8 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
             'Libraries\AjaxHandler\GetLibrariesFactory',
         'RVK\AjaxHandler\GetRVKStatus' =>
             'RVK\AjaxHandler\GetRVKStatusFactory',
+        'RVK\AjaxHandler\GetRVKTree' =>
+            'RVK\AjaxHandler\GetRVKTreeFactory',
         'VuFind\AjaxHandler\CheckRequestIsValid' =>
             'VuFind\AjaxHandler\AbstractIlsAndUserActionFactory',
         'VuFind\AjaxHandler\CommentRecord' =>

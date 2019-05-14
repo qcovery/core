@@ -50,29 +50,31 @@
 }
 
 .article_access_level,
-.homepage_access_level,
-.issue_access_level,
-.volume_access_level,
-.oa_article_access_level,
 .fid_article_access_level,
 .fid_homepage_access_level,
 .fid_issue_access_level,
 .fid_volume_access_level,
+.homepage_access_level,
 .ill_access_level,
+.issue_access_level,
 .check_ill_access_level,
+.oa_article_access_level,
+.print_access_level,
 .uncertain_article_access_level,
 .uncertain_homepage_access_level,
 .uncertain_issue_access_level,
 .uncertain_volume_access_level,
-.unknown_access_level {
+.unknown_access_level,
+.volume_access_level {
   font-weight: bold;
 }
 
 .article_access_level:after,
 .homepage_access_level:after,
 .issue_access_level:after,
-.volume_access_level:after,
-.oa_article_access_level:after {
+.oa_article_access_level:after,
+.print_access_level:after,
+.volume_access_level:after {
   content: url("../images/checkmark_green.png");
   margin-left: 5px;
 }

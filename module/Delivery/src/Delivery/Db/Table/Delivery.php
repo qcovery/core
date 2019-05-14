@@ -73,6 +73,21 @@ class Delivery extends Gateway
         return $resource->select($callback)->toArray();
     }
 
+    public function getCompleteList()
+    {
+        $callback = function ($select) use ($user_delivery_id) {
+            $select->columns(['*']);
+            $select->join(
+                ['d' => 'delivery'],
+                'resource.id = d.resource_id',
+                ['*']
+            );
+            //$select->where->equalTo('d.user_delivery_id', $user_delivery_id);
+        };
+        $resource = $this->getDbTable('Resource');
+        return $resource->select($callback)->toArray();
+    }
+
     public function createRowForUserDeliveryId($user_delivery_id, $data)
     {
         if (empty($data['record_id']) || empty($user_delivery_id)) {

@@ -68,8 +68,8 @@ class DeliveryAuthenticatorFactory implements FactoryInterface
         // actually utilized.
         $callback = function (& $wrapped, $proxy) use ($container, $requestedName) {
             // Generate wrapped object:
-            $auth = $container->get('PAIA\Auth\Manager');
-            $catalog = $container->get('PAIA\ILS\Connection');
+            $auth = $container->get('VuFind\Auth\Manager');
+            $catalog = $container->get('PAIAplus\ILS\Connection');
             $config = $container->get('VuFind\Config\PluginManager')->get('deliveryGlobal');
             $table = $container->get('Delivery\Db\Table\PluginManager')->get('userDelivery');
             $wrapped = new $requestedName($auth, $catalog, $config, $table);

@@ -1,6 +1,5 @@
-        <span class="status ajax-availability hidden">
-            <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
-        </span>
-        <div class="electronic-availability" data-ppn="<?=$this->driver->getUniqueID();?>" data-site="<?=$isil?>" data-openurl="<?=urlencode($this->driver->tryMethod('getOpenURL'));?>" data-first-matching-issn="" data-doi="<?=$doi;?>" data-list="1" data-mediatype="<?=$formats[0]?>" data-sfx="<?=$this->DAIAplus()->getSfxLink($this->driver)?>">
-            <span class="daia-loading"> <?=$this->transEsc('ft_availability_being_determined');?></span>
-        </div>
+<div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->searchClassId ?>">
+    <span class="status ajax-availability hidden">
+        <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
+    </span>
+</div>
