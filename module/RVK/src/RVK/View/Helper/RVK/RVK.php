@@ -19,4 +19,8 @@ class RVK extends \Zend\View\Helper\AbstractHelper
     public function getRvk($driver) {
         return '';
     }
+
+    public function getRVKTree() {
+        return '';
+    }
 }
