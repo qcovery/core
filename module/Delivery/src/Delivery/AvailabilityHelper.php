@@ -37,8 +37,10 @@ class AvailabilityHelper {
         $flatData = [];
         foreach ($data as $date) {
             $tmpData = [];
-            foreach ($date as $key => $value) {
-                $tmpData[$key] = $value['data'][0];
+            if (is_array($date)) {
+                foreach ($date as $key => $value) {
+                    $tmpData[$key] = $value['data'][0];
+                }
             }
             $flatData[] = $tmpData;
         }
