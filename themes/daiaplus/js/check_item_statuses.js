@@ -15,15 +15,16 @@ function linkCallnumbers(callnumber, callnumber_handler) {
 function displayArticleStatus(results, $item) {
   $item.removeClass('js-item-pending');
   $item.find('.ajax-availability').removeClass('ajax-availability hidden');
+  $item.find('.status').empty();
   $.each(results, function(index, result){
     if (typeof(result.error) != 'undefined'
       && result.error.length > 0
     ) {
-      $item.find('.status').empty().append('error');
+      $item.find('.status').append('error');
     } else {
       if (typeof(result.href) != 'undefined') {
         var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '">' + VuFind.translate(result.level) + '</a>';
-        $item.find('.status').empty().append(html);
+        $item.find('.status').append(html);
       }
     }
   });
