@@ -85,6 +85,10 @@ foreach ($cumulatedResults as $storage => $cumulatedResult) {
                 $storage_additional_info = $daiaResult['daiaplus']['storage_additional_info'];
             }
 
+            $chronology = null;
+            if (isset($daiaResult['chronology']['about'])) {
+                $chronology = $daiaResult['chronology']['about'];
+            }
             $about = $daiaResult['daiaplus']['about'];
             $label = $daiaResult['daiaplus']['label'];
 
@@ -147,6 +151,10 @@ foreach ($cumulatedResults as $storage => $cumulatedResult) {
         } else {
             if ($daiaResult['daiaplus']['queue'] != '') {
                 echo '<br/>' . $daiaResult['daiaplus']['queue'];
+            }
+
+            if ($chronology) {
+                echo '<br/><strong>'.$this->transEsc('Inventory Information').':</strong> '.$chronology.'<br/>';
             }
 
             if ($about != '') {
