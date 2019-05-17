@@ -115,6 +115,7 @@ var itemStatusDelay = 200;
 var itemStatusRunning = false;
 var itemStatusList = false;
 var itemStatusSource = '';
+var itemStatusHideLink = '';
 
 function runItemAjaxForQueue() {
   // Only run one item status AJAX request at a time:
@@ -133,7 +134,7 @@ function runItemAjaxForQueue() {
     url: VuFind.path + '/AJAX/JSON?method=' + method,
     dataType: 'json',
     method: 'get',
-    data: {id:itemStatusIds, list:itemStatusList, source:itemStatusSource}
+    data: {id:itemStatusIds, list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink}
   })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
@@ -173,6 +174,7 @@ function checkItemStatus(el) {
   var id = $item.attr('data-id');
   itemStatusSource = $item.attr('data-src');
   itemStatusList = ($item.attr('data-list') == 1);
+  itemStatusHideLink = $item.attr('data-hide-link');
   itemQueueAjax(id + '', $item);
 }
 
@@ -188,6 +190,7 @@ function checkItemStatuses(_container) {
     var id = $(availabilityItems[i]).attr('data-id');
     itemStatusSource = $(availabilityItems[i]).attr('data-src');
     itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
+    itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
     itemQueueAjax(id, $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader

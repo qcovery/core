@@ -82,6 +82,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
         $ids = $params->fromPost('id', $params->fromQuery('id', []));
 //neu V
         $list = $params->fromPost('list', $params->fromQuery('list', []));
+        $hideLink = $params->fromPost('hideLink', $params->fromQuery('hideLink', []));
 //neu A
         try {
 //neu V
@@ -168,6 +169,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                         'callnumberHandler' => $this->getCallnumberHandler(),
                         'list' => $list === 'true'? true: false,
                         'ppn' => $current['id'],
+                        'hideLink' => $hideLink,
                     ]
                 );
 //neu A
