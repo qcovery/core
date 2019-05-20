@@ -35,7 +35,7 @@
 <p id="short_summary">
     <?=$this->truncate($summary, 300) ?>
     <?php if(strlen($summary) > 300): ?>
-    <br /><a href="javascript:showSummary()"><?=$this->transEsc('Full description')?></a>
+    <br /><a href="javascript:showSummary()"><?=$this->transEsc('Full description')?><i class="bel-pfeil-u01"></i></a>
 </p>
 <p id="long_summary" style="display:none">
     <?=$summary ?>
