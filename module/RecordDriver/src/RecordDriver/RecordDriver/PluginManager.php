@@ -83,7 +83,7 @@ class PluginManager extends \VuFind\RecordDriver\PluginManager
      */
     protected $factories = [
         'RecordDriver\RecordDriver\SolrMarc' => 
-            'RecordDriver\RecordDriver\SolrDefaultFactory',
+            'VuFind\RecordDriver\SolrDefaultFactory',
         'VuFind\RecordDriver\BrowZine' =>
             'Zend\ServiceManager\Factory\InvokableFactory',
         'VuFind\RecordDriver\EDS' => 'VuFind\RecordDriver\NameBasedConfigFactory',
