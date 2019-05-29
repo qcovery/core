@@ -34,6 +34,7 @@ use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\ILS\Connection;
 use VuFind\ILS\Logic\Holds;
 use VuFind\Session\Settings as SessionSettings;
+use VuFind\Crypt\HMAC;
 use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\View\Renderer\RendererInterface;
@@ -54,6 +55,9 @@ use Zend\View\Renderer\RendererInterface;
  */
 class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
 {
+
+    protected $hmac;
+
     /**
      * Constructor
      *
@@ -64,8 +68,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
      * @param Holds             $holdLogic Holds logic
      */
     public function __construct(SessionSettings $ss, Config $config, Connection $ils,
-                                RendererInterface $renderer, Holds $holdLogic
+                                RendererInterface $renderer, Holds $holdLogic, HMAC $hmac
     ) {
+        $this->hmac = $hmac;
         parent::__construct($ss, $config, $ils, $renderer, $holdLogic);
     }
 
@@ -83,6 +88,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
 //neu V
         $list = $params->fromPost('list', $params->fromQuery('list', []));
         $hideLink = $params->fromPost('hideLink', $params->fromQuery('hideLink', []));
+        $hmacKeys = explode(':', $this->config['StorageRetrievalRequests']['HMACKeys']);
 //neu A
         try {
 //neu V
@@ -162,6 +168,29 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                     );
                 }
 //neu V
+                foreach ($record as $index1 => $recordItem) {
+                    $id = $recordItem['id'];
+                    foreach ($recordItem['daiaplus']['actionArray'] as $index2 => $action) {
+                        if (!empty($action['beluga_core']['href'])) {
+                            $docId = $action['documentId'];
+                            $itemId = $action['itemId'];
+                            $type = $action['type'];
+                            $hmacPairs = [
+                                'id' => $id,
+                                'doc_id' => $docId,
+                                'item_id' => $itemId
+                            ];
+                            $hashKey = $this->hmac->generate($hmacKeys, $hmacPairs);
+                            $orderLink = '/vufind/Record/' . $id . '/Hold?';
+                            $orderLink .= 'doc_id=' . urlencode($docId);
+                            $orderLink .= '&item_id=' . urlencode($itemId);
+                            $orderLink .= '&type=' . $type;
+                            $orderLink .= '&hashKey=' . $hashKey;
+                            $record[$index1]['daiaplus']['actionArray'][$index2]['beluga_core']['href'] = $orderLink;
+                        }
+                    }
+                }
+
                 // Add display for DAIA+ data
                 $current['daiaplus'] = $this->renderer->render(
                     'ajax/daiaplus.phtml', [
