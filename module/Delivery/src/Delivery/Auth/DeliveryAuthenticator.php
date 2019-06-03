@@ -132,6 +132,9 @@ class DeliveryAuthenticator extends ILSAuthenticator
         }
         $config = $this->getConfig()->toArray();
         $allowedTypes = $config['Patron']['allowed'];
+        if (!is_array($allowedTypes)) {
+            $allowedTypes = [];
+        }
 
         $patron = $this->storedCatalogLogin();
         $patronTypes = array_map([$this, 'extractUserType'], $patron['type']);
