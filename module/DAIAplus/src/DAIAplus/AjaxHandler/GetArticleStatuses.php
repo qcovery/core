@@ -103,6 +103,16 @@ class GetArticleStatuses extends AbstractBase
                     }
                 }
 
+                list($spage, $epage) = explode('-', $sfxData[1]['pages']['data'][0]);
+                $openUrl = str_replace('&rft.volume=', '&rft.volume=' . $sfxData[1]['volume']['data'][0], $openUrl);
+                $openUrl = str_replace('&rft.issue=', '&rft.issue=' . $sfxData[1]['issue']['data'][0], $openUrl);
+                $openUrl = str_replace('&rft.spage=', '&rft.spage=' . $spage, $openUrl);
+                if (strpos($openUrl, 'rft.epage') !== false) {
+                    $openUrl = str_replace('&rft.epage=', '&rft.epage=' . $epage, $openUrl);
+                } else {
+                    $openUrl .= '&rft.epage=' . $epage;
+                }
+
                 $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
                 $sfxLink = urlencode('http://sfx.gbv.de/sfx_' . $sfxDomain . '?' . $sfxLink);
 
