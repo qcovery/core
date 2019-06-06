@@ -157,15 +157,6 @@
           </span>
       <? endif; ?>
 
-      <?
-        $context_array = $this->paia()->getContext($this->driver);
-        $formats = $context_array['formats'];
-        $collection_details = $context_array['collection_details'];
-      ?>
-      <? if (!in_array("GBV_ILN_".$iln,$collection_details, TRUE) || in_array("Article",$formats,true)): ?>
-          <div class="electronic-availability" data-ppn="<?=$this->driver->getUniqueID();?>" data-site="<?=$isil?>" data-openurl="<?=urlencode($this->driver->tryMethod('getOpenURL'));?>" data-first-matching-issn="" data-doi="<?=$doi;?>" data-list="1" data-mediatype="<?=$formats[0]?>"><span class="daia-loading"> <?=$this->transEsc('ft_availability_being_determined');?></span></div>
-      <? endif; ?>
-
       <!-- Module SFX -->
       <?=$this->render('sfx/sfx.phtml', ['driver' => $this->driver]) ?>
       <!-- Module SFX -->
