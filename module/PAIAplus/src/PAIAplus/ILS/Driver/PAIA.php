@@ -143,4 +143,53 @@ class PAIA extends PAIAbase
         }
         return $session->paia_domain;
     }
+
+    /**
+     * Get Pick Up Locations
+     *
+     * This is responsible for gettting a list of valid library locations for
+     * holds / recall retrieval
+     *
+     * @param array $patron      Patron information returned by the patronLogin
+     *                           method.
+     * @param array $holdDetails Optional array, only passed in when getting a list
+     * in the context of placing a hold; contains most of the same values passed to
+     * placeHold, minus the patron data.  May be used to limit the pickup options
+     * or may be ignored.  The driver must not add new options to the return array
+     * based on this data or other areas of VuFind may behave incorrectly.
+     *
+     * @return array        An array of associative arrays with locationID and
+     * locationDisplay keys
+     */
+    public function getPickUpLocations($patron = null, $holdDetails = null)
+    {
+        $item = $holdDetails['item_id'];
+
+        $doc = [];
+        $doc['item'] = stripslashes($item);
+        $post_data['doc'][] = $doc;
+
+        try {
+            $array_response = $this->paiaPostAsArray(
+                'core/' . $patron['cat_username'] . '/request', $post_data
+            );
+        } catch (ILSException $e) {
+            $this->debug($e->getMessage());
+            return [
+                'success' => false,
+                'sysMessage' => $e->getMessage(),
+            ];
+        }
+
+        $pickupLocation = [];
+        if (isset($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
+            if (is_array($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
+                foreach ($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'] as $option) {
+                    $pickupLocation[] = ['locationID' => $option['id'], 'locationDisplay' => $option['about']];
+                }
+            }
+        }
+
+        return $pickupLocation;
+    }
 }
