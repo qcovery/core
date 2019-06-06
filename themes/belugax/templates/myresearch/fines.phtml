@@ -39,9 +39,9 @@
 					<a href="<?=$this->recordLink()->getUrl($record['driver'])?>"><?=$this->escapeHtml(trim($record['title'], '/:'))?></a>
 				  <? endif; ?>
 				</td>
-				<td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']) : ''?></td>
+				<td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount'] / 100.00) : ''?></td>
 			  </tr>
-			  <? $totalDue += $record['amount']; ?>
+			  <? $totalDue += ($record['amount'] / 100.00); ?>
 		<? } ?>
     <? endforeach; ?>
       <tr style="font-weight:bold"><td colspan="3"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue) ?></td></tr>
