@@ -214,7 +214,7 @@ class Libraries
         $codes = [];
         foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library) {
             if (empty($searchClassId) || isset($library[$searchClassId])){
-                $codes[] = $library['code'];
+                $codes[] = array_merge($codes, explode(',', $library[$searchClassId]));
             }
         }
         return $codes;
