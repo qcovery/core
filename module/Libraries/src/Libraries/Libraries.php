@@ -209,11 +209,11 @@ class Libraries
      *
      * @return array
      */
-    public function getLibraryCodes($searchClassId = null) {
+    public function getLibraryCodes($searchClassId = 'solr') {
         $searchClassId = strtolower($searchClassId);
         $codes = [];
         foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library) {
-            if (empty($searchClassId) || isset($library[$searchClassId])){
+            if (isset($library[$searchClassId])){
                 $codes[] = array_merge($codes, explode(',', $library[$searchClassId]));
             }
         }
