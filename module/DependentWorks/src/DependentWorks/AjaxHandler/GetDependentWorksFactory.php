@@ -64,7 +64,7 @@ class GetDependentWorksFactory
             throw new \Exception('Unexpected options passed to factory.');
         }
         return new $requestedName(
-            $container->get('Config'),
+            $container->get('VuFind\Config\PluginManager')->get('dependent-works'),
             $container->get('VuFind\Search\Results\PluginManager')
         );
     }

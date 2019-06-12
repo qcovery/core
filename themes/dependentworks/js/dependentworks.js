@@ -22,27 +22,17 @@ jQuery(document).ready(function() {
                 var visibleItems = (data.data.length < 3) ? data.data.length : 3;
                 for (var i = 0; i < visibleItems; i++) {
                     var title = data.data[i]['title'];
-                    if (data.data[i]['part'] != '') {
-                        title = title + ' ' + data.data[i]['part'];
-                    }
-                    if (data.data[i]['date'] != '') {
-                        title = title + ' (' + data.data[i]['date'] + ')';
-                    }
                     var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
-                    jQuery('ul#DependentWorks').append('<li>' + href + '</li>');                
+                    var item = data.data[i]['prefix'] + href;                    
+                    jQuery('ul#DependentWorks').append('<li>' + item + '</li>');                
                 }
                 if (data.data.length > visibleItems) {
                     jQuery('p#ToggleDependentWorksMore').attr('style', 'display:block');
                     for (var i = visibleItems; i < data.data.length; i++) {
                         var title = data.data[i]['title'];
-                        if (data.data[i]['part'] != '') {
-                            title = title + ' ' + data.data[i]['part'];
-                        }
-                        if (data.data[i]['date'] != '') {
-                            title = title + ' (' + data.data[i]['date'] + ')';
-                        }
                         var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
-                        jQuery('ul#DependentWorksHidden').append('<li>' + href + '</li>');                
+                        var item = data.data[i]['prefix'] + href;                    
+                        jQuery('ul#DependentWorksHidden').append('<li>' + item + '</li>');                
                     }
                 }
                 jQuery('div#DependentWorks').attr('style', 'display:block');
