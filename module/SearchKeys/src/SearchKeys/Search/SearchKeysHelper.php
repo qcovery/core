@@ -34,6 +34,11 @@ class SearchKeysHelper
         if ($config->get('phrasedKeys-' . $id)) {
             $phrasedKeywords = $config->get('phrasedKeys-' . $id)->toArray();
         }
+        $hiddenKeywords = [];
+        if ($config->get('hiddenKeys-' . $id)) {
+            $hiddenKeywords = $config->get('hiddenKeys-' . $id)->toArray();
+        }
+
         $defaultType = $options->getDefaultHandler();
 
         $lookfor = trim(preg_replace('/\s+/', ' ', $request->get('lookfor')));
@@ -46,7 +51,7 @@ class SearchKeysHelper
 
         while (!empty($lookfor) && $limit-- > 0) {
             $item = $key = '';
-            foreach (array_merge($keywords, $phrasedKeywords) as $keyword => $searchType) {
+            foreach (array_merge($keywords, $phrasedKeywords, $hiddenKeywords) as $keyword => $searchType) {
                 $upperKey = strtoupper($keyword);
                 $searchName = $options->getHumanReadableFieldName($searchType);
                 $keyRegex = '(('.$keyword.'\s)|('.$upperKey.'\s)|('.$searchType.':)|('.$searchName.':))';
