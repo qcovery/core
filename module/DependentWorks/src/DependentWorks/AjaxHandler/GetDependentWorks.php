@@ -33,6 +33,7 @@ use VuFind\Search\Results\PluginManager as ResultsManager;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\Stdlib\Parameters;
+use Zend\Config\Config;
 
 /**
  * This controller handles global AJAX functionality
@@ -65,9 +66,9 @@ class GetDependentWorks extends AbstractBase
      * @param array             $config   ZF configuration
      * @param Request           $request  HTTP request
      */
-    public function __construct(array $config, ResultsManager $resultsManager)
+    public function __construct(Config $config, ResultsManager $resultsManager)
     {
-        $this->config = $config;
+        $this->config = $config->toArray();
         $this->resultsManager = $resultsManager;
     }
 
@@ -80,18 +81,21 @@ class GetDependentWorks extends AbstractBase
      */
     public function handleRequest(Params $params)
     {
+        $limit = $this->config['Global']['limit'] ?? 1;
+        $sort = $this->config['Global']['sort'] ?? SORT_REGULAR;
+
         $ppn = $params->fromQuery('ppn');
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $results = $this->resultsManager->get($backend);
         $results->getOptions()->setLimitOptions([20, 1000]);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn, 'limit' => 1000]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn, 'limit' => $limit]));
 
         $records = $results->getResults();
         $data = [];
         foreach ($records as $i => $record) {
             $dependentWorksData = $record->getMarcData('DependentWorksData');
-            $title = $part = $date = '';
+            $title = $part = $date = $sort = '';
             foreach ($dependentWorksData as $dependentWorksDate) {
                 if (empty($title) && !empty($dependentWorksDate['title']['data'][0])) {
                     $title = $dependentWorksDate['title']['data'][0];
@@ -102,21 +106,16 @@ class GetDependentWorks extends AbstractBase
                 if (!empty($dependentWorksDate['date']['data'][0])) {
                     $date = $dependentWorksDate['date']['data'][0];
                 }
+                if (!empty($dependentWorksDate['sort']['data'][0])) {
+                    $sort = $dependentWorksDate['sort']['data'][0];
+                }
             }
-            $sortFlag = SORT_REGULAR;
-            if (!empty($part) && !isset($data[$part])) {
-                $sort = $part;
-            } elseif (!empty($date) && !isset($data[$date])) {
-                $sort = $date;
-                $sortFlag = SORT_NUMERIC;
-            } else {
-                $sort = $i;
-            }
+            $prefix = (empty($date)) ? $part . '. ' : $part . ', ' . $date . '. ';
             $data[$sort] = ['id' => $record->getUniqueID(), 
-                       'title' => $title, 
-                       'part' => $part, 
-                       'date' => $date];
+                            'prefix' => $prefix,
+                            'title' => $title]; 
         }
+        $sortFlag = SORT_REGULAR;
         krsort($data, $sortFlag);
         return $this->formatResponse(array_values($data));
     }
