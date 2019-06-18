@@ -22,7 +22,7 @@
 				
 				echo '<div class="delimiter"></div>';
 				echo '<span>';
-				echo '<a target="_blank" href="'.$url_access.'" class="'.$url_access_level.'">'.$this->transEsc($url_access_label).' '.$this->transEsc($url_access_level).'</a>';
+				echo '<a target="_blank" href="'.$url_access.'" class="'.$url_access_level.'">'.$this->transEsc($url_access_label).'</a>';
 				if ($doi) { ?>
 					<span class="doi"><?=$doi;?></i>
 				<? }
@@ -47,7 +47,7 @@
 							$access_notification[] = $link['access_notification'];
 						}
 						
-						echo '<a target="_blank" href="'.$url_access.'" class="'.$url_access_level.'">'.$this->transEsc($url_access_label).' '.$this->transEsc($url_access_level).'</a>';
+						echo '<a target="_blank" href="'.$url_access.'" class="'.$url_access_level.'">'.$this->transEsc($url_access_label).'</a>';
 						if ($doi) { ?>
 							<span class="doi"><?=$doi;?></i></span>
 						<? }
