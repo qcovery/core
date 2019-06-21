@@ -87,6 +87,169 @@ class PAIA extends PAIAbase
     }
 
     /**
+     * Get Patron Holds
+     *
+     * This is responsible for retrieving all holds by a specific patron.
+     *
+     * @param array $patron The patron array from patronLogin
+     *
+     * @return mixed Array of the patron's holds on success.
+     */
+    public function getMyHolds($patron)
+    {
+        if (isset($this->config['Holds']['status'])) {
+            $filter = ['status' => explode(':', $this->config['Holds']['status'])];
+            $items = $this->paiaGetItems($patron, $filter);
+            return $this->mapPaiaItems($items, 'myHoldsMapping');
+        } else {
+            return parent::getMyHolds($patron);
+        }
+    }
+
+    /**
+     * Get Patron Transactions
+     *
+     * This is responsible for retrieving all transactions (i.e. checked out items)
+     * by a specific patron.
+     *
+     * @param array $patron The patron array from patronLogin
+     *
+     * @return array Array of the patron's transactions on success,
+     */
+    public function getMyTransactions($patron)
+    {
+        if (isset($this->config['Transactions']['status'])) {
+            $filter = ['status' => explode(':', $this->config['Transactions']['status'])];
+            $items = $this->paiaGetItems($patron, $filter);
+            return $this->mapPaiaItems($items, 'myTransactionsMapping');
+        } else {
+            return parent::getMyTransactions($patron);
+        }
+    }
+
+
+
+    /**
+     * This PAIA helper function allows custom overrides for mapping of PAIA response
+     * to getMyTransactions data structure.
+     *
+     * @param array $items Array of PAIA items to be mapped.
+     *
+     * @return array
+     */
+    protected function myTransactionsMapping($items)
+    {
+        $results = [];
+
+        foreach ($items as $doc) {
+            $result = [];
+            // canrenew (0..1) whether a document can be renewed (bool)
+            $result['renewable'] = ($doc['canrenew'] ?? false);
+
+            // item (0..1) URI of a particular copy
+            $result['item_id'] = ($doc['item'] ?? '');
+
+            $result['renew_details']
+                = (isset($doc['canrenew']) && $doc['canrenew'])
+                ? $result['item_id'] : '';
+
+            // edition (0..1)  URI of a the document (no particular copy)
+            // hook for retrieving alternative ItemId in case PAIA does not
+            // the needed id
+            $result['id'] = (isset($doc['edition'])
+                ? $this->getAlternativeItemId($doc['edition']) : '');
+
+            // added by beluga-core
+            $result['type'] = $this->paiaStatusString($doc['status']);
+
+            // requested (0..1) URI that was originally requested
+
+            // about (0..1) textual description of the document
+            $result['title'] = ($doc['about'] ?? null);
+
+            // queue (0..1) number of waiting requests for the document or item
+            $result['request'] = ($doc['queue'] ?? null);
+
+            // renewals (0..1) number of times the document has been renewed
+            $result['renew'] = ($doc['renewals'] ?? null);
+
+            // reminder (0..1) number of times the patron has been reminded
+            $result['reminder'] = (
+                $doc['reminder'] ?? null
+            );
+
+            // custom PAIA field
+            // starttime (0..1) date and time when the status began
+            $result['startTime'] = (isset($doc['starttime'])
+                ? $this->convertDatetime($doc['starttime']) : '');
+
+            // endtime (0..1) date and time when the status will expire
+            $result['dueTime'] = (isset($doc['endtime'])
+                ? $this->convertDatetime($doc['endtime']) : '');
+
+            // duedate (0..1) date when the current status will expire (deprecated)
+            $result['duedate'] = (isset($doc['duedate'])
+                ? $this->convertDate($doc['duedate']) : '');
+
+            // cancancel (0..1) whether an ordered or provided document can be
+            // canceled
+
+            // error (0..1) error message, for instance if a request was rejected
+            $result['message'] = ($doc['error'] ?? '');
+
+            // storage (0..1) textual description of location of the document
+            $result['borrowingLocation'] = ($doc['storage'] ?? '');
+
+            // storageid (0..1) location URI
+
+            // PAIA custom field
+            // label (0..1) call number, shelf mark or similar item label
+            $result['callnumber'] = $this->getCallNumber($doc);
+
+            // Optional VuFind fields
+            /*
+            $result['barcode'] = null;
+            $result['dueStatus'] = null;
+            $result['renewLimit'] = "1";
+            $result['volume'] = null;
+            $result['publication_year'] = null;
+            $result['isbn'] = null;
+            $result['issn'] = null;
+            $result['oclc'] = null;
+            $result['upc'] = null;
+            $result['institution_name'] = null;
+            */
+
+            $results[] = $result;
+        }
+
+        return $results;
+    }
+        
+
+    
+    /**
+     * Get Patron StorageRetrievalRequests
+     *
+     * This is responsible for retrieving all storage retrieval requests
+     * by a specific patron.
+     *
+     * @param array $patron The patron array from patronLogin
+     *
+     * @return array Array of the patron's storage retrieval requests on success,
+     */
+    public function getMyStorageRetrievalRequests($patron)
+    {
+        if (isset($this->config['StorageRetrievalRequests']['status'])) {
+            $filter = ['status' => explode(':', $this->config['StorageRetrievalRequests']['status'])];
+            $items = $this->paiaGetItems($patron, $filter);
+            return $this->mapPaiaItems($items, 'myStorageRetrievalRequestsMapping');
+        } else {
+            return parent::getMyStorageRetrievalRequests($patron);
+        }
+    }
+
+    /**
      * Get Patron Profile
      *
      * This is responsible for retrieving the profile for a specific patron.
