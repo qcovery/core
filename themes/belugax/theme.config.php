@@ -24,6 +24,7 @@ return [
         'dependentworks',
         'recorddriver',
         'beluga-core-base',
+        'rvk',
     ],
     "less" => [
         "active" => false,
