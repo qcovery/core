@@ -1,0 +1,3 @@
+<? foreach ($this->HelpTooltips()->getHelpTooltipsConfig($context) as $helpTooltip):?>
+    <span class="<?=$helpTooltip['class']?>" data-helpContent="<?=$this->transEsc($helpTooltip['translation'])?>" data-help_my_position="<?=$helpTooltip['my_position']?>" data-help_at_position="<?=$helpTooltip['at_position']?>" data-target="<?=$helpTooltip['target']?>" data-x="<?=$helpTooltip['x']?>" data-y="<?=$helpTooltip['y']?>" style="display:none"></span>
+<? endforeach; ?>
