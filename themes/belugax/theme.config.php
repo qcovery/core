@@ -25,6 +25,7 @@ return [
         'recorddriver',
         'beluga-core-base',
         'rvk',
+        'helptooltips',
     ],
     "less" => [
         "active" => false,
