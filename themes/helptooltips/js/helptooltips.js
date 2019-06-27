@@ -52,5 +52,7 @@ function displayHelp (helpClass) {
 
 $(document).ready(function() {
     console.log('HelpTooltips');
-    displayHelp('showHelp');
+    if (showHelp) {
+        displayHelp('showHelp');
+    }
 });

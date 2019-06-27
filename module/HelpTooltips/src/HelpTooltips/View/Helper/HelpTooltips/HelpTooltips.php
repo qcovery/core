@@ -31,4 +31,8 @@ class HelpTooltips extends \Zend\View\Helper\AbstractHelper
     public function getHelpFormAction () {
         return $_SERVER['REQUEST_URI'];
     }
+
+    public function showHelp () {
+        return true;
+    }
 }
