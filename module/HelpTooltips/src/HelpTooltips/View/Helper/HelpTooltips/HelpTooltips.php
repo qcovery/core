@@ -7,11 +7,15 @@ namespace HelpTooltips\View\Helper\HelpTooltips;
 class HelpTooltips extends \Zend\View\Helper\AbstractHelper
 {
     protected $helpTooltipsConfig;
+    protected $session;
 
-
-    public function __construct($config, \VuFind\Search\Memory $memory)
+    public function __construct($config, \VuFind\Search\Memory $memory, $sessionManager)
     {
         $this->helpTooltipsConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/HelpTooltips.ini'), true);
+        $this->sessionManager = $sessionManager;
+        $this->session = new \Zend\Session\Container(
+            'HelpTooltips', $essionManager
+        );
     }
 
     public function getHelpTooltipsConfig ($context = 'all') {
@@ -33,6 +37,12 @@ class HelpTooltips extends \Zend\View\Helper\AbstractHelper
     }
 
     public function showHelp () {
-        return true;
+        if ($_POST['showHelp']) {
+            $this->session->showHelp = true;
+        } else if ($_POST['hideHelp']) {
+            $this->session->showHelp = false;
+        }
+
+        return $this->session->showHelp;
     }
 }

@@ -64,7 +64,7 @@ class HelpTooltipsFactory implements FactoryInterface
         $config = $container->get('VuFind\Config\PluginManager');
         $memory = $container->get('VuFind\Search\Memory');
         return new $requestedName(
-            $config, $memory
+            $config, $memory, [$container->get('Zend\Session\SessionManager')]
         );
     }
 }
