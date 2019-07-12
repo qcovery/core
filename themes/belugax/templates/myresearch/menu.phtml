@@ -25,9 +25,9 @@
       <a href="<?=$this->url('myresearch-holds')?>"<?=$this->active == 'holds' ? ' class="active"' : ''?>>
         <i class="bel-flagge" aria-hidden="true"></i> <?=$this->transEsc('Holds_Interlibrary_Loans')?>
       </a>
-      <a href="<?=str_replace("Holds","Recalls",$this->url('myresearch-holds'))?>"<?=$this->active == 'recalls' ? ' class="active"' : ''?>>
+      <!-- <a href="<?=str_replace("Holds","Recalls",$this->url('myresearch-holds'))?>"<?=$this->active == 'recalls' ? ' class="active"' : ''?>>
         <i class="bel-flagge" aria-hidden="true"></i> <?=$this->transEsc('Recalls')?>
-      </a>
+      </a> -->
     <? endif; ?>
     <? if ($this->ils()->checkFunction('StorageRetrievalRequests', $capabilityParams)): ?>
       <a href="<?=$this->url('myresearch-storageretrievalrequests')?>"<?=$this->active == 'storageRetrievalRequests' ? ' class="active"' : ''?>>
