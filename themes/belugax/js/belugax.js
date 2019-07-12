@@ -87,4 +87,13 @@ $(document).ready(function() {
         document.execCommand("copy");
         $temp.remove();
     });
+
+    /*
+     * Show summary on detail view.
+     */
+    $('.showSummary').on('click', function(e){
+        e.preventDefault();
+        document.getElementById('short_summary').style.display='none';
+        document.getElementById('long_summary').style.display='block';
+    });
 });
