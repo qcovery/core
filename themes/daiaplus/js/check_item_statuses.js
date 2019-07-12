@@ -211,3 +211,11 @@ $(document).ready(function() {
   }
   checkItemStatusReady();
 });
+
+function initDaiaPlusOverlay () {
+    $('.daiaplus-overlay').on('click', function(e){
+        e.preventDefault();
+        $('#modal .modal-body').html($('#'+$(this).data('daiaplus-overlay')).html());
+        VuFind.modal('show');
+    });
+}

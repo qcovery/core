@@ -52,7 +52,9 @@ function displayHelp (helpClass) {
 
 $(document).ready(function() {
     console.log('HelpTooltips');
-    if (showHelp) {
-        displayHelp('showHelp');
+    if (typeof showHelp !== 'undefined') {
+    		if (showHelp) {
+        		displayHelp('showHelp');
+    		}
     }
 });
