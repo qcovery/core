@@ -129,15 +129,13 @@ function runItemAjaxForQueue() {
   } else {
     var method = 'getItemStatuses';
   }
-
-  var itemIds = new Array();
+  
   for (var i=0; i<itemStatusIds.length; i++) {
-    itemIds[i] = itemStatusIds[i];
     $.ajax({
       url: VuFind.path + '/AJAX/JSON?method=' + method,
       dataType: 'json',
       method: 'get',
-      data: {id:itemIds, list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink}
+      data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink}
     })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
