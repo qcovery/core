@@ -275,7 +275,7 @@ class SolrMarc extends SolrDefault
                                 $val = substr($val, 1);
                                 if ($type == 'indicator') {
                                     $indicator = $fieldObject->getIndicator($key);
-                                    if (!empty($indicator) && ($val == '*' || $indicator == $val)) {
+                                    if (!empty($indicator) && ($val == '*' || preg_match('/'.$val.'/', $indicator))) {
                                         continue 2;
                                     }
                                 } elseif ($type == 'field') {
@@ -290,16 +290,21 @@ class SolrMarc extends SolrDefault
                             } else {
                                 if ($type == 'indicator') {
                                     $indicator = $fieldObject->getIndicator($key);
-                                    if (!isset($indicator) || $val != '*' && $indicator != $val) {
+                                    if (!isset($indicator) || $val != '*' && !preg_match('/'.$val.'/', $indicator)) {
                                         continue 2;
                                     }
                                 } elseif ($type == 'field') {
+                                    $fieldExists = false;
                                     foreach ($fieldObject->getSubfields() as $subFieldObject) {
                                         if ($subFieldObject->getCode() == $key) {
+                                            $fieldExists = true;
                                             if ($val != '*' && !preg_match('/'.$val.'/', $subFieldObject->getData())) {
                                                 continue 3;
                                             }
                                         }
+                                    }
+                                    if (!$fieldExists) {
+                                        continue 2;
                                     }
                                 }
                             }
