@@ -72,6 +72,7 @@ class GetDependentWorks extends AbstractBase
         $this->resultsManager = $resultsManager;
     }
 
+
     /**
      * Handle a request.
      *
@@ -82,7 +83,7 @@ class GetDependentWorks extends AbstractBase
     public function handleRequest(Params $params)
     {
         $limit = $this->config['Global']['limit'] ?? 1;
-        $sort = $this->config['Global']['sort'] ?? SORT_REGULAR;
+        $sortFlag = $this->config['Global']['sort'] ?? SORT_REGULAR;
 
         $ppn = $params->fromQuery('ppn');
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
@@ -108,14 +109,17 @@ class GetDependentWorks extends AbstractBase
                 }
                 if (!empty($dependentWorksDate['sort']['data'][0])) {
                     $sort = $dependentWorksDate['sort']['data'][0];
+                } else {
+                    $sort = $i;
                 }
             }
             $prefix = (empty($date)) ? $part . '. ' : $part . ', ' . $date . '. ';
-            $data[$sort] = ['id' => $record->getUniqueID(), 
+            $data[$sort] = ['id' => $record->getUniqueID(),
                             'prefix' => $prefix,
-                            'title' => $title]; 
+                            'title' => $title,
+                            'part' => $part,
+                            'date' => $date];
         }
-        $sortFlag = SORT_REGULAR;
         krsort($data, $sortFlag);
         return $this->formatResponse(array_values($data));
     }

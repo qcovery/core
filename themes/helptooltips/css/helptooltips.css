@@ -1,0 +1,15 @@
+#helpForm i {
+    font-size: 44px;
+    vertical-align: middle;
+    margin-right: -8px;
+}
+
+.helpTooltipLink {
+    background: none;
+    border: none;
+    /* margin-top: ...px; - overwrite in library theme */
+}
+
+#btn-help:hover {
+    /* color: #...;  - overwrite in library theme */
+}
