@@ -125,16 +125,19 @@ class CartController extends \VuFind\Controller\CartController
                             if ($turbomarcData != '') {
                                 $turbomarcData .= "\n";
                             }
-                            $turbomarcData .= implode("\n", $execResults);
+                            
+                            $turbomarcData .= $this->addFormat(implode("\n", $execResults), $record);
                         }
-                        $result = '<collection xmlns="http://www.indexdata.com/turbomarc">' . "\n" . $turbomarcData . "\n" . '</collection>';
+                        $turbomarcData = str_ireplace('<?xml version="1.0"?>', '', $turbomarcData);
+                        $result = '<?xml version="1.0"?>' . "\n" . '<collection xmlns="http://www.indexdata.com/turbomarc">' . "\n" . $turbomarcData . "\n" . '</collection>';
                     } else if ($format == 'marc21') {
                         $records = $this->getRecordLoader()->loadBatch($ids);
                         $marc21Data = [];
                         foreach ($records as $record) {
-                            $marc21Data[] = $record->getXML('marc21');
+                            $marc21Xml = $this->addFormat($record->getXML('marc21'), $record);
+                            $marc21Data[] = str_ireplace('<?xml version="1.0"?>', '', $marc21Xml);
                         }
-                        $result = '<collection>' . "\n" . implode("\n", $marc21Data) . "\n" . '</collection>';
+                        $result = '<?xml version="1.0"?>' . "\n" . '<collection>' . "\n" . implode("\n", $marc21Data) . "\n" . '</collection>';
                     } else {
                         $result = json_encode($ids);
                     }
@@ -144,6 +147,12 @@ class CartController extends \VuFind\Controller\CartController
         // Process and display the exported records
         $response->setContent($result);
         return $response;
+    }
+    
+    private function addFormat ($xml, $record) {        
+        $marcxml = simplexml_load_string($xml);
+        $marcxml->addChild('format', implode(',', $record->getFormats()));
+        return $marcxml->asXML();
     }
 }
 

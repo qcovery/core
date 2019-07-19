@@ -1,9 +1,3 @@
-<script type="text/javascript">
-    function showSummary() {
-        document.getElementById('short_summary').style.display='none';
-        document.getElementById('long_summary').style.display='block';
-    }
-</script>
 <?php $titleFields = $this->solrDetails()->getCoreFields($this->driver, ['title']); ?>
 <h3 property="name">
 <?php $originalLetters = ''; ?>
@@ -35,7 +29,7 @@
 <p id="short_summary">
     <?=$this->truncate($summary, 300) ?>
     <?php if(strlen($summary) > 300): ?>
-    <br /><a href="javascript:showSummary()"><?=$this->transEsc('Full description')?><i class="bel-pfeil-u01"></i></a>
+    <br /><a href="" class="showSummary"><?=$this->transEsc('Full description')?><i class="bel-pfeil-u01"></i></a>
 </p>
 <p id="long_summary" style="display:none">
     <?=$summary ?>

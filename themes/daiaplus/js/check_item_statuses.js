@@ -23,7 +23,7 @@ function displayArticleStatus(results, $item) {
       $item.find('.status').append('error');
     } else {
       if (typeof(result.href) != 'undefined') {
-        var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '">' + VuFind.translate(result.level) + '</a><br/>';
+        var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '">' + VuFind.translate(result.label) + '</a><br/>';
         $item.find('.status').append(html);
       }
     }
@@ -211,3 +211,11 @@ $(document).ready(function() {
   }
   checkItemStatusReady();
 });
+
+function initDaiaPlusOverlay () {
+    $('.daiaplus-overlay').on('click', function(e){
+        e.preventDefault();
+        $('#modal .modal-body').html($('#'+$(this).data('daiaplus-overlay')).html());
+        VuFind.modal('show');
+    });
+}

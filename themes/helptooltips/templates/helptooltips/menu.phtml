@@ -1,0 +1,19 @@
+<li>
+    <form id="helpForm" class="helpForm" action="<?=$this->HelpTooltips()->getHelpFormAction()?>" method="post">
+        <? if (!$this->HelpTooltips()->showHelp()) { ?>
+            <span id="btn-help">
+                <strong>
+                    <i class="bel-hilfe01"></i><input type="submit" class="helpTooltipLink" value="<?=$this->transEsc('help_show')?>">
+                </strong>
+            </span>
+            <input type="hidden" name="showHelp" value="1">
+        <? } else { ?>
+            <span id="btn-help">
+                <strong>
+                    <i class="bel-hilfe01"></i><input type="submit" class="helpTooltipLink" value="<?=$this->transEsc('help_hide')?>">
+                </strong>
+            </span>
+            <input type="hidden" name="hideHelp" value="1">
+        <? } ?>
+    </form>
+</li>
