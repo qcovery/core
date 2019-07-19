@@ -45,6 +45,8 @@ trait HoldsTrait
      */
     public function holdAction()
     {
+        $type = $this->request->getQuery('type');
+
         $driver = $this->loadRecord();
 
         // Stop now if the user does not have valid catalog credentials available:
@@ -108,7 +110,8 @@ trait HoldsTrait
             $pickupDetails['requestGroupId'] = $requestGroups[0]['id'];
         }
 
-        $pickupDetails['type'] = $this->request->getQuery('type');
+        $pickupDetails['type'] = $type;
+        $pickupDetails['storage_id'] = $this->request->getQuery('storage_id');
 
         $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
 
@@ -122,6 +125,15 @@ trait HoldsTrait
             $validPickup = $validGroup && $this->holds()->validatePickUpInput(
                 $gatheredDetails['pickUpLocation'], $extraHoldFields, $pickup
             );
+
+            //---------------------------------------------------------------------------------------
+            //--- beluga core hack: use until library system supports pickup location for recalls ---
+            //---------------------------------------------------------------------------------------
+            if ($type == 'recall') {
+                $validPickup = true;
+            }
+            //---------------------------------------------------------------------------------------
+
             if (!$validGroup) {
                 $this->flashMessenger()
                     ->addMessage('hold_invalid_request_group', 'error');
@@ -196,7 +208,7 @@ trait HoldsTrait
                 'defaultRequestGroup' => $defaultRequestGroup,
                 'requestGroupNeeded' => $requestGroupNeeded,
                 'helpText' => $checkHolds['helpText'] ?? null,
-                'type' => $this->request->getQuery('type'),
+                'type' => $type,
             ]
         );
         $view->setTemplate('record/hold');

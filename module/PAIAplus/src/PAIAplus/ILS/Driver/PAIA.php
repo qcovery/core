@@ -329,26 +329,25 @@ class PAIA extends PAIAbase
     {
         $pickupLocation = [];
 
+        $item = $holdDetails['item_id'];
+
+        $doc = [];
+        $doc['item'] = stripslashes($item);
+        $post_data['doc'][] = $doc;
+
+        try {
+            $array_response = $this->paiaPostAsArray(
+                'core/' . $patron['cat_username'] . '/request', $post_data
+            );
+        } catch (ILSException $e) {
+            $this->debug($e->getMessage());
+            return [
+                'success' => false,
+                'sysMessage' => $e->getMessage(),
+            ];
+        }
+
         if ($holdDetails['type'] == 'order') {
-
-            $item = $holdDetails['item_id'];
-
-            $doc = [];
-            $doc['item'] = stripslashes($item);
-            $post_data['doc'][] = $doc;
-
-            try {
-                $array_response = $this->paiaPostAsArray(
-                    'core/' . $patron['cat_username'] . '/request', $post_data
-                );
-            } catch (ILSException $e) {
-                $this->debug($e->getMessage());
-                return [
-                    'success' => false,
-                    'sysMessage' => $e->getMessage(),
-                ];
-            }
-
             if (isset($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
                 if (is_array($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
                     foreach ($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'] as $option) {
@@ -356,6 +355,13 @@ class PAIA extends PAIAbase
                     }
                 }
             }
+        } else if ($holdDetails['type'] == 'recall') {
+            $locationsArray['http://uri.gbv.de/organization/isil/DE-18-302@h302a'] = [
+                'locationId' => 'http://uri.gbv.de/organization/isil/DE-18-302@counter-21',
+                'locationDisplay' => 'Berliner Tor 5',
+            ];
+
+            $pickupLocation[] = $locationsArray[$holdDetails['storage_id']];
         }
 
         return $pickupLocation;
