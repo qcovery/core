@@ -1,6 +1,13 @@
 <?php
     // Set page title.
-    $this->headTitle($this->translate('request_place_text'));
+    $type_request_place_text = $this->translate('request_place_text');
+    $type_request_submit_text = $this->translate('request_submit_text');
+    if ($this->type == 'recall') {
+        $type_request_place_text = $this->translate('request_place_recall_text');
+        $type_request_submit_text = $this->translate('request_submit_recall_text');
+    }
+
+    $this->headTitle($this->translate($type_request_place_text));
 
     // Set up breadcrumbs:
     $this->layout()->breadcrumbs = '<li>' . $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '', '</li> ')
@@ -8,7 +15,9 @@
         . '<li class="active">' . $this->transEsc('request_place_text') . '</li>';
 ?>
 <div class="mainbody left">
-<h2><?=$this->transEsc('request_place_text')?></h2>
+<h2>
+    <?=$this->transEsc($type_request_place_text)?>
+</h2>
 <?php if ($this->helpText): ?>
 <p class="helptext"><?=$this->helpText?></p>
 <?php endif; ?>
@@ -98,7 +107,7 @@
     <?php endif; ?>
   <?php endif; ?>
   <div class="form-group">
-    <input class="btn btn-primary" type="submit" name="placeHold" value="<?=$this->transEsc('request_submit_text')?>"/>
+    <input class="btn btn-primary" type="submit" name="placeHold" value="<?=$this->transEsc($type_request_submit_text)?>"/>
   </div>
 </form>
 
