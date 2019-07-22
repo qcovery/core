@@ -356,12 +356,16 @@ class PAIA extends PAIAbase
                 }
             }
         } else if ($holdDetails['type'] == 'recall') {
-            $locationsArray['http://uri.gbv.de/organization/isil/DE-18-302@h302a'] = [
-                'locationId' => 'http://uri.gbv.de/organization/isil/DE-18-302@counter-21',
-                'locationDisplay' => 'Berliner Tor 5',
-            ];
-
-            $pickupLocation[] = $locationsArray[$holdDetails['storage_id']];
+            if (isset($this->config['pickUpLocations'])) {
+                foreach ($this->config['pickUpLocations'] as $pickUpLocationData) {
+                    if ($pickUpLocationData[0] == $holdDetails['storage_id']) {
+                        $pickupLocation[] = [
+                            'locationID' => $pickUpLocationData[1],
+                            'locationDisplay' => $pickUpLocationData[2],
+                        ];
+                    }
+                }
+            }
         }
 
         return $pickupLocation;

@@ -126,14 +126,6 @@ trait HoldsTrait
                 $gatheredDetails['pickUpLocation'], $extraHoldFields, $pickup
             );
 
-            //---------------------------------------------------------------------------------------
-            //--- beluga core hack: use until library system supports pickup location for recalls ---
-            //---------------------------------------------------------------------------------------
-            if ($type == 'recall') {
-                $validPickup = true;
-            }
-            //---------------------------------------------------------------------------------------
-
             if (!$validGroup) {
                 $this->flashMessenger()
                     ->addMessage('hold_invalid_request_group', 'error');
