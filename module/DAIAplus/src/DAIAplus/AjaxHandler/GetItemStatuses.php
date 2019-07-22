@@ -175,6 +175,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                             $docId = $action['documentId'];
                             $itemId = $action['itemId'];
                             $type = $action['type'];
+                            $storageId = null;
+                            if (isset($action['storageId'])) {
+                                $storageId = $action['storageId'];
+                            }
                             $hmacPairs = [
                                 'id' => $id,
                                 'doc_id' => $docId,
@@ -185,6 +189,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                             $orderLink .= 'doc_id=' . urlencode($docId);
                             $orderLink .= '&item_id=' . urlencode($itemId);
                             $orderLink .= '&type=' . $type;
+                            if ($storageId) {
+                                $orderLink .= '&storage_id=' . $storageId;
+                            }
                             $orderLink .= '&hashKey=' . $hashKey;
                             $record[$index1]['daiaplus']['actionArray'][$index2]['beluga_core']['href'] = $orderLink;
                         }

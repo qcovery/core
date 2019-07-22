@@ -52,6 +52,7 @@ use VuFind\ILS\Driver\PAIA as PAIAbase;
  */
 class PAIA extends PAIAbase
 {
+    private $request;
 
     /**
      * Initialize the driver.
@@ -326,6 +327,8 @@ class PAIA extends PAIAbase
      */
     public function getPickUpLocations($patron = null, $holdDetails = null)
     {
+        $pickupLocation = [];
+
         $item = $holdDetails['item_id'];
 
         $doc = [];
@@ -344,15 +347,31 @@ class PAIA extends PAIAbase
             ];
         }
 
-        $pickupLocation = [];
-        if (isset($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
-            if (is_array($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
-                foreach ($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'] as $option) {
-                    $pickupLocation[] = ['locationID' => $option['id'], 'locationDisplay' => $option['about']];
+        if ($holdDetails['type'] == 'order') {
+            if (isset($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
+                if (is_array($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
+                    foreach ($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'] as $option) {
+                        $pickupLocation[] = ['locationID' => $option['id'], 'locationDisplay' => $option['about']];
+                    }
+                }
+            }
+        } else if ($holdDetails['type'] == 'recall') {
+            if (isset($this->config['pickUpLocations'])) {
+                foreach ($this->config['pickUpLocations'] as $pickUpLocationData) {
+                    if ($pickUpLocationData[0] == $holdDetails['storage_id']) {
+                        $pickupLocation[] = [
+                            'locationID' => $pickUpLocationData[1],
+                            'locationDisplay' => $pickUpLocationData[2],
+                        ];
+                    }
                 }
             }
         }
 
         return $pickupLocation;
+    }
+
+    public function setRequest ($request) {
+        $this->request = $request;
     }
 }

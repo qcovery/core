@@ -26,6 +26,7 @@ return [
         'helptooltips',
         'rvk',
         'beluga-core-base',
+        'rvk',
     ],
     "less" => [
         "active" => false,

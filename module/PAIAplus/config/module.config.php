@@ -18,6 +18,15 @@ $config = [
             'VuFind\ILSConnection' => 'PAIAplus\ILS\Connection',
         ],
     ],
+    'controllers' => [
+        'factories' => [
+            'PAIAplus\Controller\RecordController' => 'PAIAplus\Controller\AbstractBaseWithConfigFactory',
+        ],
+        'aliases' => [
+            'Record' => 'PAIAplus\Controller\RecordController',
+            'record' => 'PAIAplus\Controller\RecordController',
+        ],
+    ],
 ];
 
 return $config;
