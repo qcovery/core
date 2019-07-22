@@ -144,16 +144,30 @@ class DeliveryController extends AbstractBase
             return $this->forwardTo('Delivery', 'Home');
         }
 
-        $orderDataConfig = $this->getConfig('deliveryOrderData');
-        $this->dataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
+        $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
+        $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
 
-        $sendOrder = false;
         if (!empty($this->params()->fromPost('order'))) {
-            $errors = $this->dataHandler->checkData();
-            if (empty($errors)) {
-                $this->sendDeliveryMail('order');
+            $orderSent = $this->dataHandler->sendOrder($this->user);
+
+
+            $mailData = $this->dataHandler->prepareOrderMail($this->user);
+            $renderer = $this->serviceLocator->get('ViewRenderer');
+            $message = $renderer->render('Email/delivery-order.phtml', $mailData);
+            //$mailer->send($mailConfig['orderMailTo'], $mailConfig['orderMailFrom'], $mailConfig['orderSubject'], $message);
+
+
+            $listData = [
+                'record_id' => $mailData['itemSystemNo'],
+                'title' => $mailData['itemTitle'],
+                'author' => $mailData['itemAuthorOfArticle'],
+                'year' => $mailData['itemPublicationDate'],
+                'source' => $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId')
+            ];
+            $deliveryTable = $this->getTable('delivery');
+            $deliveryTable->createRowForUserDeliveryId($this->user->user_delivery_id, $listData);
                 return $this->forwardTo('Delivery', 'List');
-            }
+
         }
  
         $view = $this->createViewModel();
@@ -264,19 +278,6 @@ class DeliveryController extends AbstractBase
             $mailer->send($mailTo, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
             $mailer->send($admin, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
         } elseif ($emailType == 'order') {
-            $mailData = $this->dataHandler->prepareOrderMail($this->user);
-            $renderer = $this->getViewRenderer();
-            $message = $renderer->render('Email/delivery-order.phtml', $mailData);
-            //$mailer->send($mailConfig['orderMailTo'], $mailConfig['orderMailFrom'], $mailConfig['orderSubject'], $message);
-            $listData = [
-                'record_id' => $mailData['itemSystemNo'],
-                'title' => $mailData['itemTitle'],
-                'author' => $mailData['itemAuthorOfArticle'],
-                'year' => $mailData['itemPublicationDate'],
-                'source' => $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId')
-            ];
-            $deliveryTable = $this->getTable('delivery');
-            $deliveryTable->createRowForUserDeliveryId($this->user->user_delivery_id, $listData);
         }
     }
     

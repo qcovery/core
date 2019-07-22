@@ -13,9 +13,17 @@
  */
 namespace Delivery;
 
+use Delivery\Driver\PluginManager;
+
 class DataHandler {
 
+    protected $deliveryConfig;
+
     protected $solrDriver;
+
+    protected $deliveryDriver;
+
+    protected $driverManager;
 
     protected $params;
 
@@ -45,10 +53,11 @@ class DataHandler {
         'Comment' => ['display' => 'Comment', 'name' => 'comment', 'mandantory' => 0]
     ]; 
 */
-    public function __construct($solrDriver = null, $params, $orderDataConfig)
+    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $deliveryConfig)
     {
-        $this->dataFields = $orderDataConfig->toArray();
-        $this->solrDriver = $solrDriver;
+        $this->deliveryConfig = $deliveryConfig;
+        $this->dataFields = $orderDataConfig;
+        $this->driverManager = $driverManager;
         $this->params = $params;
     }
 
@@ -57,20 +66,68 @@ class DataHandler {
         $this->solrDriver = $solrDriver;
     }
 
-    public function checkData()
+    public function sendOrder($user)
     {
-        $errors = [];
+        if (!$this->checkData()) {
+            return false;
+        }
+        if ($this->setDeliveryDriver()) {
+            $orderData = $this->deliveryDriver->prepareOrder($user);
+            foreach ($this->dataFields as $fieldSpecs) {
+                $entry = $fieldSpecs['orderfieldprefix'] ?? '';
+                $orderData[$fieldSpecs['orderfield']] .= $entry . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+            }
+            $this->deliveryDriver->sendOrder($orderData);
+        }
+    }
+
+    private function setDeliveryDriver()
+    {
+        $deliveryDriver = $this->deliveryConfig['Order']['plugin'];
+        if (empty($deliveryDriver)) {
+            throw new \Exception('Delivery driver configuration missing');
+        }
+        if (!$this->driverManager->has($deliveryDriver)) {
+            throw new \Exception('Delivery driver missing: ' . $deliveryDriver);
+        }
+        $this->deliveryDriver = $this->driverManager->get($deliveryDriver);
+        try {
+            $this->deliveryDriver->setConfig($this->deliveryConfig[$deliveryDriver]);
+            $this->deliveryDriver->init();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+        return true;
+    }
+
+    private function checkData()
+    {
+        $failed = false;
+        $this->errors = [];
         foreach ($this->dataFields as $dataField) {
-            $name = $this->params->fromPost($dataField['name']);
-            if (isset($name)) {
-                if ($dataField['mandantory'] == 1) {
-                    if (empty($name)) {
-                        $errors[] = $dataField['name'];
-                    }
+            if ($dataField['mandantory'] == 1) {
+                if (empty($this->params->fromPost($dataField['name']))) {
+                    $failed = true;
+                    $this->errors[] = $dataField['name'];
                 }
             }
         }
-        return $errors;
+        return !$failed;
+    }
+
+    public function prepareOrder($user)
+    {
+        $email = $this->params->fromPost('email') ?: $user->delivery_email;
+        $mailData = [];
+        $mailData['clientName'] = $user->firstname . ' ' . $user->lastname;
+        $mailData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
+        $mailData['clientIdentifier'] = $user->cat_id;
+        $mailData['delEmailAddress'] = $email;
+        foreach ($this->dataFields as $fieldSpecs) {
+            $entry = $fieldSpecs['orderfieldprefix'] ?? '';
+            $mailData[$fieldSpecs['orderfield']] .= $entry . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+        }
+        return $mailData;
     }
 
     public function collectData($signature, $articleAvailable = false)
@@ -119,21 +176,6 @@ class DataHandler {
         }
     }
 
-    public function prepareOrderMail($user)
-    {
-        $email = $this->params->fromPost('email') ?: $user->delivery_email;
-        $mailData = [];
-        $mailData['clientName'] = $user->firstname . ' ' . $user->lastname;
-        $mailData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
-        $mailData['clientIdentifier'] = $user->cat_id;
-        $mailData['delEmailAddress'] = $email;
-        foreach ($this->dataFields as $fieldSpecs) {
-            $entry = $fieldSpecs['orderfieldprefix'] ?? '';
-            $mailData[$fieldSpecs['orderfield']] .= $entry . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
-        }
-        return $mailData;
-    }
-
     public function getFormData()
     {
         return $this->formData;
@@ -146,7 +188,9 @@ class DataHandler {
 
     public function getErrors()
     {
-        return $this->errors;
+        $errors = $this->errors;
+        $this->errors = [];
+        return $errors;
     }
 
     private function getTitle($format, $type = 'info')
