@@ -89,6 +89,7 @@ class GetArticleStatuses extends AbstractBase
                 $openUrl = $driver->getOpenUrl();
                 $formats = $driver->getFormats();
                 $format = $formats[0];
+                $format = strtolower(str_ireplace('electronic ','',$format));
 
                 $sfxLink = $openUrl;
                 $sfxData = $driver->getMarcData('SFX');
@@ -97,20 +98,17 @@ class GetArticleStatuses extends AbstractBase
                     foreach ($sfxData as $sfxDate) {
                         if (is_array($sfxDate)) {
                             foreach ($sfxDate as $key => $value) {
-                                $sfxLink .= $key . '=' . urlencode($value['data'][0]);
+                                $sfxLink .= '&' . $key . '=' . urlencode($value['data'][0]);
+                                if(strpos($openUrl, 'rft.' . $key . '=') === false) {
+                                    $openUrl .= '&rft.' . $key . '=' . urlencode($value['data'][0]);
+                                }
                             }
                         }
                     }
                 }
 
-                list($spage, $epage) = explode('-', $sfxData[1]['pages']['data'][0]);
-                $openUrl = str_replace('&rft.volume=', '&rft.volume=' . $sfxData[1]['volume']['data'][0], $openUrl);
-                $openUrl = str_replace('&rft.issue=', '&rft.issue=' . $sfxData[1]['issue']['data'][0], $openUrl);
-                $openUrl = str_replace('&rft.spage=', '&rft.spage=' . $spage, $openUrl);
-                if (strpos($openUrl, 'rft.epage') !== false) {
-                    $openUrl = str_replace('&rft.epage=', '&rft.epage=' . $epage, $openUrl);
-                } else {
-                    $openUrl .= '&rft.epage=' . $epage;
+                if(strpos($openUrl, 'rft.genre=') === false) {
+                    $openUrl .= '&rft.genre=' . $format;
                 }
 
                 $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
@@ -126,6 +124,7 @@ class GetArticleStatuses extends AbstractBase
                 $url .= '&sfx=' . $sfxLink;
                 $url .= '&language=de';
                 $url .= '&format=json';
+
                 $response = json_decode($this->makeRequest($url), true);
                 $response = $this->prepareData($response, $listView);
                 $response['id'] = $id;
