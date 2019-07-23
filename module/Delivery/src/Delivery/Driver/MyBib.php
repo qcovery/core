@@ -27,7 +27,7 @@
  */
 namespace Delivery\Driver;
 
-class MyBib {
+class MyBib implements DriverInterface {
     protected $session;
 
     protected $config;

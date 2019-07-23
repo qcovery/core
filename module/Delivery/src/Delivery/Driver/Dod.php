@@ -27,7 +27,7 @@
  */
 namespace Delivery\Driver;
 
-class Dod {
+class Dod implements DriverInterface {
 
     protected $config;
 
@@ -35,7 +35,7 @@ class Dod {
 
     protected $mailer;
 
-    public function __construct($viewRenderer, \VuFind\Mailer $mailer) {
+    public function __construct($viewRenderer, \VuFind\Mailer\Mailer $mailer) {
         $this->viewRenderer = $viewRenderer;
         $this->mailer = $mailer;
     }

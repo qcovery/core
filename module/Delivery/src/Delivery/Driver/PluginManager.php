@@ -54,7 +54,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'Delivery\Driver\Dod' => 'Delivery\Driver\DriverFactory',
+        'Delivery\Driver\Dod' => 'Delivery\Driver\DodFactory',
         'Delivery\Driver\MyBib' => 'Delivery\Driver\DriverFactory',
     ];
 
@@ -67,10 +67,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @param array $v3config                  If $configOrContainerInstance is a
      * container, this value will be passed to the parent constructor.
      */
-    public function __construct($configOrContainerInstance = null,
-        array $v3config = []
-    ) {
-        parent::__construct($configOrContainerInstance, $v3config);
+    public function __construct($configOrContainerInstance = null) {
+        parent::__construct($configOrContainerInstance);
     }
 
     /**
@@ -81,6 +79,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\ILS\Driver\DriverInterface';
+        return 'Delivery\Driver\DriverInterface';
     }
 }
