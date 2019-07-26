@@ -468,6 +468,28 @@ class SolrMarc extends SolrDefault
     }
 
     /**
+     * Get the multipart resource record level level of the current record.
+     *
+     * @return string
+     */
+    public function getMultipartResourceRecordLevel()
+    {
+        $leader = $this->getMarcRecord()->getLeader();
+        $mrrLevel = strtoupper($leader[19]);
+
+        switch ($mrrLevel) {
+            case 'A': // Set
+                return "Set";
+            case 'B': // Part with independent title
+                return "Part with independent title";
+            case 'C': // Part with dependent title
+                return "Part with dependent title";
+            default:
+                return "Unknown";
+        }
+    }
+
+    /**
      * Return an XML representation of the record using the specified format.
      * Return false if the format is unsupported.
      *
