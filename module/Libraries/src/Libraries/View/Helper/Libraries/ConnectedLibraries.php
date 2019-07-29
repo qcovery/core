@@ -29,8 +29,8 @@ class ConnectedLibraries extends \Zend\View\Helper\AbstractHelper
             $holdingCodes = [];
             if (is_array($collectionDetails)) {
                 foreach ($collectionDetails as $collectionDetail) {
-                    if (isset($collectionDetail['code'])) {
-                        $holdingCodes[] = $collectionDetail['code'];
+                    if (isset($collectionDetail['code']['data'][0])) {
+                        $holdingCodes[] = $collectionDetail['code']['data'][0];
                     }
                 }
             }
@@ -45,5 +45,19 @@ class ConnectedLibraries extends \Zend\View\Helper\AbstractHelper
 
     public function getSelectedLibrary() {
         return $this->Libraries->selectLibrary();
+    }
+
+    /**
+     *
+     */
+    public function getConnectedLibrariesCodes($searchClassId) {
+        return array_unique($this->Libraries->getLibraryCodes($searchClassId));
+    }
+
+    /**
+     *
+     */
+    public function getConnectedLibrariesLinkData($libraryCode) {
+        return $this->Libraries->getLibraryLinkData($libraryCode);
     }
 }
