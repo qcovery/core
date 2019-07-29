@@ -78,6 +78,13 @@ class Libraries
     protected $searchMemory;
 
     /**
+     * Data for external links to libraries
+     *
+     * @var array
+     */
+    protected $externalLinkData;
+
+    /**
      * Constructor
      *
      * @param Config        $config                Configuration of Libraries
@@ -106,7 +113,8 @@ class Libraries
                         $this->locations[$libraryCode][$key] = $value;
                     }
                 }
-
+            } elseif ($data['action'] == 'externalLink') {
+                $this->$externalLinkData[$libraryCode] = $data;
             }
         }
         uasort($this->includedLibraries, function($a, $b) {return strcmp($a['sort'], $b['sort']);});
@@ -214,7 +222,7 @@ class Libraries
         $codes = [];
         foreach (array_merge($this->defaultLibraries, $this->includedLibraries) as $library) {
             if (isset($library[$searchClassId])){
-                $codes[] = array_merge($codes, explode(',', $library[$searchClassId]));
+                $codes = array_merge($codes, explode(',', $library[$searchClassId]));
             }
         }
         return $codes;
@@ -430,5 +438,9 @@ class Libraries
         }
         uasort($locationList, function($a, $b) {return $b['count'] - $a['count'];});
         return $locationList;
+    }
+
+    public function getLibraryLinkData ($libraryCode) {
+        return $this->$externalLinkData[$libraryCode];
     }
 }
