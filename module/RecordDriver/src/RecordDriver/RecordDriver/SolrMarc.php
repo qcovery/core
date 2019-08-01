@@ -267,7 +267,7 @@ class SolrMarc extends SolrDefault
                     }
                 }
                 foreach ($this->getMarcRecord()->getFields($field) as $index => $fieldObject) {
-                    $data = $indexData[0];
+                    $data = $indexData[0] ?? [];
                     if (!empty($subFieldSpecs['conditions'])) {
                         foreach ($subFieldSpecs['conditions'] as $condition) {
                             list($type, $key, $val) = $condition;
