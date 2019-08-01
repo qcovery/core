@@ -103,7 +103,6 @@ class AvailabilityHelper {
         return '';
     }
 
-/*
     public function checkItem()
     {
         $deliveryConfig = $this->deliveryConfig;
@@ -133,7 +132,6 @@ class AvailabilityHelper {
         }
         return false;
     }
-*/
 
     private function performCheck($item, $data, $format) 
     {
