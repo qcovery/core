@@ -144,14 +144,12 @@ class DeliveryController extends AbstractBase
             return $this->forwardTo('Delivery', 'Home');
         }
 
-        $orderDataConfig = $this->getConfig('deliveryOrderData');
-        $this->dataHandler = new DataHandler(null, $this->params(), $orderDataConfig);
+        $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
+        $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
 
-        $sendOrder = false;
         if (!empty($this->params()->fromPost('order'))) {
-            $errors = $this->dataHandler->checkData();
-            if (empty($errors)) {
-                $this->sendDeliveryMail('order');
+            if ($this->dataHandler->sendOrder($this->user)) {
+                $this->dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
                 return $this->forwardTo('Delivery', 'List');
             }
         }
@@ -201,48 +199,6 @@ class DeliveryController extends AbstractBase
         return $view;
     }
 
-    /**
-     * Home action
-     *
-     * @return mixed
-     */
-    public function adminlistAction()
-    {
-        $message = $this->authenticate(true);
-        if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-
-// list nach status & Reihenfolge
-        $deliveryTable = $this->getTable('delivery');
-        $listData = $deliveryTable->getCompleteList();
- 
-        $view = $this->createViewModel();
-        $view->listData = $listData;
-        return $view;
-    }
-
-    /**
-     * Home action
-     *
-     * @return mixed
-     */
-    public function admineditAction()
-    {
-        $message = $this->authenticate(true);
-        if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-
-// list nach status & Reihenfolge
-        $deliveryTable = $this->getTable('delivery');
-        $listData = $deliveryTable->getCompleteList();
- 
-        $view = $this->createViewModel();
-        $view->listData = $listData;
-        return $view;
-    }
-
     private function sendDeliveryMail($emailType)
     {
         $mailer = $this->serviceLocator->get('VuFind\Mailer');
@@ -263,20 +219,6 @@ class DeliveryController extends AbstractBase
         } elseif ($emailType == 'authorize') {
             $mailer->send($mailTo, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
             $mailer->send($admin, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
-        } elseif ($emailType == 'order') {
-            $mailData = $this->dataHandler->prepareOrderMail($this->user);
-            $renderer = $this->getViewRenderer();
-            $message = $renderer->render('Email/delivery-order.phtml', $mailData);
-            //$mailer->send($mailConfig['orderMailTo'], $mailConfig['orderMailFrom'], $mailConfig['orderSubject'], $message);
-            $listData = [
-                'record_id' => $mailData['itemSystemNo'],
-                'title' => $mailData['itemTitle'],
-                'author' => $mailData['itemAuthorOfArticle'],
-                'year' => $mailData['itemPublicationDate'],
-                'source' => $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId')
-            ];
-            $deliveryTable = $this->getTable('delivery');
-            $deliveryTable->createRowForUserDeliveryId($this->user->user_delivery_id, $listData);
         }
     }
     

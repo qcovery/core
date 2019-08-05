@@ -177,7 +177,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             foreach ($data as $item => $date) {
                 $additional[] = implode($sep0, $date['data']);
             }
-            $additionals[$index] = $additional;
+            if (empty($additionals[$index])) {
+                $additionals[$index] = $additional;
+            }
         }
         $strings = [];
         foreach ($links as $index => $link) {

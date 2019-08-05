@@ -2,11 +2,12 @@
 $hideLink = false;
 $hideDaia = false;
 $hierarchyTopIdArray = $this->driver->getHierarchyTopID();
+$formats = $this->driver->getFormats();
 if (isset($hierarchyTopIdArray[0])) {
     if ($this->driver->getUniqueID() == $hierarchyTopIdArray[0]) {
-        if (in_array('Journal', $this->driver->getFormats())) {
+        if (in_array('Journal', $formats)) {
             $hideLink = true;
-        } else if (in_array('Electronic Journal', $this->driver->getFormats())) {
+        } else if (in_array('eJournal', $formats)) {
             // Display results with no change.
         } else {
             $hideDaia = true;

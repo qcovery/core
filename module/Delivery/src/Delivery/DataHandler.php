@@ -13,9 +13,17 @@
  */
 namespace Delivery;
 
+use Delivery\Driver\PluginManager;
+
 class DataHandler {
 
+    protected $deliveryConfig;
+
     protected $solrDriver;
+
+    protected $deliveryDriver;
+
+    protected $driverManager;
 
     protected $params;
 
@@ -26,29 +34,12 @@ class DataHandler {
     protected $errors = [];
 
     protected $dataFields;
-/*
- = [
-        'PPN' => ['display' => 'PPN', 'name' => 'ppn', 'mandantory' => 1],
-        'Article-PPN' => ['display' => 'PPN of Article', 'name' => 'article_ppn', 'mandantory' => 0],
-        'format' => ['display' => 'Format', 'name' => 'format', 'mandantory' => 0],
-        'Author' => ['display' => 'Author of Article', 'name' => 'author', 'mandantory' => 0],
-        'Article-Title' => ['display' => 'Title of Article', 'name' => 'article_title', 'mandantory' => 0],
-        'Issue' => ['display' => 'Issue', 'name' => 'volume_issue', 'mandantory' => 0],
-        'Title' => ['display' => 'Title', 'name' => 'title', 'mandantory' => 0],
-        'JournalTitle' => ['display' => 'Title of Journal', 'name' => 'title', 'mandantory' => 0],
-        'PublicationPlace' => ['display' => 'Publication Place', 'name' => 'publication_place', 'mandantory' => 0],
-        'PublicationYear' => ['display' => 'Year', 'name' => 'publication_year', 'mandantory' => 1],
-        'UniversityNotes' => ['display' => 'University', 'name' => 'university_notes', 'mandantory' => 0],
-        'Volume' => ['display' => 'Volume', 'name' => 'volume', 'mandantory' => 0],
-        'Pages' => ['display' => 'Pages', 'name' => 'pages', 'mandantory' => 1],
-        'Signature' => ['display' => 'Signature', 'name' => 'signature', 'mandantory' => 0],
-        'Comment' => ['display' => 'Comment', 'name' => 'comment', 'mandantory' => 0]
-    ]; 
-*/
-    public function __construct($solrDriver = null, $params, $orderDataConfig)
+
+    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $deliveryConfig)
     {
-        $this->dataFields = $orderDataConfig->toArray();
-        $this->solrDriver = $solrDriver;
+        $this->deliveryConfig = $deliveryConfig;
+        $this->dataFields = $orderDataConfig;
+        $this->driverManager = $driverManager;
         $this->params = $params;
     }
 
@@ -57,20 +48,71 @@ class DataHandler {
         $this->solrDriver = $solrDriver;
     }
 
-    public function checkData()
+    public function sendOrder($user)
     {
-        $errors = [];
-        foreach ($this->dataFields as $dataField) {
-            $name = $this->params->fromPost($dataField['name']);
-            if (isset($name)) {
-                if ($dataField['mandantory'] == 1) {
-                    if (empty($name)) {
-                        $errors[] = $dataField['name'];
-                    }
+        if (!$this->checkData()) {
+            return false;
+        }
+        if ($this->setDeliveryDriver()) {
+            $orderData = $this->deliveryDriver->prepareOrder($user);
+            foreach ($this->dataFields as $fieldSpecs) {
+                $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
+                $orderData[$fieldSpecs['orderfield']] = $prefix . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+            }
+            $this->deliveryDriver->sendOrder($orderData);
+            return true;
+        }
+        return false;
+    }
+
+    public function insertOrderData($user, $table)
+    {
+        $tableFields = ['record_id', 'title', 'author', 'year'];
+        $listData = [];
+        foreach ($this->dataFields as $fieldSpecs) {
+            if (isset($fieldSpecs['tablefield']) && in_array($fieldSpecs['tablefield'], $tableFields)) {
+                $field = $fieldSpecs['tablefield'];
+                $listData[$field] = $this->params->fromPost($fieldSpecs['form_name']);
+            }
+        }
+        $listData['source'] = $this->params->fromQuery('searchClassId') ?? $this->params->fromPost('searchClassId');
+        if (!empty($listData['record_id'])) {
+            $table->createRowForUserDeliveryId($user->user_delivery_id, $listData);
+        }
+    }
+
+    private function setDeliveryDriver()
+    {
+        $deliveryDriver = $this->deliveryConfig['Order']['plugin'];
+        if (empty($deliveryDriver)) {
+            throw new \Exception('Delivery driver configuration missing');
+        }
+        if (!$this->driverManager->has($deliveryDriver)) {
+            throw new \Exception('Delivery driver missing: ' . $deliveryDriver);
+        }
+        $this->deliveryDriver = $this->driverManager->get($deliveryDriver);
+        try {
+            $this->deliveryDriver->setConfig($this->deliveryConfig[$deliveryDriver]);
+            $this->deliveryDriver->init();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+        return true;
+    }
+
+    private function checkData()
+    {
+        $failed = false;
+        $this->errors = [];
+        foreach ($this->dataFields as $fieldSpecs) {
+            if (isset($fieldSpecs['mandantory']) && $fieldSpecs['mandantory'] == 1) {
+                if (empty($this->params->fromPost($fieldSpecs['form_name']))) {
+                    $failed = true;
+                    $this->errors[] = $fieldSpecs['form_name'];
                 }
             }
         }
-        return $errors;
+        return !$failed;
     }
 
     public function collectData($signature, $articleAvailable = false)
@@ -90,8 +132,10 @@ class DataHandler {
 
         $flatData = [];
         foreach ($deliveryData as $deliveryDate) {
-            foreach ($deliveryDate as $key => $item) {
-                $flatData[$key] = $item['data'][0];
+            if (is_array($deliveryDate)) {
+                foreach ($deliveryDate as $key => $item) {
+                    $flatData[$key] = $item['data'][0];
+                }
             }
         }
         $flatData['format'] = $format;
@@ -119,21 +163,6 @@ class DataHandler {
         }
     }
 
-    public function prepareOrderMail($user)
-    {
-        $email = $this->params->fromPost('email') ?: $user->delivery_email;
-        $mailData = [];
-        $mailData['clientName'] = $user->firstname . ' ' . $user->lastname;
-        $mailData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
-        $mailData['clientIdentifier'] = $user->cat_id;
-        $mailData['delEmailAddress'] = $email;
-        foreach ($this->dataFields as $fieldSpecs) {
-            $entry = $fieldSpecs['orderfieldprefix'] ?? '';
-            $mailData[$fieldSpecs['orderfield']] .= $entry . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
-        }
-        return $mailData;
-    }
-
     public function getFormData()
     {
         return $this->formData;
@@ -146,7 +175,9 @@ class DataHandler {
 
     public function getErrors()
     {
-        return $this->errors;
+        $errors = $this->errors;
+        $this->errors = [];
+        return $errors;
     }
 
     private function getTitle($format, $type = 'info')

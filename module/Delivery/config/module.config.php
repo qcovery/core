@@ -18,6 +18,7 @@ $config = [
         'factories' => [
             'Delivery\Db\Table\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
             'Delivery\Db\Row\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
+            'Delivery\Driver\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
             'Delivery\Auth\DeliveryAuthenticator' => 'Delivery\Auth\DeliveryAuthenticatorFactory',
         ],
         'aliases' => [

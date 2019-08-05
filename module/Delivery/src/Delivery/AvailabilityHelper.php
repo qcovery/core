@@ -64,14 +64,13 @@ class AvailabilityHelper {
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
 
-        $sigel = '';
-        $signature = '';
+        $sigel = $signature = '';
         $available = false;
-        $sortedSignatureData = array();
+        $sortedSignatureData = [];
 
         foreach ($deliveryConfig['sigel_all'] as $sigel) {
             foreach ($signatureData as $index => $signatureDate) {
-                if (preg_match('#'.$sigel.'$#', $signatureDate['sigel'])) {
+                if (isset($signatureDate['sigel']) && preg_match('#'.$sigel.'$#', $signatureDate['sigel'])) {
                     $sortedSignatureData[] = $signatureDate;
                     unset($signatureData[$index]);
                     break;
@@ -81,22 +80,22 @@ class AvailabilityHelper {
 
         //$sortedSignatureData = array_merge($sortedSignatureData, $signatureData);
         if (in_array($format, $deliveryConfig['formats'])) {
-            if (empty($signatureData) && $this->checkSigel(array(), $format)) {
-                return '!'.$sigel.'! '.$signature;
+            if (empty($sortedSignatureData) && $this->checkSigel([], $format)) {
+                return '!!';
             }
             foreach ($sortedSignatureData as $signatureDate) {
-                $sigel = $signatureDate['sigel'];
-                $signature = $signatureDate['signature'];
+                $sigel = $signatureDate['sigel'] ?? '';
+                $signature = $signatureDate['signature'] ?? '';
                 if ($this->checkSigel($signatureDate, $format)) {
                     if (empty($licenceData)) {
-                        return '!'.$sigel.'! '.$signature;
+                        return '!' . $sigel . '! ' . $signature;
                     } else {
                         foreach ($licenceData as $licenceDate) {
                             if (!$this->checkLicence($licenceDate, $format)) {
                                 return '';
                             }
                         }
-                        return '!'.$sigel.'! '.$signature;
+                        return '!' . $sigel . '! ' . $signature;
                     }
                 }
             }
@@ -129,8 +128,6 @@ class AvailabilityHelper {
                         return true;
                     }
                 }
-                $sigelOk = $this->checkParent('sigel', $signatureDate['sigel'], $format);
-
             }
         }
         return false;
@@ -151,7 +148,8 @@ class AvailabilityHelper {
                     $regex = substr($regex, 1);
                     $noMatch = true;
                 }
-                if ((!$noMatch && preg_match('#'.$regex.'$#', $data)) || ($noMatch && !preg_match('#'.$regex.'$#', $data))) {
+                if ((!$noMatch && preg_match('#' . $regex . '$#', $data)) 
+                    || ($noMatch && !preg_match('#' . $regex . '$#', $data))) {
                     return true;
                 }
             }
@@ -163,20 +161,19 @@ class AvailabilityHelper {
 
     private function checkSigel($signatureDate, $format, $sigelOnly = false) 
     {
+        $signatureDate['sigel'] = $signatureDate['sigel'] ?? '';
+        $signatureDate['licencenote'] = $signatureDate['licencenote'] ?? '';
+        $signatureDate['footnote'] = $signatureDate['footnote'] ?? '';
+        $signatureDate['location'] = $signatureDate['location'] ?? '';
         $format = str_replace(' ', '_', $format);
         $sigelOk = $this->performCheck('sigel', $signatureDate['sigel'], $format);
         if ($sigelOk) {
             if ($sigelOnly) {
                 return true;
-            } else {
-                $sigelOk = $this->performCheck('licencenote', $signatureDate['licencenote'], $format);
             }
-        }
-        if ($sigelOk) {
-            $sigelOk = $this->performCheck('footnote', $signatureDate['footnote'], $format);
-        }
-        if ($sigelOk) {
-            $sigelOk = $this->performCheck('location', $signatureDate['locationnote'], $format);
+            $sigelOk = $this->performCheck('licencenote', $signatureDate['licencenote'], $format);
+            $sigelOk = $sigelOk && $this->performCheck('footnote', $signatureDate['footnote'], $format);
+            $sigelOk = $sigelOk && $this->performCheck('location', $signatureDate['locationnote'], $format);
         }
         return $sigelOk;
     }
