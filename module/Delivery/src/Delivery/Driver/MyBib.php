@@ -127,7 +127,7 @@ class MyBib implements DriverInterface {
             }
         }
 
-        $orderStruct = ['type' => 'subito|fes',
+        $orderStruct = ['type' => 'subito',
                         'data' => $orderData];
 
         $method = 'order.acquire';
