@@ -27,6 +27,8 @@
  */
 namespace Delivery\Driver;
 
+use Zend\XmlRpc;
+
 class MyBib implements DriverInterface {
 
     protected $config;
@@ -35,7 +37,7 @@ class MyBib implements DriverInterface {
 
     protected $session_id;
 
-    protected $rpc_service;
+    protected $rpcClient;
 
     public function __construct($viewRenderer, \VuFind\Mailer\Mailer $mailer) {
         $this->viewRenderer = $viewRenderer;
@@ -72,18 +74,18 @@ class MyBib implements DriverInterface {
         $rpcClient = hash('md5', $rpcSystem);
         if ($config['rpcRegistered'] != 'y') {
             $method = 'service.register';
-            $parameters = ['register_struct' => 
+            $parameters = [['register_struct' => 
                 ['register_user' => $rpcUser, 
                  'register_pwd' => $rpcPass, 
                  'register_mac' => $rpcClient, 
-                 'scc_system' => $rpcSystem]];
-            $this->request($method, $parameters);
+                 'scc_system' => $rpcSystem]]];
+            $response = $this->request($method, $parameters);
         }
         $method = 'service.login';
-        $parameters = ['login_struct' => 
+        $parameters = [['login_struct' => 
             ['login_user' => $rpcUser, 
              'login_pwd' => $rpcPass, 
-             'login_mac' => $rpcClient]];
+             'login_mac' => $rpcClient]]];
         $response = $this->request($method, $parameters);
         if ($response['status'] == 1) {
             $this->session_id = $response['session_struct']['sid'];
@@ -94,7 +96,6 @@ class MyBib implements DriverInterface {
 
     public function prepareOrder($user) {
         $orderData = [];
-        $orderData['clientName'] = $user->firstname . ' ' . $user->lastname;
         $orderData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
         $orderData['clientIdentifier'] = $user->cat_id;
         $orderData['delEmailAddress'] = $user->delivery_email;
@@ -113,15 +114,28 @@ class MyBib implements DriverInterface {
      * @return mixed     On success, an associative array with the following keys:
      * id, availability (boolean), status, location, reserve, callnumber.
      */
-    public function sendOrder($order) {
-        $orderData = $this->viewRenderer->render('Email/delivery-order.phtml', $orderData);
-        $config = $this->config;
+    public function sendOrder($orderData) {
+        $orderData = $this->viewRenderer->render('Delivery/ill-subito-mybib.tbl', $orderData);
+        $orderData = str_replace('##', "", $orderData);
+
+        $orderDataLines = explode("##", $orderData);
+        $orderDataArray = [];
+        foreach ($orderDataLines as $orderDataLine) {
+            list($key, $val) = explode(':', trim($orderDataLine), 2);
+            if (!empty($key)) {
+                $orderDataArray[$key] = trim($val);
+            }
+        }
+
+        $orderStruct = ['type' => 'subito|fes',
+                        'data' => $orderData];
+
         $method = 'order.acquire';
-        $parameters = ['session_id' => $this->session_id,
-                       'order_struct' => $orderData];
+        $parameters = [$this->session_id,
+                       ['order_struct' => $orderStruct]];
         $response = $this->request($method, $parameters);
-        if (xmlrpc_is_fault($response)) {
-            print_r($this->rpcError);
+        if ($response === false) {
+            print_r($this->getRpcError());
         } else {
             print_r($response);
         }
@@ -130,10 +144,15 @@ class MyBib implements DriverInterface {
     
     private function request($method, $parameters) {
         $config = $this->config;
-        $request = xmlrpc_encode_request($method, $parameters);
-        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-type: text/xml', 'content' => $request]]);
-        $file = file_get_contents($config['rpcUrl'], false, $context);
-        $response = xmlrpc_decode($file);
+        if (!isset($this->rpcClient)) {
+            $this->rpcClient = new XmlRpc\Client($config['rpcUrl']);
+        }
+/*
+$introspector = $this->rpcClient->getIntrospector();
+print_r($introspector->getMethodSignature($method));
+print_r($parameters);
+*/
+        $response = $this->rpcClient->call($method, $parameters);
         if (xmlrpc_is_fault($response)) {
             $this->rpcError = $response;
             return false;
@@ -145,7 +164,6 @@ class MyBib implements DriverInterface {
         $rpcError = $this->rpcError;
         $this->rpcError = '';
         return $rpcError;
-
     }
 }
 

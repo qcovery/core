@@ -1,0 +1,31 @@
+or_ext_order_id:Campuslieferdienst:<?=date('ymdHis') . rand(0, 9) ?>##
+or_del_service:Email##
+or_del_format:PDF##
+or_del_email:<?=$this->delEmailAddress ?>##
+or_item_type:SERIAL##
+or_item_callname:<?=$this->itemCallNumber ?>##
+or_item_author:<?=$this->itemAuthor ?>##
+or_item_art_author:<?=$this->itemAuthorOfArticle ?>##
+or_item_title:<?=$this->itemTitle ?>##
+or_item_art_title:<?=$this->itemTitleOfArticle ?>##
+or_item_publ_place:<?=$this->itemPlaceOfPublication ?>##
+or_item_publ_date:<?=$this->itemPublicationDate ?>##
+or_item_vol_issue:<?=$this->itemVolumeIssue ?>##
+or_item_pagination:<?=$this->itemPagination ?>##
+or_item-system_no:<?=$this->itemSystemNo ?>##
+or_item_add_no_lett:<?=$this->itemAdditionalNoLetters ?>##
+or_bill_meth:INVOICE##
+or_bill_email:abrechnung@beluga.sub.uni-hamburg.de##
+or_bill_type:COLLECTIVE##
+or_date_generate:<?=date('YmdHis') ?>##
+or_req_id:Campuslieferdienst##
+or_req_note:<?=$this->requesterNote ?>##
+or_req_email:bestellcap@beluga.sub.uni-hamburg.de##
+or_req_group:USER-GROUP-0##
+or_accounting_del_type:EMAIL##
+or_forward_type:FORWARD=N##
+or_trans_qualifier:1##
+or_trans_group_qualifier:Campuslieferdienst: <?=date('ymdHis') . rand(0, 9) ?>##
+or_responder_id:0018##
+or_client_id:<?=$this->clientIdentifier ?>##
+or_cont_name:<?=$this->contactPersonName ?>##
