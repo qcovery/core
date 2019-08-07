@@ -39,7 +39,7 @@
       </div>
 <?php endif; ?>
       <div class="facet-group" id="side-panel-library">
-          <button class="title" data-toggle="collapse" href="#side-collapse-library"><?=$this->transEsc("Library")?></button>
+          <button class="title collapsed" data-toggle="collapse" href="#side-collapse-library"><?=$this->transEsc("Library")?></button>
           <div id="side-collapse-library" class="collapse out">
               <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchlink='<?=$searchLink ?>' data-searchclass='<?=$this->searchClassId ?>'>
                   <a href="" class="facet facetAND library-item"><span class="badge library-item-count"></span><span class="text library-item-text"></span></a>
@@ -47,7 +47,7 @@
           </div>
       </div>
       <div class="facet-group" id="side-panel-location">
-          <button class="title" data-toggle="collapse" href="#side-collapse-location"><?=$this->transEsc("Location")?></button>
+          <button class="title collapsed" data-toggle="collapse" href="#side-collapse-location"><?=$this->transEsc("Location")?></button>
           <div id="side-collapse-location" class="collapse out">
               <div id="location-list">
                   <a href="" class="facet facetAND location-item"><span class="badge location-item-count"></span></a>
