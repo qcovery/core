@@ -73,7 +73,7 @@ class Dod implements DriverInterface {
         $orderData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
         $orderData['clientIdentifier'] = $user->cat_id;
         $orderData['delEmailAddress'] = $user->delivery_email;
-        return $mailData;
+        return $orderData;
     }
 
     /**

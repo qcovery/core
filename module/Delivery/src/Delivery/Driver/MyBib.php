@@ -29,18 +29,18 @@ namespace Delivery\Driver;
 
 class MyBib implements DriverInterface {
 
-    protected $session;
-
     protected $config;
 
-/*
-$res = xmlrpc_server_create();
-$xmlRpcData = xmlrpc_encode($data);
+    protected $viewRenderer;
 
+    protected $session_id;
 
-$resopnse = xmlrpc_encode($xmlRpcResponse);
- */
+    protected $rpc_service;
 
+    public function __construct($viewRenderer, \VuFind\Mailer\Mailer $mailer) {
+        $this->viewRenderer = $viewRenderer;
+        $this->mailer = $mailer;
+    }
 
     /**
      * Set configuration.
@@ -65,19 +65,40 @@ $resopnse = xmlrpc_encode($xmlRpcResponse);
      * @return void
      */
     public function init() {
-/*
-        $res = xmlrpc_server_create();
-        
-        Server mit  Pfad des Skriptes : http://esx-48.gbv.de/edoc_test/xmlrpc_server.php
-        Kennung und Passwort: Katalogplus 
-
-        register mit user, pw, client-Kennung
-        login 
-*/
+        $config = $this->config;
+        $rpcUser = $config['rpcUser'];
+        $rpcPass = $config['rpcPassword'];
+        $rpcSystem = $config['rpcSystem'];
+        $rpcClient = hash('md5', $rpcSystem);
+        if ($config['rpcRegistered'] != 'y') {
+            $method = 'service.register';
+            $parameters = ['register_struct' => 
+                ['register_user' => $rpcUser, 
+                 'register_pwd' => $rpcPass, 
+                 'register_mac' => $rpcClient, 
+                 'scc_system' => $rpcSystem]];
+            $this->request($method, $parameters);
+        }
+        $method = 'service.login';
+        $parameters = ['login_struct' => 
+            ['login_user' => $rpcUser, 
+             'login_pwd' => $rpcPass, 
+             'login_mac' => $rpcClient]];
+        $response = $this->request($method, $parameters);
+        if ($response['status'] == 1) {
+            $this->session_id = $response['session_struct']['sid'];
+            return true;
+        }
+        return false;
     }
 
     public function prepareOrder($user) {
-        
+        $orderData = [];
+        $orderData['clientName'] = $user->firstname . ' ' . $user->lastname;
+        $orderData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
+        $orderData['clientIdentifier'] = $user->cat_id;
+        $orderData['delEmailAddress'] = $user->delivery_email;
+        return $orderData;
     }
 
     /**
@@ -93,28 +114,38 @@ $resopnse = xmlrpc_encode($xmlRpcResponse);
      * id, availability (boolean), status, location, reserve, callnumber.
      */
     public function sendOrder($order) {
-        $url = 'http://esx-48.gbv.de/edoc_test/xmlrpc_server.php';
-
-        $rpcClient = hash('md5', 'beluga-core');
-        $rpcUser = 'Katalogplus';
-        $rpcPass = 'Katalogplus';
-        
-        $method = 'service.register';
-        $parameters = ['register_struct' => ['register_user' => $rpcUser, 'register_pwd' => $rpcPass, 'register_mac' => $rpcClient]];
-//        $parameters = [$rpcUser, $rpcPass, $rpcClient];
-
-        $request = xmlrpc_encode_request($method, $parameters);
-
-        echo $request;
-
-        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-type: text/xml', 'content' => $request]]);
-        $file = file_get_contents($url, false, $context);
-        $response = xmlrpc_decode($file);
-        if ($response && xmlrpc_is_fault($response)) {
-            echo "xmlrpc: $response[faultString] ($response[faultCode])";
+        $orderData = $this->viewRenderer->render('Email/delivery-order.phtml', $orderData);
+        $config = $this->config;
+        $method = 'order.acquire';
+        $parameters = ['session_id' => $this->session_id,
+                       'order_struct' => $orderData];
+        $response = $this->request($method, $parameters);
+        if (xmlrpc_is_fault($response)) {
+            print_r($this->rpcError);
         } else {
             print_r($response);
         }
         die;
     }
+    
+    private function request($method, $parameters) {
+        $config = $this->config;
+        $request = xmlrpc_encode_request($method, $parameters);
+        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-type: text/xml', 'content' => $request]]);
+        $file = file_get_contents($config['rpcUrl'], false, $context);
+        $response = xmlrpc_decode($file);
+        if (xmlrpc_is_fault($response)) {
+            $this->rpcError = $response;
+            return false;
+        }
+        return $response;
+    }
+
+    private function getRpcError() {
+        $rpcError = $this->rpcError;
+        $this->rpcError = '';
+        return $rpcError;
+
+    }
 }
+
