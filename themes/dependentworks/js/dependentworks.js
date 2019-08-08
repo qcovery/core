@@ -22,7 +22,7 @@ jQuery(document).ready(function() {
                 var visibleItems = (data.data.length < 3) ? data.data.length : 3;
                 for (var i = 0; i < visibleItems; i++) {
                     var title = data.data[i]['title'];
-                    var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
+                    var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '">' + title + '</a>';
                     var item = data.data[i]['prefix'] + href;                    
                     jQuery('ul#DependentWorks').append('<li>' + item + '</li>');                
                 }
@@ -30,7 +30,7 @@ jQuery(document).ready(function() {
                     jQuery('p#ToggleDependentWorksMore').attr('style', 'display:block');
                     for (var i = visibleItems; i < data.data.length; i++) {
                         var title = data.data[i]['title'];
-                        var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '" target="_blank">' + title + '</a>';
+                        var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '">' + title + '</a>';
                         var item = data.data[i]['prefix'] + href;                    
                         jQuery('ul#DependentWorksHidden').append('<li>' + item + '</li>');                
                     }
