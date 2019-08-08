@@ -6,42 +6,30 @@ namespace DAIAplus\View\Helper\DAIAplus;
 
 class DAIAplus extends \Zend\View\Helper\AbstractHelper
 {
-    protected $paiaConfig;
+    protected $config;
 
     /**
      *
      */
-    public function __construct($config, \VuFind\Search\Memory $memory)
+    public function __construct($config)
     {
-        $this->paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
+        $this->config = $config['DAIA'];
     }
 
-    public function getSfxLink($driver) {
-        $sfx_domain = '';
-        if (isset($this->paiaConfig['DAIA']['sfxDomain'])) {
-            $sfx_domain = $this->paiaConfig['DAIA']['sfxDomain'];
-        }
-
-        $urls[] = ['url' => $driver->getOpenUrl()];
-
-        $url = $urls[0]['url'];
-
-        $sfxData = $driver->getMarcData('SFX');
-        if (is_array($sfxData)) {
-            foreach ($sfxData as $sfx) {
-                if (is_array($sfx)) {
-                    foreach ($sfx as $key => $value) {
-                        $url .= '&rft.' . $key . '=' . urlencode($value['data'][0]);
+    public function hideAvailabilityInfo($driver, $hideOnlyLink = false) {
+        $formatList = ($hideOnlyLink) ? 'hideAvailabilityLink' : 'hideAvailability';
+        if (!empty($this->config[$formatList])) {
+            $hideFormats = explode(',', $this->config[$formatList]);
+            $formats = $driver->getFormats();
+            if (!empty(array_intersect($hideFormats, $formats))) {
+                if (!empty($driver->getHierarchyTopID())) {
+                    $hierarchyTopIDs = $driver->getHierarchyTopID();
+                    if (in_array($driver->getUniqueID(), $hierarchyTopIDs)) {
+                        return true;
                     }
                 }
-            }
-        }
-
-        $url = str_ireplace('rfr_', '', $url);
-        $url = str_ireplace('rft.', '', $url);
-
-        $url = 'http://sfx.gbv.de/sfx_' . $sfx_domain . '?' . $url;
-
-        return urlencode($url);
+             }
+         }
+         return false;
     }
 }

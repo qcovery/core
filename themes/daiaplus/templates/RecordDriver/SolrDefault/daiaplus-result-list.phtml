@@ -1,24 +1,13 @@
-<?
-$hideLink = false;
-$hideDaia = false;
-$hierarchyTopIdArray = $this->driver->getHierarchyTopID();
-$formats = $this->driver->getFormats();
-if (isset($hierarchyTopIdArray[0])) {
-    if ($this->driver->getUniqueID() == $hierarchyTopIdArray[0]) {
-        if (in_array('Journal', $formats)) {
-            $hideLink = true;
-        } else if (in_array('eJournal', $formats)) {
-            // Display results with no change.
-        } else {
-            $hideDaia = true;
-        }
-    }
-}
+<?php
+$DAIAplus = $this->DAIAplus();
+
+$hideLink = $DAIAplus->hideAvailabilityInfo($this->driver, true);
+$hideDaia = $DAIAplus->hideAvailabilityInfo($this->driver);
 ?>
-<? if (!$hideDaia): ?>
+<?php if (!$hideDaia): ?>
 <div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->searchClassId ?>" data-hierarchy-top-id="<?=($hideLink ? '1' : '0')?>">
     <span class="status ajax-availability hidden">
         <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
     </span>
 </div>
-<? endif; ?>
+<?php endif; ?>
