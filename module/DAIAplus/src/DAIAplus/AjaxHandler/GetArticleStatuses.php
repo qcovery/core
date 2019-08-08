@@ -121,7 +121,9 @@ class GetArticleStatuses extends AbstractBase
                 $url .= '&openurl=' . urlencode($openUrl);
                 $url .= '&list=' . $listView;
                 $url .= '&mediatype=' . urlencode($format);
-                $url .= '&sfx=' . $sfxLink;
+                if ($sfxDomain) {
+                    $url .= '&sfx=' . $sfxLink;
+                }
                 $url .= '&language=de';
                 $url .= '&format=json';
 
