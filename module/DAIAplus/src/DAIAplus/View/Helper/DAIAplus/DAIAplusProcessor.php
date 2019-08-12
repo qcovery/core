@@ -29,10 +29,6 @@ class DAIAplusProcessor extends \Zend\View\Helper\AbstractHelper
                     }
                 }
             }
-        } elseif (!empty($hierarchyTopIDs)) {
-            if (in_array($driver->getUniqueID(), $hierarchyTopIDs)) {
-                return true;
-            }
         }
         return false;
     }
