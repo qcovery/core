@@ -1,8 +1,8 @@
 <?php
-$DAIAplus = $this->DAIAplus();
+$DAIAplusProcessor = $this->DAIAplusProcessor();
 
-$hideLink = $DAIAplus->hideAvailabilityInfo($this->driver, true);
-$hideDaia = $DAIAplus->hideAvailabilityInfo($this->driver);
+$hideLink = $DAIAplusProcessor->hideAvailabilityInfo($this->driver, true);
+$hideDaia = $DAIAplusProcessor->hideAvailabilityInfo($this->driver);
 ?>
 <?php if (!$hideDaia): ?>
 <div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->searchClassId ?>" data-hierarchy-top-id="<?=($hideLink ? '1' : '0')?>">
