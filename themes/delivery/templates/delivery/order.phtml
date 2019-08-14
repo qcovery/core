@@ -4,21 +4,30 @@
 
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Order') . '</li><li><a href="' . $this->url('delivery-home') . '">' . $this->transEsc('Delivery Home') . '</a></li>';
+
+  $errors = $this->errors;
+  $missingFields = $this->missingFields;
 ?>
 
 <h2 class="lightbox-header"><?=$this->transEsc('Delivery Order')?></h2>
-<?=$this->flashmessages()?>
+<?php if (!empty($errors)): ?>
+<p>
+    <?php foreach ($errors as $error): ?>
+    <?=$error ?><br />
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <h4><?=$this->transEsc($this->formTitle) ?></h4>
 
   <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-login">
-    <input type="hidden" name="order" value="y"/>
-    <input type="hidden" name="id" value="<?=$this->id ?>"/>
-    <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>"/>
+<!--    <input type="hidden" name="order" value="y" /> -->
+    <input type="hidden" name="id" value="<?=$this->id ?>" />
+    <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>" />
 <?php foreach ($this->formFields as $formField): ?>
   <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
+  <?php $style = (in_array($formField['form_name'], $missingFields)) ? ' style="color:red"' : ''; ?>
     <div class="form-group">
-      <label class="control-label" for="<?=$formField['form_name'] ?>"><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
+      <label class="control-label" for="<?=$formField['form_name'] ?>"<?=$style ?>><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
       <input type="text" name="<?=$formField['form_name'] ?>" id="<?=$formField['form_name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
     </div>
 <?php endforeach; ?>

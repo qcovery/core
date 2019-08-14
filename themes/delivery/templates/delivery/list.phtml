@@ -21,9 +21,11 @@
     <h3><a href="<?=$this->url('delivery-home')?>"><?=$this->transEsc('Delivery Home') ?></a></h3>
     <table>
         <tr>
+            <td><?=$this->transEsc('PPN') ?></td>
             <td><?=$this->transEsc('Title') ?></td>
-            <td><?=$this->transEsc('Author') ?></td>
-            <td><?=$this->transEsc('Year') ?></td>
+<!--            <td><?=$this->transEsc('Author') ?></td>
+            <td><?=$this->transEsc('Year') ?></td>//-->
+            <td><?=$this->transEsc('order_id') ?></td>
             <td><?=$this->transEsc('Status') ?></td>
             <td><?=$this->transEsc('Date') ?></td>
             <td><?=$this->transEsc('Comment') ?></td>
@@ -31,9 +33,11 @@
 <?php foreach ($this->listData as $listItem): ?>
     <?php $status = (!empty($listItem['rejected'])) ? 'rejected' : (!empty($listItem['delivered'])) ? 'delivered' : 'ordered'; ?>
         <tr>
+            <td><?=$listItem['record_id'] ?></td>
             <td><?=$listItem['title'] ?></td>
-            <td><?=$listItem['author'] ?></td>
-            <td><?=$listItem['year'] ?></td>
+<!--            <td><?=$listItem['author'] ?></td>
+            <td><?=$listItem['year'] ?></td>//-->
+            <td><?=$listItem['order_id'] ?></td>
             <td><?=$status ?></td>
             <td><?=$listItem[$status] ?></td>
             <td><?=$listItem['comment'] ?></td>
