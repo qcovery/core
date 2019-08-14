@@ -180,20 +180,18 @@ class DeliveryController extends AbstractBase
 
         $view->errors = $errors;
         $view->missingFields = $missingFields;
-            //$articleAvailable = ($AvailabilityHelper->checkPpnLink($this->getServiceLocator(), $id));
-            $articleAvailable = false;
-            $this->dataHandler->setSolrDriver($driver);
-            $this->dataHandler->collectData($signature, $articleAvailable);
+        $this->dataHandler->setSolrDriver($driver);
+        $this->dataHandler->collectData($signature);
 
-            $formData = $this->dataHandler->getFormData();
-            $infoData = $this->dataHandler->getInfoData();
+        $formData = $this->dataHandler->getFormData();
+        $infoData = $this->dataHandler->getInfoData();
 
-            $view->id = $id;
-            $view->searchClassId = $searchClassId;
-            $view->formTitle = $formData['title'];
-            $view->formFields = $formData['fields'];
-            $view->infoTitle = $infoData['title'];
-            $view->infoFields = $infoData['fields'];
+        $view->id = $id;
+        $view->searchClassId = $searchClassId;
+        $view->formTitle = $formData['title'];
+        $view->formFields = $formData['fields'];
+        $view->infoTitle = $infoData['title'];
+        $view->infoFields = $infoData['fields'];
         return $view;
     }
 

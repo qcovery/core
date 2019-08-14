@@ -165,10 +165,6 @@ class DataHandler {
         }
         $this->infoData['title'] = $this->getTitle($format, 'info');
         $this->formData['title'] = $this->getTitle($format, 'form');
-
-        if (($format == 'Article' || $format == 'electronic Article') && !$articleAvailable) {
-            $this->errors[] = 'Article not available';
-        }
     }
 
     public function getFormData()
