@@ -4,9 +4,6 @@
 
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Home') . '</li><li><a href="' . $this->url('delivery-edit') . '">' . $this->transEsc('Delivery Edit') . '</a></li>';
-  if ($deliverUser['is_admin'] == 'y'):
-    $this->layout()->breadcrumbs .= '<li><a href="' . $this->url('delivery-admin') . '">' . $this->transEsc('Delivery Admin') . '</a></li> ';
-  endif;
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
@@ -18,15 +15,15 @@
     
 <?php if (!empty($this->message) && $this->message == 'authorized'): ?>
     <a href="<?=$this->url('delivery-list')?>"><?=$this->transEsc('View delivery list') ?></a>
-    <h3><?=$this->name . ', ' . $this->transEsc('welcome to our delivery service.') ?></h3>
+    <h3><?=$this->name . ', ' . $this->transEsc('welcome to our delivery service') ?>.</h3>
     <ul>
-        <li><?=$this->transEsc('Calalog Id') ?>: <?=$this->catalog_id ?></li>
-        <li><?=$this->transEsc('Delivery Email') ?>: <?=$this->delivery_email ?> (<a href="#"><?=$this->transEsc('change') ?></a>)</li>
+        <li><strong><?=$this->transEsc('Catalog Id') ?>:</strong> <?=$this->catalog_id ?></li>
+        <li><strong><?=$this->transEsc('Delivery Email') ?>:</strong> <?=$this->delivery_email ?> (<a href="#"><?=$this->transEsc('change') ?></a>)</li>
     <ul>
 <?php else: ?>
     <?=$this->name . ', ' . $this->transEsc('You are not authorized to use our delivery service.') ?>
 <?php endif; ?>
-
+  <p>Platz für weitere Erläuterungen</p>
 </div>
 <div class="<?=$this->layoutClass('sidebar')?>">
     <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery'])?>
