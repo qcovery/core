@@ -165,9 +165,11 @@ class DeliveryController extends AbstractBase
 
         if ($parentId = $AvailabilityHelper->checkParent()) {
             $searchClassId = DEFAULT_SEARCH_BACKEND;
-            $driver = $this->getRecordLoader()->load($parentId, $searchClassId);
+            $parentDriver = $this->getRecordLoader()->load($parentId, $searchClassId);
+            $AvailabilityHelper = new AvailabilityHelper($parentDriver, $availabilityConfig['default']);
+        } else {
+            $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
         }
-        $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
         $signature = $AvailabilityHelper->getSignature();
 
 //echo $signature; die;
@@ -181,7 +183,7 @@ class DeliveryController extends AbstractBase
         $view->errors = $errors;
         $view->missingFields = $missingFields;
         $this->dataHandler->setSolrDriver($driver);
-        $this->dataHandler->collectData($signature);
+        $this->dataHandler->collectData();
 
         $formData = $this->dataHandler->getFormData();
         $infoData = $this->dataHandler->getInfoData();

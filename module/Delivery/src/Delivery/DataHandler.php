@@ -123,7 +123,7 @@ class DataHandler {
         return !$failed;
     }
 
-    public function collectData($signature, $articleAvailable = false)
+    public function collectData()
     {
         $formats = $this->solrDriver->getMarcData('Format');
         $format = $formats[0][0]['data'][0];
