@@ -147,25 +147,39 @@ class DeliveryController extends AbstractBase
         $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
         $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
 
+        $errors = $missingFields = [];
+        
         if (!empty($this->params()->fromPost('order'))) {
             if ($this->dataHandler->sendOrder($this->user)) {
                 $this->dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
                 return $this->forwardTo('Delivery', 'List');
+            } else {
+                $errors = $this->dataHandler->getErrors();
+                $missingFields = $this->dataHandler->getMissingFields();
             }
         }
  
+        $driver = $this->getRecordLoader()->load($id, $searchClassId);
+        $availabilityConfig = $this->getConfig('deliveryAvailability');
+        $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
+
+        if ($parentId = $AvailabilityHelper->checkParent()) {
+            $searchClassId = DEFAULT_SEARCH_BACKEND;
+            $driver = $this->getRecordLoader()->load($parentId, $searchClassId);
+        }
+        $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
+        $signature = $AvailabilityHelper->getSignature();
+
+//echo $signature; die;
+
+        if (empty($signature)) {
+            return $this->forwardTo('Delivery', 'Home');
+       	}
+
         $view = $this->createViewModel();
 
-        if (!empty($errors)) {
-            $view->errors = $errors;
-        } else {
-            $driver = $this->getRecordLoader()->load($id, $searchClassId);
-            $availabilityConfig = $this->getConfig('deliveryAvailability');
-            $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
-            $signature = $AvailabilityHelper->getSignature();
-            if (empty($signature)) {
-                return $this->forwardTo('Delivery', 'Home');
-       	    }
+        $view->errors = $errors;
+        $view->missingFields = $missingFields;
             //$articleAvailable = ($AvailabilityHelper->checkPpnLink($this->getServiceLocator(), $id));
             $articleAvailable = false;
             $this->dataHandler->setSolrDriver($driver);
@@ -180,7 +194,6 @@ class DeliveryController extends AbstractBase
             $view->formFields = $formData['fields'];
             $view->infoTitle = $infoData['title'];
             $view->infoFields = $infoData['fields'];
-        }
         return $view;
     }
 

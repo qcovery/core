@@ -63,7 +63,7 @@ class CheckAvailabilityFactory
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
-        $config = $container->get('VuFind\Config\PluginManager')->get('delivery');
+        $config = $container->get('VuFind\Config\PluginManager')->get('deliveryAvailability');
         return new $requestedName(
             $config,
             $container->get('VuFind\Search\Results\PluginManager')

@@ -58,29 +58,11 @@ interface DriverInterface
      */
     public function setConfig($config);
 
-    /**
-     * Initialize the driver.
-     *
-     * Validate configuration and perform all resource-intensive tasks needed to
-     * make the driver active.
-     *
-     * @return void
-     */
     public function init();
 
     public function prepareOrder($user);
 
-    /**
-     * Get Status
-     *
-     * This is responsible for retrieving the status information of a certain
-     * record.
-     *
-     * @param string $id The record id to retrieve the holdings for
-     *
-     * @throws \VuFind\Exception\ILS
-     * @return mixed     On success, an associative array with the following keys:
-     * id, availability (boolean), status, location, reserve, callnumber.
-     */
     public function sendOrder($order);
+
+    public function getErrors();
 }

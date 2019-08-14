@@ -39,6 +39,8 @@ class MyBib implements DriverInterface {
 
     protected $rpcClient;
 
+    protected $rpcErrors = [];
+
     public function __construct($viewRenderer, \VuFind\Mailer\Mailer $mailer) {
         $this->viewRenderer = $viewRenderer;
         $this->mailer = $mailer;
@@ -115,7 +117,7 @@ class MyBib implements DriverInterface {
      * id, availability (boolean), status, location, reserve, callnumber.
      */
     public function sendOrder($orderData) {
-        $orderData = $this->viewRenderer->render('Delivery/ill-subito-mybib.tbl', $orderData);
+        $orderData = $this->viewRenderer->render('Order/ill-subito-mybib.tbl', $orderData);
         $orderData = str_replace('##', "", $orderData);
 
         $orderDataLines = explode("##", $orderData);
@@ -134,36 +136,31 @@ class MyBib implements DriverInterface {
         $parameters = [$this->session_id,
                        ['order_struct' => $orderStruct]];
         $response = $this->request($method, $parameters);
-        if ($response === false) {
-            print_r($this->getRpcError());
-        } else {
-            print_r($response);
+        if ($response !== false) {
+            if ($response['status'] == 1) {
+                return $response['order_struct']['order_id'];
+            }
         }
-        die;
+        return null;
     }
-    
+
     private function request($method, $parameters) {
         $config = $this->config;
         if (!isset($this->rpcClient)) {
             $this->rpcClient = new XmlRpc\Client($config['rpcUrl']);
         }
-/*
-$introspector = $this->rpcClient->getIntrospector();
-print_r($introspector->getMethodSignature($method));
-print_r($parameters);
-*/
         $response = $this->rpcClient->call($method, $parameters);
         if (xmlrpc_is_fault($response)) {
-            $this->rpcError = $response;
+            $this->rpcErrors[] = $response['ERROR_struct']['message'];
             return false;
         }
         return $response;
     }
 
-    private function getRpcError() {
-        $rpcError = $this->rpcError;
-        $this->rpcError = '';
-        return $rpcError;
+    public function getErrors() {
+        $errors = $this->rpcErrors;
+        $this->rpcErrors = [];
+        return $errors;
     }
 }
 
