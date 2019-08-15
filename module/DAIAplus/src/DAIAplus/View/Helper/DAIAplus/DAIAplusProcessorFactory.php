@@ -39,7 +39,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class DAIAplusFactory implements FactoryInterface
+class DAIAplusProcessorFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -61,10 +61,9 @@ class DAIAplusFactory implements FactoryInterface
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $config = $container->get('VuFind\Config\PluginManager');
-        $memory = $container->get('VuFind\Search\Memory');
+        $config = $container->get('VuFind\Config\PluginManager')->get('PAIA');
         return new $requestedName(
-            $config, $memory
+            $config
         );
     }
 }

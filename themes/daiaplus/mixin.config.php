@@ -6,10 +6,10 @@ return [
     ],
     'helpers' => [
         'factories' => [
-            'DAIAplus\View\Helper\DAIAplus\DAIAplus' => 'DAIAplus\View\Helper\DAIAplus\DAIAplusFactory',
+            'DAIAplus\View\Helper\DAIAplus\DAIAplusProcessor' => 'DAIAplus\View\Helper\DAIAplus\DAIAplusProcessorFactory',
         ],
         'aliases' => [
-            'DAIAplus' => 'DAIAplus\View\Helper\DAIAplus\DAIAplus',
+            'DAIAplusProcessor' => 'DAIAplus\View\Helper\DAIAplus\DAIAplusProcessor',
         ]
     ]
 ];
