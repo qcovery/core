@@ -88,7 +88,7 @@ class Delivery extends Gateway
         return $resource->select($callback)->toArray();
     }
 
-    public function createRowForUserDeliveryId($user_delivery_id, $data)
+    public function createRowForUserDeliveryId($user_delivery_id, $order_id, $data)
     {
         if (empty($data['record_id']) || empty($user_delivery_id)) {
             return false;
@@ -109,6 +109,9 @@ class Delivery extends Gateway
         $row = $this->createRow();
         $row->user_delivery_id = $user_delivery_id;
         $row->resource_id = $resource_id;
+        if (isset($order_id)) {
+            $row->order_id = $order_id;
+        }
         $row->ordered = $date->format('Y-m-d H:i:s');
         $row->save();
         return $row->id;

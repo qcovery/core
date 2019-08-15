@@ -35,6 +35,8 @@ class Dod implements DriverInterface {
 
     protected $mailer;
 
+    protected $mailErrors = [];
+
     public function __construct($viewRenderer, \VuFind\Mailer\Mailer $mailer) {
         $this->viewRenderer = $viewRenderer;
         $this->mailer = $mailer;
@@ -73,7 +75,7 @@ class Dod implements DriverInterface {
         $orderData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
         $orderData['clientIdentifier'] = $user->cat_id;
         $orderData['delEmailAddress'] = $user->delivery_email;
-        return $mailData;
+        return $orderData;
     }
 
     /**
@@ -89,8 +91,18 @@ class Dod implements DriverInterface {
      * id, availability (boolean), status, location, reserve, callnumber.
      */
     public function sendOrder($orderData) {
-        $orderData = $this->viewRenderer->render('Email/delivery-order.phtml', $orderData);
+        $orderData = $this->viewRenderer->render('Order/ill-subito-dod.xml', $orderData);
         $config = $this->config;
-        $this->mailer->send($config['orderMailTo'], $config['orderMailFrom'], $config['orderSubject'], $orderData);
+        if ($this->mailer->send($config['orderMailTo'], $config['orderMailFrom'], $config['orderSubject'], $orderData)) {
+            return 'per Email';
+        } else {
+            return null;
+        }
+    }
+
+    public function getErrors() {
+        $errors = $this->mailErrors;
+        $this->mailErrors = [];
+        return $errors;
     }
 }

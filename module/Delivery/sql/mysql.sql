@@ -15,6 +15,7 @@
 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+DROP TABLE IF EXISTS `user_delivery`;
 CREATE TABLE IF NOT EXISTS `user_delivery` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `delivery` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_delivery_id` int(11) NOT NULL DEFAULT '0',
   `resource_id` int(11) NOT NULL DEFAULT 0,
+  `order_id` varchar(31),
   `comment` text,
   `ordered` datetime,
   `delivered` datetime,

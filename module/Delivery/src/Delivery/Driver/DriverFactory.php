@@ -62,7 +62,8 @@ class DriverFactory implements FactoryInterface
             throw new \Exception('Unexpected options passed to factory.');
         }
         return new $requestedName(
-            $container->get('ViewRenderer')
+            $container->get('ViewRenderer'), 
+            $container->get('VuFind\Mailer')
         );
     }
 }

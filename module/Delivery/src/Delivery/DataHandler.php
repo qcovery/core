@@ -33,7 +33,11 @@ class DataHandler {
 
     protected $errors = [];
 
+    protected $missingFields = [];
+
     protected $dataFields;
+
+    protected $order_id;
 
     public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $deliveryConfig)
     {
@@ -59,8 +63,11 @@ class DataHandler {
                 $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
                 $orderData[$fieldSpecs['orderfield']] = $prefix . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
             }
-            $this->deliveryDriver->sendOrder($orderData);
-            return true;
+            if ($this->order_id = $this->deliveryDriver->sendOrder($orderData)) {
+                return true;
+            } else {
+                $this->errors = $this->deliveryDriver->getErrors();
+            }
         }
         return false;
     }
@@ -76,8 +83,9 @@ class DataHandler {
             }
         }
         $listData['source'] = $this->params->fromQuery('searchClassId') ?? $this->params->fromPost('searchClassId');
+
         if (!empty($listData['record_id'])) {
-            $table->createRowForUserDeliveryId($user->user_delivery_id, $listData);
+            $table->createRowForUserDeliveryId($user->user_delivery_id, $this->order_id, $listData);
         }
     }
 
@@ -103,19 +111,19 @@ class DataHandler {
     private function checkData()
     {
         $failed = false;
-        $this->errors = [];
+        $this->missingFields = [];
         foreach ($this->dataFields as $fieldSpecs) {
             if (isset($fieldSpecs['mandantory']) && $fieldSpecs['mandantory'] == 1) {
                 if (empty($this->params->fromPost($fieldSpecs['form_name']))) {
                     $failed = true;
-                    $this->errors[] = $fieldSpecs['form_name'];
+                    $this->missingFields[] = $fieldSpecs['form_name'];
                 }
             }
         }
         return !$failed;
     }
 
-    public function collectData($signature, $articleAvailable = false)
+    public function collectData()
     {
         $formats = $this->solrDriver->getMarcData('Format');
         $format = $formats[0][0]['data'][0];
@@ -157,10 +165,6 @@ class DataHandler {
         }
         $this->infoData['title'] = $this->getTitle($format, 'info');
         $this->formData['title'] = $this->getTitle($format, 'form');
-
-        if (($format == 'Article' || $format == 'electronic Article') && !$articleAvailable) {
-            $this->errors[] = 'Article not available';
-        }
     }
 
     public function getFormData()
@@ -173,13 +177,6 @@ class DataHandler {
         return $this->infoData;
     }
 
-    public function getErrors()
-    {
-        $errors = $this->errors;
-        $this->errors = [];
-        return $errors;
-    }
-
     private function getTitle($format, $type = 'info')
     {
         if ($format == 'Article' || $format == 'electronic Article') {
@@ -189,6 +186,16 @@ class DataHandler {
         } else {
             return ($type == 'info') ? 'Book' : 'Copy';
         }
+    }
+
+    public function getErrors() {
+        $errors = ($fieldErrors) ? $this->fieldErrors : $this->errors;
+        $this->fieldErrors = $this->errors = [];
+        return $errors;
+    }
+
+    public function getMissingFields() {
+        return $this->missingFields;
     }
 }
 

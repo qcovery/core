@@ -81,15 +81,15 @@ class CheckAvailability extends AbstractBase
     {
         $ppn = $params->fromQuery('ppn');
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
-        $backend = 'Solr';
+        $backend = DEFAULT_SEARCH_BACKEND;
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'id:'.$ppn, 'limit' => 1]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'id:' . $ppn, 'limit' => 1]));
 
         $records = $results->getResults();
         $driver = $records[0];
         $this->AvailabilityHelper->setSolrDriver($driver);
-        $available = ($this->AvailabilityHelper->checkItem()) ? 'available' : 'not available';
+        $available = ($this->AvailabilityHelper->checkSignature()) ? 'available' : 'not available';
         return $this->formatResponse(['available' => $available]);
     }
 }

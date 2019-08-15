@@ -19,7 +19,10 @@ use VuFind\Search\Factory\SolrDefaultBackendFactory;
 class AvailabilityHelper {
 
     protected $deliveryConfig;
+
     protected $solrDriver;
+
+    protected $signature;
 
     public function __construct($solrDriver = null, $deliveryConfig = null) 
     {
@@ -57,17 +60,37 @@ class AvailabilityHelper {
         $this->deliveryConfig = $config->toArray();
     }
 
+    public function checkParent() 
+    {
+        $format = array_shift(array_shift($this->getMarcData('Format')));
+        if (in_array($format, $this->deliveryConfig['formats'])) {
+            $parentId = '';
+            $articleData = $this->getMarcData('DeliveryDataArticle');
+            foreach ($articleData as $articleDate) {
+                if (!empty($articleDate['ppn'])) {
+                    return $articleDate['ppn'];
+                }
+            }
+        }
+        return null;
+    }
+
     public function getSignature() 
+    {
+        $this->checkSignature();
+        return $this->signature;
+    }
+
+    public function checkSignature() 
     {
         $deliveryConfig = $this->deliveryConfig;
         $format = array_shift(array_shift($this->getMarcData('Format')));
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
 
-        $sigel = $signature = '';
-        $available = false;
-        $sortedSignatureData = [];
+        $this->signature = '';
 
+        $sortedSignatureData = [];
         foreach ($deliveryConfig['sigel_all'] as $sigel) {
             foreach ($signatureData as $index => $signatureDate) {
                 if (isset($signatureDate['sigel']) && preg_match('#'.$sigel.'$#', $signatureDate['sigel'])) {
@@ -77,56 +100,29 @@ class AvailabilityHelper {
                 }
             }
         }
-
-        //$sortedSignatureData = array_merge($sortedSignatureData, $signatureData);
         if (in_array($format, $deliveryConfig['formats'])) {
-            if (empty($sortedSignatureData) && $this->checkSigel([], $format)) {
-                return '!!';
+            if (empty($sortedSignatureData)) {
+                foreach ($signatureData as $signatureDate) {
+                    if ($this->checkSigel($signatureDate, $format)) {
+                        $this->signature = '!!';
+                        return true;
+                    }
+                }
             }
+
             foreach ($sortedSignatureData as $signatureDate) {
                 $sigel = $signatureDate['sigel'] ?? '';
                 $signature = $signatureDate['signature'] ?? '';
                 if ($this->checkSigel($signatureDate, $format)) {
-                    if (empty($licenceData)) {
-                        return '!' . $sigel . '! ' . $signature;
-                    } else {
-                        foreach ($licenceData as $licenceDate) {
-                            if (!$this->checkLicence($licenceDate, $format)) {
-                                return '';
-                            }
-                        }
-                        return '!' . $sigel . '! ' . $signature;
-                    }
-                }
-            }
-        }
-        return '';
-    }
-
-    public function checkItem()
-    {
-        $deliveryConfig = $this->deliveryConfig;
-        $format = array_shift(array_shift($this->getMarcData('Format')));
-        $signatureData = $this->getMarcData('Signature');
-        $licenceData = $this->getMarcData('Licence');
-        if (in_array($format, $deliveryConfig['formats'])) {
-            if (empty($signatureData) && $this->checkSigel([], $format)) {
-                return true;
-            }
-            foreach ($signatureData as $signatureDate) {
-                $sigel = $signatureDate['sigel'];
-                $signature = $signatureDate['signature'];
-                if ($this->checkSigel($signatureDate, $format)) {
-                    if (empty($licenceData)) {
-                        return true;
-                    } else {
+                    if (!empty($licenceData)) {
                         foreach ($licenceData as $licenceDate) {
                             if (!$this->checkLicence($licenceDate, $format)) {
                                 return false;
                             }
                         }
-                        return true;
                     }
+                    $this->signature = '!' . $sigel . '! ' . $signature;
+                    return true;
                 }
             }
         }
@@ -161,59 +157,25 @@ class AvailabilityHelper {
 
     private function checkSigel($signatureDate, $format, $sigelOnly = false) 
     {
-        $signatureDate['sigel'] = $signatureDate['sigel'] ?? '';
-        $signatureDate['licencenote'] = $signatureDate['licencenote'] ?? '';
-        $signatureDate['footnote'] = $signatureDate['footnote'] ?? '';
-        $signatureDate['location'] = $signatureDate['location'] ?? '';
+        $sigel = $signatureDate['sigel'] ?? '';
+        $licencenote = $signatureDate['licencenote'] ?? '';
+        $footnote = $signatureDate['footnote'] ?? '';
+        $location = $signatureDate['location'] ?? '';
         $format = str_replace(' ', '_', $format);
-        $sigelOk = $this->performCheck('sigel', $signatureDate['sigel'], $format);
-        if ($sigelOk) {
-            if ($sigelOnly) {
-                return true;
-            }
-            $sigelOk = $this->performCheck('licencenote', $signatureDate['licencenote'], $format);
-            $sigelOk = $sigelOk && $this->performCheck('footnote', $signatureDate['footnote'], $format);
-            $sigelOk = $sigelOk && $this->performCheck('location', $signatureDate['locationnote'], $format);
+
+        $sigelOk = $this->performCheck('sigel', $sigel, $format);
+        if ($sigelOk && !$sigelOnly) {
+            $sigelOk = $this->performCheck('licencenote', $licencenote, $format);
+            $sigelOk = $sigelOk && $this->performCheck('footnote', $footnote, $format);
+            $sigelOk = $sigelOk && $this->performCheck('location', $location, $format);
         }
         return $sigelOk;
     }
 
     private function checkLicence($licenceDate, $format) {
-	return $this->performCheck('licence', $licenceDate['licencetype'], $format);
-    }
-
-    public function checkParent($serviceLocator, $ppn) {
-        return false;
-        $deliveryConfig = $this->deliveryConfig;
-        $request = 'id:'.$ppn.' AND collection_details:GBV_ILN_'.$deliveryConfig['iln'].' -format:Article';
-        $query = new Query();
-        $query->setHandler('AllFields');
-        $query->setString($request);
-        $solr_backend_factory = new SolrDefaultBackendFactory();
-        $service = $solr_backend_factory->createService($serviceLocator);
-        $result = $service->search($query, 0, 10);
-        $resultArray = $result->getResponse();
-        $sigelList = $resultArray['docs'][0]['standort_str_mv'];
-        $ilnList = $resultArray['docs'][0]['collection_details'];
-        $format = $resultArray['docs'][0]['format'][0];
-
-        $ppnValid = false;
-        foreach ($ilnList as $iln) {
-            if ($iln == 'GBV_ILN_'.$deliveryConfig['iln']) {
-                $ppnValid = true;
-                break;
-            }
-        }
-        if ($ppnValid) {
-            foreach ($sigelList as $sigel) {
-                if ($this->checkSigel(array('sigel' => $sigel), $format, true) ) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
- 
+        $licencetype = $licenceDate['licencetype'] ?? '';
+	return $this->performCheck('licence', $licencetype, $format);
+    } 
 }
 
 ?>

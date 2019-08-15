@@ -61,7 +61,7 @@ class AvailabilityCheckerFactory implements FactoryInterface
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $config = $container->get('VuFind\Config\PluginManager')->get('delivery');
+        $config = $container->get('VuFind\Config\PluginManager')->get('deliveryAvailability');
         return new $requestedName($config);
     }
 }

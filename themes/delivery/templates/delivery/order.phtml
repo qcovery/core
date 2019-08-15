@@ -4,30 +4,47 @@
 
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Order') . '</li><li><a href="' . $this->url('delivery-home') . '">' . $this->transEsc('Delivery Home') . '</a></li>';
+
+  $errors = $this->errors;
+  $missingFields = $this->missingFields;
 ?>
 
-<h2 class="lightbox-header"><?=$this->transEsc('Delivery Order')?></h2>
-<?=$this->flashmessages()?>
+<div class="<?=$this->layoutClass('mainbody')?>">
+  <h2 class="lightbox-header"><?=$this->transEsc('Delivery Order')?></h2>
+  <?php if (!empty($errors)): ?>
+  <p>
+    <?php foreach ($errors as $error): ?>
+    <?=$error ?><br />
+    <?php endforeach; ?>
+  </p>
+  <?php endif; ?>
 
-<h4><?=$this->transEsc($this->formTitle) ?></h4>
 
-  <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-login">
-    <input type="hidden" name="order" value="y"/>
-    <input type="hidden" name="id" value="<?=$this->id ?>"/>
-    <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>"/>
-<?php foreach ($this->formFields as $formField): ?>
-  <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
+  <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-order">
+    <input type="hidden" name="order" value="y" />
+    <input type="hidden" name="id" value="<?=$this->id ?>" />
+    <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>" />
     <div class="form-group">
-      <label class="control-label" for="<?=$formField['form_name'] ?>"><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
+      <h3><?=$this->transEsc($this->formTitle) ?></h3>
+    </div>
+    <?php foreach ($this->formFields as $formField): ?>
+      <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
+      <?php $style = (in_array($formField['form_name'], $missingFields)) ? ' style="color:red"' : ''; ?>
+    <div class="form-group">
+      <label class="control-label" for="<?=$formField['form_name'] ?>"<?=$style ?>><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
       <input type="text" name="<?=$formField['form_name'] ?>" id="<?=$formField['form_name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
     </div>
-<?php endforeach; ?>
+    <?php endforeach; ?>
 
-<h4><?=$this->transEsc($this->infoTitle) ?></h4>
-<?php foreach ($this->infoFields as $infoField): ?>
-  <?php if (!empty($infoField['value'])): ?>
-    <p><?=$this->transEsc($infoField['display']) ?>: <?=$this->transEsc($infoField['value']) ?>
-    <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/></p>
+    <div class="form-group">
+      <h3><?=$this->transEsc($this->infoTitle) ?></h3>
+    </div>
+    <?php foreach ($this->infoFields as $infoField): ?>
+      <?php if (!empty($infoField['value'])): ?>
+    <div class="form-group">
+        <p><strong><?=$this->transEsc($infoField['display']) ?>:</strong> <?=$this->transEsc($infoField['value']) ?></p>
+      <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/>
+    </div>
   <?php endif; ?>
 <?php endforeach; ?>
 
@@ -36,3 +53,4 @@
     </div>
   </form>
 
+</div>
