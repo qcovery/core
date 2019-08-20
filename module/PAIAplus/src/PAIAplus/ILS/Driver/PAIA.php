@@ -52,8 +52,6 @@ use VuFind\ILS\Driver\PAIA as PAIAbase;
  */
 class PAIA extends PAIAbase
 {
-    private $request;
-
     /**
      * Initialize the driver.
      *
@@ -369,9 +367,5 @@ class PAIA extends PAIAbase
         }
 
         return $pickupLocation;
-    }
-
-    public function setRequest ($request) {
-        $this->request = $request;
     }
 }
