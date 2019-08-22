@@ -82,10 +82,27 @@ class DataHandler {
                 $listData[$field] = $this->params->fromPost($fieldSpecs['form_name']);
             }
         }
+        foreach ($this->dataFields as $fieldSpecs) {
+            if (isset($fieldSpecs['fallbacktablefield']) && in_array($fieldSpecs['fallbacktablefield'], $tableFields)) {
+                $field = $fieldSpecs['fallbacktablefield'];
+                if (empty($listData[$field])) {
+                    $listData[$field] = $this->params->fromPost($fieldSpecs['form_name']);
+                }
+            }
+        }
         $listData['source'] = $this->params->fromQuery('searchClassId') ?? $this->params->fromPost('searchClassId');
 
         if (!empty($listData['record_id'])) {
             $table->createRowForUserDeliveryId($user->user_delivery_id, $this->order_id, $listData);
+        }
+    }
+
+    public function getOrderStatus()
+    {
+        if ($this->setDeliveryDriver()) {
+            $order_id = 'CLD-00000110';
+            $this->deliveryDriver->getOrderStatus($order_id);
+        
         }
     }
 

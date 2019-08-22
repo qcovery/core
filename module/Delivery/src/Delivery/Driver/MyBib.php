@@ -144,6 +144,17 @@ class MyBib implements DriverInterface {
         return null;
     }
 
+    public function getOrderStatus($order_id) {
+        $method = 'order.track';
+        $method = 'order.validateorder';
+        $parameters = [$this->session_id, $order_id, 'STATE'];
+        $parameters = [$this->session_id, $order_id];
+        $response = $this->request($method, $parameters);
+        
+        print_r($response);
+        die;
+    }    
+
     private function request($method, $parameters) {
         $config = $this->config;
         if (!isset($this->rpcClient)) {

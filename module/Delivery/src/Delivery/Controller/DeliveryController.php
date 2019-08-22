@@ -199,6 +199,13 @@ class DeliveryController extends AbstractBase
 
     public function listAction()
     {
+/*
+        $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
+        $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
+        $this->dataHandler->getOrderStatus();
+*/
+
+
         $message = $this->authenticate();
         if ($message != 'authorized') {
             return $this->forwardTo('Delivery', 'Home');

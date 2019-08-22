@@ -68,6 +68,7 @@ class Delivery extends Gateway
                 ['*']
             );
             $select->where->equalTo('d.user_delivery_id', $user_delivery_id);
+            $select->order('d.order_id DESC');
         };
         $resource = $this->getDbTable('Resource');
         return $resource->select($callback)->toArray();
