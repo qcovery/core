@@ -140,30 +140,14 @@ class PAIA extends PAIAbase
         $results = [];
 
         foreach ($items as $doc) {
-            $result = [];
+            $result = $this->getBasicDetails($doc);
+
             // canrenew (0..1) whether a document can be renewed (bool)
             $result['renewable'] = ($doc['canrenew'] ?? false);
-
-            // item (0..1) URI of a particular copy
-            $result['item_id'] = ($doc['item'] ?? '');
 
             $result['renew_details']
                 = (isset($doc['canrenew']) && $doc['canrenew'])
                 ? $result['item_id'] : '';
-
-            // edition (0..1)  URI of a the document (no particular copy)
-            // hook for retrieving alternative ItemId in case PAIA does not
-            // the needed id
-            $result['id'] = (isset($doc['edition'])
-                ? $this->getAlternativeItemId($doc['edition']) : '');
-
-            // added by beluga-core
-            $result['type'] = $this->paiaStatusString($doc['status']);
-
-            // requested (0..1) URI that was originally requested
-
-            // about (0..1) textual description of the document
-            $result['title'] = ($doc['about'] ?? null);
 
             // queue (0..1) number of waiting requests for the document or item
             $result['request'] = ($doc['queue'] ?? null);
