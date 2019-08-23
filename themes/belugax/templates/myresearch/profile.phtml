@@ -89,7 +89,7 @@ $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
                         $color = $accountConfig['account_barcode_color'];
                     }
                     $generator = new Picqer\Barcode\BarcodeGeneratorHTML();
-                    echo $generator->getBarcode('*'.$profile['username'].'*', $generator::TYPE_CODE_128, $factor, $height, $color);
+                    echo $generator->getBarcode('*'.$profile['username'].'*', $generator::TYPE_CODE_39, $factor, $height, $color);
                 }
             }
         }
