@@ -70,6 +70,15 @@ $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
             ?>
     </table>
 
+    <div id="account-barcode">
+        <?
+        if (isset($profile['username'])) {
+            $generator = new Picqer\Barcode\BarcodeGeneratorHTML();
+            echo $generator->getBarcode('*'.$profile['username'].'*', $generator::TYPE_CODE_128, 2, 75);
+        }
+        ?>
+    </div>
+
     <div id="paiaHint">
         <?= $this->translate('profileHint'); ?>
     </div>
