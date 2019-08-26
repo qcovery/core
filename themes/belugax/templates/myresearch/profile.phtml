@@ -70,6 +70,33 @@ $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
             ?>
     </table>
 
+    <div id="account-barcode">
+        <?
+        if (isset($profile['username'])) {
+            $accountConfig = $this->configreader()->getConfigData('Account');
+            if (!empty($accountConfig) && isset($accountConfig['account_barcode_show'])) {
+                if ($accountConfig['account_barcode_show']) {
+                    $factor = 2;
+                    if (isset($accountConfig['account_barcode_factor'])) {
+                        $factor = $accountConfig['account_barcode_factor'];
+                    }
+                    $height = 75;
+                    if (isset($accountConfig['account_barcode_height'])) {
+                        $height = $accountConfig['account_barcode_height'];
+                    }
+                    $color = '#000000';
+                    if (isset($accountConfig['account_barcode_color'])) {
+                        $color = $accountConfig['account_barcode_color'];
+                    }
+                    $generator = new Picqer\Barcode\BarcodeGeneratorHTML();
+                    echo $generator->getBarcode($profile['username'], $generator::TYPE_CODE_39, $factor, $height, $color);
+                    echo '<br/>'.$profile['username'];
+                }
+            }
+        }
+        ?>
+    </div>
+
     <div id="paiaHint">
         <?= $this->translate('profileHint'); ?>
     </div>
