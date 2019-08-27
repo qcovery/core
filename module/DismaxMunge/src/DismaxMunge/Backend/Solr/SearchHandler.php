@@ -46,45 +46,8 @@ namespace DismaxMunge\Backend\Solr;
  */
 class SearchHandler extends \VuFindSearch\Backend\Solr\SearchHandler
 {
-    /**
-     * Return the munge values for specified search string.
-     *
-     * If optional argument $tokenize is true tokenize the search string.
-     *
-     * @param string $search   Search string
-     * @param bool   $tokenize Tokenize the search string?
-     *
-     * @return string
-     */
-    public function customMunge($search)
+    public function mungeValues($search, $tokenize = true)
     {
-        foreach ($this->specs['CustomMunge'] as $mungeName => $mungeOps) {
-            foreach ($mungeOps as $operation) {
-                switch ($operation[0]) {
-                case 'append':
-                    $search .= $operation[1];
-                    break;
-                case 'lowercase':
-                    $search = strtolower($search);
-                    break;
-                case 'uppercase':
-                    $search = strtoupper($search);
-                    break;
-                case 'ucfirst':
-                    $search = ucfirst($search);
-                    break;
-                case 'preg_replace':
-                    $search = preg_replace(
-                        $operation[1], $operation[2], $search
-                    );
-                    break;
-                default:
-                    throw new \InvalidArgumentException(
-                        sprintf('Unknown munge operation: %s', $operation[0])
-                    );
-                }
-            }
-        }
-        return $search;
+        return parent::mungeValues($search, $tokenize);
     }
 }

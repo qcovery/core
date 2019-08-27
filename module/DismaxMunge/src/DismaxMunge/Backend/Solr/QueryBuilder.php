@@ -109,7 +109,7 @@ class QueryBuilder extends \VuFindSearch\Backend\Solr\QueryBuilder implements Qu
 
         if ($handler = $this->getSearchHandler($finalQuery->getHandler(), $string)) {
             if ($handler->hasDismax()) {
-                 $string = $handler->customMunge($string);
+                 $string = array_pop($handler->mungeValues($string, false));
             }
             if (!$handler->hasExtendedDismax()
                 && $this->getLuceneHelper()->containsAdvancedLuceneSyntax($string)
@@ -183,7 +183,7 @@ class QueryBuilder extends \VuFindSearch\Backend\Solr\QueryBuilder implements Qu
                 $searchString
             );
             if ($searchHandler->hasDismax()) {
-                $searchString = $searchHandler->customMunge($searchString);
+                $searchString = array_pop($searchHandler->mungeValues($searchString, false));
             }
             if ($searchHandler && '' !== $searchString) {
                 $searchString
