@@ -271,6 +271,7 @@ class SolrMarc extends SolrDefault
                     if (!empty($subFieldSpecs['conditions'])) {
                         foreach ($subFieldSpecs['conditions'] as $condition) {
                             list($type, $key, $val) = $condition;
+                            $val = strval($val);
                             if (substr($val, 0, 1) == '!') {
                                 $val = substr($val, 1);
                                 if ($type == 'indicator') {
