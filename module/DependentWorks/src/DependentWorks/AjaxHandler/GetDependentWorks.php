@@ -97,6 +97,7 @@ class GetDependentWorks extends AbstractBase
         foreach ($records as $i => $record) {
             $dependentWorksData = $record->getMarcData('DependentWorksData');
             $title = $part = $date = $sort = '';
+            $sort = $i; // Keep this default setting outside inner foreach loop, otherwise $sort gets reset to $i even if value of $dependentWorksDate['sort']['data'][0] was previously set.
             foreach ($dependentWorksData as $dependentWorksDate) {
                 if (empty($title) && !empty($dependentWorksDate['title']['data'][0])) {
                     $title = $dependentWorksDate['title']['data'][0];
