@@ -109,9 +109,10 @@ class GetDependentWorks extends AbstractBase
                 }
                 if (!empty($dependentWorksDate['sort']['data'][0])) {
                     $sort = $dependentWorksDate['sort']['data'][0];
-                } else {
-                    $sort = $i;
                 }
+            }
+            if (empty($sort)) {
+                $sort = $i;
             }
             $prefix = (empty($date)) ? $part . '. ' : $part . ', ' . $date . '. ';
             $data[$sort] = ['id' => $record->getUniqueID(),
