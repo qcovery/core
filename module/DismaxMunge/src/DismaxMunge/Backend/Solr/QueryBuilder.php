@@ -182,7 +182,7 @@ class QueryBuilder extends \VuFindSearch\Backend\Solr\QueryBuilder implements Qu
                 $component->getHandler(),
                 $searchString
             );
-            if ($searchHandler->hasDismax()) {
+            if ($searchHandler && $searchHandler->hasDismax()) {
                 $searchString = array_pop($searchHandler->mungeValues($searchString, false));
             }
             if ($searchHandler && '' !== $searchString) {
