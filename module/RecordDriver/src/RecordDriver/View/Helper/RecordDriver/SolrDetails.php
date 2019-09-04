@@ -196,7 +196,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             }
             if (!empty($linknames[$index])) {
                 $linkname = $linknames[$index];
-            } elseif (empty($linkname)) {
+            } else {
                 $linkname = $link;
             }
             $string .= '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
