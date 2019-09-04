@@ -177,11 +177,17 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             foreach ($data as $item => $date) {
                 $additional[] = implode($sep0, $date['data']);
             }
-            if (empty($additionals[$index])) {
+            if (!empty($additional) && empty($additionals[$index])) {
                 $additionals[$index] = $additional;
             }
         }
         $strings = [];
+        if (count($links) == 1) {
+            $links = array_values($links);
+            $linknames = array_values($linknames);
+            $descriptions = array_values($descriptions);
+            $additionals = array_values($additionals);
+        }
         foreach ($links as $index => $link) {
             if (!empty($prefixes[$index])) {
                 $string = $prefixes[$index] . ': ';
@@ -190,7 +196,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             }
             if (!empty($linknames[$index])) {
                 $linkname = $linknames[$index];
-            } else {
+            } elseif (empty($linkname)) {
                 $linkname = $link;
             }
             $string .= '<a href="' . $this->getLink($key, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
