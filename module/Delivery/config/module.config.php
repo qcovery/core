@@ -4,7 +4,6 @@ namespace Delivery\Module\Configuration;
 $config = [
     'controllers' => [
         'factories' => [
-            //'Delivery\Controller\DeliveryController' => 'Delivery\Controller\AbstractBaseFactory',
             'Delivery\Controller\DeliveryController' => 'VuFind\Controller\AbstractBaseFactory',
         ],
         'aliases' => [
