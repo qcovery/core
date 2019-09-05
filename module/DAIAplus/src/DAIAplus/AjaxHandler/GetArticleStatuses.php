@@ -86,6 +86,11 @@ class GetArticleStatuses extends AbstractBase
 
             foreach ($ids as $id) {
                 $driver = $this->recordLoader->load($id, $source);
+
+/*
+hier erst prüfen: $driver->getMarcData('ContainingWorkPpn'): link. Oder ContainingWorkXyz oder extra Kategorie?
+*/
+
                 $openUrl = $driver->getOpenUrl();
                 $formats = $driver->getFormats();
                 $format = $formats[0];
@@ -128,6 +133,11 @@ class GetArticleStatuses extends AbstractBase
                 $url .= '&format=json';
 
                 $response = json_decode($this->makeRequest($url), true);
+/*
+Falls ContainingWork: Daten für prepareData vorbereiten
+
+*/
+
                 $response = $this->prepareData($response, $listView);
                 $response['id'] = $id;
                 $responses[] = $response;
