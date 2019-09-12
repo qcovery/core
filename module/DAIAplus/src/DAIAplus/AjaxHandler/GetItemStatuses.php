@@ -190,7 +190,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                             $orderLink .= '&item_id=' . urlencode($itemId);
                             $orderLink .= '&type=' . $type;
                             if ($storageId) {
-                                $orderLink .= '&storage_id=' . $storageId;
+                                $orderLink .= '&storage_id=' . urlencode($storageId);
                             }
                             $orderLink .= '&hashKey=' . $hashKey;
                             $record[$index1]['daiaplus']['actionArray'][$index2]['beluga_core']['href'] = $orderLink;
