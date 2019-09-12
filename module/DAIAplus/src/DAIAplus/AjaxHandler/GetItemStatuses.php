@@ -169,9 +169,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                 }
 //neu V
                 foreach ($record as $index1 => $recordItem) {
-                    $id = $recordItem['id'];
                     foreach ($recordItem['daiaplus']['actionArray'] as $index2 => $action) {
                         if (!empty($action['beluga_core']['href'])) {
+							$id = $action['ppn'];
                             $docId = $action['documentId'];
                             $itemId = $action['itemId'];
                             $type = $action['type'];
