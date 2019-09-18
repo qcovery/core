@@ -266,7 +266,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         return $result;
      }
 
-    private function makeText($data, $separator = ', ') {
+    private function makeText($data, $separator = ' ; ') {
         $string = '';
         foreach ($data as $key => $date) {
             $translatedData = [];
