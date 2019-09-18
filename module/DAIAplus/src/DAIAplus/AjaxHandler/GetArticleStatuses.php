@@ -31,6 +31,7 @@ namespace DAIAplus\AjaxHandler;
 
 use VuFind\Record\Loader;
 use VuFind\AjaxHandler\AbstractBase;
+use VuFind\I18n\Translator\TranslatorAwareInterface;
 use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
 
@@ -48,7 +49,7 @@ use Zend\Mvc\Controller\Plugin\Params;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetArticleStatuses extends AbstractBase
+class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
