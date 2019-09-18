@@ -85,7 +85,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         $source = $params->fromPost('source', $params->fromQuery('source', ''));
         $resolverChecks = $this->config['ResolverChecks'];
         if (!empty($ids) && !empty($source)) {
-            $listView = $params->fromPost('list', $params->fromQuery('list', '0'));
+            $listView = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
             foreach ($ids as $id) {
                 $driver = $this->recordLoader->load($id, $source);
 
