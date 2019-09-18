@@ -95,7 +95,7 @@ class GetLibraries extends AbstractBase
         foreach ($queryArray as $queryItem) {
             $arrayKey = false;
             list($key, $value) = explode('=', $queryItem, 2);
-            if (preg_match('/([0-9]\[\]$)/', $key, $matches)) {
+            if (preg_match('/[0-9](\[\]$)/', $key, $matches)) {
                 $key = str_replace($matches[1], '', $key);
                 $arrayKey = true;
             }
@@ -127,7 +127,6 @@ class GetLibraries extends AbstractBase
         $paramsObj->setFacetLimit(2000); 
         $paramsObj->getOptions()->disableHighlighting();
         $paramsObj->getOptions()->spellcheckEnabled(false);
-//print_r($searchParams);
 
         if (!empty($facetSearch)) {
             $this->Libraries->selectLibrary($facetSearch);
@@ -159,17 +158,14 @@ class GetLibraries extends AbstractBase
             $libraryData[$libraryCode] = ['fullname' => $library['fullname'], 'count' => $count];
         }
 
-//print_r($libraryData);
-
         $locationFacets = [];
-
         foreach ($locationList as $locationItem) {
             $locationFacets[$locationItem['value']] = $locationItem['count'];
         }
         $locationFacets = $this->Libraries->getLocationList($locationFacets);
 
         $data = [
-            'libraryCount' => count($libraryData) + 2,
+            'libraryCount' => count($libraryData),
             'libraryData' => $libraryData,
             'locationFacets' => $locationFacets,
             'locationFilter' => ['field' => $locationFilter['field'], 'value' => ''],
@@ -179,5 +175,3 @@ class GetLibraries extends AbstractBase
     }
 
 }
-
-
