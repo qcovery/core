@@ -20,6 +20,15 @@
     <?php if (!empty($titleFields['TitleStatement']['originalLetters'])): ?>
         <?php $originalLetters .= ' / ' . $titleFields['TitleStatement']['originalLetters']; ?>
     <?php endif; ?>
+    <?php if (!empty($titleFields['TitleAdditionalPart'])): ?>
+        <?= ' ; ' . implode(' ; ', $titleFields['TitleAdditionalPart']) ?>
+        <?php if (!empty($titleFields['TitleAdditionalVolume'])): ?>
+            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalVolume']) ?>
+        <?php endif; ?>
+        <?php if (!empty($titleFields['TitleAdditionalStatement'])): ?>
+            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalStatement']) ?>
+        <?php endif; ?>
+    <?php endif; ?>
 <?php else: ?>
     <?=$this->transEsc('no title') ?>
 <?php endif; ?>
