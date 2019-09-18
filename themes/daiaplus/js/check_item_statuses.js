@@ -113,7 +113,7 @@ var itemStatusEls = {};
 var itemStatusTimer = null;
 var itemStatusDelay = 200;
 var itemStatusRunning = false;
-var itemStatusList = false;
+var itemStatusList = 0;
 var itemStatusSource = '';
 var itemStatusHideLink = '';
 
@@ -175,7 +175,7 @@ function checkItemStatus(el) {
   var $item = $(el);
   var id = $item.attr('data-id');
   itemStatusSource = $item.attr('data-src');
-  itemStatusList = ($item.attr('data-list') == 1);
+  itemStatusList = $item.attr('data-list');
   itemStatusHideLink = $item.attr('data-hide-link');
   itemQueueAjax(id + '', $item);
 }
@@ -191,7 +191,7 @@ function checkItemStatuses(_container) {
   for (var i = 0; i < availabilityItems.length; i++) {
     var id = $(availabilityItems[i]).attr('data-id');
     itemStatusSource = $(availabilityItems[i]).attr('data-src');
-    itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
+    itemStatusList = $(availabilityItems[i]).attr('data-list') == 1;
     itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
     itemQueueAjax(id, $(availabilityItems[i]));
   }
