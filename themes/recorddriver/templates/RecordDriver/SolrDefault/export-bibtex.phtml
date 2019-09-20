@@ -121,11 +121,6 @@ if (!empty($doi)) {
 	echo "doi = {{$doi}},\n";
 }
 
-foreach ($this->driver->getURLs(true) as $url) {
-    $url= $url['url'];
-	echo "url = {{$url}},\n";
-}
-
 $edition = $this->driver->tryMethod('getEdition');
 if (!empty($edition)) {
     echo "edition = {{$edition}},\n";
