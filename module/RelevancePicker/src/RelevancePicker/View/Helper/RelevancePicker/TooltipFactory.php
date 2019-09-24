@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic factory for search params objects.
+ * SearchBox helper factory.
  *
  * PHP version 7
  *
@@ -20,26 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search
+ * @package  View_Helpers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace RelevancePicker\Search\Params;
+namespace RelevancePicker\View\Helper\RelevancePicker;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Generic factory for search params objects.
+ * SearchBox helper factory.
  *
  * @category VuFind
- * @package  Search
+ * @package  View_Helpers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ParamsFactory implements FactoryInterface
+class TooltipFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -58,16 +58,9 @@ class ParamsFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        // Replace trailing "Params" with "Options" to get the options service:
-        $optionsService = preg_replace('/Params$/', 'Options', $requestedName);
-        // Replace leading "SearchKeys" with "VuFind" to get the VuFind options service:
-        $optionsService = preg_replace('/^RelevancePicker/', 'VuFind', $optionsService);
-        $optionsObj = $container->get('VuFind\Search\Options\PluginManager')
-            ->get($optionsService);
-        $configLoader = $container->get('VuFind\Config\PluginManager');
-        // Clone the options instance in case caller modifies it:
-        return new $requestedName(
-            clone $optionsObj, $configLoader, ...($options ?: [])
-        );
+        if (!empty($options)) {
+            throw new \Exception('Unexpected options sent to factory.');
+        }
+        return new $requestedName();
     }
 }

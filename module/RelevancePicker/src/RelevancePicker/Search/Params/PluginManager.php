@@ -74,7 +74,7 @@ class PluginManager extends \VuFind\Search\Params\PluginManager
      */
     protected $factories = [
         'Libraries\Search\Search2\Params' => 'Libraries\Search\Solr\ParamsFactory',
-        'RelevancePicker\Search\Solr\Params' => 'Libraries\Search\Solr\ParamsFactory',
+        'RelevancePicker\Search\Solr\Params' => 'RelevancePicker\Search\Solr\ParamsFactory',
         'VuFind\Search\BrowZine\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\Combined\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\EDS\Params' => 'VuFind\Search\Params\ParamsFactory',

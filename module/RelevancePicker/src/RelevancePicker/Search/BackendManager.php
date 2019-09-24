@@ -39,7 +39,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class BackendManager extends \Libaries\Search\BackendManager
+class BackendManager extends \Libraries\Search\BackendManager
 {
     /**
      * Constructor.
