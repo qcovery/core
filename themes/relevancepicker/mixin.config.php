@@ -1,6 +1,6 @@
 <?php
 return [
-//    'js' => ['libraries.js'],
+    'js' => ['relevancepicker.js'],
     'helpers' => [
         'factories' => [
             'RelevancePicker\View\Helper\RelevancePicker\Tooltip' => 'RelevancePicker\View\Helper\RelevancePicker\TooltipFactory',

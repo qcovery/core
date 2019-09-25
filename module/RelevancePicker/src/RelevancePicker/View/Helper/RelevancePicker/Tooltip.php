@@ -34,14 +34,13 @@ class ToolTip extends \Zend\View\Helper\AbstractHelper
     }
 
     public function setData($explainData) {
-        $this->explainData = explode("\n", json_decode($explainData));
+        $this->explainData = explode("\n", $explainData);
         foreach ($this->clusterConfig as $cluster => $fields) {
             foreach ($fields as $field) {
                 $this->clusters[$field] = $cluster;
             }
         }
         $this->parseValues();
-//          print_r($this->explainData);
     }
 
     public function getValues() {
@@ -100,6 +99,7 @@ class ToolTip extends \Zend\View\Helper\AbstractHelper
         $tie = 0;
         $scores = $this->prepareScores();
         $this->scores = $scores;
+        $this->results = [];
         $fieldFound = false;
         foreach ($this->explainData as $line) {
             $value = 0;
