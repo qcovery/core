@@ -276,7 +276,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             if ($key === 'description') {
                 $string .= ' [' . implode($separator, $translatedData) . ']';
             } elseif ($key === 'prefix') {
-                $string = $translatedData[0] . ': ' . $string;
+                $string = implode(', ', $translatedData) . ': ' . $string;
             } else {
                 $string .= implode($separator, $translatedData) . $separator;
             }
