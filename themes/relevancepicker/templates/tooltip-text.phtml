@@ -1,0 +1,37 @@
+<?php
+$tt = $this->tooltip;
+$fieldP = (isset($tt['all']['boosting-format'])) ? 'zu ' . $tt['all']['fields-all']['percent'] . '%' : '';
+?>
+Der Rang dieses Ergebnisses setzt sich <?=$fieldP ?> aus der Bewertung
+der eingegebenen Suchbegriffe zusammen<?php if ($tt['all']['fields-phrase']['percent'] > 0): ?>, 
+wobei die Phrasenübereinstimmung <?=$tt['all']['fields-phrase']['percent'] ?> der Gesamtbewertung ausmacht<?php endif; ?>.
+Davon haben ...
+<?php
+$othersP = 100;
+$formatTerm = '';
+foreach ($tt as $area => $values):
+  if ($area == 'fields-terms' || $area == 'fields-phrase'):
+    foreach ($values as $term => $value):
+      $othersP -= $value['percent'];
+?>
+    <?=$term ?> im Bereich <?=$value['cluster'] ?> <?=$value['percent'] ?>%
+<?php
+    endforeach;
+  endif;
+  if ($area == 'boosting-format'):
+    foreach ($values as $term => $value):
+      if ($value['percent'] > 0 ):
+        $formatTerm = $term;
+      endif;
+    endforeach;
+  endif;
+endforeach;
+if ($othersP > 0):
+?>
+    weitere gering bewertete Felder <?=$othersP ?>%
+<?php endif; ?>
+beigesteuert.
+<?php if (isset($tt['all']['boosting-format'])): ?>
+Das Format (<?=$this->transEsc($formatTerm) ?>) hat die restlichen <?=$tt['all']['boosting-format']['percent'] ?>% zur Bewertung beigetragen.
+<?php endif; ?>
+Hinweis: Neuere Erscheinungsjahre erhöhen die Bewertung.
