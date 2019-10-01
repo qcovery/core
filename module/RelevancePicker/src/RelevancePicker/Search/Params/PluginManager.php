@@ -54,7 +54,7 @@ class PluginManager extends \VuFind\Search\Params\PluginManager
         'mixedlist' => 'VuFind\Search\MixedList\Params',
         'pazpar2' => 'VuFind\Search\Pazpar2\Params',
         'primo' => 'VuFind\Search\Primo\Params',
-        'search2' => 'Libraries\Search\Search2\Params',
+        'search2' => 'RelevancePicker\Search\Search2\Params',
         'solr' => 'RelevancePicker\Search\Solr\Params',
         'solrauth' => 'VuFind\Search\SolrAuth\Params',
         'solrauthor' => 'VuFind\Search\SolrAuthor\Params',
@@ -73,7 +73,7 @@ class PluginManager extends \VuFind\Search\Params\PluginManager
      * @var array
      */
     protected $factories = [
-        'Libraries\Search\Search2\Params' => 'Libraries\Search\Solr\ParamsFactory',
+        'RelevancePicker\Search\Search2\Params' => 'RelevancePicker\Search\Search2\ParamsFactory',
         'RelevancePicker\Search\Solr\Params' => 'RelevancePicker\Search\Solr\ParamsFactory',
         'VuFind\Search\BrowZine\Params' => 'VuFind\Search\Params\ParamsFactory',
         'VuFind\Search\Combined\Params' => 'VuFind\Search\Params\ParamsFactory',

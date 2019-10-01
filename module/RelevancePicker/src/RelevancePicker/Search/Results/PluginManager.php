@@ -54,7 +54,7 @@ class PluginManager extends \VuFind\Search\Results\PluginManager
         'mixedlist' => 'VuFind\Search\MixedList\Results',
         'pazpar2' => 'VuFind\Search\Pazpar2\Results',
         'primo' => 'VuFind\Search\Primo\Results',
-        'search2' => 'VuFind\Search\Search2\Results',
+        'search2' => 'RelevancePicker\Search\Search2\Results',
         'solr' => 'RelevancePicker\Search\Solr\Results',
         'solrauth' => 'VuFind\Search\SolrAuth\Results',
         'solrauthor' => 'VuFind\Search\SolrAuthor\Results',
@@ -74,6 +74,7 @@ class PluginManager extends \VuFind\Search\Results\PluginManager
      */
     protected $factories = [
         'RelevancePicker\Search\Solr\Results' => 'RelevancePicker\Search\Solr\ResultsFactory',
+        'RelevancePicker\Search\Search2\Results' => 'RelevancePicker\Search\Search2\ResultsFactory',
         'VuFind\Search\BrowZine\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\Combined\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\EDS\Results' => 'VuFind\Search\Results\ResultsFactory',
@@ -85,7 +86,6 @@ class PluginManager extends \VuFind\Search\Results\PluginManager
         'VuFind\Search\MixedList\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\Pazpar2\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\Primo\Results' => 'VuFind\Search\Results\ResultsFactory',
-        'VuFind\Search\Search2\Results' => 'Libraries\Search\Search2\ResultsFactory',
         'VuFind\Search\SolrAuth\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\SolrAuthor\Results' => 'VuFind\Search\Results\ResultsFactory',
         'VuFind\Search\SolrAuthorFacets\Results' =>
