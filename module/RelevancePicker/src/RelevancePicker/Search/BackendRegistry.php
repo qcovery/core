@@ -51,7 +51,7 @@ class BackendRegistry extends \Libraries\Search\BackendRegistry
         'LibGuides' => 'VuFind\Search\Factory\LibGuidesBackendFactory',
         'Pazpar2' => 'VuFind\Search\Factory\Pazpar2BackendFactory',
         'Primo' => 'VuFind\Search\Factory\PrimoBackendFactory',
-        'Search2' => 'Libraries\Search\Factory\Search2BackendFactory',
+        'Search2' => 'RelevancePicker\Search\Factory\Search2BackendFactory',
         'Solr' => 'RelevancePicker\Search\Factory\SolrDefaultBackendFactory',
         'SolrAuth' => 'VuFind\Search\Factory\SolrAuthBackendFactory',
         'SolrReserves' => 'VuFind\Search\Factory\SolrReservesBackendFactory',
