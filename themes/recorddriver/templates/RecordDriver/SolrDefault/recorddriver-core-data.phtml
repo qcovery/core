@@ -16,7 +16,7 @@ endif;
             <?php if (!empty($items[0])): ?>
           <tr><th><?=$this->transEsc($field)?>:</th><td>
                 <?php foreach ($items as $key => $item): ?>
-             <p style="margin:0px">
+             <p class="detail-line">
                  <?php if(!empty($item)): ?>
                     <?php if ($key === 'originalLetters'): ?>
                  <strong><?=$this->transEsc('Original Letters') ?>:</strong>

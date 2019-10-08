@@ -49,7 +49,7 @@ $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
                 </form>
             </td>
             <? endif; ?>
-            <?
+            <?php
             echo $this->renderArray(
                 $arrTemplate, $profile,
                 [
@@ -65,6 +65,7 @@ $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
                     $this->transEsc('Address') => 'address1',
                     $this->transEsc('E-Mail') => 'email',
                     $this->transEsc('Expires') => 'expires',
+                    $this->transEsc('Note') => 'note',
                 ]
             );
             ?>
