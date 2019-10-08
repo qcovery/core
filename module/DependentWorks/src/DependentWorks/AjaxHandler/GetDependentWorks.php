@@ -88,7 +88,7 @@ class GetDependentWorks extends AbstractBase
         $ppn = $params->fromQuery('ppn');
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $results = $this->resultsManager->get($backend);
-        $results->getOptions()->setLimitOptions([20, 1000]);
+        $results->getOptions()->setLimitOptions([20, 400]);
         $paramsObj = $results->getParams();
         $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn, 'limit' => $limit]));
 
