@@ -5,12 +5,9 @@ $hideLink = $DAIAplusProcessor->hideAvailabilityInfo($this->driver, true);
 $hideDaia = $DAIAplusProcessor->hideAvailabilityInfo($this->driver);
 ?>
 <?php if (!$hideDaia): ?>
-<div class="belugax-item-checkout">
-    <h3><?=$this->transEsc('Access & availability')?></h3>
     <div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="0" data-src="<?=$this->searchClassId ?>" data-hide-link="<?=($hideLink ? '1' : '0')?>">
         <span class="status ajax-availability hidden">
             <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
         </span>
     </div>
-</div>
 <?php endif; ?>
