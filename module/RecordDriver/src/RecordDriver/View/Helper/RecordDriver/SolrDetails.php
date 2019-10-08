@@ -162,6 +162,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 $links[$index] = implode($sep0, $data['link']['data']);
                 unset($data['link']);
             }
+            if (!empty($data['prefix'])) {
+                unset($data['prefix']);
+            }
             if (!empty($data['linkname'])) {
                 $linknames[$index] = implode($sep1, $data['linkname']['data']);
                 unset($data['linkname']);
@@ -181,7 +184,6 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 $additionals[$index] = $additional;
             }
         }
-        $strings = [];
         if (count($links) == 1) {
             $prefixes = array_values($prefixes);
             $links = array_values($links);
@@ -189,6 +191,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             $descriptions = array_values($descriptions);
             $additionals = array_values($additionals);
         }
+        $strings = [];
         foreach ($links as $index => $link) {
             if (!empty($prefixes[$index])) {
                 $string = $prefixes[$index] . ': ';
