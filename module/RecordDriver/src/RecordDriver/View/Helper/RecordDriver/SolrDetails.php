@@ -154,11 +154,11 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         $prefixes = $links = $linknames = $descriptions = $additionals = [];
         list($sep0, $sep1, $sep2) = $this->separatorSet[$separators];
         foreach ($solrMarcData as $index => $data) {
-            if (!empty($data['prefix'])) {
-                $prefixes[$index] = implode(': ', $data['prefix']['data']);
-                unset($data['prefix']);
-            }
             if (!empty($data['link'])) {
+                if (!empty($data['prefix'])) {
+                    $prefixes[$index] = implode(' ', $data['prefix']['data']);
+                    unset($data['prefix']);
+                }
                 $links[$index] = implode($sep0, $data['link']['data']);
                 unset($data['link']);
             }
@@ -166,7 +166,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 $linknames[$index] = implode($sep1, $data['linkname']['data']);
                 unset($data['linkname']);
             }
-            if (!isset($links[$index])) {
+            if (!isset($links[$index]) && $index > 0) {
                 $index--;
             }
             if (!empty($data['description'])) {
@@ -183,6 +183,7 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
         }
         $strings = [];
         if (count($links) == 1) {
+            $prefixes = array_values($prefixes);
             $links = array_values($links);
             $linknames = array_values($linknames);
             $descriptions = array_values($descriptions);
@@ -276,12 +277,12 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             if ($key === 'description') {
                 $string .= ' [' . implode($separator, $translatedData) . ']';
             } elseif ($key === 'prefix') {
-                $string = $translatedData[0] . ': ' . $string;
+                $string = implode(' ', $translatedData) . ': ' . $string;
             } else {
                 $string .= implode($separator, $translatedData) . $separator;
             }
         }
-        return substr_replace($string, '', -1 * strlen($separator));
+        return preg_replace('/(' . $separator . '|: )$/', '', $string);
      }
 
     /**
