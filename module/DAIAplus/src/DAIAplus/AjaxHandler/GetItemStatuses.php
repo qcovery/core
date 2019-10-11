@@ -91,6 +91,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
         $hmacKeys = explode(':', $this->config['StorageRetrievalRequests']['HMACKeys']);
 //neu A
         try {
+            if (method_exists($this->ils, 'getDriver')) {
+                $ilsDriver = $this->ils->getDriver();
+                if (method_exists($ilsDriver, 'setLanguage')) {
+                    $ilsDriver->setLanguage(
+                        $this->translator->getLocale()
+                    );
+                }
+            }
 //neu V
             $this->ils->setList($list);
 //neu A
