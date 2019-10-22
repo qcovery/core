@@ -7,4 +7,9 @@
     <? else: ?>
     let showHelp = false;
     <? endif; ?>
+
+    $( document ).ajaxComplete(function() {
+        $('.showHelp').qtip('reposition');
+        console.log( "Repositioned HelpToolTips due to ajaxComplete" );
+    });
 </script>
