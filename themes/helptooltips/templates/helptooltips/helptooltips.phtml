@@ -3,9 +3,9 @@
 <? endforeach; ?>
 <script type="text/javascript">
     <? if ($showHelp = $this->HelpTooltips()->showHelp()) : ?>
-    let showHelp = true;
+    window.showHelp = true;
     <? else: ?>
-    let showHelp = false;
+    window.showHelp = false;
     <? endif; ?>
 
     $( document ).ajaxComplete(function() {
