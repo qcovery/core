@@ -19,20 +19,27 @@ jQuery(document).ready(function() {
         data:{ppn:recordId},
         success:function(data, textStatus) {
             if (data.data.length > 0) {
-                var visibleItems = (data.data.length < 3) ? data.data.length : 3;
-                for (var i = 0; i < visibleItems; i++) {
-                    var title = data.data[i]['title'];
-                    var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '">' + title + '</a>';
-                    var item = data.data[i]['prefix'] + href;                    
-                    jQuery('ul#DependentWorks').append('<li>' + item + '</li>');                
-                }
-                if (data.data.length > visibleItems) {
-                    jQuery('p#ToggleDependentWorksMore').attr('style', 'display:block');
-                    for (var i = visibleItems; i < data.data.length; i++) {
+                if (data.data[0]['resultString'] !== undefined) {
+                    var href = '<a href="/vufind/Search/Results?lookfor=hierarchy_top_id:'
+                            + recordId + ' -id:'  + recordId + '">'
+                            + data.data[0]['resultString'] + '</a>'
+                    jQuery('ul#DependentWorks').append('<li>' + href + '</li>');
+                } else {
+                    var visibleItems = (data.data.length < 3) ? data.data.length : 3;
+                    for (var i = 0; i < visibleItems; i++) {
                         var title = data.data[i]['title'];
                         var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '">' + title + '</a>';
-                        var item = data.data[i]['prefix'] + href;                    
-                        jQuery('ul#DependentWorksHidden').append('<li>' + item + '</li>');                
+                        var item = data.data[i]['prefix'] + href;
+                        jQuery('ul#DependentWorks').append('<li>' + item + '</li>');
+                    }
+                    if (data.data.length > visibleItems) {
+                        jQuery('p#ToggleDependentWorksMore').attr('style', 'display:block');
+                        for (var i = visibleItems; i < data.data.length; i++) {
+                            var title = data.data[i]['title'];
+                            var href = '<a href="/vufind/Record/' + data.data[i]['id'] + '">' + title + '</a>';
+                            var item = data.data[i]['prefix'] + href;
+                            jQuery('ul#DependentWorksHidden').append('<li>' + item + '</li>');
+                        }
                     }
                 }
                 jQuery('div#DependentWorks').attr('style', 'display:block');
