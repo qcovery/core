@@ -33,7 +33,6 @@ namespace PAIAplus\ILS\Driver;
 
 use VuFind\Exception\ILS as ILSException;
 use VuFind\ILS\Driver\PAIA as PAIAbase;
-//use DAIAplus\ILS\Driver\DAIA as PAIAbase;
 
 /**
  * PAIA ILS Driver for VuFind to get patron information
@@ -52,6 +51,26 @@ use VuFind\ILS\Driver\PAIA as PAIAbase;
  */
 class PAIA extends PAIAbase
 {
+    /**
+     * URL of PAIA service
+     *
+     * @var
+     */
+    protected $locationMap;
+
+    /**
+     * PAIA constructor.
+     *
+     * @param \VuFind\Date\Converter       $converter      Date converter
+     * @param \Zend\Session\SessionManager $sessionManager Session Manager
+     */
+    public function __construct(\VuFind\Date\Converter $converter,
+        \Zend\Session\SessionManager $sessionManager, $locationMap
+    ) {
+        parent::__construct($converter, $sessionManager);
+        $this->locationMap = $locationMap->toArray();
+    }
+
     /**
      * Initialize the driver.
      *
@@ -102,6 +121,40 @@ class PAIA extends PAIAbase
         } else {
             return parent::getMyHolds($patron);
         }
+    }
+
+    /**
+     * This PAIA helper function allows custom overrides for mapping of PAIA response
+     * to getMyHolds data structure.
+     *
+     * @param array $items Array of PAIA items to be mapped.
+     *
+     * @return array
+     */
+    protected function myHoldsMapping($items)
+    {
+        $results = [];
+
+        foreach ($items as $doc) {
+            $result = $this->getBasicDetails($doc);
+
+            if ($doc['status'] == '4') {
+                $result['expire'] = (isset($doc['endtime'])
+                    ? $this->convertDatetime($doc['endtime']) : '');
+            } else {
+                $result['duedate'] = (isset($doc['endtime'])
+                    ? $this->convertDatetime($doc['endtime']) : '');
+            }
+
+            // status: provided (the document is ready to be used by the patron)
+            $result['available'] = $doc['status'] == 4 ? true : false;
+
+            list($signet, ) = explode(':', $doc['label']);
+            $result['institution_name'] = $this->locationMap[$signet] ?? '';
+
+            $results[] = $result;
+        }
+        return $results;
     }
 
     /**
@@ -188,6 +241,9 @@ class PAIA extends PAIAbase
             // label (0..1) call number, shelf mark or similar item label
             $result['callnumber'] = $this->getCallNumber($doc);
 
+            list($signet, ) = explode(':', $doc['label']);
+            $result['institution_name'] = $this->locationMap[$signet] ?? '';
+
             // Optional VuFind fields
             /*
             $result['barcode'] = null;
@@ -204,12 +260,9 @@ class PAIA extends PAIAbase
 
             $results[] = $result;
         }
-
         return $results;
     }
         
-
-    
     /**
      * Get Patron StorageRetrievalRequests
      *
