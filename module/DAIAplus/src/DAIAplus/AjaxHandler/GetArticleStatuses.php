@@ -90,6 +90,7 @@ class GetArticleStatuses extends AbstractBase
                 $formats = $driver->getFormats();
                 $format = $formats[0];
                 $format = strtolower(str_ireplace('electronic ','',$format));
+                $doi = $driver->getMarcData('Doi');
 
                 $sfxLink = $openUrl;
                 $sfxData = $driver->getMarcData('SFX');
@@ -121,6 +122,11 @@ class GetArticleStatuses extends AbstractBase
                 $url .= '&openurl=' . urlencode($openUrl);
                 $url .= '&list=' . $listView;
                 $url .= '&mediatype=' . urlencode($format);
+
+                if ($doi[0]['doi']['data'][0]) {
+                    $url .= '&doi=' . $doi[0]['doi']['data'][0];
+                }
+
                 if ($sfxDomain) {
                     $url .= '&sfx=' . $sfxLink;
                 }
