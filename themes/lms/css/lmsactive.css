@@ -33,3 +33,13 @@ footer {
 
 .cart-controls {
 }
+
+#lms-hint {
+    width: 75%;
+    margin: 25px auto;
+    background-color:#6D96D1;
+    text-align:center;
+    color:#ffffff;
+    padding:20px;
+    border-radius: 10px;
+}
