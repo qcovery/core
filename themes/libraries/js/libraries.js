@@ -96,8 +96,8 @@ jQuery(document).ready(function() {
                             jQuery.each(data.data.locationFacets, function(locationName, locationData) {
                                 var filter = encodeURI(locationData.filter);
                                 jQuery('div#location-list').append(locationTemplate);
-                                jQuery('div#location-list .location-item-count').last().before(locationName);
                                 jQuery('div#location-list .location-item-count').last().html(formatNumber(locationData.count));
+                                jQuery('div#location-list .location-item-text').last().html(locationName);
                                 jQuery('div#location-list .location-item').last().attr('href', searchLink + queryString + '&filter[]=' + filter);
                             });
                             jQuery('div#side-panel-location').attr('style', 'display:block');
