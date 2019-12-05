@@ -43,3 +43,15 @@ footer {
     padding:20px;
     border-radius: 10px;
 }
+
+#lms-text {
+    height: 20px;
+    overflow: hidden;
+}
+
+#lms-toggle {
+    color:#ffffff !important;
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: underline;
+}
