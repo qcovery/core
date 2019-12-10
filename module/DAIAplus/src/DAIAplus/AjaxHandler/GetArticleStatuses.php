@@ -203,6 +203,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         $openUrl = $driver->getOpenUrl();
         $formats = $driver->getFormats();
         $format = strtolower(str_ireplace('electronic ','',$formats[0]));
+        $doi = $driver->getMarcData('Doi');
 
         $sfxLink = $openUrl;
         $sfxData = $driver->getMarcData('SFX');
@@ -234,9 +235,15 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         $url .= '&openurl=' . urlencode($openUrl);
         $url .= '&list=' . $listView;
         $url .= '&mediatype=' . urlencode($format);
+
+        if ($doi[0]['doi']['data'][0]) {
+            $url .= '&doi=' . $doi[0]['doi']['data'][0];
+        }
+
         if ($sfxDomain) {
             $url .= '&sfx=' . $sfxLink;
         }
+
         $url .= '&language=de';
         $url .= '&format=json';
         return $url;
