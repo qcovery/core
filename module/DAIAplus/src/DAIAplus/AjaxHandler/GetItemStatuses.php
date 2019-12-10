@@ -91,6 +91,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
         $hmacKeys = explode(':', $this->config['StorageRetrievalRequests']['HMACKeys']);
 //neu A
         try {
+            if (method_exists($this->ils, 'getDriver')) {
+                $ilsDriver = $this->ils->getDriver();
+                if (method_exists($ilsDriver, 'setLanguage')) {
+                    $ilsDriver->setLanguage(
+                        $this->translator->getLocale()
+                    );
+                }
+            }
 //neu V
             $this->ils->setList($list);
 //neu A
@@ -169,9 +177,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                 }
 //neu V
                 foreach ($record as $index1 => $recordItem) {
-                    $id = $recordItem['id'];
                     foreach ($recordItem['daiaplus']['actionArray'] as $index2 => $action) {
                         if (!empty($action['beluga_core']['href'])) {
+							$id = $action['ppn'];
                             $docId = $action['documentId'];
                             $itemId = $action['itemId'];
                             $type = $action['type'];
@@ -190,7 +198,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                             $orderLink .= '&item_id=' . urlencode($itemId);
                             $orderLink .= '&type=' . $type;
                             if ($storageId) {
-                                $orderLink .= '&storage_id=' . $storageId;
+                                $orderLink .= '&storage_id=' . urlencode($storageId);
                             }
                             $orderLink .= '&hashKey=' . $hashKey;
                             $record[$index1]['daiaplus']['actionArray'][$index2]['beluga_core']['href'] = $orderLink;

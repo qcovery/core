@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory for GetRecordDetails AJAX handler.
+ * Generic factory for search params objects.
  *
  * PHP version 7
  *
@@ -20,28 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Libraries\AJAX
+ * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
- * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de> 
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
- * @link     https://github.com/beluga-core
  */
-namespace Libraries\AjaxHandler;
+namespace FacetPrefix\Search\Params;
 
 use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Factory for GetRecordDetails AJAX handler.
+ * Generic factory for search params objects.
  *
  * @category VuFind
- * @package  AJAX
+ * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetLibrariesFactory
-    implements \Zend\ServiceManager\Factory\FactoryInterface
+class ParamsFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -56,20 +54,20 @@ class GetLibrariesFactory
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
      * @throws ContainerException if any other error occurs
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        if (!empty($options)) {
-            throw new \Exception('Unexpected options passed to factory.');
-        }
+        // Replace trailing "Params" with "Options" to get the options service:
+        $optionsService = preg_replace('/Params$/', 'Options', $requestedName);
+        // Replace leading "SearchKeys" with "VuFind" to get the VuFind options service:
+        $optionsService = preg_replace('/^FacetPrefix/', 'VuFind', $optionsService);
+        $optionsObj = $container->get('VuFind\Search\Options\PluginManager')
+            ->get($optionsService);
+        $configLoader = $container->get('VuFind\Config\PluginManager');
+        // Clone the options instance in case caller modifies it:
         return new $requestedName(
-            $container->get('VuFind\Config\PluginManager')->get('libraries'),
-            $container->get('Libraries\Search\Results\PluginManager'),
-            $container->get('VuFind\Search\Memory'),
-            $container->get('VuFind\Translator')
+            clone $optionsObj, $configLoader, ...($options ?: [])
         );
     }
 }

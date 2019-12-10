@@ -248,6 +248,9 @@ class PAIA extends PAIAbase
             $profile['name'] = $patron['name'];
             $profile['address1'] = $patron['address'];
             $profile['username'] = $patron['cat_username'];
+            if (!empty($patron['note'])) {
+                $profile['note'] = $patron['note'];
+            }
         }
         return $profile;
     }

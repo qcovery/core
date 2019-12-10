@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory for GetRecordDetails AJAX handler.
+ * Generic factory for search results objects.
  *
  * PHP version 7
  *
@@ -20,28 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Libraries\AJAX
+ * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
- * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de> 
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
- * @link     https://github.com/beluga-core
  */
-namespace Libraries\AjaxHandler;
+namespace FacetPrefix\Search\Results;
 
 use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Factory for GetRecordDetails AJAX handler.
+ * Generic factory for search results objects.
  *
  * @category VuFind
- * @package  AJAX
+ * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetLibrariesFactory
-    implements \Zend\ServiceManager\Factory\FactoryInterface
+class ResultsFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -56,20 +54,19 @@ class GetLibrariesFactory
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
      * @throws ContainerException if any other error occurs
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        if (!empty($options)) {
-            throw new \Exception('Unexpected options passed to factory.');
-        }
+        // Replace trailing "Results" with "Params" to get the params service:
+        $paramsService = preg_replace('/Results$/', 'Params', $requestedName);
+        $paramsService = preg_replace('/^VuFind/', 'FacetPrefix', $paramsService);
+        $params = $container->get('FacetPrefix\Search\Params\PluginManager')
+            ->get($paramsService);
+        $searchService = $container->get('VuFindSearch\Service');
+        $recordLoader = $container->get('VuFind\Record\Loader');
         return new $requestedName(
-            $container->get('VuFind\Config\PluginManager')->get('libraries'),
-            $container->get('Libraries\Search\Results\PluginManager'),
-            $container->get('VuFind\Search\Memory'),
-            $container->get('VuFind\Translator')
+            $params, $searchService, $recordLoader, ...($options ?: [])
         );
     }
 }
