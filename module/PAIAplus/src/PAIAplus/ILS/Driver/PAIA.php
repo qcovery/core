@@ -191,6 +191,7 @@ class PAIA extends PAIAbase
     protected function myTransactionsMapping($items)
     {
         $results = [];
+        $index = 0;
 
         foreach ($items as $doc) {
             $result = $this->getBasicDetails($doc);
@@ -257,10 +258,12 @@ class PAIA extends PAIAbase
             $result['upc'] = null;
             $result['institution_name'] = null;
             */
-
-            $results[] = $result;
+            list($m, $d, $y) = explode('-', $result['dueTime']);
+            $sort = $y.$m.$d.$index++;
+            $results[$sort] = $result;
         }
-        return $results;
+        krsort($results);
+        return array_values($results);
     }
         
     /**
