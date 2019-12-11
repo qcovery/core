@@ -16,6 +16,7 @@
     <?=$this->transEsc('You are not authorized to use our delivery service.') ?>
 <?php else: ?>
     <p><a href="<?=$this->url('delivery-home')?>"><?=$this->transEsc('View delivery home') ?></a></p>
+    <?php if (count($this->listData) > 0): ?>
     <table class="recordSet mobile_serialize">
       <thead>
         <tr>
@@ -43,6 +44,9 @@
       </tbody>
 <?php endforeach; ?>
     </table>
+    <?php else: ?>
+    <p><?=$this->transEsc('Your delivery list is empty.') ?></p>
+    <?php endif; ?>
 <?php endif; ?>
 
 </div>

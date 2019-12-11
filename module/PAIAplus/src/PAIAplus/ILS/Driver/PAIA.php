@@ -259,10 +259,12 @@ class PAIA extends PAIAbase
             $result['institution_name'] = null;
             */
             list($m, $d, $y) = explode('-', $result['dueTime']);
-            $sort = $y.$m.$d.$index++;
+            $i = ($index < 10) ? '0' . $index : $index;
+            $sort = $y.$m.$d.$i;
             $results[$sort] = $result;
+            $index++;
         }
-        krsort($results);
+        krsort($results, SORT_NUMERIC);
         return array_values($results);
     }
         
