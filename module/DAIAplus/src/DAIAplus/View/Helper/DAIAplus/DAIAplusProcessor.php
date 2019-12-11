@@ -19,6 +19,7 @@ class DAIAplusProcessor extends \Zend\View\Helper\AbstractHelper
     public function hideAvailabilityInfo($driver, $hideOnlyLink = false) {
         $formatList = ($hideOnlyLink) ? 'hideAvailabilityLink' : 'hideAvailability';
         $hierarchyTopIDs = $driver->getHierarchyTopID();
+        
         if (!empty($this->config[$formatList])) {
             $hideFormats = explode(',', $this->config[$formatList]);
             $formats = $driver->getFormats();
