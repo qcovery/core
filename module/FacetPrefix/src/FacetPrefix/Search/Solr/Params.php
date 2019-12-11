@@ -62,8 +62,10 @@ class Params extends BaseParams
         $facetSet = parent::getFacetSettings();
 
         $facetConfig = $this->configLoader->get('facets');
-        foreach ($facetConfig->FacetPrefix as $facet => $prefix) {
-            $facetSet["f.{$facet}.facet.prefix"] = $prefix;
+        if (isset($facetConfig->FacetPrefix) && is_array($facetConfig->FacetPrefix)) {
+            foreach ($facetConfig->FacetPrefix as $facet => $prefix) {
+                $facetSet["f.{$facet}.facet.prefix"] = $prefix;
+            }
         }
 
         return $facetSet;
