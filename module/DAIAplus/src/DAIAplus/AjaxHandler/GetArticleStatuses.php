@@ -131,6 +131,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                                             'link_status' => 1]
                                 ]
                     ];
+$response = ['list' => [], 'items' => []];
                 } else {
                     $url = $this->prepareUrl($driver, $id, $listView);
                     $response = json_decode($this->makeRequest($url), true);
@@ -267,6 +268,9 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         } elseif (!empty($rawData)) {
             if ($list == 1 && !empty($rawData['list']['url_access'])) {
                 $urlAccess = (is_array($rawData['list']['url_access'])) ? $rawData['list']['url_access'][0] : $rawData['list']['url_access'];
+                if (strpos($urlAccess, 'type=ISN') > 0) {
+                    $urlAccess .= urldecode('&filter[]=format_facet:Zeitschriften');
+                }
                 $level = str_replace('_access_level', '', $rawData['list']['url_access_level']);
                 $label = $resolverLabels[$level] ?: $rawData['list']['url_access_label'];
                 $data[] = [
@@ -286,6 +290,9 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     foreach ($rawData['items'] as $item) {
                         if (!empty($item) && !empty($item['url_access'])) {
                             $urlAccess = (is_array($item['url_access'])) ? $item['url_access'][0] : $item['url_access'];
+                            if (strpos($urlAccess, 'type=ISN') > 0) {
+                                $urlAccess .= urldecode('&filter[]=format_facet:Zeitschriften');
+                            }
                             $level = str_replace('_access_level', '', $item['url_access_level']);
                             $label = $resolverLabels[$level] ?: $item['url_access_label'];
                             $data[] = [
