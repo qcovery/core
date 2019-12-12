@@ -131,7 +131,6 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                                             'link_status' => 1]
                                 ]
                     ];
-$response = ['list' => [], 'items' => []];
                 } else {
                     $url = $this->prepareUrl($driver, $id, $listView);
                     $response = json_decode($this->makeRequest($url), true);
