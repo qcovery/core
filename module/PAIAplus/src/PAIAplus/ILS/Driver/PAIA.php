@@ -264,7 +264,7 @@ class PAIA extends PAIAbase
             $results[$sort] = $result;
             $index++;
         }
-        krsort($results, SORT_NUMERIC);
+        ksort($results, SORT_NUMERIC);
         return array_values($results);
     }
         
