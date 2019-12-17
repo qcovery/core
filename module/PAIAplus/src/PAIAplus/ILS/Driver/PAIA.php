@@ -203,6 +203,10 @@ class PAIA extends PAIAbase
                 = (isset($doc['canrenew']) && $doc['canrenew'])
                 ? $result['item_id'] : '';
 
+            $result['renew_link']
+                = (isset($doc['canrenew']) && $doc['canrenew'])
+                ? $result['item_id'] : '';
+
             // queue (0..1) number of waiting requests for the document or item
             $result['request'] = ($doc['queue'] ?? null);
 
