@@ -90,6 +90,9 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
         $switchToRegularSearch = ($this->config['Global']['switch_to_regular_search'] == 'y');
 
         $ppn = $params->fromQuery('ppn');
+        if (empty($ppn)) {
+            return $this->formatResponse([]);
+        }
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $results = $this->resultsManager->get($backend);
         $results->getOptions()->setLimitOptions([$limit, $limit]);
