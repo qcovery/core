@@ -146,6 +146,21 @@ if ($format == 'phdthesis' && $school) {
 	echo "school = {".$school."},\n";
 }
 
+//Keywords
+foreach ($this->driver->tryMethod('getFormalSubjectHeadings') as $subject) {
+	if(!empty($subject)) {
+	echo "keywords = {{$subject}},\n";
+	}
+}
+
+//Keywords
+foreach ($this->driver->tryMethod('getAllSubjectHeadings') as $field) {
+	$subject = $field[0];
+	if(!empty($subject)) {
+		echo "keywords = {{$subject}},\n";
+	}
+}
+
 // Access Date
 $today = date("Y-m-d");
 echo "note = {Access date: {$today}},\n";
