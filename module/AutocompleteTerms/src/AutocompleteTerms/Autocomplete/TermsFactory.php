@@ -61,8 +61,9 @@ class TermsFactory implements \Zend\ServiceManager\Factory\FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        return new $requestedName(
-            $container->get('VuFind\Search\Results\PluginManager')
+        return new Terms(
+            $container->get('VuFind\Search\Results\PluginManager'),
+            $container->get('VuFind\Config\PluginManager')->get('searches')
         );
     }
 }

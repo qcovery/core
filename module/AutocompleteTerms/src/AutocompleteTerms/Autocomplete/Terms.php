@@ -97,14 +97,17 @@ class Terms implements \VuFind\Autocomplete\AutocompleteInterface
      */
     protected $resultsManager;
 
+    protected $config;
+
     /**
      * Constructor
      *
      * @param \VuFind\Search\Results\PluginManager $results Results plugin manager
      */
-    public function __construct(\VuFind\Search\Results\PluginManager $results)
+    public function __construct(\VuFind\Search\Results\PluginManager $results, $config)
     {
         $this->resultsManager = $results;
+        $this->config = $config;
     }
 
     /**
@@ -546,19 +549,40 @@ class Terms implements \VuFind\Autocomplete\AutocompleteInterface
             $current = $object->getRawData();
             $matches = [];
 
-            $searchContent = '';
+            $searchContents = '';
             if (!$allFields) {
                 if (isset($current[strtolower($this->handler)])) {
-                    $searchContent = $current[strtolower($this->handler)];
+                    $searchContents = $current[strtolower($this->handler)];
                 }
             } else {
-                $searchContent = $current['allfields'];
+                $searchContents = $current['allfields'];
             }
 
-            preg_match_all('~\b'.$query.'[a-z]*\b~i', $searchContent, $matches);
-            foreach ($matches as $terms) {
-                foreach ($terms as $term) {
-                    $results [] = strtolower($term);
+            if (!is_array($searchContents)) {
+                $searchContents = [$searchContents];
+            }
+
+            foreach ($searchContents as $searchContent) {
+                $completeFields = false;
+                if (isset($this->config['Autocomplete_Types_Options']['CompleteFields'])) {
+                    foreach ($this->config['Autocomplete_Types_Options']['CompleteFields'] as $completeField) {
+                        if ($completeField == $this->handler) {
+                            $completeFields = true;
+                        }
+                    }
+                }
+
+                if (!$completeFields) {
+                    preg_match_all('~\b' . $query . '[a-z]*\b~i', $searchContent, $matches);
+                    foreach ($matches as $terms) {
+                        foreach ($terms as $term) {
+                            $results[] = strtolower($term);
+                        }
+                    }
+                } else {
+                    if (stristr(strtolower($searchContent), $query)) {
+                        $results[] = strtolower($searchContent);
+                    }
                 }
             }
         }
