@@ -531,11 +531,31 @@ class Terms implements \VuFind\Autocomplete\AutocompleteInterface
 
         */
 
+        $results = $this->getTerms($searchResults, $query);
+
+        if (empty($results)) {
+            $results = $this->getTerms($searchResults, $query, true);
+        }
+
+        return $results;
+    }
+
+    private function getTerms($searchResults, $query, $allFields = false) {
         $results = [];
         foreach ($searchResults as $object) {
             $current = $object->getRawData();
             $matches = [];
-            preg_match_all('~\b'.$query.'[a-z]*\b~i', $current['allfields'], $matches);
+
+            $searchContent = '';
+            if (!$allFields) {
+                if (isset($current[strtolower($this->handler)])) {
+                    $searchContent = $current[strtolower($this->handler)];
+                }
+            } else {
+                $searchContent = $current['allfields'];
+            }
+
+            preg_match_all('~\b'.$query.'[a-z]*\b~i', $searchContent, $matches);
             foreach ($matches as $terms) {
                 foreach ($terms as $term) {
                     $results [] = strtolower($term);
@@ -548,7 +568,6 @@ class Terms implements \VuFind\Autocomplete\AutocompleteInterface
 
         return $results;
     }
-
 
     /**
      * Given the values from a Solr field and the user's search query, pick the best
