@@ -60,8 +60,11 @@ class DataHandler {
         if ($this->setDeliveryDriver()) {
             $orderData = $this->deliveryDriver->prepareOrder($user);
             foreach ($this->dataFields as $fieldSpecs) {
-                $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
-                $orderData[$fieldSpecs['orderfield']] = $prefix . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+                if (!empty($fieldSpecs['orderfield']) && !empty($fieldSpecs['form_name'])) {
+                    $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
+                    $orderData[$fieldSpecs['orderfield']] .= (empty($orderData[$fieldSpecs['orderfield']])) ? '' : ', ';
+                    $orderData[$fieldSpecs['orderfield']] .= $prefix . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+                }
             }
             if ($this->order_id = $this->deliveryDriver->sendOrder($orderData)) {
                 return true;
@@ -77,7 +80,7 @@ class DataHandler {
         $tableFields = ['record_id', 'title', 'author', 'year'];
         $listData = [];
         foreach ($this->dataFields as $fieldSpecs) {
-            if (isset($fieldSpecs['tablefield']) && in_array($fieldSpecs['tablefield'], $tableFields)) {
+            if (!empty($fieldSpecs['tablefield']) && in_array($fieldSpecs['tablefield'], $tableFields)) {
                 $field = $fieldSpecs['tablefield'];
                 $listData[$field] = $this->params->fromPost($fieldSpecs['form_name']);
             }
@@ -140,7 +143,7 @@ class DataHandler {
         return !$failed;
     }
 
-    public function collectData()
+    public function collectData($presetData = [])
     {
         $formats = $this->solrDriver->getMarcData('Format');
         $format = $formats[0][0]['data'][0];
@@ -163,20 +166,25 @@ class DataHandler {
                 }
             }
         }
-        $flatData['format'] = $format;
 
         foreach ($this->dataFields as $fieldKey => $fieldSpecs) {
             if (in_array('all', $fieldSpecs['formats']) || in_array($format, $fieldSpecs['formats'])) {
                 $key = $fieldSpecs['form_name'];
-                $data = $this->params->fromPost($key);
+                if (!empty($presetData[$fieldKey])) {
+                    $data = $presetData[$fieldKey];
+                } else {
+                    $data = $this->params->fromPost($key);
+                }
                 if (empty($data) && !empty($flatData[$fieldKey])) {
                     $data = $flatData[$fieldKey];
                 }
                 $dataArray = array_merge($this->dataFields[$fieldKey], ['value' => $data]);
                 if ($fieldSpecs['type'] == 'info') {
                     $this->infoData['fields'][$fieldKey] = $dataArray;
-                } else {
+                } elseif ($fieldSpecs['type'] == 'form') {
                     $this->formData['fields'][$fieldKey] = $dataArray;
+                } elseif ($fieldSpecs['type'] == 'checkbox') {
+                    $this->formData['checkbox'][$fieldKey] = $dataArray;
                 }
             }
         }

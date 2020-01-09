@@ -120,15 +120,6 @@ class MyBib implements DriverInterface {
         $orderData = $this->viewRenderer->render('Order/ill-subito-mybib.tbl', $orderData);
         $orderData = str_replace('##', "", $orderData);
 
-        $orderDataLines = explode("##", $orderData);
-        $orderDataArray = [];
-        foreach ($orderDataLines as $orderDataLine) {
-            list($key, $val) = explode(':', trim($orderDataLine), 2);
-            if (!empty($key)) {
-                $orderDataArray[$key] = trim($val);
-            }
-        }
-
         $orderStruct = ['type' => 'subito',
                         'data' => $orderData];
 

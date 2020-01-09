@@ -78,8 +78,7 @@ class DeliveryController extends AbstractBase
     {
         $message = $this->deliveryAuthenticator->authenticate($asAdmin);
         if ($message != 'not_logged_in') {
-            $user = $this->deliveryAuthenticator->getUser();
-            $this->user = $user;
+            $this->user = $this->deliveryAuthenticator->getUser();
         }
         return $message;
     }
@@ -92,52 +91,37 @@ class DeliveryController extends AbstractBase
     public function homeAction()
     {
         $message = $this->authenticate();
-        if ($message == 'not_logged_in') {
-            return $this->forceLogin();
+        if ($message != 'authorized') {
+            return $this->forwardTo('MyResearch', 'Profile');
         }
+
+        $deliveryTable = $this->getTable('delivery');
+        $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
+
+        $error = $this->updateDeliveryMail();
 
         $view = $this->createViewModel();
         $view->message = $message;
+        $view->error = $error;
         $view->catalog_id = $this->user->cat_id;
         $view->delivery_email = $this->user->delivery_email;
         $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
+        $view->listData = $listData;
         return $view;
     }
 
     /**
-     * Email action
+     * Order action
      *
      * @return mixed
      */
-    public function emailAction()
-    {
-        $message = $this->authenticate();
-        if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-
-        $deliveryEmail = $this->params()->fromPost('delivery_email');
-        $update = $this->params()->fromPost('update');
-        $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
-
-        if (!empty($update) && !empty($deliveryEmail)) {
-            if ($this->checkEmail($deliveryEmail)) {
-                $deliveryTable = $this->getTable('delivery');
-                $deliveryTable->update(['delivery_email' => $deliveryEmail], ['user_id' => $this->user->id]);
-                return $this->forwardTo('Delivery', 'Home');
-            } else {
-                return $this->forwardTo('Delivery', 'Home');
-            }
-        }
-        return $this->forwardTo('Delivery', 'Home');
-    }
-
     public function orderAction()
     {
         $message = $this->authenticate();
         if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
+            return $this->forwardTo('MyResearch', 'Profile');
         }
+
         $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
         $searchClassId = $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId');
         if (empty($id)) {
@@ -149,6 +133,10 @@ class DeliveryController extends AbstractBase
 
         $errors = $missingFields = [];
         
+        if ($error = $this->updateDeliveryMail()) {
+            $errors[] = $error;
+        }
+
         if (!empty($this->params()->fromPost('order'))) {
             if ($this->dataHandler->sendOrder($this->user)) {
                 $this->dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
@@ -163,16 +151,23 @@ class DeliveryController extends AbstractBase
         $availabilityConfig = $this->getConfig('deliveryAvailability');
         $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
 
-        if ($parentId = $AvailabilityHelper->checkParent()) {
+        if ($parentId = $AvailabilityHelper->getParentId()) {
             $searchClassId = DEFAULT_SEARCH_BACKEND;
             $parentDriver = $this->getRecordLoader()->load($parentId, $searchClassId);
             $AvailabilityHelper = new AvailabilityHelper($parentDriver, $availabilityConfig['default']);
         } else {
             $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
         }
-        $signature = $AvailabilityHelper->getSignature();
 
-//echo $signature; die;
+        $signatureCount = $this->deliveryGlobalConfig['Order']['collectedCallnumbers'] ?: 1;
+        $signatureList = array_slice($AvailabilityHelper->getSignatureList(), 0 , $signatureCount);
+//$signatureList = $AvailabilityHelper->getSignatureList();
+        $signature = implode(', ', $signatureList);
+
+        $preset = [];
+        if ($this->deliveryGlobalConfig['Order']['presetCallnumbers'] == 'y') {
+            $preset = ['signature' => $signature];
+        }
 
         if (empty($signature)) {
             return $this->forwardTo('Delivery', 'Home');
@@ -183,7 +178,7 @@ class DeliveryController extends AbstractBase
         $view->errors = $errors;
         $view->missingFields = $missingFields;
         $this->dataHandler->setSolrDriver($driver);
-        $this->dataHandler->collectData();
+        $this->dataHandler->collectData($preset);
 
         $formData = $this->dataHandler->getFormData();
         $infoData = $this->dataHandler->getInfoData();
@@ -192,30 +187,12 @@ class DeliveryController extends AbstractBase
         $view->searchClassId = $searchClassId;
         $view->formTitle = $formData['title'];
         $view->formFields = $formData['fields'];
+        $view->checkboxFields = $formData['checkbox'];
         $view->infoTitle = $infoData['title'];
         $view->infoFields = $infoData['fields'];
-        return $view;
-    }
-
-    public function listAction()
-    {
-/*
-        $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
-        $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
-        $this->dataHandler->getOrderStatus();
-*/
-
-
-        $message = $this->authenticate();
-        if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-
-        $deliveryTable = $this->getTable('delivery');
-        $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
- 
-        $view = $this->createViewModel();
-        $view->listData = $listData;
+        $view->catalog_id = $this->user->cat_id;
+        $view->delivery_email = $this->user->delivery_email;
+        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
         return $view;
     }
 
@@ -241,6 +218,24 @@ class DeliveryController extends AbstractBase
             $mailer->send($admin, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
         }
     }
+
+    private function updateDeliveryMail()
+    {
+        $error = '';
+        $deliveryEmail = $this->params()->fromPost('delivery_email');
+        $update = $this->params()->fromPost('update_email');
+        if (!empty($update) && !empty($deliveryEmail)) {
+            if ($deliveryEmail != $this->user->delivery_email && $this->checkEmail($deliveryEmail)) {
+                $userDeliveryTable = $this->getTable('userdelivery');
+                $userDeliveryTable->update(['delivery_email' => $deliveryEmail], ['user_id' => $this->user->id]);
+                $this->authenticate();
+            } else {
+                $error = 'wrong email format';
+            }
+        }
+        return $error;
+    }
+
     
     private function checkEmail($email)
     {

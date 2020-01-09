@@ -1,9 +1,9 @@
 jQuery(document).ready(function() {
-    $('span.delivery_article').each(function() {
+    jQuery('span.delivery_article').each(function() {
         var element = $(this);
         var topId = element.attr('data-top-id');
         var searchClassId = element.attr('data-searchclass-id');
-        $.ajax({
+        jQuery.ajax({
             url:'/vufind/AJAX/JSON?method=checkAvailability',
             dataType:'json',
             data:{ppn:topId, source:searchClassId},
@@ -13,5 +13,9 @@ jQuery(document).ready(function() {
                 }
             }
         });
+    });
+    jQuery('p#delivery_email a').on('click', function(event) {
+        jQuery('#delivery_email #delivery_email_text').attr('style', 'display:none');
+        jQuery('#delivery_email #delivery_email_field').attr('style', 'display:inline');
     });
 });
