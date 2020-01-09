@@ -32,7 +32,7 @@ use VuFindSearch\Backend\Solr\Backend;
 use VuFindSearch\Backend\Solr\Connector;
 use VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory;
 use VuFind\Search\Factory\AbstractSolrBackendFactory;
-use DismaxMunge\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
+use LuceneHelper\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
 
 /**
  * Factory for the default SOLR backend.
