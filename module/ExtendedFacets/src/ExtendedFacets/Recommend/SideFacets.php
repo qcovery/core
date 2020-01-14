@@ -93,6 +93,7 @@ class SideFacets extends \VuFind\Recommend\SideFacets
                     }
                 }
                 krsort($newFacetList);
+                $newFacetList = array_values($newFacetList);
                 if (isset($filteredYearFacet)) {
                     array_unshift($newFacetList, $filteredYearFacet);
                 }
