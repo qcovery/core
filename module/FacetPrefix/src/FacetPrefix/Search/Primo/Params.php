@@ -55,7 +55,7 @@ class Params extends \Libraries\Search\Primo\Params
         $facetSet = parent::getFacetSettings();
 
         $facetConfig = $this->configLoader->get('facets');
-        if (isset($facetConfig->FacetPrefix) && is_array($facetConfig->FacetPrefix)) {
+        if (isset($facetConfig->FacetPrefix)) {
             foreach ($facetConfig->FacetPrefix as $facet => $prefix) {
                 $facetSet["f.{$facet}.facet.prefix"] = $prefix;
             }
