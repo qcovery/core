@@ -343,7 +343,7 @@ class PAIA extends PAIAbase
         } else if ($holdDetails['type'] == 'recall') {
             if (isset($this->config['pickUpLocations'])) {
                 foreach ($this->config['pickUpLocations'] as $pickUpLocationData) {
-                    if ($pickUpLocationData[0] == $holdDetails['storage_id']) {
+                    if ($pickUpLocationData[0] == $holdDetails['storage_id'] || $pickUpLocationData[0] == urldecode($holdDetails['storage_id'])) {
                         $pickupLocation[] = [
                             'locationID' => $pickUpLocationData[1],
                             'locationDisplay' => $pickUpLocationData[2],
