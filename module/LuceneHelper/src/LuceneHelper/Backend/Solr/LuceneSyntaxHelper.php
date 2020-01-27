@@ -55,7 +55,7 @@ class LuceneSyntaxHelper extends \VuFindSearch\Backend\Solr\LuceneSyntaxHelper
      */
     protected function normalizeUnquotedText($input)
     {
-        $input = str_replace(['/', '?', '*', '~', '{', '}', '^'], '', $input);
+        $input = trim(str_replace(['/', '?', '*', '~', '{', '}', '^'], ' ', $input));
         return parent::normalizeUnquotedText($input);
     }
 }
