@@ -83,6 +83,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         $responses = [];
         $ids = $params->fromPost('id', $params->fromQuery('id', ''));
         $source = $params->fromPost('source', $params->fromQuery('source', ''));
+        $clientUrl = $_SERVER['REMOTE_ADDR'];
         $resolverChecks = $this->config['ResolverChecks'];
         if (!empty($ids) && !empty($source)) {
             $listView = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
@@ -90,18 +91,19 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                 $driver = $this->recordLoader->load($id, $source);
 
                 $urlAccess = '';
-                if (isset($resolverChecks['fulltext']) && $resolverChecks['fulltext'] == 'y') {
-                    $urlAccess = $this->checkFulltext($driver);
-                    if (!empty($urlAccess)) {
-                        $urlAccessLevel = 'article_access_level';
-                        $urlAccessLabel = 'Fulltext';
-                    }
-                }
-                if (empty($urlAccess) && isset($resolverChecks['open_access']) && $resolverChecks['open_access'] == 'y') {
+
+                if (isset($resolverChecks['open_access']) && $resolverChecks['open_access'] == 'y') {
                     $urlAccess = $this->checkOpenAccess($driver);
                     if (!empty($urlAccess)) {
                         $urlAccessLevel = 'article_access_level';
                         $urlAccessLabel = 'Fulltext (DOAJ)';
+                    }
+                }
+                if (empty($urlAccess) && isset($resolverChecks['fulltext']) && $resolverChecks['fulltext'] == 'y') {
+                    $urlAccess = $this->checkFulltext($driver);
+                    if (!empty($urlAccess)) {
+                        $urlAccessLevel = 'article_access_level';
+                        $urlAccessLabel = 'Fulltext';
                     }
                 }
                 if (empty($urlAccess) && isset($resolverChecks['doi']) && $resolverChecks['doi'] == 'y') {
@@ -111,15 +113,9 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                         $urlAccessLabel = 'Fulltext (DOI)';
                     }
                 }
-                if (empty($urlAccess) && isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
-                    $urlAccess = $this->checkParentId($driver);
-                    if (!empty($urlAccess)) {
-                        $urlAccessLevel = 'print_access_level';
-                        $urlAccessLabel = 'Journal';
-                    }
-                }
 
                 if (!empty($urlAccess)) {
+                    $urlAccess = 'http://ilo.sub.uni-hamburg.de/sfx/sfxredir.php?url=' . $urlAccess;
                     $response = ['list' => ['url_access' => $urlAccess,
                                             'url_access_level' => $urlAccessLevel,
                                             'url_access_label' => $urlAccessLabel,
@@ -133,7 +129,36 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     ];
                 } else {
                     $url = $this->prepareUrl($driver, $id, $listView);
-                    $response = json_decode($this->makeRequest($url), true);
+                    $resolverResponse = json_decode($this->makeRequest($url), true);
+                    if (!empty($resolverResponse['items']['sfx_check']['url_access'])) {
+                        $response = ['list' => $resolverResponse['list'],
+                                     'items' => ['sfx_check' => $resolverResponse['items']['sfx_check']]
+                                    ];
+                    }
+                    if (empty($response) && !empty($resolverResponse['items']['lr_check']['url_access'])) {
+                        $response = ['list' => $resolverResponse['list'],
+                                     'items' => ['lr_check' => $resolverResponse['items']['lr_check']]
+                                    ];
+                    }
+                    if (empty($response) && isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
+                        $urlAccess = $this->checkParentId($driver);
+                        if (!empty($urlAccess)) {
+                            $response = ['list' => ['url_access' => $urlAccess,
+                                                    'url_access_level' => 'print_access_level',
+                                                    'url_access_label' => 'Journal',
+                                                    'link_status' => 1],
+                                         'items' => ['lr_check' =>
+                                                     ['url_access' => $urlAccess,
+                                                      'url_access_level' => 'print_access_level',
+                                                      'url_access_label' => 'Journal',
+                                                      'link_status' => 1]
+                                                    ]
+                                         ];
+                        }
+                    }
+                    if (empty($response)) {
+                        $response = $resolverResponse;
+                    }
                 }
 
                 $response = $this->prepareData($response, $listView);
@@ -225,7 +250,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         }
 
         $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
-        $sfxLink = urlencode('http://sfx.gbv.de/sfx_' . $sfxDomain . '?' . $sfxLink);
+//        $sfxLink = urlencode('http://sfx.gbv.de/sfx_' . $sfxDomain . '?' . $sfxLink);
+        $sfxLink = urlencode('http://sfx-49gbv.hosted.exlibrisgroup.com/sfx_' . $sfxDomain . '?' . $sfxLink);
 
         $isil = $this->config['Global']['isil'];
         $url = $this->config['DAIA_' . $isil]['url'];
