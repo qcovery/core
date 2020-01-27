@@ -39,6 +39,8 @@ class DataHandler {
 
     protected $order_id;
 
+    protected $format;
+
     public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $deliveryConfig)
     {
         $this->deliveryConfig = $deliveryConfig;
@@ -50,6 +52,8 @@ class DataHandler {
     public function setSolrDriver($solrDriver)
     {
         $this->solrDriver = $solrDriver;
+        $formats = $solrDriver->getMarcData('Format');
+        $this->format = $formats[0][0]['data'][0];
     }
 
     public function sendOrder($user)
@@ -57,6 +61,7 @@ class DataHandler {
         if (!$this->checkData()) {
             return false;
         }
+
         if ($this->setDeliveryDriver()) {
             $orderData = $this->deliveryDriver->prepareOrder($user);
             foreach ($this->dataFields as $fieldSpecs) {
@@ -103,9 +108,7 @@ class DataHandler {
     public function getOrderStatus()
     {
         if ($this->setDeliveryDriver()) {
-            $order_id = 'CLD-00000110';
-            $this->deliveryDriver->getOrderStatus($order_id);
-        
+            return $this->deliveryDriver->getOrderStatus($this->order_id);
         }
     }
 
@@ -133,10 +136,12 @@ class DataHandler {
         $failed = false;
         $this->missingFields = [];
         foreach ($this->dataFields as $fieldSpecs) {
-            if (isset($fieldSpecs['mandantory']) && $fieldSpecs['mandantory'] == 1) {
-                if (empty($this->params->fromPost($fieldSpecs['form_name']))) {
-                    $failed = true;
-                    $this->missingFields[] = $fieldSpecs['form_name'];
+            if (in_array('all', $fieldSpecs['formats']) || in_array($this->format, $fieldSpecs['formats'])) {
+                if (isset($fieldSpecs['mandatory']) && $fieldSpecs['mandatory'] == 1) {
+                    if (empty($this->params->fromPost($fieldSpecs['form_name']))) {
+                        $failed = true;
+                        $this->missingFields[] = $fieldSpecs['form_name'];
+                    }
                 }
             }
         }
@@ -145,8 +150,7 @@ class DataHandler {
 
     public function collectData($presetData = [])
     {
-        $formats = $this->solrDriver->getMarcData('Format');
-        $format = $formats[0][0]['data'][0];
+        $format = $this->format;
 
         if ($format == 'Article' || $format == 'electronic Article') {
             $deliveryData = $this->solrDriver->getMarcData('DeliveryDataArticle');
@@ -162,7 +166,7 @@ class DataHandler {
         foreach ($deliveryData as $deliveryDate) {
             if (is_array($deliveryDate)) {
                 foreach ($deliveryDate as $key => $item) {
-                    $flatData[$key] = $item['data'][0];
+                    $flatData[$key] = implode(', ', $item['data']);
                 }
             }
         }
@@ -211,6 +215,10 @@ class DataHandler {
         } else {
             return ($type == 'info') ? 'Book' : 'Copy';
         }
+    }
+
+    public function getOrderId() {
+        return $this->order_id;
     }
 
     public function getErrors() {

@@ -14,12 +14,16 @@
   <?php if (!empty($errors)): ?>
   <p>
     <?php foreach ($errors as $error): ?>
-    <?=$error ?><br />
+    <?=$this->transEsc($error) ?><br />
     <?php endforeach; ?>
   </p>
   <?php endif; ?>
 
+<?php //print_r($missingFields); ?>
 
+<?php if (!empty($this->orderId)): ?>
+  <p><?=$this->transEsc('Your Order is Placed') ?></p>
+<?php else: ?>
   <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-order">
     <input type="hidden" name="update_email" value="y" />
     <input type="hidden" name="order" value="y" />
@@ -30,7 +34,7 @@
     </div>
 
     <?php foreach ($this->formFields as $formField): ?>
-      <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
+      <?php $mandatory = ($formField['mandatory'] == 1) ? ' *' : ''; ?>
       <?php $style = (in_array($formField['form_name'], $missingFields)) ? ' style="color:red"' : ''; ?>
     <div class="form-group">
       <label class="control-label" for="<?=$formField['form_name'] ?>"<?=$style ?>><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
@@ -52,7 +56,7 @@
       <?php if (!empty($infoField['value'])): ?>
     <div class="form-group">
       <p><strong><?=$this->transEsc($infoField['display']) ?>:</strong> <?=$this->transEsc($infoField['value']) ?></p>
-      <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/>
+      <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['display'] ?>"/>
     </div>
       <?php endif; ?>
     <?php endforeach; ?>
@@ -68,14 +72,17 @@
     </div>
     <div class="form-group">
       <p>
-          <strong><?=$this->transEsc('Delivery Email') ?>:</strong> 
+          <?php $style = (in_array('delivery_email', $missingFields)) ? ' style="color:red"' : ''; ?>
+          <label class="control-label" for="delivery_email"<?=$style ?>><?=$this->transEsc('Delivery Email') ?>: *</label>
           <input type="text" name="delivery_email" id="email" value="<?=$this->delivery_email ?>" style="width:380px;"/>
       </p>
     </div>
 
     <div class="form-group">
-      <input class="btn btn-primary" type="submit" name="processRegister" value="<?=$this->transEsc('Order')?>">
+      <input class="btn btn-primary" type="submit" name="sendForm" value="<?=$this->transEsc('Order')?>">
+      <input class="btn btn-primary" type="reset" name="resetForm" value="<?=$this->transEsc('Reset')?>">
     </div>
   </form>
+<?php endif; ?>
 
 </div>

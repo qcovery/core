@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
             data:{ppn:topId, source:searchClassId},
             success:function(data, textStatus) {
                 if (data.data.available == 'available') {
-                    element.attr('style', 'display:block');
+                    element.attr('style', 'display:inline');
                 }
             }
         });

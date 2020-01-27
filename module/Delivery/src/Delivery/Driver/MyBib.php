@@ -92,6 +92,8 @@ class MyBib implements DriverInterface {
         if ($response['status'] == 1) {
             $this->session_id = $response['session_struct']['sid'];
             return true;
+        } else {
+            echo 'failed';
         }
         return false;
     }

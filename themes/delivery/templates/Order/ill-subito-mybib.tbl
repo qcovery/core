@@ -6,7 +6,7 @@ item-type:SERIAL##
 item-call-number:<?=$this->itemCallNumber ?>##
 item-author:<?=$this->itemAuthor ?>##
 item-author-of-article:<?=$this->itemAuthorOfArticle ?>##
-item_title:<?=$this->itemTitle ?>##
+item-title:<?=$this->itemTitle ?>##
 item-title-of-article:<?=$this->itemTitleOfArticle ?>##
 item-place-of-publication:<?=$this->itemPlaceOfPublication ?>##
 item-publication-date:<?=$this->itemPublicationDate ?>##

@@ -138,12 +138,17 @@ class DeliveryController extends AbstractBase
         }
 
         if (!empty($this->params()->fromPost('order'))) {
-            if ($this->dataHandler->sendOrder($this->user)) {
-                $this->dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
-                return $this->forwardTo('Delivery', 'List');
+            if ($this->checkEmail($this->params()->fromPost('delivery_email'))) {
+                $this->user->delivery_email = $this->params()->fromPost('delivery_email');
+                if ($this->dataHandler->sendOrder($this->user)) {
+                    $this->dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
+                    $orderId = $this->dataHandler->getOrderId();
+                } else {
+                    $errors = $this->dataHandler->getErrors();
+                    $missingFields = $this->dataHandler->getMissingFields();
+                }
             } else {
-                $errors = $this->dataHandler->getErrors();
-                $missingFields = $this->dataHandler->getMissingFields();
+                $missingFields = ['delivery_email'];
             }
         }
  
@@ -152,8 +157,7 @@ class DeliveryController extends AbstractBase
         $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
 
         if ($parentId = $AvailabilityHelper->getParentId()) {
-            $searchClassId = DEFAULT_SEARCH_BACKEND;
-            $parentDriver = $this->getRecordLoader()->load($parentId, $searchClassId);
+            $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
             $AvailabilityHelper = new AvailabilityHelper($parentDriver, $availabilityConfig['default']);
         } else {
             $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
@@ -161,8 +165,8 @@ class DeliveryController extends AbstractBase
 
         $signatureCount = $this->deliveryGlobalConfig['Order']['collectedCallnumbers'] ?: 1;
         $signatureList = array_slice($AvailabilityHelper->getSignatureList(), 0 , $signatureCount);
-//$signatureList = $AvailabilityHelper->getSignatureList();
-        $signature = implode(', ', $signatureList);
+
+        $signature = implode("\n", $signatureList);
 
         $preset = [];
         if ($this->deliveryGlobalConfig['Order']['presetCallnumbers'] == 'y') {
@@ -177,22 +181,29 @@ class DeliveryController extends AbstractBase
 
         $view->errors = $errors;
         $view->missingFields = $missingFields;
-        $this->dataHandler->setSolrDriver($driver);
-        $this->dataHandler->collectData($preset);
 
-        $formData = $this->dataHandler->getFormData();
-        $infoData = $this->dataHandler->getInfoData();
+        if (!empty($orderId)) {
+            $view->id = $id;
+            $view->searchClassId = $searchClassId;
+            $view->orderId = $orderId;
+        } else {
+            $this->dataHandler->setSolrDriver($driver);
+            $this->dataHandler->collectData($preset);
 
-        $view->id = $id;
-        $view->searchClassId = $searchClassId;
-        $view->formTitle = $formData['title'];
-        $view->formFields = $formData['fields'];
-        $view->checkboxFields = $formData['checkbox'];
-        $view->infoTitle = $infoData['title'];
-        $view->infoFields = $infoData['fields'];
-        $view->catalog_id = $this->user->cat_id;
-        $view->delivery_email = $this->user->delivery_email;
-        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
+            $formData = $this->dataHandler->getFormData();
+            $infoData = $this->dataHandler->getInfoData();
+
+            $view->id = $id;
+            $view->searchClassId = $searchClassId;
+            $view->formTitle = $formData['title'];
+            $view->formFields = $formData['fields'];
+            $view->checkboxFields = $formData['checkbox'];
+            $view->infoTitle = $infoData['title'];
+            $view->infoFields = $infoData['fields'];
+            $view->catalog_id = $this->user->cat_id;
+            $view->delivery_email = $this->user->delivery_email;
+            $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
+        }
         return $view;
     }
 
@@ -225,12 +236,14 @@ class DeliveryController extends AbstractBase
         $deliveryEmail = $this->params()->fromPost('delivery_email');
         $update = $this->params()->fromPost('update_email');
         if (!empty($update) && !empty($deliveryEmail)) {
-            if ($deliveryEmail != $this->user->delivery_email && $this->checkEmail($deliveryEmail)) {
-                $userDeliveryTable = $this->getTable('userdelivery');
-                $userDeliveryTable->update(['delivery_email' => $deliveryEmail], ['user_id' => $this->user->id]);
-                $this->authenticate();
-            } else {
-                $error = 'wrong email format';
+            if ($deliveryEmail != $this->user->delivery_email) {
+                if ($this->checkEmail($deliveryEmail)) {
+                    $userDeliveryTable = $this->getTable('userdelivery');
+                    $userDeliveryTable->update(['delivery_email' => $deliveryEmail], ['user_id' => $this->user->id]);
+                    $this->authenticate();
+                } else {
+                    $error = 'wrong email format';
+                }
             }
         }
         return $error;
