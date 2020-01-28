@@ -45,7 +45,7 @@
     <?php foreach ($this->checkboxFields as $checkboxField): ?>
     <div class="form-group">
       <label class="control-label" for="<?=$checkboxField['form_name'] ?>"><?=$this->transEsc($checkboxField['display']) ?></label>
-      <input type="checkbox" name="<?=$checkboxField['form_name'] ?>" id="<?=$checkboxField['form_name'] ?>" value="y" style="margin: 0px 10px 0px; vertical-align:middle;"/>
+      <input type="checkbox" name="<?=$checkboxField['form_name'] ?>" id="<?=$checkboxField['form_name'] ?>" value="<?=$checkboxField['form_value'] ?>" style="margin: 0px 10px 0px; vertical-align:middle;"/>
     </div>
     <?php endforeach; ?>
 
@@ -53,10 +53,10 @@
       <h3><?=$this->transEsc($this->infoTitle) ?></h3>
     </div>
     <?php foreach ($this->infoFields as $infoField): ?>
-      <?php if (!empty($infoField['value'])): ?>
+      <?php if (!empty($infoField['form_value'])): ?>
     <div class="form-group">
       <p><strong><?=$this->transEsc($infoField['display']) ?>:</strong> <?=$this->transEsc($infoField['value']) ?></p>
-      <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['display'] ?>"/>
+      <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/>
     </div>
       <?php endif; ?>
     <?php endforeach; ?>

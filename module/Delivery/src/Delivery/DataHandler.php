@@ -61,7 +61,6 @@ class DataHandler {
         if (!$this->checkData()) {
             return false;
         }
-
         if ($this->setDeliveryDriver()) {
             $orderData = $this->deliveryDriver->prepareOrder($user);
             foreach ($this->dataFields as $fieldSpecs) {

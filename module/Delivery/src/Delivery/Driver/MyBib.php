@@ -92,8 +92,6 @@ class MyBib implements DriverInterface {
         if ($response['status'] == 1) {
             $this->session_id = $response['session_struct']['sid'];
             return true;
-        } else {
-            echo 'failed';
         }
         return false;
     }
@@ -143,9 +141,6 @@ class MyBib implements DriverInterface {
         $parameters = [$this->session_id, $order_id, 'STATE'];
         $parameters = [$this->session_id, $order_id];
         $response = $this->request($method, $parameters);
-        
-        print_r($response);
-        die;
     }    
 
     private function request($method, $parameters) {
@@ -154,8 +149,9 @@ class MyBib implements DriverInterface {
             $this->rpcClient = new XmlRpc\Client($config['rpcUrl']);
         }
         $response = $this->rpcClient->call($method, $parameters);
-        if (xmlrpc_is_fault($response)) {
+        if (!empty($response['ERROR_struct']['technical'])) {
             $this->rpcErrors[] = $response['ERROR_struct']['message'];
+//            print_r($response['ERROR_struct']);
             return false;
         }
         return $response;
