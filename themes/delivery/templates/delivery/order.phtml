@@ -53,7 +53,7 @@
       <h3><?=$this->transEsc($this->infoTitle) ?></h3>
     </div>
     <?php foreach ($this->infoFields as $infoField): ?>
-      <?php if (!empty($infoField['form_value'])): ?>
+      <?php if (!empty($infoField['value'])): ?>
     <div class="form-group">
       <p><strong><?=$this->transEsc($infoField['display']) ?>:</strong> <?=$this->transEsc($infoField['value']) ?></p>
       <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/>
