@@ -128,9 +128,12 @@ class DeliveryController extends AbstractBase
             return $this->forwardTo('Delivery', 'Home');
         }
 
+        $driver = $this->getRecordLoader()->load($id, $searchClassId);
+
         $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
         $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
-
+        $this->dataHandler->setSolrDriver($driver);
+        
         $errors = $missingFields = [];
         
         if ($error = $this->updateDeliveryMail()) {
@@ -152,7 +155,6 @@ class DeliveryController extends AbstractBase
             }
         }
  
-        $driver = $this->getRecordLoader()->load($id, $searchClassId);
         $availabilityConfig = $this->getConfig('deliveryAvailability');
         $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
 
