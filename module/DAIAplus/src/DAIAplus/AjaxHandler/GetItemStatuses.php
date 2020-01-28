@@ -87,12 +87,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
         $ids = $params->fromPost('id', $params->fromQuery('id', []));
 //neu V
         $list = $params->fromPost('list', $params->fromQuery('list', []));
+        $language = $params->fromPost('language', $params->fromQuery('language', 'de'));
         $hideLink = $params->fromPost('hideLink', $params->fromQuery('hideLink', []));
         $hmacKeys = explode(':', $this->config['StorageRetrievalRequests']['HMACKeys']);
 //neu A
         try {
 //neu V
             $this->ils->setList($list);
+            $this->ils->setLanguage($language);
 //neu A
             $results = $this->ils->getStatuses($ids);
         } catch (ILSException $e) {

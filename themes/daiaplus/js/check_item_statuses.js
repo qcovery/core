@@ -112,6 +112,7 @@ var itemStatusIds = [];
 var itemStatusEls = {};
 var itemStatusTimer = null;
 var itemStatusDelay = 200;
+var itemStatusLanguage = 'en';
 var itemStatusRunning = false;
 var itemStatusList = false;
 var itemStatusSource = '';
@@ -135,7 +136,7 @@ function runItemAjaxForQueue() {
       url: VuFind.path + '/AJAX/JSON?method=' + method,
       dataType: 'json',
       method: 'get',
-      data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink}
+      data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink, language:itemStatusLanguage}
     })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
@@ -174,6 +175,7 @@ function itemQueueAjax(id, el) {
 function checkItemStatus(el) {
   var $item = $(el);
   var id = $item.attr('data-id');
+  itemStatusLanguage = $item.attr('data-lang');
   itemStatusSource = $item.attr('data-src');
   itemStatusList = ($item.attr('data-list') == 1);
   itemStatusHideLink = $item.attr('data-hide-link');
@@ -188,6 +190,7 @@ function checkItemStatuses(_container) {
     : _container;
 
   var availabilityItems = $(container).find('.availabilityItem');
+  itemStatusLanguage = $(availabilityItems[0]).attr('data-lang');
   for (var i = 0; i < availabilityItems.length; i++) {
     var id = $(availabilityItems[i]).attr('data-id');
     itemStatusSource = $(availabilityItems[i]).attr('data-src');
