@@ -32,7 +32,7 @@
           <?=strtolower($this->transEsc($resultList['relation']))?>:
         <?php endif; ?>
         <?php if(!empty($resultList['journallink'])): ?>
-          <a href="<?=$this->record($this->driver)->getLink('ppn', $resultList['journallink'])?>">
+          <a href="<?=$this->record($this->driver)->getLink('isn', $resultList['journallink'])?>">
             <?=$resultList['journal'] ?>
           </a>
         <?php else: ?>

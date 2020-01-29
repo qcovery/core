@@ -33,3 +33,25 @@ footer {
 
 .cart-controls {
 }
+
+#lms-hint {
+    width: 75%;
+    margin: 25px auto;
+    background-color:#6D96D1;
+    text-align:center;
+    color:#ffffff;
+    padding:20px;
+    border-radius: 10px;
+}
+
+#lms-text {
+    height: 20px;
+    overflow: hidden;
+}
+
+#lms-toggle {
+    color:#ffffff !important;
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: underline;
+}
