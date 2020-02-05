@@ -117,6 +117,7 @@ var itemStatusRunning = false;
 var itemStatusList = false;
 var itemStatusSource = '';
 var itemStatusHideLink = '';
+var itemStatusType = '';
 
 function runItemAjaxForQueue() {
   // Only run one item status AJAX request at a time:
@@ -125,7 +126,7 @@ function runItemAjaxForQueue() {
     return;
   }
   itemStatusRunning = true;
-  if (itemStatusSource == 'Search2') {
+  if (itemStatusSource == 'Search2' || itemStatusType == 'electronic') {
     var method = 'getArticleStatuses';
   } else {
     var method = 'getItemStatuses';
@@ -179,6 +180,7 @@ function checkItemStatus(el) {
   itemStatusSource = $item.attr('data-src');
   itemStatusList = ($item.attr('data-list') == 1);
   itemStatusHideLink = $item.attr('data-hide-link');
+  itemStatusType = $item.attr('data-type');
   itemQueueAjax(id + '', $item);
 }
 
@@ -196,6 +198,7 @@ function checkItemStatuses(_container) {
     itemStatusSource = $(availabilityItems[i]).attr('data-src');
     itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
     itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
+    itemStatusType = $(availabilityItems[i]).attr('data-type');
     itemQueueAjax(id, $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader

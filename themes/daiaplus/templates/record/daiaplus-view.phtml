@@ -9,7 +9,7 @@ $hideDaia = $DAIAplusProcessor->hideAvailabilityInfo($this->driver);
       <?=$this->transEsc('see series/volume information'); ?>
     </div>
 <?php else: ?>
-    <div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="0" data-src="<?=$this->searchClassId ?>" data-hide-link="<?=($hideLink ? '1' : '0')?>" data-lang="<?=$this->layout()->userLang ?>">
+    <div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="0" data-src="<?=$this->searchClassId ?>" data-hide-link="<?=($hideLink ? '1' : '0')?>" data-type="<?=$this->availabilityType?>" data-lang="<?=$this->layout()->userLang ?>">
         <span class="status ajax-availability hidden">
             <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
         </span>
