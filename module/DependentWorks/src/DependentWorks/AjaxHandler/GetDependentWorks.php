@@ -30,6 +30,7 @@ namespace DependentWorks\AjaxHandler;
 //use DependentWorks\DependentWorks;
 use VuFind\AjaxHandler\AbstractBase;
 use VuFind\Search\Results\PluginManager as ResultsManager;
+use VuFind\I18n\Translator\TranslatorAwareInterface;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\Stdlib\Parameters;
@@ -44,8 +45,10 @@ use Zend\Config\Config;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:building_a_controller Wiki
  */
-class GetDependentWorks extends AbstractBase
+class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
 {
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
+
     /**
      * ZF configuration
      *
@@ -84,15 +87,26 @@ class GetDependentWorks extends AbstractBase
     {
         $limit = $this->config['Global']['limit'] ?? 1;
         $sortFlag = $this->config['Global']['sort'] ?? SORT_REGULAR;
+        $switchToRegularSearch = ($this->config['Global']['switch_to_regular_search'] == 'y');
 
         $ppn = $params->fromQuery('ppn');
+        if (empty($ppn)) {
+            return $this->formatResponse([]);
+        }
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $results = $this->resultsManager->get($backend);
-        $results->getOptions()->setLimitOptions([20, 400]);
+        $results->getOptions()->setLimitOptions([$limit, $limit]);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn, 'limit' => $limit]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn]));
 
         $records = $results->getResults();
+        $resultTotal = $results->getResultTotal();
+
+        if ($switchToRegularSearch && $resultTotal > $limit) {
+            $resultString = $resultTotal . ' ' . $this->translate('results') . ': ' . $this->translate('show all');
+            return $this->formatResponse([['resultString' => (string) $resultString]]);
+        }
+
         $data = [];
         foreach ($records as $i => $record) {
             $dependentWorksData = $record->getMarcData('DependentWorksData');
