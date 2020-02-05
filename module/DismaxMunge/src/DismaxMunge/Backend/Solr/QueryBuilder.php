@@ -50,9 +50,6 @@ use VuFindSearch\Backend\Solr\QueryBuilderInterface;
  */
 class QueryBuilder extends \VuFindSearch\Backend\Solr\QueryBuilder implements QueryBuilderInterface
 {
-    /// Public API
-
-
     /**
      * Set query builder search specs.
      *
@@ -108,9 +105,7 @@ class QueryBuilder extends \VuFindSearch\Backend\Solr\QueryBuilder implements Qu
         $highlight = !empty($this->fieldsToHighlight);
 
         if ($handler = $this->getSearchHandler($finalQuery->getHandler(), $string)) {
-            if ($handler->hasDismax()) {
-                 $string = array_pop($handler->mungeValues($string, false));
-            }
+            $string = $handler->preprocessQueryString($string);
             if (!$handler->hasExtendedDismax()
                 && $this->getLuceneHelper()->containsAdvancedLuceneSyntax($string)
             ) {
@@ -145,51 +140,5 @@ class QueryBuilder extends \VuFindSearch\Backend\Solr\QueryBuilder implements Qu
         }
         $params->set('q', $string);
         return $params;
-    }
-
-    /**
-     * Reduce components of query group to a search string of a simple query.
-     *
-     * This function implements the recursive reduction of a query group.
-     *
-     * @param AbstractQuery $component Component
-     *
-     * @return string
-     *
-     * @see self::reduceQueryGroup()
-     */
-    protected function reduceQueryGroupComponents(AbstractQuery $component)
-    {
-        if ($component instanceof QueryGroup) {
-            $reduced = array_map(
-                [$this, 'reduceQueryGroupComponents'], $component->getQueries()
-            );
-            $searchString = $component->isNegated() ? 'NOT ' : '';
-            $reduced = array_filter(
-                $reduced,
-                function ($s) {
-                    return '' !== $s;
-                }
-            );
-            if ($reduced) {
-                $searchString .= sprintf(
-                    '(%s)', implode(" {$component->getOperator()} ", $reduced)
-                );
-            }
-        } else {
-            $searchString = $this->getNormalizedQueryString($component);
-            $searchHandler = $this->getSearchHandler(
-                $component->getHandler(),
-                $searchString
-            );
-            if ($searchHandler && $searchHandler->hasDismax()) {
-                $searchString = array_pop($searchHandler->mungeValues($searchString, false));
-            }
-            if ($searchHandler && '' !== $searchString) {
-                $searchString
-                    = $this->createSearchString($searchString, $searchHandler);
-            }
-        }
-        return $searchString;
     }
 }
