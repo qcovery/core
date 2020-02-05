@@ -203,6 +203,10 @@ class PAIA extends PAIAbase
                 = (isset($doc['canrenew']) && $doc['canrenew'])
                 ? $result['item_id'] : '';
 
+            $result['renew_link']
+                = (isset($doc['canrenew']) && $doc['canrenew'])
+                ? $result['item_id'] : '';
+
             // queue (0..1) number of waiting requests for the document or item
             $result['request'] = ($doc['queue'] ?? null);
 
@@ -259,10 +263,12 @@ class PAIA extends PAIAbase
             $result['institution_name'] = null;
             */
             list($m, $d, $y) = explode('-', $result['dueTime']);
-            $sort = $y.$m.$d.$index++;
+            $i = ($index < 10) ? '0' . $index : $index;
+            $sort = $y.$m.$d.$i;
             $results[$sort] = $result;
+            $index++;
         }
-        krsort($results);
+        ksort($results, SORT_NUMERIC);
         return array_values($results);
     }
         
