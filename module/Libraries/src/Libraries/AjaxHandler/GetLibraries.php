@@ -33,7 +33,6 @@ use VuFind\Search\Memory;
 use Libraries\Libraries;
 use VuFind\AjaxHandler\AbstractBase;
 use Zend\Mvc\Controller\Plugin\Params;
-use Zend\Mvc\I18n\Translator;
 use Zend\Stdlib\Parameters;
 use Zend\Config\Config;
 
@@ -63,25 +62,17 @@ class GetLibraries extends AbstractBase
     protected $resultsManager;
 
     /**
-     * Translation helper
-     *
-     * @var TransEsc
-     */
-    protected $translator;
-
-    /**
      * Constructor
      *
      * @param ServiceLocatorInterface $sm Service locator
      */
-    public function __construct(Config $config, ResultsManager $resultsManager, Memory $searchMemory, Translator $translator)
+    public function __construct(Config $config, ResultsManager $resultsManager, Memory $searchMemory)
     {
         $this->resultsManager = $resultsManager;
         $this->Libraries = new Libraries(
             $config,
             $searchMemory
         );
-        $this->translator = $translator;
     }
 
     /**
@@ -164,7 +155,7 @@ class GetLibraries extends AbstractBase
                     }
                 }
             }
-            $libraryData[$libraryCode] = ['fullname' => $this->translator->translate($library['fullname']), 'count' => $count];
+            $libraryData[$libraryCode] = ['fullname' => $library['fullname'], 'count' => $count];
         }
 
         $locationFacets = [];
