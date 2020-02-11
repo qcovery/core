@@ -29,7 +29,7 @@ namespace Delivery\Auth;
 
 use VuFind\Auth\ILSAuthenticator;
 use VuFind\Auth\Manager;
-use VuFind\ILS\Connection as ILSConnection;
+use PAIAplus\ILS\Connection as ILSConnection;
 
 /**
  * Class for managing ILS-specific authentication.
@@ -55,7 +55,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
      * @param Manager       $auth    Auth manager
      * @param ILSConnection $catalog ILS connection
      */
-    public function __construct(Manager $auth, ILSConnection $catalog, 
+    public function __construct(Manager $auth, ILSConnection $catalog,
         $config, $table)
     {
         $this->setConfig($config);
@@ -130,14 +130,21 @@ class DeliveryAuthenticator extends ILSAuthenticator
         if (!$user = $this->auth->isLoggedIn()) {
             return 'not_logged_in';
         }
+
+        $patron = $this->storedCatalogLogin();
+        $expireDate = new \DateTime($patron['expires']);
+        $today = new \DateTime('today');
+        if ($expireDate < $today) {
+            return 'not_authorized';
+        }
+
+        $patronTypes = array_map([$this, 'extractUserType'], $patron['type']);
+
         $config = $this->getConfig()->toArray();
         $allowedTypes = $config['Patron']['allowed'];
         if (!is_array($allowedTypes)) {
             $allowedTypes = [];
         }
-
-        $patron = $this->storedCatalogLogin();
-        $patronTypes = array_map([$this, 'extractUserType'], $patron['type']);
 
         if (!empty(array_intersect($patronTypes, $allowedTypes))) {
             $userDeliveryTable = $this->getTable();
