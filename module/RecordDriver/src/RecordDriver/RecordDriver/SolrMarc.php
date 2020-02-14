@@ -268,6 +268,7 @@ class SolrMarc extends SolrDefault
                 }
                 foreach ($this->getMarcRecord()->getFields($field) as $index => $fieldObject) {
                     $data = $indexData[0] ?? [];
+                    $conditionForcedValue = [];
                     if (!empty($subFieldSpecs['conditions'])) {
                         foreach ($subFieldSpecs['conditions'] as $condition) {
                             list($type, $key, $val) = $condition;
@@ -296,15 +297,18 @@ class SolrMarc extends SolrDefault
                                     }
                                 } elseif ($type == 'field') {
                                     $fieldExists = false;
+                                    $subfieldCheckPassed = false;
                                     foreach ($fieldObject->getSubfields() as $subFieldObject) {
                                         if ($subFieldObject->getCode() == $key) {
                                             $fieldExists = true;
-                                            if ($val != '*' && !preg_match('/'.$val.'/', $subFieldObject->getData())) {
-                                                continue 3;
+                                            if ($val == '*' || preg_match('/'.$val.'/', $subFieldObject->getData())) {
+                                                $subfieldCheckPassed = true;
+                                                $conditionForcedValue[$key] = $subFieldObject->getData();
+                                                break;
                                             }
                                         }
                                     }
-                                    if (!$fieldExists) {
+                                    if (!$subfieldCheckPassed || !$fieldExists) {
                                         continue 2;
                                     }
                                 }
@@ -355,7 +359,13 @@ class SolrMarc extends SolrDefault
                             } else {
                                 foreach ($fieldObject->getSubfields() as $subFieldObject) {
                                     if ($subFieldObject->getCode() == $subfield) {
-                                        $fieldData[] = $subFieldObject->getData();
+                                        if (!empty($conditionForcedValue[$subfield])) {
+                                            if ($subFieldObject->getData() == $conditionForcedValue[$subfield]) {
+                                                $fieldData[] = $conditionForcedValue[$subfield];
+                                            }
+                                        } else {
+                                            $fieldData[] = $subFieldObject->getData();
+                                        }
                                     }
                                 }
                             }
