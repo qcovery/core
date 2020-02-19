@@ -6,7 +6,7 @@
 namespace SearchKeys\Search\Solr;
 
 //use SearchKeys\Search\QueryAdapter;
-use VuFind\Search\QueryAdapter;
+use SearchKeys\Search\QueryAdapter;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use SearchKeys\Search\SearchKeysHelper;
 
@@ -62,7 +62,10 @@ class Params extends \VuFind\Search\Solr\Params
      */
     public function getDisplayQuery()
     {
-        return $this->getRawQuery();
+        $translate = [$this, 'translate'];
+        $showField = [$this->getOptions(), 'getHumanReadableFieldName'];
+
+        return QueryAdapter::display($this->getQuery(), $translate, $showField);
     }
 
     /**
