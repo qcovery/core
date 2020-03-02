@@ -268,6 +268,7 @@ class SolrMarc extends SolrDefault
                 }
                 foreach ($this->getMarcRecord()->getFields($field) as $index => $fieldObject) {
                     $data = $indexData[0] ?? [];
+                    $conditionForcedValue = [];
                     if (!empty($subFieldSpecs['conditions'])) {
                         foreach ($subFieldSpecs['conditions'] as $condition) {
                             list($type, $key, $val) = $condition;
@@ -296,15 +297,18 @@ class SolrMarc extends SolrDefault
                                     }
                                 } elseif ($type == 'field') {
                                     $fieldExists = false;
+                                    $subfieldCheckPassed = false;
                                     foreach ($fieldObject->getSubfields() as $subFieldObject) {
                                         if ($subFieldObject->getCode() == $key) {
                                             $fieldExists = true;
-                                            if ($val != '*' && !preg_match('/'.$val.'/', $subFieldObject->getData())) {
-                                                continue 3;
+                                            if ($val == '*' || preg_match('/'.$val.'/', $subFieldObject->getData())) {
+                                                $subfieldCheckPassed = true;
+                                                $conditionForcedValue[$key] = $subFieldObject->getData();
+                                                break;
                                             }
                                         }
                                     }
-                                    if (!$fieldExists) {
+                                    if (!$subfieldCheckPassed || !$fieldExists) {
                                         continue 2;
                                     }
                                 }
@@ -328,10 +332,19 @@ class SolrMarc extends SolrDefault
                                             $subFieldList[$subField]['filter'] = $spec[1];
                                             $subFieldList[$subField]['match'] = intval($spec[2]);
                                         } elseif ($spec[0] == 'replace') {
-                                            $subFieldList[$subField]['toReplace'] = $spec[1];
-                                            $subFieldList[$subField]['replacement'] = $spec[2];
+                                            if (!isset($subFieldList[$subField]['toReplace'])) {
+                                                $subFieldList[$subField]['toReplace'] = [];
+                                                $subFieldList[$subField]['replacement'] = [];
+                                            }
+                                            $subFieldList[$subField]['toReplace'][] = $spec[1];
+                                            $subFieldList[$subField]['replacement'][] = $spec[2];
                                         } elseif ($spec[0] == 'function') {
-                                            $subFieldList[$subField]['function'] = $spec[1];
+                                            if (!isset($subFieldList[$subField]['function'])) {
+                                                $subFieldList[$subField]['function'] = [];
+                                                $subFieldList[$subField]['parameter'] = [];
+                                            }
+                                            $subFieldList[$subField]['function'][] = $spec[1];
+                                            $subFieldList[$subField]['parameter'][] = $spec[2];
                                         }
                                     }
                                 }
@@ -346,7 +359,13 @@ class SolrMarc extends SolrDefault
                             } else {
                                 foreach ($fieldObject->getSubfields() as $subFieldObject) {
                                     if ($subFieldObject->getCode() == $subfield) {
-                                        $fieldData[] = $subFieldObject->getData();
+                                        if (!empty($conditionForcedValue[$subfield])) {
+                                            if ($subFieldObject->getData() == $conditionForcedValue[$subfield]) {
+                                                $fieldData[] = $conditionForcedValue[$subfield];
+                                            }
+                                        } else {
+                                            $fieldData[] = $subFieldObject->getData();
+                                        }
                                     }
                                 }
                             }
@@ -359,12 +378,21 @@ class SolrMarc extends SolrDefault
                                             $fieldDate = '';
                                         }
                                     }
-                                    if (isset($properties['toReplace']) && isset($properties['replacement'])) {
-                                        $fieldDate = preg_replace('/' . $properties['toReplace'] . '/', $properties['replacement'], $fieldDate);
-                                    }
                                     if (isset($properties['function'])) {
-                                        $function = $properties['function'];
-                                        $fieldDate = $function($fieldDate);
+                                        for ($i = 0; $i < count($properties['function']); $i++) {
+                                            $function = $properties['function'][$i];
+                                            if (!empty($properties['parameter'][$i])) {
+                                                $fieldDate = $function($fieldDate, $properties['parameter'][$i]);
+                                                #$fieldDate = $function($fieldDate, MB_CASE_TITLE);
+                                            } else {
+                                                $fieldDate = $function($fieldDate);
+                                            }
+                                        }
+                                    }
+                                    if (isset($properties['toReplace']) && isset($properties['replacement'])) {
+                                        for ($i = 0; $i < count($properties['toReplace']); $i++) {
+                                            $fieldDate = preg_replace('/' . $properties['toReplace'][$i] . '/', $properties['replacement'][$i], $fieldDate);
+                                        }
                                     }
                                     $fieldDate = trim($fieldDate);
                                     if (empty($fieldDate) && $fieldDate !== '0' && $fieldDate !== 0) {
