@@ -12,7 +12,7 @@
         <DODSCANS>/opt/dod/dod_files/scandateien/</DODSCANS>
     </PATH>
     <MAIL>
-        <EMPFAENGER>lieferdienste@leuphana.de</EMPFAENGER>
+        <EMPFAENGER>christensen@effective-webwork.de</EMPFAENGER>
         <ABSENDER>LUX Artikelbestellung</ABSENDER>
         <SUBJECT>LUX Artikelbestellung</SUBJECT>
         <ERRORTO>christen@leuphana.de</ERRORTO>
