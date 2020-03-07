@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CONFIG>
+    <MAIL>
+        <EMPFAENGER>chemiebibliothek@biblio.tu-bs.de</EMPFAENGER>
+        <ABSENDER>chemiebibliothek@biblio.tu-bs.de</ABSENDER>
+        <SUBJECT>Artikelbestellung</SUBJECT>
+        <ERRORTO>chemiebibliothek@biblio.tu-bs.de</ERRORTO>
+        <XSENDER>Artikelbestellung</XSENDER>
+    </MAIL>
+</CONFIG>

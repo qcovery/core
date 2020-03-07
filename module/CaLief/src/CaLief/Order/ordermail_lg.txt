@@ -1,0 +1,17 @@
+Ich bestelle folgende/n Zeitschriftenartikel:
+
+Benutzernummer:         [client-identifier]
+E‐Mailadresse:          [del-email-address]
+Nutzertyp:              [user_type]
+Lieferung an:           [Lieferung_an]
+Titel der Zeitschrift:  [item-title]
+ISSN:                   [issn]
+Signatur:               [signature]
+PPN:                    [ppn]
+Jahr:                   [item-publication-date]
+Band/Heft:              [item-volume-issue]
+Titel des Aufsatzes:    [item-title-of-article]
+Autor des Aufsatzes:    [item-author-of-article]
+Seitenangabe:           [item-pagination]
+
+[requester-note]
