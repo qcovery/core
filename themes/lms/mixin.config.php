@@ -5,5 +5,6 @@ return [
     ],
     'js' => [
         'cart.js',
+        'lms.js',
     ],
 ];
