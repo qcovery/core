@@ -131,6 +131,35 @@ class SideFacets extends \VuFind\Recommend\SideFacets
     }
 
     /**
+     * getFacetHierarchies
+     *
+     * Return dependency informations on facets.
+     *
+     * @param array $oldFacetList list of facets, $label filterlabel.
+     *
+     * @return array list of facets
+     */
+    public function getFacetHierarchies($oldFacetList, $label)
+    {
+        $facetLength = count($oldFacetList);
+        $newFacetList = array();
+        for ($i = 0; $i < $facetLength; $i++) {
+            if (isset($oldFacetList[$i])) {
+                $newFacetList[] = $oldFacetList[$i];
+            }
+            $value = $oldFacetList[$i]['value'];
+            for ($j = $i+1; $j < $facetLength; $j++) {
+                if (strpos($oldFacetList[$j]['value'], $value) > 0) {
+                    $oldFacetList[$j]['parent'] = $value;
+                    $newFacetList[] = $oldFacetList[$j];
+                    unset($oldFacetList[$j]);
+                }
+            }
+        }
+        return $newFacetList;
+    }
+
+    /**
      * Get facet information from the search results.
      *
      * @return array
@@ -140,6 +169,9 @@ class SideFacets extends \VuFind\Recommend\SideFacets
         $facetSet = \VuFind\Recommend\SideFacets::getFacetSet();
         if (isset($facetSet['publishDate'])) {
             $facetSet['publishDate']['list'] = $this->getYearFacets($facetSet['publishDate']['list'], $facetSet['publishDate']['label']);
+        }
+        if (isset($facetSet['format_facet'])) {
+            $facetSet['format_facet']['list'] = $this->getFacetHierarchies($facetSet['format_facet']['list'], $facetSet['format_facet']['label']);
         }
 
         $facetSet = $this->showFacetValue($facetSet);
