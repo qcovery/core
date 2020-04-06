@@ -71,7 +71,8 @@
         "zendframework/zendservice-amazon": "2.3.0",
         "zendframework/zendservice-recaptcha": "3.1.0",
         "zf-commons/zfc-rbac": "2.6.3",
-        "picqer/php-barcode-generator": "^0.3.0"
+        "picqer/php-barcode-generator": "^0.3.0",
+        "sabberworm/php-css-parser": "*"
     },
     "require-dev": {
         "behat/mink": "1.7.1",
