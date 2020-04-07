@@ -110,7 +110,8 @@ class Loader extends \VuFind\Cover\Loader
                     $format = str_ireplace(' ', '', $settings['format']);
                     $format = strtolower($format);
                     if ($im = imagecreate(64, 64)) {
-                        $beluginoParser = new \Sabberworm\CSS\Parser(file_get_contents(APPLICATION_PATH . '/themes/belugax/css/belugino.css'));
+                        $beluginoFile = APPLICATION_PATH . '/themes/belugax/css/belugino.css';
+                        $beluginoParser = new \Sabberworm\CSS\Parser(file_get_contents($beluginoFile));
                         $beluginoCss = $beluginoParser->parse();
 
                         $belugino = [];
@@ -121,10 +122,6 @@ class Loader extends \VuFind\Cover\Loader
                                 $belugino[$key] = $value;
                             }
                         }
-
-                        error_log(print_r($belugino, true));
-                        error_log(print_r($format, true));
-                        error_log(print_r($belugino[$format], true));
 
                         $formatString = '';
                         foreach ($beluginoCss->getAllDeclarationBlocks() as $declarationBlock) {
@@ -137,17 +134,23 @@ class Loader extends \VuFind\Cover\Loader
                             if ($foundBeluginoClass) {
                                 foreach ($declarationBlock->getRules() as $rule) {
                                     if ($rule->getRule() == 'content') {
-                                        $formatString = $rule->getValue()->getString()."";
-                                        $formatString = str_ireplace("\e", "0xe", $formatString);
+                                        $lines = file($beluginoFile);
+                                        $formatString = $lines[$rule->getLineNo()-1];
+                                        $formatString = preg_match("/\"([^\"]+)\"/", $formatString, $matches);
+                                        if (isset($matches[1])) {
+                                            $formatString = $matches[1];
+                                        }
+                                        $formatString = str_ireplace('\e', "&#xE", $formatString).';';
+                                        $formatString = json_decode('"'.$formatString.'"');
                                     }
                                 }
                             }
                         }
 
                         $bg = imagecolorallocate($im, 255, 255, 255);
-                        $textcolor = imagecolorallocate($im, 0, 0, 255);
+                        $textcolor = imagecolorallocate($im, 0, 0, 0);
 
-                        imagettftext($im, 5,0,0,0, $textcolor, APPLICATION_PATH . '/themes/belugax/css/fonts/belugino.ttf', $formatString);
+                        imagettftext($im, 64,0,-10,72, $textcolor, APPLICATION_PATH . '/themes/belugax/css/fonts/belugino.ttf', $formatString);
 
                         imageAlphaBlending($im, true);
                         imageSaveAlpha($im, true);
