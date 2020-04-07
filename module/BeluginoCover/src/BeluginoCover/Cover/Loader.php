@@ -134,14 +134,7 @@ class Loader extends \VuFind\Cover\Loader
                             if ($foundBeluginoClass) {
                                 foreach ($declarationBlock->getRules() as $rule) {
                                     if ($rule->getRule() == 'content') {
-                                        $lines = file($beluginoFile);
-                                        $formatString = $lines[$rule->getLineNo()-1];
-                                        $formatString = preg_match("/\"([^\"]+)\"/", $formatString, $matches);
-                                        if (isset($matches[1])) {
-                                            $formatString = $matches[1];
-                                        }
-                                        $formatString = str_ireplace('\e', "&#xE", $formatString).';';
-                                        $formatString = json_decode('"'.$formatString.'"');
+                                        $formatString = $rule->getValue()->getString();
                                     }
                                 }
                             }
