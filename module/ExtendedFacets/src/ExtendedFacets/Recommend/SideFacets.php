@@ -27,6 +27,9 @@
  */
 namespace ExtendedFacets\Recommend;
 
+use VuFind\I18n\Translator\TranslatorAwareInterface;
+use Zend\I18n\Translator\TranslatorInterface;
+
 /**
  * SideFacets Recommendations Module
  *
@@ -38,8 +41,28 @@ namespace ExtendedFacets\Recommend;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
-class SideFacets extends \VuFind\Recommend\SideFacets
+class SideFacets extends \VuFind\Recommend\SideFacets implements TranslatorAwareInterface
 {
+    /**
+     * Translator
+     *
+     * @var \Zend\I18n\Translator\Translator
+     */
+    protected $translator = null;
+
+    /**
+     * Set a translator
+     *
+     * @param \Zend\I18n\Translator\Translator $translator Translator
+     *
+     * @return $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+        return $this;
+    }
+
     /**
      * getYearFacets
      *
@@ -160,6 +183,61 @@ class SideFacets extends \VuFind\Recommend\SideFacets
     }
 
     /**
+     * getLocationFacets
+     *
+     * Return location facet information in a format processed for use in the view.
+     *
+     * @param array $oldFacetList list of facets, $label filterlabel.
+     *
+     * @return array list of facets
+     */
+    public function getLocationFacets($sigelFacetList, $sigelLabel) {
+        $filters = $this->results->getParams()->getFilterList();
+
+        $tmpFacetList = array();
+        $filterList = array();
+        $isAppliedGlobal = false;
+        foreach ($sigelFacetList as $sigelFacetItem) {
+            $displayText = $this->translator->translate($sigelFacetItem['displayText']);
+
+            $sigelFacetItemCropped = preg_replace('/-[A-z]+$/', '', $sigelFacetItem['displayText']);
+            if ($displayText == $sigelFacetItem['displayText']) {
+                $displayText = $this->translator->translate($sigelFacetItemCropped);
+            }
+            if ($displayText != $sigelFacetItem['displayText'] && $displayText != $sigelFacetItemCropped) {
+                if (isset($tmpFacetList[$displayText])) {
+                    $tmpFacetList[$displayText]['sort'] += $sigelFacetItem['count'];
+                    $tmpFacetList[$displayText]['count'] += $sigelFacetItem['count'];
+                } else {
+                    $isApplied = (strpos($filters[$sigelLabel][0]['value'], $sigelFacetItem['value']) !== false);
+                    $tmpFacetList[$displayText] = array('sort' => $sigelFacetItem['count'], 'value' => $sigelFacetItem['value'], 'displayText' => $displayText, 'count' => $sigelFacetItem['count'], 'operator' => 'AND', 'isApplied' => $isApplied);
+                    if ($isApplied) {
+                        $isAppliedGlobal = true;
+                    }
+                }
+                if (isset($filterList[$displayText])) {
+                    $filterList[$displayText]['value'] .= ' OR standort_iln_str_mv:"'.$sigelFacetItem['value'].'"';
+                } else {
+                    $filterList[$displayText]['value'] = 'complex:standort_iln_str_mv:"'.$sigelFacetItem['value'].'"';
+                }
+            }
+        }
+        foreach ($tmpFacetList as $name => $data) {
+            if (isset($filterList[$name]['value'])) {
+                $tmpFacetList[$name]['value'] = $filterList[$name]['value'];
+            }
+        }
+        array_multisort($tmpFacetList, SORT_DESC);
+        $newFacetList = array();
+        foreach ($tmpFacetList as $tmpFacetItem) {
+            if (!$isAppliedGlobal || $tmpFacetItem['isApplied']) {
+                $newFacetList[] = $tmpFacetItem;
+            }
+        }
+        return $newFacetList;
+    }
+
+    /**
      * Get facet information from the search results.
      *
      * @return array
@@ -172,6 +250,9 @@ class SideFacets extends \VuFind\Recommend\SideFacets
         }
         if (isset($facetSet['format_facet'])) {
             $facetSet['format_facet']['list'] = $this->getFacetHierarchies($facetSet['format_facet']['list'], $facetSet['format_facet']['label']);
+        }
+        if (isset($facetSet['standort_iln_str_mv'])) {
+            $facetSet['standort_iln_str_mv']['list'] = $this->getLocationFacets($facetSet['standort_iln_str_mv']['list'], $facetSet['standort_iln_str_mv']['label']);
         }
 
         $facetSet = $this->showFacetValue($facetSet);
