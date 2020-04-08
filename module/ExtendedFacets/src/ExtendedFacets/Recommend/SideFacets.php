@@ -251,9 +251,11 @@ class SideFacets extends \VuFind\Recommend\SideFacets implements TranslatorAware
         if (isset($facetSet['format_facet'])) {
             $facetSet['format_facet']['list'] = $this->getFacetHierarchies($facetSet['format_facet']['list'], $facetSet['format_facet']['label']);
         }
+        /*
         if (isset($facetSet['standort_iln_str_mv'])) {
             $facetSet['standort_iln_str_mv']['list'] = $this->getLocationFacets($facetSet['standort_iln_str_mv']['list'], $facetSet['standort_iln_str_mv']['label']);
         }
+        */
 
         $facetSet = $this->showFacetValue($facetSet);
 
