@@ -89,6 +89,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
         $list = $params->fromPost('list', $params->fromQuery('list', []));
         $hideLink = $params->fromPost('hideLink', $params->fromQuery('hideLink', []));
         $hmacKeys = explode(':', $this->config['StorageRetrievalRequests']['HMACKeys']);
+
+        $mediatype = $params->fromPost('list', $params->fromQuery('mediatype', []));
 //neu A
         try {
             if (method_exists($this->ils, 'getDriver')) {
@@ -214,6 +216,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                         'list' => $list === 'true'? true: false,
                         'ppn' => $current['id'],
                         'hideLink' => $hideLink,
+                        'mediatype' => $mediatype,
                     ]
                 );
 //neu A
