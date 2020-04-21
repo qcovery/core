@@ -60,6 +60,14 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
         );
         $view->driver = $driver;
 
+        $configReader = $this->serviceLocator->get('VuFind\Config\PluginManager');
+        $resultFeedbackConfig = $configReader->get('resultFeedback')->toArray();
+        $resultUserTypes = [];
+        if (isset($resultFeedbackConfig['resultFeedback']['user_types'])) {
+            $resultUserTypes = $resultFeedbackConfig['resultFeedback']['user_types'];
+        }
+        $view->resultUserTypes = $resultUserTypes;
+
         // Process form submission:
         if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
             if (empty($view->email) || empty($view->comments)) {

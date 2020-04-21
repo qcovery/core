@@ -9,10 +9,9 @@
   <div class="form-group">
     <label class="control-label" for="usertype"><?=$this->transEsc("resultfeedback_usertype")?></label>
     <select name="usertype">
-      <option value="1">Lehrende*r der HAW Hamburg</option>
-      <option value="2">Studierende*r der HAW Hamburg</option>
-      <option value="3">Mitarbeiter*in der HAW Hamburg</option>
-      <option value="4">Externer Nutzerin</option>
+      <?php foreach($this->resultUserTypes as $resultUserType): ?>
+        <option value="<?=$resultUserType?>"><?=$this->transEsc($resultUserType)?></option>
+      <?php endforeach; ?>
     </select>
   </div>
   <div class="form-group">
