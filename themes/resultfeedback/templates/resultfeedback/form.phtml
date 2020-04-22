@@ -1,37 +1,39 @@
 <h2><?=$this->transEsc("Contact us about this title")?></h2>
-<div class="resultfeedback-title">
-    <?=$this->render('RecordDriver/SolrDefault/recorddriver-core-title.phtml', ['driver' => $this->driver]) ?>
-</div>
 <?=$this->flashmessages() ?>
-<form class="form-feedback" name="feedback" method="post" action="<?=$this->url('resultfeedback-email')?>">
-    <input type="hidden" id="recordId" name="recordId" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueID() ?? '')?>" />
-    <input type="hidden" id="recordTitle" name="recordTitle" value="<?=$this->escapeHtmlAttr($this->driver->getTitle() ?? '')?>" />
-  <div class="form-group">
-    <label class="control-label" for="usertype"><?=$this->transEsc("resultfeedback_usertype")?></label>
-    <select name="usertype">
-      <?php foreach($this->resultUserTypes as $resultUserType): ?>
-        <option value="<?=$resultUserType?>"><?=$this->transEsc($resultUserType)?></option>
-      <?php endforeach; ?>
-    </select>
-  </div>
-  <div class="form-group">
-    <label class="control-label" for="name"><?=$this->transEsc("feedback_name")?></label>
-    <input type="text" id="name" name="name" value="<?=$this->escapeHtmlAttr($name ?? '')?>" class="form-control"/>
-  </div>
-  <div class="form-group">
-    <label class="control-label" for="email"><?=$this->transEsc("Email")?></label>
-    <input type="email" id="email" name="email" value="<?=$this->escapeHtmlAttr($email ?? '')?>" class="form-control" required />
-  </div>
-  <div class="form-group">
-    <label class="control-label" for="comments"><?=$this->transEsc("Comments")?></label>
-    <textarea id="comments" name="comments" class="form-control" required><?=$this->escapeHtml($comments ?? '')?></textarea>
-  </div>
-    <div class="form-group">
-        <label class="control-label" for="comments"><?=$this->transEsc("Privacy")?></label>
-        <input type="checkbox" name="privacy" required />
+<?php if(!$this->hideForm): ?>
+    <div class="resultfeedback-title">
+        <?=$this->render('RecordDriver/SolrDefault/recorddriver-core-title.phtml', ['driver' => $this->driver]) ?>
     </div>
-  <?=$this->recaptcha()->html($this->useRecaptcha) ?>
-  <div class="form-group">
-    <input type="submit" name="submit" class="btn btn-primary" value="<?=$this->transEsc("Send")?>" />
-  </div>
-</form>
+    <form class="form-feedback result-feedback" name="feedback" method="post" action="<?=$this->url('resultfeedback-email').'?id='.$this->id.'&searchclassid='.$this->searchClassId?>">
+      <input type="hidden" id="recordid" name="recordid" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueID() ?? '')?>" />
+      <input type="hidden" id="recordtitle" name="recordtitle" value="<?=$this->escapeHtmlAttr($this->driver->getTitle() ?? '')?>" />
+      <div class="form-group">
+        <label class="control-label" for="usertype"><?=$this->transEsc("resultfeedback_usertype")?></label>
+        <select name="usertype">
+          <?php foreach($this->resultUserTypes as $resultUserType): ?>
+            <option value="<?=$resultUserType?>"><?=$this->transEsc($resultUserType)?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="control-label" for="name"><?=$this->transEsc("feedback_name")?></label>
+        <input type="text" id="name" name="name" value="<?=$this->escapeHtmlAttr($name ?? '')?>" class="form-control"/>
+      </div>
+      <div class="form-group">
+        <label class="control-label" for="email"><?=$this->transEsc("Email")?></label>
+        <input type="email" id="email" name="email" value="<?=$this->escapeHtmlAttr($email ?? '')?>" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label class="control-label" for="comments"><?=$this->transEsc("Comments")?></label>
+        <textarea id="comments" name="comments" class="form-control" required><?=$this->escapeHtml($comments ?? '')?></textarea>
+      </div>
+      <div class="form-group">
+        <label class="control-label privacy" for="privacy"><?=$this->translate("I Accept The Privacy Policy")?></label>
+        <input type="checkbox" name="privacy" required />
+      </div>
+      <?=$this->recaptcha()->html($this->useRecaptcha) ?>
+      <div class="form-group">
+        <input type="submit" name="submit" class="btn btn-primary" value="<?=$this->transEsc("Send")?>" />
+      </div>
+    </form>
+<?php endif; ?>

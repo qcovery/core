@@ -6,7 +6,7 @@
  *
  * @category VuFind
  * @package  Controller
- * @author   Josiah Knoll <jk1135@ship.edu>
+ * @author   Johannes Schultze <schultze@effective-webwork.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
@@ -22,7 +22,7 @@ use Zend\Mail\Address;
  *
  * @category VuFind
  * @package  Controller
- * @author   Josiah Knoll <jk1135@ship.edu>
+ * @author   Johannes Schultze <schultze@effective-webwork.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
@@ -40,28 +40,32 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
 
     /**
      * Receives input from the user and sends an email to the recipient set in
-     * the config.ini
+     * the resultFeedback.ini
      *
      * @return void
      */
     public function emailAction()
     {
+        $translator = $this->serviceLocator->get('Zend\Mvc\I18n\Translator');
+
         $view = $this->createViewModel();
         $view->useRecaptcha = $this->recaptcha()->active('feedback');
         $view->name = $this->params()->fromPost('name');
         $view->email = $this->params()->fromPost('email');
         $view->comments = $this->params()->fromPost('comments');
+        $view->usertype = $this->params()->fromPost('usertype');
+        $view->recordid = $this->params()->fromPost('recordid');
+        $view->recordtitle = $this->params()->fromPost('recordtitle');
 
+        $id = $this->params()->fromRoute('id', $this->params()->fromQuery('id'));
+        $view->id = $id;
+        $searchClassId = $this->params()->fromRoute('searchclassid', $this->params()->fromQuery('searchclassid'));
+        $view->searchClassId = $searchClassId;
         $recordLoader = $this->serviceLocator->get('VuFind\Record\Loader');;
-        $driver = $recordLoader->load(
-            $this->params()->fromRoute('id', $this->params()->fromQuery('id')),
-            $this->params()->fromRoute('searchclassid', $this->params()->fromQuery('searchclassid')),
-            false
-        );
+        $driver = $recordLoader->load($id, $searchClassId, false);
         $view->driver = $driver;
 
-        $configReader = $this->serviceLocator->get('VuFind\Config\PluginManager');
-        $resultFeedbackConfig = $configReader->get('resultFeedback')->toArray();
+        $resultFeedbackConfig = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('resultFeedback')->toArray();
         $resultUserTypes = [];
         if (isset($resultFeedbackConfig['resultFeedback']['user_types'])) {
             $resultUserTypes = $resultFeedbackConfig['resultFeedback']['user_types'];
@@ -69,35 +73,30 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
         $view->resultUserTypes = $resultUserTypes;
 
         // Process form submission:
+        $view->hideForm = false;
         if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
             if (empty($view->email) || empty($view->comments)) {
                 $this->flashMessenger()->addMessage('bulk_error_missing', 'error');
                 return;
             }
 
-            // These settings are set in the feedback settion of your config.ini
-            $config = $this->serviceLocator->get('VuFind\Config\PluginManager')
-                ->get('config');
-            $feedback = isset($config->Feedback) ? $config->Feedback : null;
-            $recipient_email = isset($feedback->recipient_email)
-                ? $feedback->recipient_email : null;
-            $recipient_name = isset($feedback->recipient_name)
-                ? $feedback->recipient_name : 'Your Library';
-            $email_subject = isset($feedback->email_subject)
-                ? $feedback->email_subject : 'VuFind Feedback';
-            $sender_email = isset($feedback->sender_email)
-                ? $feedback->sender_email : 'noreply@vufind.org';
-            $sender_name = isset($feedback->sender_name)
-                ? $feedback->sender_name : 'VuFind Feedback';
+            $recipient_email = isset($resultFeedbackConfig['resultFeedback']['recipient_email']) ? $resultFeedbackConfig['resultFeedback']['recipient_email'] : null;
+            $recipient_name = isset($resultFeedbackConfig['resultFeedback']['recipient_name']) ? $resultFeedbackConfig['resultFeedback']['recipient_name'] : 'Your Library';
+            $email_subject = isset($resultFeedbackConfig['resultFeedback']['email_subject']) ? $resultFeedbackConfig['resultFeedback']['email_subject'] : 'Result Feedback';
+            $sender_email = isset($resultFeedbackConfig['resultFeedback']['sender_email']) ? $resultFeedbackConfig['resultFeedback']['sender_email'] : 'noreply@vufind.org';
+            $sender_name = isset($resultFeedbackConfig['resultFeedback']['sender_name']) ? $resultFeedbackConfig['resultFeedback']['sender_name'] : 'Result Feedback';
             if ($recipient_email == null) {
                 throw new \Exception(
-                    'Feedback Module Error: Recipient Email Unset (see config.ini)'
+                    'Result Feedback Module Error: Recipient Email Unset (see resultFeedback.ini)'
                 );
             }
 
-            $email_message = empty($view->name) ? '' : 'Name: ' . $view->name . "\n";
-            $email_message .= 'Email: ' . $view->email . "\n";
-            $email_message .= 'Comments: ' . $view->comments . "\n\n";
+            $email_message = $translator->translate('resultfeedback_usertype') . ':' . "\n" . $translator->translate($view->usertype) . "\n\n";
+            $email_message .= empty($view->name) ? '' : 'Name:' . "\n" . $view->name . "\n\n";
+            $email_message .= $translator->translate('Email') . ':' . "\n" . $view->email . "\n\n";
+            $email_message .= $translator->translate('PPN') . ':' . "\n" . $view->recordid . "\n\n";
+            $email_message .= $translator->translate('Title') . ':' . "\n" . $view->recordtitle . "\n\n";
+            $email_message .= $translator->translate('Message') . ':' . "\n" . $view->comments . "\n\n";
 
             // This sets up the email to be sent
             // Attempt to send the email and show an appropriate flash message:
@@ -106,15 +105,20 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
                 $mailer->send(
                     new Address($recipient_email, $recipient_name),
                     new Address($sender_email, $sender_name),
-                    $email_subject, $email_message
+                    $email_subject,
+                    $email_message,
+                    null,
+                    $view->email
                 );
                 $this->flashMessenger()->addMessage(
-                    'Thank you for your feedback.', 'success'
+                    'Your result feedback has been send', 'success'
                 );
+                $view->hideForm = true;
             } catch (MailException $e) {
                 $this->flashMessenger()->addMessage($e->getMessage(), 'error');
             }
         }
+
         return $view;
     }
 }
