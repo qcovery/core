@@ -96,6 +96,11 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
             $email_message .= $translator->translate('Email') . ':' . "\n" . $view->email . "\n\n";
             $email_message .= $translator->translate('PPN') . ':' . "\n" . $view->recordid . "\n\n";
             $email_message .= $translator->translate('Title') . ':' . "\n" . $view->recordtitle . "\n\n";
+
+            if (isset($resultFeedbackConfig['resultFeedback']['base_url_' . $searchClassId])) {
+              $email_message .= $translator->translate('Link') . ':' . "\n" . trim($resultFeedbackConfig['resultFeedback']['base_url_' . $searchClassId], '/') . '/' . $driver->getUniqueID() . "\n\n";
+            }
+
             $email_message .= $translator->translate('Message') . ':' . "\n" . $view->comments . "\n\n";
 
             // This sets up the email to be sent
