@@ -190,11 +190,14 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             }
         }
         if (!empty($parentId)) {
-            $parentDriver = $this->recordLoader->load($parentId, 'Solr');
-            $ilnMatch = $parentDriver->getMarcData('ILN');
-            if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                $urlAccess = '/vufind/Record/' . $parentId;
-            }
+            try {
+                $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+                $ilnMatch = $parentDriver->getMarcData('ILN');
+                if (!empty($ilnMatch[0]['iln']['data'][0])) {
+                  $urlAccess = '/vufind/Record/' . $parentId;
+                }
+             } catch (\Exception $e) {
+             }
         }
         return $urlAccess;
     }
