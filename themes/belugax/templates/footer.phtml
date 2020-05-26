@@ -5,7 +5,7 @@
       <ul>
         <? if (!empty($this->configreader()->getConfigData('Footer', 'links_left'))): ?>
           <? foreach ($this->configreader()->getConfigData('Footer', 'links_left') as $text => $link): ?>
-            <li><a href="<?=$link?>"><?=$this->transEsc($text)?></a></li>
+            <li><a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a></li>
           <? endforeach; ?>
         <? endif; ?>
       </ul>
@@ -16,7 +16,7 @@
       <ul>
         <? if (!empty($this->configreader()->getConfigData('Footer', 'links_center'))): ?>
           <? foreach ($this->configreader()->getConfigData('Footer', 'links_center') as $text => $link): ?>
-            <li><a href="<?=$link?>"><?=$this->transEsc($text)?></a></li>
+            <li><a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a></li>
           <? endforeach; ?>
         <? endif; ?>
       </ul>
@@ -27,7 +27,7 @@
       <ul>
         <? if (!empty($this->configreader()->getConfigData('Footer', 'links_right'))): ?>
           <? foreach ($this->configreader()->getConfigData('Footer', 'links_right') as $text => $link): ?>
-            <li><a href="<?=$link?>"><?=$this->transEsc($text)?></a></li>
+            <li><a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a></li>
           <? endforeach; ?>
         <? endif; ?>
       </ul>
