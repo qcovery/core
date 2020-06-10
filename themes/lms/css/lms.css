@@ -9,3 +9,8 @@
 .spinner {
     animation: anim-rotate 2s infinite linear;
 }
+
+.lms-list-id-export {
+    margin: 15px;
+    padding-bottom: 20px;
+}

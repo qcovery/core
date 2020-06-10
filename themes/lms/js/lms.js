@@ -12,4 +12,13 @@ $(document).ready(function() {
             $(this).html($(this).data('display-more'));
         }
     });
+
+    $('#copy-lms-id-button').on('click', function(e){
+        e.preventDefault();
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val($('#copy-lms-id-input').val()).select();
+        document.execCommand("copy");
+        $temp.remove();
+    });
 });
