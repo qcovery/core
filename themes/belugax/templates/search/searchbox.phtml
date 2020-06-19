@@ -10,6 +10,12 @@
         $this->searchClassId,
         isset($this->searchIndex) ? $this->searchIndex : null
     );
+
+	$keywords = array();
+	foreach($handlers as $handler){
+		$keywords[$handler['label']] = $handler['value'];
+	}
+
     $handlerCount = count($handlers);
     $basicSearch = $this->searchbox()->combinedHandlersActive() ? 'combined-searchbox' : $options->getSearchAction();
     $searchHome = $options->getSearchHomeAction();
