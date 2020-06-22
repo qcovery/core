@@ -11,10 +11,10 @@
         isset($this->searchIndex) ? $this->searchIndex : null
     );
 
-	$keywords = array();
-	foreach($handlers as $handler){
-		$keywords[$handler['label']] = $handler['value'];
-	}
+    $keywords = array();
+    foreach($handlers as $handler){
+        $keywords[$handler['label']] = $handler['value'];
+    }
 
     $handlerCount = count($handlers);
     $basicSearch = $this->searchbox()->combinedHandlersActive() ? 'combined-searchbox' : $options->getSearchAction();
@@ -38,7 +38,7 @@
     $searchIndex = $this->searchIndex;
     $searchType = $this->searchType;
 
-    if ($this->lookfor == '') {
+    if (empty($this->lookfor)) {
         if ($_GET['lookfor'])  {
             $this->lookfor = $_GET['lookfor'];
             foreach($keywords as $identifier => $type) {
