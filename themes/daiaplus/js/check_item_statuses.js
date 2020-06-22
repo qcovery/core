@@ -23,7 +23,7 @@ function displayArticleStatus(results, $item) {
       $item.find('.status').append('error');
     } else {
       if (typeof(result.href) != 'undefined') {
-        var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a><br/>';
+        var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a> (' + result.type + ')<br/>';
         $item.find('.status').append(html);
       }
     }
@@ -117,6 +117,7 @@ var itemStatusList = false;
 var itemStatusSource = '';
 var itemStatusHideLink = '';
 var itemStatusType = '';
+var itemStatusRanks = [];
 
 function runItemAjaxForQueue() {
   // Only run one item status AJAX request at a time:
@@ -136,7 +137,7 @@ function runItemAjaxForQueue() {
       url: VuFind.path + '/AJAX/JSON?method=' + method,
       dataType: 'json',
       method: 'get',
-      data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink}
+      data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink, rank:itemStatusRanks[i]}
     })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
@@ -157,12 +158,13 @@ function runItemAjaxForQueue() {
   }
 }
 
-function itemQueueAjax(id, el) {
+function itemQueueAjax(id, rank, el) {
   if (el.hasClass('js-item-pending')) {
     return;
   }
   clearTimeout(itemStatusTimer);
   itemStatusIds.push(id);
+  itemStatusRanks.push(rank);
   itemStatusEls[id] = el;
   itemStatusTimer = setTimeout(runItemAjaxForQueue, itemStatusDelay);
   el.addClass('js-item-pending').removeClass('hidden');
@@ -179,7 +181,8 @@ function checkItemStatus(el) {
   itemStatusList = ($item.attr('data-list') == 1);
   itemStatusHideLink = $item.attr('data-hide-link');
   itemStatusType = $item.attr('data-type');
-  itemQueueAjax(id + '', $item);
+  var rank = $item.attr('data-rank');
+  itemQueueAjax(id + '', rank + '', $item);
 }
 
 var itemStatusObserver = null;
@@ -196,6 +199,7 @@ function checkItemStatuses(_container) {
     itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
     itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
     itemStatusType = $(availabilityItems[i]).attr('data-type');
+    itemStatusRanks[i] = $(availabilityItems[i]).attr('data-rank');
     itemQueueAjax(id, $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader

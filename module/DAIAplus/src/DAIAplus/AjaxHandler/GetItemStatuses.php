@@ -87,6 +87,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
         $ids = $params->fromPost('id', $params->fromQuery('id', []));
 //neu V
         $list = $params->fromPost('list', $params->fromQuery('list', []));
+        $rank = $params->fromPost('rank', $params->fromQuery('rank', []));
         $hideLink = $params->fromPost('hideLink', $params->fromQuery('hideLink', []));
         $hmacKeys = explode(':', $this->config['StorageRetrievalRequests']['HMACKeys']);
 //neu A
@@ -201,6 +202,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                                 $orderLink .= '&storage_id=' . urlencode($storageId);
                             }
                             $orderLink .= '&hashKey=' . $hashKey;
+                            $orderLink .= '&rank=' . $rank;
                             $record[$index1]['daiaplus']['actionArray'][$index2]['beluga_core']['href'] = $orderLink;
                         }
                     }
@@ -214,6 +216,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                         'list' => $list === 'true'? true: false,
                         'ppn' => $current['id'],
                         'hideLink' => $hideLink,
+                        'rank' => $rank,
                     ]
                 );
 //neu A
