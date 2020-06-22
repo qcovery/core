@@ -200,7 +200,7 @@ function checkItemStatuses(_container) {
     itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
     itemStatusType = $(availabilityItems[i]).attr('data-type');
     itemStatusRanks[i] = $(availabilityItems[i]).attr('data-rank');
-    itemQueueAjax(id, $(availabilityItems[i]));
+    itemQueueAjax(id, '', $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader
   if (itemStatusObserver) {
