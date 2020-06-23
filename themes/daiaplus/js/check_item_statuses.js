@@ -177,11 +177,11 @@ function itemQueueAjax(id, rank, el) {
 function checkItemStatus(el) {
   var $item = $(el);
   var id = $item.attr('data-id');
+  var rank = $item.attr('data-rank');
   itemStatusSource = $item.attr('data-src');
   itemStatusList = ($item.attr('data-list') == 1);
   itemStatusHideLink = $item.attr('data-hide-link');
   itemStatusType = $item.attr('data-type');
-  var rank = $item.attr('data-rank');
   itemQueueAjax(id + '', rank + '', $item);
 }
 
@@ -195,12 +195,12 @@ function checkItemStatuses(_container) {
   var availabilityItems = $(container).find('.availabilityItem');
   for (var i = 0; i < availabilityItems.length; i++) {
     var id = $(availabilityItems[i]).attr('data-id');
+    var rank = $(availabilityItems[i]).attr('data-rank');
     itemStatusSource = $(availabilityItems[i]).attr('data-src');
     itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
     itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
     itemStatusType = $(availabilityItems[i]).attr('data-type');
-    itemStatusRanks[i] = $(availabilityItems[i]).attr('data-rank');
-    itemQueueAjax(id, '', $(availabilityItems[i]));
+    itemQueueAjax(id + '', rank + '', $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader
   if (itemStatusObserver) {
