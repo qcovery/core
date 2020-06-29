@@ -1,6 +1,6 @@
 jQuery(document).ready(function() {
     var recordId;
-    var pathParts = window.location.href.split('/');
+    var pathParts = window.location.pathname.split('/');
     var recordIndex = pathParts.length - 1;
     if (pathParts[recordIndex] == 'Record') {
       recordId = pathParts[(recordIndex + 1)];
