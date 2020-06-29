@@ -131,7 +131,6 @@ function runItemAjaxForQueue() {
   } else {
     var method = 'getItemStatuses';
   }
-  
   for (var i=0; i<itemStatusIds.length; i++) {
     $.ajax({
       url: VuFind.path + '/AJAX/JSON?method=' + method,
@@ -148,6 +147,7 @@ function runItemAjaxForQueue() {
           displayArticleStatus(status, itemStatusEls[status.id]);
         }
         itemStatusIds.splice(itemStatusIds.indexOf(status.id), 1);
+        itemStatusRanks.splice(itemStatusIds.indexOf(status.id), 1);
       }
       itemStatusRunning = false;
     })
