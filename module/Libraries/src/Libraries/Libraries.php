@@ -425,7 +425,7 @@ class Libraries
                         }
                         $locationList[$value]['count'] += intval($facetValue);
                         if (true || strpos($key, ' ') !== false) {
-                            $key = '"'.$key.'"';
+                            $key = str_replace([':', '/'], ['\:', '\/'], $key);
                         }
                         $filterList[$value][] = $locations['solr-field'].':'.str_replace('.', '', $key);
                         break;
