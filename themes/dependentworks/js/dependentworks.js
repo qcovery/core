@@ -43,8 +43,11 @@ jQuery(document).ready(function() {
                     }
                 }
                 jQuery('div#DependentWorks').attr('style', 'display:block');
+				jQuery('div#DependentWorksRotator').attr('style', 'display:none');
+            } else {
+                jQuery('div#DependentWorks').attr('style', 'display:none');
             }
-        }
+        } 
     });
 
     jQuery('#ToggleDependentWorksMore').on('click', function(event) {
