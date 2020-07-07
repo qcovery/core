@@ -20,7 +20,7 @@ jQuery(document).ready(function() {
         success:function(data, textStatus) {
             if (data.data.length > 0) {
                 if (data.data[0]['resultString'] !== undefined) {
-                    var href = '<a href="/vufind/Search/Results?lookfor=hierarchy_top_id:'
+                    var href = '<a href="/vufind/Search/Results?lookfor='+data.data[0]['searchfield']+':'
                             + recordId + ' -id:'  + recordId + '&sort=year">'
                             + data.data[0]['resultString'] + '</a>'
                     jQuery('ul#DependentWorks').append('<li>' + href + '</li>');
