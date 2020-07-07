@@ -21,7 +21,7 @@ jQuery(document).ready(function() {
             if (data.data.length > 0) {
                 if (data.data[0]['resultString'] !== undefined) {
                     var href = '<a href="/vufind/Search/Results?lookfor='+data.data[0]['searchfield']+':'
-                            + recordId + ' -id:'  + recordId + '&sort=year">'
+                            + recordId + ' -id:'  + recordId + '&filter[]='+data.data[0]['filter']+'&sort=year">'
                             + data.data[0]['resultString'] + '</a>'
                     jQuery('ul#DependentWorks').append('<li>' + href + '</li>');
                 } else {
