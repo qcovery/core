@@ -1,6 +1,7 @@
 jQuery(document).ready(function() {
     var recordId;
     var SearchClassId = 'Solr';
+    var ResultPath = 'Search';
     var RecordPath = 'Record';
     var pathParts = window.location.href.split('/');
     var recordIndex = pathParts.length - 1;
@@ -17,6 +18,7 @@ jQuery(document).ready(function() {
     
     if (pathParts[recordIndex] == 'Search2Record') {
       var SearchClassId = 'Search2';
+      var ResultPath = 'Search2';
       var RecordPath = 'Search2Record';
     }
 
@@ -27,7 +29,7 @@ jQuery(document).ready(function() {
         success:function(data, textStatus) {
             if (data.data.length > 0) {
                 if (data.data[0]['resultString'] !== undefined) {
-                    var href = '<a href="/vufind/'+SearchClassId+'/Results?lookfor='+data.data[0]['searchfield']+':'
+                    var href = '<a href="/vufind/'+ResultPath+'/Results?lookfor='+data.data[0]['searchfield']+':'
                             + recordId + ' -id:'  + recordId + '&filter[]='+data.data[0]['filter']+'&sort=year">'
                             + data.data[0]['resultString'] + '</a>'
                     jQuery('ul#DependentWorks').append('<li>' + href + '</li>');
