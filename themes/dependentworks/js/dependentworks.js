@@ -2,11 +2,11 @@ jQuery(document).ready(function() {
     var recordId;
     var pathParts = window.location.href.split('/');
     var recordIndex = pathParts.length - 1;
-    if (pathParts[recordIndex] == 'Record') {
+    if (pathParts[recordIndex] == 'Record' || pathParts[recordIndex] == 'Search2Record') {
       recordId = pathParts[(recordIndex + 1)];
     } else {
       recordIndex--;
-      if (pathParts[recordIndex] == 'Record') {
+      if (pathParts[recordIndex] == 'Record' || pathParts[recordIndex] == 'Search2Record') {
         recordId = pathParts[(recordIndex + 1)];
       } else {
         recordId = 0;
