@@ -88,23 +88,34 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
         $limit = $this->config['Global']['limit'] ?? 1;
         $sortFlag = $this->config['Global']['sort'] ?? SORT_REGULAR;
         $switchToRegularSearch = ($this->config['Global']['switch_to_regular_search'] == 'y');
+		if(isset($this->config['Global']['searchfield']) && !empty($this->config['Global']['searchfield'])){
+		    $searchfield = $this->config['Global']['searchfield'];
+		} else {
+		    $searchfield = 'hierarchy_top_id';
+		}
+		
+		if(isset($this->config['Global']['filter']) && !empty($this->config['Global']['filter'])){
+		    $filter = $this->config['Global']['filter'];
+		} else {
+		    $filter = '';
+		}
 
         $ppn = $params->fromQuery('ppn');
         if (empty($ppn)) {
             return $this->formatResponse([]);
         }
-        $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
+        $backend = $params->fromQuery('source');
         $results = $this->resultsManager->get($backend);
         $results->getOptions()->setLimitOptions([$limit, $limit]);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => $searchfield.':'.$ppn.' -id:'.$ppn, 'filter' => $filter]));
 
         $records = $results->getResults();
         $resultTotal = $results->getResultTotal();
 
         if ($switchToRegularSearch && $resultTotal > $limit) {
             $resultString = $resultTotal . ' ' . $this->translate('results') . ': ' . $this->translate('show all');
-            return $this->formatResponse([['resultString' => (string) $resultString]]);
+            return $this->formatResponse([['resultString' => (string) $resultString, 'searchfield' => $searchfield, 'filter' => $filter]]);
         }
 
         $data = [];
