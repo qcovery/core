@@ -3,7 +3,7 @@ jQuery(document).ready(function() {
     var SearchClassId = 'Solr';
     var ResultPath = 'Search';
     var RecordPath = 'Record';
-    var pathParts = window.location.href.split('/');
+    var pathParts = window.location.pathname.split('/');
     var recordIndex = pathParts.length - 1;
     if (pathParts[recordIndex] == 'Record' || pathParts[recordIndex] == 'Search2Record') {
       recordId = pathParts[(recordIndex + 1)];
