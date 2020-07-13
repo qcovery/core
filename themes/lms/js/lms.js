@@ -17,8 +17,9 @@ $(document).ready(function() {
         e.preventDefault();
         var $temp = $("<input>");
         $("body").append($temp);
-        $temp.val($('#copy-lms-id-input').val()).select();
+        $temp.val(window.location.href).select();
         document.execCommand("copy");
         $temp.remove();
+        UIkit.modal.dialog('<p class="uk-modal-body">'+lms_list_id_export_message+'</p>');
     });
 });
