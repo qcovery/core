@@ -388,7 +388,7 @@ class CaLiefController extends AbstractBase
             }
             if ($checkForm) {
                 $orderNumber = 'CaLief:'.date('ymdHis').rand(0, 9);
-                $this->caliefMail('order', $orderNumber, $driver);
+                //$this->caliefMail('order', $orderNumber, $driver);
                 $this->caliefFileOrder($orderNumber, $driver);
                 $this->caliefAuthorize($userCalief->id, 'renew');
                 $sendOrder = true;
