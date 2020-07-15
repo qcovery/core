@@ -61,8 +61,6 @@ class ParamsFactory extends \FacetPrefix\Search\Params\ParamsFactory
             throw new \Exception('Unexpected options sent to factory.');
         }
         $facetHelper = $container->get('VuFind\Search\Solr\HierarchicalFacetHelper');
-        $searchKeysHelper = $container->get('SearchKeys\Search\SearchKeysHelper');
-        $searchMemory = $container->get('VuFind\Search\Memory');
-        return parent::__invoke($container, $requestedName, [$facetHelper, $searchKeysHelper, $searchMemory]);
+        return parent::__invoke($container, $requestedName, [$facetHelper]);
     }
 }

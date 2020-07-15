@@ -27,13 +27,9 @@
  */
 namespace FacetPrefix\Search\Solr;
 
-use Libraries\Libraries;
 use VuFindSearch\ParamBag;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
-use SearchKeys\Search\SearchKeysHelper;
-
-//use VuFind\Search\Solr\Params as BaseParams;
-use Libraries\Search\Solr\Params as BaseParams;
+use VuFind\Search\Solr\Params as BaseParams;
 
 class Params extends BaseParams
 {
@@ -44,11 +40,9 @@ class Params extends BaseParams
      * @param \VuFind\Config\PluginManager $configLoader Config loader
      */
     public function __construct($options, \VuFind\Config\PluginManager $configLoader,
-        HierarchicalFacetHelper $facetHelper = null,
-        SearchKeysHelper $searchKeysHelper,
-        \VuFind\Search\Memory $searchMemory
+        HierarchicalFacetHelper $facetHelper = null
     ) {
-        parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper, $searchMemory);
+        parent::__construct($options, $configLoader, $facetHelper);
     }
 
     /**
@@ -66,13 +60,11 @@ class Params extends BaseParams
                 $facetSet["f.{$facet}.facet.prefix"] = $prefix;
             }
         }
-		
-		if (isset($facetConfig->FacetMatches)) {
+       if (isset($facetConfig->FacetMatches)) {
             foreach ($facetConfig->FacetMatches as $facet => $matches) {
                 $facetSet["f.{$facet}.facet.matches"] = $matches;
             }
         }
-
         return $facetSet;
     }
 }
