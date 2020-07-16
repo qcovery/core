@@ -50,7 +50,11 @@ class FeedbackController extends AbstractBase
         $view->useRecaptcha = $this->recaptcha()->active('feedback');
         $view->name = $this->params()->fromPost('name');
         $view->email = $this->params()->fromPost('email');
+        $view->category = $this->params()->fromPost('category');
         $view->comments = $this->params()->fromPost('comments');
+        $view->ip_address_part = $this->params()->fromPost('ip_address_part');
+        $view->request_response = $this->params()->fromPost('request_response');
+        $view->request_copy = $this->params()->fromPost('request_copy');
 
         // Process form submission:
         if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
@@ -68,30 +72,36 @@ class FeedbackController extends AbstractBase
             $recipient_name = isset($feedback->recipient_name)
                 ? $feedback->recipient_name : 'Your Library';
             $email_subject = isset($feedback->email_subject)
-                ? $feedback->email_subject : 'VuFind Feedback';
-            $sender_email = isset($feedback->sender_email)
-                ? $feedback->sender_email : 'noreply@vufind.org';
-            $sender_name = isset($feedback->sender_name)
-                ? $feedback->sender_name : 'VuFind Feedback';
+                ? $feedback->email_subject." - ".$view->category." ".$view->request_response : 'VuFind Feedback';
+            $sender_email = $view->email;
+            $sender_name = $view->name;
             if ($recipient_email == null) {
                 throw new \Exception(
                     'Feedback Module Error: Recipient Email Unset (see config.ini)'
                 );
             }
 
-            $email_message = empty($view->name) ? '' : 'Name: ' . $view->name . "\n";
-            $email_message .= 'Email: ' . $view->email . "\n";
-            $email_message .= 'Comments: ' . $view->comments . "\n\n";
+            $email_message .= $view->comments . "\n\n";
+            $email_message .= 'IP: '.$view->ip_address_part . "\n\n";
 
             // This sets up the email to be sent
             // Attempt to send the email and show an appropriate flash message:
             try {
                 $mailer = $this->serviceLocator->get('VuFind\Mailer\Mailer');
-                $mailer->send(
-                    new Address($recipient_email, $recipient_name),
-                    new Address($sender_email, $sender_name),
-                    $email_subject, $email_message
-                );
+                
+                if($view->request_copy == 1) {
+                    $mailer->send(
+                        new Address($recipient_email, $recipient_name),
+                        new Address($sender_email, $sender_name),
+                        $email_subject, $email_message, new Address($sender_email, $sender_name)
+                    );
+                } else {
+                    $mailer->send(
+                        new Address($recipient_email, $recipient_name),
+                        new Address($sender_email, $sender_name),
+                        $email_subject, $email_message
+                    );
+                }
                 $this->flashMessenger()->addMessage(
                     'Thank you for your feedback.', 'success'
                 );
