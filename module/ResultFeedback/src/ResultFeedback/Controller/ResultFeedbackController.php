@@ -90,8 +90,12 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
                     'Result Feedback Module Error: Recipient Email Unset (see resultFeedback.ini)'
                 );
             }
-
-            $email_message = $translator->translate('resultfeedback_usertype') . ':' . "\n" . $translator->translate($view->usertype) . "\n\n";
+               
+            if(!empty($view->usertype)){
+                $email_message = $translator->translate('resultfeedback_usertype') . ':' . "\n" . $translator->translate($view->usertype) . "\n\n";
+            } else {
+                $email_message = '';
+            }
             $email_message .= empty($view->name) ? '' : 'Name:' . "\n" . $view->name . "\n\n";
             $email_message .= $translator->translate('Email') . ':' . "\n" . $view->email . "\n\n";
             $email_message .= $translator->translate('PPN') . ':' . "\n" . $view->recordid . "\n\n";
