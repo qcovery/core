@@ -137,9 +137,6 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
                     $sort = $dependentWorksDate['sort']['data'][0];
                 }
             }
-            if (empty($sort)) {
-                $sort = $i;
-            }
             $prefix = (empty($date)) ? $part . '. ' : $part . ', ' . $date . '. ';
             $data[$sort] = ['id' => $record->getUniqueID(),
                             'prefix' => $prefix,
