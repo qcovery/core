@@ -9,8 +9,9 @@ namespace SearchKeys\Search\Solr;
 use SearchKeys\Search\QueryAdapter;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use SearchKeys\Search\SearchKeysHelper;
+use FacetPrefix\Search\Solr\Params as BaseParams;
 
-class Params extends \VuFind\Search\Solr\Params
+class Params extends BaseParams
 {
     /**
      * SearchKeys Helper
