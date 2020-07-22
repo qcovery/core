@@ -23,7 +23,7 @@ function displayArticleStatus(results, $item) {
       $item.find('.status').append('error');
     } else {
       if (typeof(result.href) != 'undefined') {
-        var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a> (' + result.type + ')<br/>';
+        var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a><br/>';
         $item.find('.status').append(html);
       }
     }
