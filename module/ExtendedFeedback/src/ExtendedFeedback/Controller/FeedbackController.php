@@ -64,7 +64,7 @@ class FeedbackController extends BasicFeedbackController
                 ? $feedback->sender_email : 'noreply@vufind.org';
             $sender_name = isset($feedback->sender_name)
                 ? $feedback->sender_name : 'VuFind Feedback';
-            $reply_to = (isset($feedback->reply-to) && $feedback->reply-to == 'user_email')
+            $reply_to = (isset($feedback->reply_to) && $feedback->reply_to == 'user_email')
                 ? $view->email : null;
             if ($recipient_email == null) {
                 throw new \Exception(
