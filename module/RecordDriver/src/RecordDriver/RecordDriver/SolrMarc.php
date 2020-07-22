@@ -559,4 +559,35 @@ class SolrMarc extends SolrDefault
         // Try the parent method:
         return parent::getXML($format, $baseUrl, $recordLink);
     }
+
+    /**
+     * Get the OpenURL parameters to represent this record (useful for the
+     * title attribute of a COinS span tag).
+     *
+     * @param bool $overrideSupportsOpenUrl Flag to override checking
+     * supportsOpenUrl() (default is false)
+     *
+     * @return string OpenURL parameters.
+     */
+    public function getOpenUrl($overrideSupportsOpenUrl = false)
+    {
+        return parent::getOpenUrl($overrideSupportsOpenUrl);
+    }
+
+    /**
+     * Get OpenURL parameters for an article.
+     *
+     * @return array
+     */
+    protected function getArticleOpenUrlParams()
+    {
+        $params = parent::getArticleOpenUrlParams();
+        $pages = $this->getMarcData('Pages');
+        if (strpos($pages, '-') !== false) { 
+            list($spage, $epage) = explode('-', $pages[0]['pages']['data'][0]);
+            $params['rft.epage'] = $epage;
+        }
+        return $params;
+    }
+
 }
