@@ -58,6 +58,7 @@
 .ill_access_level,
 .issue_access_level,
 .check_ill_access_level,
+.check_sfx_access_level,
 .oa_article_access_level,
 .print_access_level,
 .uncertain_article_access_level,
@@ -89,6 +90,7 @@
 
 .ill_access_level:after,
 .check_ill_access_level:after,
+.check_sfx_access_level:after,
 .uncertain_article_access_level:after,
 .uncertain_homepage_access_level:after,
 .uncertain_issue_access_level:after,
