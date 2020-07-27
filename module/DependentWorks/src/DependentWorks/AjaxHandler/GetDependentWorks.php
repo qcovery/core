@@ -92,7 +92,7 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
             false : ($this->config['Global']['switch_to_regular_search'] == 'y');
         $searchfield = empty($this->config['Global']['searchfield']) ?
             'hierarchy_top_id' : $this->config['Global']['searchfield'];
-        $filter = !empty($this->config['Global']['filter']) ?
+        $filter = empty($this->config['Global']['filter']) ?
             '' : $this->config['Global']['filter'];
 
         $ppn = $params->fromQuery('ppn');
