@@ -30,8 +30,11 @@ jQuery(document).ready(function() {
             if (data.data.length > 0) {
                 if (data.data[0]['resultString'] !== undefined) {
                     var href = '<a href="/vufind/'+ResultPath+'/Results?lookfor='+data.data[0]['searchfield']+':'
-                            + recordId + ' -id:'  + recordId + '&filter[]='+data.data[0]['filter']+'&sort=year">'
-                            + data.data[0]['resultString'] + '</a>'
+                            + recordId + ' -id:'  + recordId;
+                    if (data.data[0]['filter'].length > 0) {
+                        href += '&filter[]='+data.data[0]['filter'];
+                    }
+                    href += '&sort=year">' + data.data[0]['resultString'] + '</a>';
                     jQuery('ul#DependentWorks').append('<li>' + href + '</li>');
                 } else {
                     var visibleItems = (data.data.length < 3) ? data.data.length : 3;
