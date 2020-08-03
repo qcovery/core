@@ -104,6 +104,8 @@ class Params extends \VuFind\Search\Search2\Params
      */
     public function getRawQuery()
     {
+        $config = $this->configLoader->get('searchkeys');
+        $translate = $config->get('translate-solr');                                                   
         // Build display query:
         $query = QueryAdapter::display($this->getQuery(), NULL, array($this, 'returnIdentic'));
         if (isset($translate)) {
@@ -111,7 +113,7 @@ class Params extends \VuFind\Search\Search2\Params
                 $query = preg_replace('/{'.$translateTo.'}/', $translateFrom, $query);
             }
         }
-        return preg_replace('/^\((.*?)\)?/', '$1', $query);
+        return preg_replace('/^\((.*?)\)/', '$1', $query);
     }
 
     public function returnIdentic($item) {
