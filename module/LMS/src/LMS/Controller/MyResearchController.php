@@ -217,4 +217,16 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
       []
     );
   }
+
+  /**
+   * Login Action
+   *
+   * @return mixed
+   */
+  public function loginAction()
+  {
+    $view = parent::loginAction();
+    $view->showLmsHint = $this->params()->fromQuery('showLmsHint');
+    return $view;
+  }
 }

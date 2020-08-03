@@ -51,3 +51,17 @@
   padding: 10px;
   margin: 0px;
 }
+
+#lms-hint-login {
+  width: 100% !important;
+  padding: 15px !important;
+  background-color: #ffffff !important;
+  border-radius: 0px !important;
+  margin: 0px !important;
+  text-align: left !important;
+}
+
+#lms-hint-login p {
+  padding: 10px;
+  margin: 0px;
+}
