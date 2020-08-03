@@ -196,4 +196,25 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $marcxml->addChild('format', implode(',', $record->getFormats()));
         return $marcxml->asXML();
     }
+
+  /**
+   * Display list of lists
+   *
+   * @return mixed
+   */
+  public function mylistsAction()
+  {
+    // Fail if lists are disabled:
+    if (!$this->listsEnabled()) {
+      throw new ForbiddenException('Lists disabled');
+    }
+
+    if (!$this->getAuthManager()->isLoggedIn()) {
+      return $this->forceLogin();
+    }
+
+    return $this->createViewModel(
+      []
+    );
+  }
 }
