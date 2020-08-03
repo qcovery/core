@@ -28,9 +28,11 @@
  */
 namespace SearchKeys\Search\Search2;
 
-use VuFind\Search\QueryAdapter;
+//use SearchKeys\Search\QueryAdapter;                                     
+use SearchKeys\Search\QueryAdapter;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use SearchKeys\Search\SearchKeysHelper;
+use VuFind\Search\Search2\Params as BaseParams;                                            
 
 /**
  * Search Params for second Solr index
@@ -41,7 +43,7 @@ use SearchKeys\Search\SearchKeysHelper;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class Params extends \VuFind\Search\Search2\Params
+class Params extends BaseParams
 {
     /**
      * SearchKeys Helper
@@ -93,7 +95,10 @@ class Params extends \VuFind\Search\Search2\Params
      */
     public function getDisplayQuery()
     {
-        return $this->getRawQuery();
+        $translate = [$this, 'translate'];
+        $showField = [$this->getOptions(), 'getHumanReadableFieldName'];
+
+        return QueryAdapter::display($this->getQuery(), $translate, $showField);
     }
 
     /**
@@ -105,7 +110,7 @@ class Params extends \VuFind\Search\Search2\Params
     public function getRawQuery()
     {
         $config = $this->configLoader->get('searchkeys');
-        $translate = $config->get('translate-solr');                                                   
+        $translate = $config->get('translate-search2');                  
         // Build display query:
         $query = QueryAdapter::display($this->getQuery(), NULL, array($this, 'returnIdentic'));
         if (isset($translate)) {
