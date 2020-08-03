@@ -50,7 +50,7 @@ class SearchBox extends \VuFind\View\Helper\Root\SearchBox
         $searchKeys = array_unique($searchKeys);
         foreach( $searchKeys as $key => $value) {
             $handlers[] = [
-                'value' => $value, 'label' => $key, 'indent' => false, 'selected' => ($activeHandler == $value)
+                'value' => $value, 'label' => $value, 'indent' => false, 'selected' => ($activeHandler == $value)
             ];
         }
         return $handlers;
