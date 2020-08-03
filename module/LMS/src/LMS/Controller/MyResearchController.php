@@ -113,7 +113,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
             if (!$export) {
                 $showExportButton = false;
-                if ($results->getListObject()->isPublic()) {
+                if ($results->getListObject() && $results->getListObject()->isPublic()) {
                   if ($lmsConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/lms.ini'), true)) {
                     $patron = $this->catalogLogin();
                     foreach ($lmsConfig['lms-list-id-export']['allowed-user-types'] as $allowedUserType) {

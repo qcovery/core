@@ -18,7 +18,7 @@
 <?=$this->flashmessages()?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-  <h2><?=$list ? $this->escapeHtml($list->title) : $this->transEsc("Your Lists")?></h2>
+  <h2><?=$list ? $this->escapeHtml($list->title) : $this->transEsc("All Lists")?></h2>
   <? if($showLmsHint): ?>
     <div id="lms-mylists-hint">
       <i class="bel-info"></i> <?=$this->transEsc('lms_list_hint_title')?><br/>
@@ -31,7 +31,7 @@
   <ul id="lms-mylists-list">
   <li>
     <i class="bel-sichtbar"></i>
-    <a href="<?=$this->url('myresearch-favorites')?>"<?=$this->active == 'favorites' ? ' class="active"' : ''?>>
+    <a href="<?=$this->url('myresearch-favorites')?>">
       <b><?=$this->transEsc('Your Favorites')?></b>
     </a>
   </li>
@@ -39,7 +39,7 @@
     <li>
       <?if(!$list['public']):?> <i class="bel-schloss02"></i><? else: ?> <i class="bel-sichtbar"></i><? endif; ?>
       <div>
-        <a href="<?=$this->url('userList', ['id' => $list['id']])?>"<?=$this->active == 'list' . $list['id'] ? ' class="active"' : ''?>>
+        <a href="<?=$this->url('userList', ['id' => $list['id']])?>">
           <b><?=$this->escapeHtml($list['title'])?></b>
         </a>
         |
@@ -55,5 +55,5 @@
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
-  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => isset($list) ? 'list' . $list['id'] : 'favorites'])?>
+  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'mylists'])?>
 </div>
