@@ -82,7 +82,7 @@ class CheckAvailability extends AbstractBase
      */
     public function handleRequest(Params $params)
     {
-        $deliveryDomain = $params->fromQuery('delivery_domain', 'main');
+        $deliveryDomain = $params->fromQuery('domain', 'main');
         $configurationManager = new ConfigurationManager($this->configManager, $deliveryDomain);
         $availabilityConfig = $configurationManager->getAvailabilityConfig();
         $availabilityHelper = new AvailabilityHelper(null, $availabilityConfig['default']);

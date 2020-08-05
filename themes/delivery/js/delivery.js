@@ -2,11 +2,12 @@ jQuery(document).ready(function() {
     jQuery('span.delivery_article').each(function() {
         var element = $(this);
         var topId = element.attr('data-top-id');
+        var domain = element.attr('data-domain');
         var searchClassId = element.attr('data-searchclass-id');
         jQuery.ajax({
             url:'/vufind/AJAX/JSON?method=checkAvailability',
             dataType:'json',
-            data:{ppn:topId, source:searchClassId},
+            data:{ppn:topId, source:searchClassId, domain:domain},
             success:function(data, textStatus) {
                 if (data.data.available == 'available') {
                     element.attr('style', 'display:inline');
