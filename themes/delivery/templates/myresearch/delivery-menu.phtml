@@ -1,5 +1,9 @@
-<? if ($this->authenticator()->isAuthorized()): ?>
+<?php foreach ($this->authenticator()->getDeliveryDomains() as $domain): ?>
+    <?php if ($this->authenticator()->isAuthorized($domain)): ?>
+        <?php $templateParams = $this->authenticator()->getTemplateParams($domain); ?>
+        <?php $deliverText = $this->transEsc($templateParams['text']); ?>
     <a href="<?=$this->url('delivery-home')?>" <?=$this->active == 'delivery' ? ' class="active"' : ''?>>
-        <i class="bel-ok03" aria-hidden="true"></i> <?=$this->transEsc('Delivery')?>
+        <i class="bel-ok03" aria-hidden="true"></i> <?=$deliveryText?>
     </a>
-<? endif; ?>
+    <?php endif; ?>
+<?php endforeach; ?>

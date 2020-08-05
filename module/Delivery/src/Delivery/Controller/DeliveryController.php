@@ -31,6 +31,7 @@ namespace Delivery\Controller;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use VuFind\Controller\AbstractBase;
 use Delivery\AvailabilityHelper;
+use Delivery\ConfigurationManager;
 use Delivery\DataHandler;
 
 /**
@@ -46,9 +47,8 @@ class DeliveryController extends AbstractBase
 {
 
     protected $deliveryAuthenticator;
-    protected $dataHandler;
     protected $deliveryTable;
-    protected $deliveryGlobalConfig;
+    protected $configurationManager;
 
     protected $user;
 
@@ -59,7 +59,8 @@ class DeliveryController extends AbstractBase
     {
         parent::__construct($sm);
         $this->deliveryAuthenticator = $sm->get('Delivery\Auth\DeliveryAuthenticator');
-        $this->deliveryGlobalConfig = $this->getConfig('deliveryGlobal')->toArray();
+        #$this->configurationManager = new ConfigurationManager($this->serviceLocator->get('VuFind\Config\PluginManager'));
+        $this->configurationManager = new ConfigurationManager($sm->get('VuFind\Config\PluginManager'));
     }
 
     /**
@@ -74,9 +75,9 @@ class DeliveryController extends AbstractBase
         return $this->serviceLocator->get('Delivery\Db\Table\PluginManager')->get($table);
     }
     
-    private function authenticate($asAdmin = false)
+    private function authenticate($deliveryDomain, $asAdmin = false)
     {
-        $message = $this->deliveryAuthenticator->authenticate($asAdmin);
+        $message = $this->deliveryAuthenticator->authenticate($deliveryDomain, $asAdmin);
         if ($message != 'not_logged_in') {
             $this->user = $this->deliveryAuthenticator->getUser();
         }
@@ -90,7 +91,8 @@ class DeliveryController extends AbstractBase
      */
     public function homeAction()
     {
-        $message = $this->authenticate();
+        $deliveryDomain = $this->params()->fromQuery('domain') ?? $this->params()->fromPost('domain');
+        $message = $this->authenticate($deliveryDomain);
         if ($message != 'authorized') {
             return $this->forwardTo('MyResearch', 'Profile');
         }
@@ -117,70 +119,74 @@ class DeliveryController extends AbstractBase
      */
     public function orderAction()
     {
-        $message = $this->authenticate();
+        $deliveryDomain = $this->params()->fromQuery('domain') ?? $this->params()->fromPost('domain');
+        $message = $this->authenticate($deliveryDomain);
         if ($message != 'authorized') {
             return $this->forwardTo('MyResearch', 'Profile');
         }
 
         $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
         $searchClassId = $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId');
-        if (empty($id)) {
-            return $this->forwardTo('Delivery', 'Home');
-        }
 
-        $driver = $this->getRecordLoader()->load($id, $searchClassId);
-
-        $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
-        $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
-        $this->dataHandler->setSolrDriver($driver);
-        
         $errors = $missingFields = [];
-        
-        if ($error = $this->updateDeliveryMail()) {
-            $errors[] = $error;
-        }
 
-        if (!empty($this->params()->fromPost('order'))) {
-            if ($this->checkEmail($this->params()->fromPost('delivery_email'))) {
-                $this->user->delivery_email = $this->params()->fromPost('delivery_email');
-                if ($this->dataHandler->sendOrder($this->user)) {
-                    $this->dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
-                    $orderId = $this->dataHandler->getOrderId();
-                } else {
-                    $errors = $this->dataHandler->getErrors();
-                    $missingFields = $this->dataHandler->getMissingFields();
-                }
-            } else {
-                $missingFields = ['delivery_email'];
-            }
-        }
- 
-        $availabilityConfig = $this->getConfig('deliveryAvailability');
-        $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
-
-        if ($parentId = $AvailabilityHelper->getParentId()) {
-            $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
-            $AvailabilityHelper = new AvailabilityHelper($parentDriver, $availabilityConfig['default']);
+        if (empty($id) || empty($searchClassId)) {
+            $errors[] = 'record id is missing';
         } else {
-            $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
-        }
+            $driver = $this->getRecordLoader()->load($id, $searchClassId);
 
-        $signatureCount = $this->deliveryGlobalConfig['Order']['collectedCallnumbers'] ?: 1;
-        $signatureList = array_slice($AvailabilityHelper->getSignatureList(), 0 , $signatureCount);
+            $this->configurationManager->setConfigurations($deliveryDomain);
+            $orderDataConfig = $this->configurationManager->getOrderDataConfig();
+            $pluginConfig =  $this->configurationManager->getPluginConfig();
+            $mainConfig = $this->configurationManager->getMainConfig();
+            $dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $pluginConfig);
+            $dataHandler->setSolrDriver($driver);
+        
+            if ($error = $this->updateDeliveryMail()) {
+                $errors[] = $error;
+            }
 
-        $signature = implode("\n", $signatureList);
+            if (!empty($this->params()->fromPost('order'))) {
+                if ($this->checkEmail($this->params()->fromPost('delivery_email'))) {
+                    $this->user->delivery_email = $this->params()->fromPost('delivery_email');
+                    if ($dataHandler->sendOrder($this->user)) {
+                        $dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
+                        $orderId = $dataHandler->getOrderId();
+                    } else {
+                        $errors = $dataHandler->getErrors();
+                        $missingFields = $dataHandler->getMissingFields();
+                    }
+                } else {
+                    $missingFields = ['delivery_email'];
+                }
+            }
+ 
+            $availabilityConfig = $this->configurationManager->getAvailabilityConfig();
+            $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
 
-        $preset = [];
-        if ($this->deliveryGlobalConfig['Order']['presetCallnumbers'] == 'y') {
-            $preset = ['signature' => $signature];
-        }
+            if ($parentId = $AvailabilityHelper->getParentId()) {
+                $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
+                $AvailabilityHelper = new AvailabilityHelper($parentDriver, $availabilityConfig['default']);
+            } else {
+                $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
+            }
 
-        if (empty($signature)) {
+            $signatureCount = $mainConfig['collectedCallnumbers'] ?: 1;
+            $signatureList = array_slice($AvailabilityHelper->getSignatureList(), 0 , $signatureCount);
+
+            $signature = implode("\n", $signatureList);
+
+            $preset = [];
+            if ($mainConfig['presetCallnumbers'] == 'y') {
+                $preset = ['signature' => $signature];
+            }
+
+/*        if (empty($signature)) {
             return $this->forwardTo('Delivery', 'Home');
-       	}
+       	}*/
+        }
 
         $view = $this->createViewModel();
-
         $view->errors = $errors;
         $view->missingFields = $missingFields;
 
@@ -188,12 +194,12 @@ class DeliveryController extends AbstractBase
             $view->id = $id;
             $view->searchClassId = $searchClassId;
             $view->orderId = $orderId;
-        } else {
-            $this->dataHandler->setSolrDriver($driver);
-            $this->dataHandler->collectData($preset);
+        } elseif (!empty($id) && !empty($signature)) {
+            $dataHandler->setSolrDriver($driver);
+            $dataHandler->collectData($preset);
 
-            $formData = $this->dataHandler->getFormData();
-            $infoData = $this->dataHandler->getInfoData();
+            $formData = $dataHandler->getFormData();
+            $infoData = $dataHandler->getInfoData();
 
             $view->id = $id;
             $view->searchClassId = $searchClassId;
@@ -207,29 +213,6 @@ class DeliveryController extends AbstractBase
             $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
         }
         return $view;
-    }
-
-    private function sendDeliveryMail($emailType)
-    {
-        $mailer = $this->serviceLocator->get('VuFind\Mailer');
-        $mailConfig = $this->deliveryGlobalConfig['Email'];
-
-        $mailTo = $this->user->delivery_email;
-        $mailFrom = $mailConfig['mailFrom'];
-        $admin = $mailConfig['deliveryAdmin'];
-        if ($emailType == 'request') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['requestSubject'], $mailConfig['requestText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['requestSubject'], $mailConfig['requestText']);
-        } elseif ($emailType == 'revoke') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['revokeSubject'], $mailConfig['revokeText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['revokeSubject'], $mailConfig['revokeText']);
-        } elseif ($emailType == 'refuse') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['refuseSubject'], $mailConfig['refuseText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['refuseSubject'], $mailConfig['refuseText']);
-        } elseif ($emailType == 'authorize') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
-        }
     }
 
     private function updateDeliveryMail()

@@ -17,7 +17,7 @@ use Delivery\Driver\PluginManager;
 
 class DataHandler {
 
-    protected $deliveryConfig;
+    protected $pluginConfig;
 
     protected $solrDriver;
 
@@ -41,9 +41,9 @@ class DataHandler {
 
     protected $format;
 
-    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $deliveryConfig)
+    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $pluginConfig)
     {
-        $this->deliveryConfig = $deliveryConfig;
+        $this->pluginConfig = $pluginConfig;
         $this->dataFields = $orderDataConfig;
         $this->driverManager = $driverManager;
         $this->params = $params;
@@ -113,7 +113,7 @@ class DataHandler {
 
     private function setDeliveryDriver()
     {
-        $deliveryDriver = $this->deliveryConfig['Order']['plugin'];
+        $deliveryDriver = $this->pluginConfig['plugin'];
         if (empty($deliveryDriver)) {
             throw new \Exception('Delivery driver configuration missing');
         }
@@ -122,7 +122,7 @@ class DataHandler {
         }
         $this->deliveryDriver = $this->driverManager->get($deliveryDriver);
         try {
-            $this->deliveryDriver->setConfig($this->deliveryConfig[$deliveryDriver]);
+            $this->deliveryDriver->setConfig($this->pluginConfig);
             $this->deliveryDriver->init();
         } catch (\Exception $e) {
             throw $e;

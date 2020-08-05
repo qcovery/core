@@ -29,7 +29,9 @@ namespace Delivery\Auth;
 
 use VuFind\Auth\ILSAuthenticator;
 use VuFind\Auth\Manager;
+use VuFind\Config\PluginManager as ConfigManager;
 use PAIAplus\ILS\Connection as ILSConnection;
+use Delivery\ConfigurationManager;
 
 /**
  * Class for managing ILS-specific authentication.
@@ -43,7 +45,7 @@ use PAIAplus\ILS\Connection as ILSConnection;
  */
 class DeliveryAuthenticator extends ILSAuthenticator
 {
-    protected $config;
+    protected $configurationManager;
 
     protected $table;
 
@@ -56,9 +58,9 @@ class DeliveryAuthenticator extends ILSAuthenticator
      * @param ILSConnection $catalog ILS connection
      */
     public function __construct(Manager $auth, ILSConnection $catalog,
-        $config, $table)
+        ConfigManager $configManager, $table)
     {
-        $this->setConfig($config);
+        $this->configurationManager = new ConfigurationManager($configManager);
         $this->setTable($table);
         parent::__construct($auth, $catalog);
     }
@@ -68,19 +70,15 @@ class DeliveryAuthenticator extends ILSAuthenticator
      *
      * @return \VuFind\Db\Table\User
      */
-    protected function setConfig($config)
+    protected function getAllowedPatronTypes($deliveryDomain)
     {
-        $this->config = $config;
-    }
-
-    /**
-     * Get access to the user table.
-     *
-     * @return \VuFind\Db\Table\User
-     */
-    protected function getConfig()
-    {
-        return $this->config;
+        $this->configurationManager->setConfigurations($deliveryDomain);
+        $config = $this->configurationManager->getMainConfig();
+        $allowedTypes = $config['allowed'];
+        if (!is_array($allowedTypes)) {
+            $allowedTypes = [];
+        }
+        return $allowedTypes;
     }
 
     /**
@@ -125,7 +123,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
      *
      * @return array|bool
      */
-    public function authenticate($asAdmin = false)
+    public function authenticate($deliveryDomain = 'main', $asAdmin = false)
     {
         if (!$user = $this->auth->isLoggedIn()) {
             return 'not_logged_in';
@@ -139,12 +137,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
         }
 
         $patronTypes = array_map([$this, 'extractUserType'], $patron['type']);
-
-        $config = $this->getConfig()->toArray();
-        $allowedTypes = $config['Patron']['allowed'];
-        if (!is_array($allowedTypes)) {
-            $allowedTypes = [];
-        }
+        $allowedTypes = $this->getAllowedPatronTypes($deliveryDomain);
 
         if (!empty(array_intersect($patronTypes, $allowedTypes))) {
             $userDeliveryTable = $this->getTable();
@@ -177,5 +170,21 @@ class DeliveryAuthenticator extends ILSAuthenticator
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function getDeliveryDomains()
+    {
+        return $this->configurationManager->getDeliveryDomains();
+    }
+
+    public function getTemplateParams($deliveryDomain)
+    {
+        $this->configurationManager->setConfigurations($deliveryDomain);
+        $config = $this->configurationManager->getMainConfig();
+        $templateParams = [];
+        $templateParams['text'] = $config['template_text'] ?: '';
+        $templateParams['icon'] = $config['template_icon'] ?: '';
+        $templateParams['belugino'] = $config['template_belugino'] ?: '';
+        return $templateParams;
     }
 }

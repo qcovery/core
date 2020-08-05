@@ -57,7 +57,7 @@ class AvailabilityHelper {
 
     public function setDeliveryConfig($config)
     {
-        $this->deliveryConfig = $config->toArray();
+        $this->deliveryConfig = $config;
     }
 
     public function getParentId() 
