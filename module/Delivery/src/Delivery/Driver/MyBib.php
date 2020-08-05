@@ -117,7 +117,8 @@ class MyBib implements DriverInterface {
      * id, availability (boolean), status, location, reserve, callnumber.
      */
     public function sendOrder($orderData) {
-        $orderData = $this->viewRenderer->render('Order/ill-subito-mybib.tbl', $orderData);
+        $orderTemplate = $this->config['orderTemplate'];
+        $orderData = $this->viewRenderer->render('Order/' . $orderTemplate, $orderData);
         $orderData = str_replace('##', "", $orderData);
 
         $orderStruct = ['type' => 'subito',
@@ -144,9 +145,8 @@ class MyBib implements DriverInterface {
     }    
 
     private function request($method, $parameters) {
-        $config = $this->config;
         if (!isset($this->rpcClient)) {
-            $this->rpcClient = new XmlRpc\Client($config['rpcUrl']);
+            $this->rpcClient = new XmlRpc\Client($this->config['rpcUrl']);
         }
         $response = $this->rpcClient->call($method, $parameters);
         if (!empty($response['ERROR_struct']['technical'])) {
