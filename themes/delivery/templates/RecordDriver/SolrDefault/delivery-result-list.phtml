@@ -1,12 +1,35 @@
-<?php if ($this->authenticator()->isAuthorized()): ?>
-    <?php if ($this->availabilitychecker()->check($this->driver) == 'available'): ?>
-        <a href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>&searchClassId=<?=$this->searchClassId ?>" aria-expanded="false" data-uk-tooltip="<?=$this->transEsc('Deliver')?>" title="<?=$this->transEsc('Deliver')?>"><img src="<?=$this->imageLink('campus-lieferdienst-rot.svg') ?>" style="height:20px;margin:10px 0px 10px 10px" aria-hidden="true"></a>
-    <?php else: ?>
-        <?php $hierarchyTopId = $this->availabilitychecker()->getHierarchyTopID($this->driver); ?>
-        <?php if (!empty($hierarchyTopId)): ?>
-        <span class="delivery_article" data-top-id="<?=$hierarchyTopId ?>" data-searchclass-id="<?=$this->searchClassId ?>" style="display:none">
-            <a href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>&searchClassId=<?=$this->searchClassId ?>" aria-expanded="false" data-uk-tooltip="<?=$this->transEsc('Deliver')?>" title="<?=$this->transEsc('Deliver')?>"><img src="<?=$this->imageLink('campus-lieferdienst-rot.svg') ?>" style="height:20px;margin:10px 0px 10px 10px" aria-hidden="true"></a>
+<?php foreach ($this->authenticator()->getDeliveryDomains() as $domain): ?>
+    <?php if ($this->authenticator()->isAuthorized($domain)): ?>
+
+        <?php $templateParams = $this->authenticator()->getTemplateParams($domain); ?>
+        <?php $deliverText = $this->transEsc($templateParams['text']); ?>
+
+        <?php if ($this->availabilitychecker()->check($this->driver, $domain) == 'available'): ?>
+            <a href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>&domain=<?=$domain ?>&searchClassId=<?=$this->searchClassId ?>" aria-expanded="false" data-uk-tooltip="<?=$deliverText?>" title="<?=$deliverText?>">
+            <?php if (!empty($templateParams['icon'])): ?>
+<img src="<?=$this->imageLink($templateParams['icon'])?>" style="height:20px;margin:10px 0px 10px 10px" aria-hidden="true">
+            <?php elseif (!empty($templateParams['belugino'])): ?>
+<i class="result-lin-icon bel-mkombo01" aria-hidden="true"></i>
+            <?php else: ?>
+<?=$deliverText?>
+            <?php endif; ?>
+</a>
+        <?php else: ?>
+            <?php $hierarchyTopId = $this->availabilitychecker()->getHierarchyTopID($this->driver); ?>
+            <?php if (!empty($hierarchyTopId)): ?>
+        <span class="delivery_article" data-top-id="<?=$hierarchyTopId ?>" data-searchclass-id="<?=$this->searchClassId ?>" data-domain="<?=$domain ?>" style="display:none">
+            <a href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>&searchClassId=<?=$this->searchClassId ?>" aria-expanded="false" data-uk-tooltip="<?=$deliverText?>" title="<?=$deliverText?>">
+                <?php if (!empty($templateParams['icon'])): ?>
+<img src="<?=$this->imageLink($templateParams['icon'])?>" style="height:20px;margin:10px 0px 10px 10px" aria-hidden="true">
+                <?php elseif (!empty($templateParams['belugino'])): ?>
+<i class="result-lin-icon bel-mkombo01" aria-hidden="true"></i>
+                <?php else: ?>
+<?=$deliverText?>
+                <?php endif; ?>
+</a>
         </span>
+            <?php endif; ?>
         <?php endif; ?>
+
     <?php endif; ?>
-<?php endif; ?>
+<?php endforeach; ?>
