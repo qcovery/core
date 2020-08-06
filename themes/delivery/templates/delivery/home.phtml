@@ -1,13 +1,13 @@
 <?php
   // Set up page title:
-  $this->headTitle($this->translate('Delivery'));
+  $this->headTitle($this->translate($this->title));
 
   // Set up breadcrumbs:
-  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery') . '</li>';
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc($this->title) . '</li>';
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-    <h2 class="lightbox-header"><?=$this->transEsc('Delivery')?></h2>
+    <h2 class="lightbox-header"><?=$this->transEsc($this->title)?></h2>
 
 <?php if (!empty($this->error)): ?>
     <?=$this->transEsc($this->error) ?>

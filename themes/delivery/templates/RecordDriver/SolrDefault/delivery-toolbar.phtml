@@ -9,7 +9,7 @@
             <?php if (!empty($templateParams['icon'])): ?>
 <img src="<?=$this->imageLink($templateParams['icon'])?>" style="height:20px;margin:10px 0px 10px 10px" aria-hidden="true">
             <?php elseif (!empty($templateParams['belugino'])): ?>
-<i class="result-lin-icon bel-mkombo01" aria-hidden="true"></i>
+<i class="<?=$templateParams['belugino']?>" aria-hidden="true"></i>
             <?php else: ?>
 <?=$deliverText?>
             <?php endif; ?>
@@ -22,7 +22,7 @@
                 <?php if (!empty($templateParams['icon'])): ?>
 <img src="<?=$this->imageLink($templateParams['icon'])?>" style="height:20px;margin:10px 0px 10px 10px" aria-hidden="true">
                 <?php elseif (!empty($templateParams['belugino'])): ?>
-<i class="result-lin-icon bel-mkombo01" aria-hidden="true"></i>
+<i class="<?=$templateParams['belugino']?>" aria-hidden="true"></i>
                 <?php else: ?>
 <?=$deliverText?>
                 <?php endif; ?>
