@@ -59,7 +59,6 @@ class DeliveryController extends AbstractBase
     {
         parent::__construct($sm);
         $this->deliveryAuthenticator = $sm->get('Delivery\Auth\DeliveryAuthenticator');
-        #$this->configurationManager = new ConfigurationManager($this->serviceLocator->get('VuFind\Config\PluginManager'));
         $this->configurationManager = new ConfigurationManager($sm->get('VuFind\Config\PluginManager'));
     }
 
@@ -99,10 +98,12 @@ class DeliveryController extends AbstractBase
 
         $deliveryTable = $this->getTable('delivery');
         $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
+        $templateParams = $this->deliveryAuthenticator->getTemplateParams($deliveryDomain);
 
         $error = $this->updateDeliveryMail();
 
         $view = $this->createViewModel();
+        $view->title = $templateParams['title'];
         $view->message = $message;
         $view->error = $error;
         $view->catalog_id = $this->user->cat_id;
@@ -162,31 +163,22 @@ class DeliveryController extends AbstractBase
             }
  
             $availabilityConfig = $this->configurationManager->getAvailabilityConfig();
-            $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
-
-            if ($parentId = $AvailabilityHelper->getParentId()) {
+            $availabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
+            if ($parentId = $availabilityHelper->getParentId()) {
                 $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
-                $AvailabilityHelper = new AvailabilityHelper($parentDriver, $availabilityConfig['default']);
-            } else {
-                $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
+                $availabilityHelper->setSolrDriver($parentDriver);
             }
+            $availabilityHelper->setDeliveryConfig($availabilityConfig['default']);
 
             $signatureCount = $mainConfig['collectedCallnumbers'] ?: 1;
-            $signatureList = array_slice($AvailabilityHelper->getSignatureList(), 0 , $signatureCount);
-
+            $signatureList = array_slice($availabilityHelper->getSignatureList(), 0 , $signatureCount);
             $signature = implode("\n", $signatureList);
-
-            $preset = [];
-            if ($mainConfig['presetCallnumbers'] == 'y') {
-                $preset = ['signature' => $signature];
-            }
-
-/*        if (empty($signature)) {
-            return $this->forwardTo('Delivery', 'Home');
-       	}*/
         }
 
+        $templateParams = $this->deliveryAuthenticator->getTemplateParams($deliveryDomain);
+
         $view = $this->createViewModel();
+        $view->title = $templateParams['title'];
         $view->errors = $errors;
         $view->missingFields = $missingFields;
 
@@ -195,7 +187,10 @@ class DeliveryController extends AbstractBase
             $view->searchClassId = $searchClassId;
             $view->orderId = $orderId;
         } elseif (!empty($id) && !empty($signature)) {
-            $dataHandler->setSolrDriver($driver);
+            $preset = [];
+            if ($mainConfig['presetCallnumbers'] == 'y') {
+                $preset = ['signature' => $signature];
+            }
             $dataHandler->collectData($preset);
 
             $formData = $dataHandler->getFormData();
