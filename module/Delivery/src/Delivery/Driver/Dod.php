@@ -91,7 +91,8 @@ class Dod implements DriverInterface {
      * id, availability (boolean), status, location, reserve, callnumber.
      */
     public function sendOrder($orderData) {
-        $orderData = $this->viewRenderer->render('Order/ill-subito-dod.xml', $orderData);
+        $orderTemplate = $this->config['orderTemplate'];
+        $orderData = $this->viewRenderer->render('Order/' . $orderTemplate, $orderData);
         $config = $this->config;
         if ($this->mailer->send($config['orderMailTo'], $config['orderMailFrom'], $config['orderSubject'], $orderData)) {
             return 'per Email';
