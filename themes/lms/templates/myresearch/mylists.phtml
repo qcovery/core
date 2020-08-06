@@ -20,21 +20,18 @@
 <div class="<?=$this->layoutClass('mainbody')?>">
   <h2><?=$list ? $this->escapeHtml($list->title) : $this->transEsc("All Lists")?></h2>
   <? if($showLmsHint): ?>
-    <div id="lms-mylists-hint">
-      <i class="bel-info"></i> <?=$this->transEsc('lms_list_hint_title')?><br/>
-      <p>
-        <?=$this->transEsc('lms_list_hint_message')?>
-      </p>
-    </div>
+    <?=$this->context($this)->renderInContext('myresearch/mylists-lms-hint.phtml', []); ?>
   <? endif; ?>
   <? $lists = $user->getLists() ?>
   <ul id="lms-mylists-list">
+  <?php /*
   <li>
     <i class="bel-schloss02"></i>
     <a href="<?=$this->url('myresearch-favorites')?>">
       <b><?=$this->transEsc('Your Favorites')?></b>
     </a>
   </li>
+  */ ?>
   <? foreach ($lists as $list): ?>
     <li>
       <?if(!$list['public']):?> <i class="bel-schloss02"></i><? else: ?> <i class="bel-sichtbar"></i><? endif; ?>
