@@ -72,6 +72,16 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
         }
         $view->resultUserTypes = $resultUserTypes;
 
+        $userIsInLocalNetwork = false;
+        if (isset($resultFeedbackConfig['resultFeedback']['ip_local_network'])) {
+            foreach ($resultFeedbackConfig['resultFeedback']['ip_local_network'] as $ip_local_network) {
+                if ($this->startsWith($_SERVER['REMOTE_ADDR'], $ip_local_network)) {
+                    $userIsInLocalNetwork = true;
+                }
+            }
+        }
+        $view->userIsInLocalNetwork = $userIsInLocalNetwork;
+
         // Process form submission:
         $view->hideForm = false;
         if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
@@ -90,7 +100,7 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
                     'Result Feedback Module Error: Recipient Email Unset (see resultFeedback.ini)'
                 );
             }
-               
+
             if(!empty($view->usertype)){
                 $email_message = $translator->translate('resultfeedback_usertype') . ':' . "\n" . $translator->translate($view->usertype) . "\n\n";
             } else {
@@ -129,5 +139,9 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
         }
 
         return $view;
+    }
+
+    private function startsWith($haystack, $needle) {
+      return substr($haystack, 0, strlen($needle)) === $needle;
     }
 }

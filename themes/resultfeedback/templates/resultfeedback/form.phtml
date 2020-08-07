@@ -1,6 +1,11 @@
 <div class="mainbody">
 <h2><?=$this->transEsc("Contact us about this title")?></h2>
 <?=$this->flashmessages() ?>
+<?php if($this->userIsInLocalNetwork): ?>
+  <?=$this->render('resultfeedback/user-is-in-local-network.phtml', []) ?>
+<?php else: ?>
+  <?=$this->render('resultfeedback/user-is-not-in-local-network.phtml', []) ?>
+<?php endif; ?>
 <?php if(!$this->hideForm): ?>
     <div class="resultfeedback-title">
         <?=$this->render('RecordDriver/SolrDefault/recorddriver-core-title.phtml', ['driver' => $this->driver]) ?>
