@@ -194,7 +194,9 @@ class MyResearchController extends AbstractBase
         if ($page == 'Favorites' && !$this->listsEnabled()) {
             return $this->forwardTo('Search', 'History');
         }
-        return $this->forwardTo('MyResearch', $page);
+        
+        return $this->redirect()->toRoute('myresearch-'.strtolower($page));
+        //return $this->forwardTo('MyResearch', $page);
     }
 
     /**
