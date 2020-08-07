@@ -14,14 +14,14 @@
       <input type="hidden" id="recordid" name="recordid" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueID() ?? '')?>" />
       <input type="hidden" id="recordtitle" name="recordtitle" value="<?=$this->escapeHtmlAttr($this->driver->getTitle() ?? '')?>" />
       <? if(!empty($this->resultUserTypes)): ?>
-          <div class="form-group">
-            <label class="control-label" for="usertype"><?=$this->transEsc("resultfeedback_usertype")?></label><br/>
-            <select name="usertype">
-              <?php foreach($this->resultUserTypes as $resultUserType): ?>
-                <option value="<?=$resultUserType?>"><?=$this->transEsc($resultUserType)?></option>
-              <?php endforeach; ?>
-            </select>
-          </div>
+        <div class="form-group">
+          <label class="control-label" for="usertype"><?=$this->transEsc("resultfeedback_usertype")?></label><br/>
+          <select name="usertype">
+            <?php foreach($this->resultUserTypes as $resultUserType): ?>
+              <option value="<?=$resultUserType?>"><?=$this->transEsc($resultUserType)?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
       <?php endif; ?>
       <div class="form-group">
         <label class="control-label" for="name"><?=$this->transEsc("feedback_name")?></label>
