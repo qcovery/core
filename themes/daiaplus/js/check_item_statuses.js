@@ -55,7 +55,11 @@ function displayItemStatus(result, $item) {
     && result.missing_data
   ) {
     // No data is available -- hide the entire status area:
-    $item.find('.callnumAndLocation,.status').addClass('hidden');
+    // $item.find('.callnumAndLocation,.status').addClass('hidden');
+    var errorText = VuFind.translate('daia_missing_data');
+    //var errorText = VuFind.translate('error_occurred');
+	  
+    $item.find('.status').empty().append(errorText);
   } else if (result.locationList) {
     // We have multiple locations -- build appropriate HTML and hide unwanted labels:
     $item.find('.callnumber,.hideIfDetailed,.location').addClass('hidden');
