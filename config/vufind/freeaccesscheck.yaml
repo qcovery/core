@@ -22,7 +22,7 @@ ArticleFulltextFreeCollection:
   912:
     conditions:
       - [field, a, 'OPENACCESS|GBV_DOAJ|Gutenberg|ZDB-94-OAB|ZDB-23-GOA']
-    u:
+    a:
       - [name, collection]
 ArticleDirectLink:
   category: resolver
