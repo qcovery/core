@@ -36,6 +36,6 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
     public function getHierarchyTopID($driver)
     {
         $deliveryArticleData = $driver->getMarcData('DeliveryDataArticle');
-        return $deliveryArticleData[2]['ppn']['data'][0] ?? '';
+        return $deliveryArticleData[3]['ppn']['data'][0] ?? '';
     }
 }
