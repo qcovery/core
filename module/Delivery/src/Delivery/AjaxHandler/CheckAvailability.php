@@ -28,7 +28,7 @@
 namespace Delivery\AjaxHandler;
 
 use Delivery\AvailabilityHelper;
-use Delivery\ConfigurartionManager;
+use Delivery\ConfigurationManager;
 use VuFind\AjaxHandler\AbstractBase;
 use VuFind\Config\PluginManager as ConfigManager;
 use VuFind\Search\Results\PluginManager as ResultsManager;
