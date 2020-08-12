@@ -17,6 +17,16 @@ ArticleFulltextFreeUrlParts:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
+ArticleFulltextFreeUrlParts2:
+  category: resolver
+  856:
+    conditions:
+      - [field, u, 'doi.org|nbn-resolving.de']
+      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
 ArticleFulltextFreeCollection:
   category: resolver
   912:

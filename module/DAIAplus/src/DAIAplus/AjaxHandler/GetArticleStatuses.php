@@ -147,6 +147,14 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                 break;
             }
         }
+        
+        $data = $driver->getMarcData('ArticleFulltextFreeUrlParts2');
+        foreach ($data as $date) {
+            if (!empty(($date['url']['data'][0]))) {
+                $urlAccess = $date['url']['data'][0];
+                break;
+            }
+        }
 
         if($urlAccessUncertain) {
                     $data = $driver->getMarcData('ArticleFulltextFreeCollection');
