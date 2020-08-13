@@ -135,9 +135,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         $categories = array("marcFulltextCheckDirect", "marcFulltextCheckIndirect");
         
         foreach ($categories as $category) {
-            error_log($category);
             foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
-                error_log($solrMarcKey);
                 $data = $driver->getMarcData($solrMarcKey);
                 foreach ($data as $date) {
                     if ($category == "marcFulltextCheckDirect") {
