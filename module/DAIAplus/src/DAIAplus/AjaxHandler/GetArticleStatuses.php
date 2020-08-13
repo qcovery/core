@@ -131,41 +131,30 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
     }
 
     private function checkFreeAccess($driver, $urlAccessUncertain = '') {
-        $urlAccess = '';
-        $data = $driver->getMarcData('ArticleFulltextFree');
-        foreach ($data as $date) {
-            if (!empty(($date['url']['data'][0]))) {
-                $urlAccess = $date['url']['data'][0];
-                break;
-            }
-        }
+        $urlAccess = '';      
+        $categories = array("marcFulltextCheckDirect", "marcFulltextCheckIndirect");
         
-        $data = $driver->getMarcData('ArticleFulltextFreeUrlParts');
-        foreach ($data as $date) {
-            if (!empty(($date['url']['data'][0]))) {
-                $urlAccess = $date['url']['data'][0];
-                break;
-            }
-        }
-        
-        $data = $driver->getMarcData('ArticleFulltextFreeUrlParts2');
-        foreach ($data as $date) {
-            if (!empty(($date['url']['data'][0]))) {
-                $urlAccess = $date['url']['data'][0];
-                break;
-            }
-        }
-
-        if($urlAccessUncertain) {
-                    $data = $driver->getMarcData('ArticleFulltextFreeCollection');
-            foreach ($data as $date) {
-                if (!empty(($date['collection']['data'][0]))) {
-                    $urlAccess = $urlAccessUncertain;
-                    break;
+        foreach ($categories as $category) {
+            error_log($category);
+            foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
+                error_log($solrMarcKey);
+                $data = $driver->getMarcData($solrMarcKey);
+                foreach ($data as $date) {
+                    if ($category == "marcFulltextCheckDirect") {
+                        if (!empty(($date['url']['data'][0]))) {
+                            $urlAccess = $date['url']['data'][0];
+                            break;
+                        }
+                    } else if ($urlAccessUncertain && $category == "marcFulltextCheckIndirect") {
+                        if (!empty(($date))) {
+                            $urlAccess = $urlAccessUncertain;
+                            break;
+                        }
+                    }
                 }
             }
         }
-        
+       
         return $urlAccess;
     }                
 
