@@ -1,38 +1,51 @@
 <?php
   // Set up page title:
-  $this->headTitle($this->translate('Delivery Order'));
+  $this->headTitle($this->translate($this->title) . ' ' . $this->translate('Order'));
 
   // Set up breadcrumbs:
-  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Order') . '</li><li><a href="' . $this->url('delivery-home') . '">' . $this->transEsc('Delivery Home') . '</a></li>';
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc($this->title) . ' ' . $this->transEsc('Order') . '</li><li><a href="' . $this->url('delivery-home') . '">' . $this->transEsc('Delivery Home') . '</a></li>';
 
   $errors = $this->errors;
   $missingFields = $this->missingFields;
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-  <h2 class="lightbox-header"><?=$this->transEsc('Delivery Order')?></h2>
+  <h2 class="lightbox-header"><?=$this->transEsc($this->title) . ' ' . $this->transEsc('Order')?></h2>
   <?php if (!empty($errors)): ?>
   <p>
     <?php foreach ($errors as $error): ?>
-    <?=$error ?><br />
+    <?=$this->transEsc($error) ?><br />
     <?php endforeach; ?>
   </p>
   <?php endif; ?>
 
+<?php //print_r($missingFields); ?>
 
+<?php if (!empty($this->orderId)): ?>
+  <p><?=$this->transEsc('Your Order is Placed') ?></p>
+<?php else: ?>
   <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-order">
+    <input type="hidden" name="update_email" value="y" />
     <input type="hidden" name="order" value="y" />
     <input type="hidden" name="id" value="<?=$this->id ?>" />
     <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>" />
     <div class="form-group">
       <h3><?=$this->transEsc($this->formTitle) ?></h3>
     </div>
+
     <?php foreach ($this->formFields as $formField): ?>
-      <?php $mandatory = ($formField['mandantory'] == 1) ? ' *' : ''; ?>
+      <?php $mandatory = ($formField['mandatory'] == 1) ? ' *' : ''; ?>
       <?php $style = (in_array($formField['form_name'], $missingFields)) ? ' style="color:red"' : ''; ?>
     <div class="form-group">
       <label class="control-label" for="<?=$formField['form_name'] ?>"<?=$style ?>><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
       <input type="text" name="<?=$formField['form_name'] ?>" id="<?=$formField['form_name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
+    </div>
+    <?php endforeach; ?>
+
+    <?php foreach ($this->checkboxFields as $checkboxField): ?>
+    <div class="form-group">
+      <label class="control-label" for="<?=$checkboxField['form_name'] ?>"><?=$this->transEsc($checkboxField['display']) ?></label>
+      <input type="checkbox" name="<?=$checkboxField['form_name'] ?>" id="<?=$checkboxField['form_name'] ?>" value="<?=$checkboxField['form_value'] ?>" style="margin: 0px 10px 0px; vertical-align:middle;"/>
     </div>
     <?php endforeach; ?>
 
@@ -42,15 +55,34 @@
     <?php foreach ($this->infoFields as $infoField): ?>
       <?php if (!empty($infoField['value'])): ?>
     <div class="form-group">
-        <p><strong><?=$this->transEsc($infoField['display']) ?>:</strong> <?=$this->transEsc($infoField['value']) ?></p>
+      <p><strong><?=$this->transEsc($infoField['display']) ?>:</strong> <?=$this->transEsc($infoField['value']) ?></p>
       <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/>
     </div>
-  <?php endif; ?>
-<?php endforeach; ?>
+      <?php endif; ?>
+    <?php endforeach; ?>
 
     <div class="form-group">
-      <input class="btn btn-primary" type="submit" name="processRegister" value="<?=$this->transEsc('Order')?>">
+      <h3><?=$this->transEsc('User Data') ?></h3>
+    </div>
+    <div class="form-group">
+      <p><strong><?=$this->transEsc('Name') ?>:</strong> <?=$this->name ?></p>
+    </div>
+    <div class="form-group">
+      <p><strong><?=$this->transEsc('Catalog Id') ?>:</strong> <?=$this->catalog_id ?></p>
+    </div>
+    <div class="form-group">
+      <p>
+          <?php $style = (in_array('delivery_email', $missingFields)) ? ' style="color:red"' : ''; ?>
+          <label class="control-label" for="delivery_email"<?=$style ?>><?=$this->transEsc('Delivery Email') ?>: *</label>
+          <input type="text" name="delivery_email" id="email" value="<?=$this->delivery_email ?>" style="width:380px;"/>
+      </p>
+    </div>
+
+    <div class="form-group">
+      <input class="btn btn-primary" type="submit" name="sendForm" value="<?=$this->transEsc('Order')?>">
+      <input class="btn btn-primary" type="reset" name="resetForm" value="<?=$this->transEsc('Reset')?>">
     </div>
   </form>
+<?php endif; ?>
 
 </div>
