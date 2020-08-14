@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic factory for search results objects.
+ * Factory for Solr search params objects.
  *
  * PHP version 7
  *
@@ -20,26 +20,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search
+ * @package  Search_Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace FacetPrefix\Search\Results;
+namespace FacetPrefix\Search\Search2;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Generic factory for search results objects.
+ * Factory for Search2 search params objects.
  *
  * @category VuFind
- * @package  Search
+ * @package  Search_Search2
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ResultsFactory implements FactoryInterface
+class ParamsFactory extends \FacetPrefix\Search\Params\ParamsFactory
 {
     /**
      * Create an object
@@ -58,15 +57,10 @@ class ResultsFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        // Replace trailing "Results" with "Params" to get the params service:
-        $paramsService = preg_replace('/Results$/', 'Params', $requestedName);
-        $paramsService = preg_replace('/^VuFind/', 'FacetPrefix', $paramsService);
-        $params = $container->get('FacetPrefix\Search\Params\PluginManager')
-            ->get($paramsService);
-        $searchService = $container->get('VuFindSearch\Service');
-        $recordLoader = $container->get('VuFind\Record\Loader');
-        return new $requestedName(
-            $params, $searchService, $recordLoader, ...($options ?: [])
-        );
+        if (!empty($options)) {
+            throw new \Exception('Unexpected options sent to factory.');
+        }
+        $facetHelper = $container->get('VuFind\Search\Solr\HierarchicalFacetHelper');
+        return parent::__invoke($container, $requestedName, [$facetHelper]);
     }
 }
