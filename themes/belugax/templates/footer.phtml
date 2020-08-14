@@ -5,33 +5,33 @@
       <ul>
         <? if (!empty($this->configreader()->getConfigData('Footer', 'links_left'))): ?>
           <? foreach ($this->configreader()->getConfigData('Footer', 'links_left') as $text => $link): ?>
-            <li><a href="<?=$link?>"><?=$this->transEsc($text)?></a></li>
+            <a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a> | 
           <? endforeach; ?>
         <? endif; ?>
       </ul>
-      <p><?=$this->configreader()->getConfigData('Footer', 'content_left')?></p>
+      <p><?=$this->translate($this->configreader()->getConfigData('Footer', 'content_left'))?></p>
     </div>
     <div class="footer-column">
       <p><strong><?=$this->configreader()->getConfigData('Footer', 'links_center_title')?></strong></p>
       <ul>
         <? if (!empty($this->configreader()->getConfigData('Footer', 'links_center'))): ?>
           <? foreach ($this->configreader()->getConfigData('Footer', 'links_center') as $text => $link): ?>
-            <li><a href="<?=$link?>"><?=$this->transEsc($text)?></a></li>
+            <a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a> |
           <? endforeach; ?>
         <? endif; ?>
       </ul>
-      <p><?=$this->configreader()->getConfigData('Footer', 'content_center')?></p>
+      <p><?=$this->translate($this->configreader()->getConfigData('Footer', 'content_center'))?></p>
     </div>
     <div class="footer-column">
       <p><strong><?=$this->configreader()->getConfigData('Footer', 'links_right_title')?></strong></p>
       <ul>
         <? if (!empty($this->configreader()->getConfigData('Footer', 'links_right'))): ?>
           <? foreach ($this->configreader()->getConfigData('Footer', 'links_right') as $text => $link): ?>
-            <li><a href="<?=$link?>"><?=$this->transEsc($text)?></a></li>
+            <a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a> |
           <? endforeach; ?>
         <? endif; ?>
       </ul>
-      <p><?=$this->configreader()->getConfigData('Footer', 'content_right')?></p>
+      <p><?=$this->translate($this->configreader()->getConfigData('Footer', 'content_right'))?></p>
     </div>
   </div>
   <div class="poweredby">

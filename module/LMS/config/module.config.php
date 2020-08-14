@@ -24,4 +24,12 @@ $config = [
     ],
 ];
 
+// Define static routes -- Controller/Action strings
+$staticRoutes = [
+  'MyResearch/MyLists'
+];
+
+$routeGenerator = new \VuFind\Route\RouteGenerator();
+$routeGenerator->addStaticRoutes($config, $staticRoutes);
+
 return $config;
