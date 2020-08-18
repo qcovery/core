@@ -94,9 +94,10 @@ class Dod implements DriverInterface {
         $orderTemplate = $this->config['orderTemplate'];
         $orderData = $this->viewRenderer->render('Order/' . $orderTemplate, $orderData);
         $config = $this->config;
-        if ($this->mailer->send($config['orderMailTo'], $config['orderMailFrom'], $config['orderSubject'], $orderData)) {
+        try{
+            $this->mailer->send($config['orderMailTo'], $config['orderMailFrom'], $config['orderSubject'], $orderData);
             return 'per Email';
-        } else {
+        } catch (exception $e) {
             return null;
         }
     }
