@@ -18,19 +18,19 @@ use VuFind\Search\Factory\SolrDefaultBackendFactory;
 
 class AvailabilityHelper {
 
-    protected $deliveryConfig;
+    protected $availabilityConfig;
 
     protected $solrDriver;
 
     protected $signatureList;
 
-    public function __construct($solrDriver = null, $deliveryConfig = null) 
+    public function __construct($availabilityConfig = null) 
     {
         if (!empty($solrDriver)) {
             $this->setSolrDriver($solrDriver);
         }
-        if (!empty($deliveryConfig)) {
-            $this->setDeliveryConfig($deliveryConfig);
+        if (!empty($availabilityConfig)) {
+            $this->setAvailabilityConfig($availabilityConfig);
         }
     }
 
@@ -55,15 +55,15 @@ class AvailabilityHelper {
         $this->solrDriver = $driver;
     }
 
-    public function setDeliveryConfig($config)
+    public function setAvailabilityConfig($config)
     {
-        $this->deliveryConfig = $config;
+        $this->availabilityConfig = $config;
     }
 
     public function getParentId() 
     {
         $format = array_shift(array_shift($this->getMarcData('Format')));
-        if (in_array($format, $this->deliveryConfig['formats'])) {
+        if (in_array($format, $this->availabilityConfig['formats'])) {
             $articleData = $this->getMarcData('DeliveryDataArticle');
             foreach ($articleData as $articleDate) {
                 if (!empty($articleDate['ppn'])) {
@@ -82,7 +82,7 @@ class AvailabilityHelper {
 
     public function checkSignature() 
     {
-        $deliveryConfig = $this->deliveryConfig;
+        $availabilityConfig = $this->availabilityConfig;
         $format = array_shift(array_shift($this->getMarcData('Format')));
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
@@ -91,7 +91,7 @@ class AvailabilityHelper {
         $this->signatureList = [];
 
         $sortedSignatureData = [];
-        foreach ($deliveryConfig['sigel_all'] as $sigel) {
+        foreach ($availabilityConfig['sigel_all'] as $sigel) {
             foreach ($signatureData as $index => $signatureDate) {
                 if (isset($signatureDate['sigel']) && preg_match('#'.$sigel.'$#', $signatureDate['sigel'])) {
                     $sortedSignatureData[] = $signatureDate;
@@ -100,7 +100,7 @@ class AvailabilityHelper {
                 }
             }
         }
-        if (in_array($format, $deliveryConfig['formats'])) {
+        if (in_array($format, $availabilityConfig['formats'])) {
             if (empty($sortedSignatureData)) {
                 foreach ($signatureData as $signatureDate) {
                     if ($this->checkSigel($signatureDate, $format)) {
@@ -131,11 +131,11 @@ class AvailabilityHelper {
 
     private function performCheck($item, $data, $format) 
     {
-        if (empty($this->deliveryConfig[$item.'_'.$format])) {
+        if (empty($this->availabilityConfig[$item.'_'.$format])) {
             $format = 'all';
         }
-        if (!empty($this->deliveryConfig[$item.'_'.$format])) {
-            foreach ($this->deliveryConfig[$item.'_'.$format] as $regex) {
+        if (!empty($this->availabilityConfig[$item.'_'.$format])) {
+            foreach ($this->availabilityConfig[$item.'_'.$format] as $regex) {
                 $noMatch = false;
                 if (strpos($regex, '!') === 0) {
                     if (empty($data)) {

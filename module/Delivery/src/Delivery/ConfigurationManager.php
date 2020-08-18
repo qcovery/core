@@ -75,6 +75,9 @@ class ConfigurationManager {
     public function getPluginConfig()
     {
         $plugin = $this->mainConfig['plugin'];
+        if (!empty($this->mainConfig['orderTemplate'])) {
+            $this->globalConfig[$plugin]['orderTemplate'] = $this->mainConfig['orderTemplate'];
+        }
         return array_merge($this->globalConfig[$plugin], ['plugin' => $plugin]);
     }
 

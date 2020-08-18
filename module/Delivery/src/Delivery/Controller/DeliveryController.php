@@ -163,12 +163,13 @@ class DeliveryController extends AbstractBase
             }
  
             $availabilityConfig = $this->configurationManager->getAvailabilityConfig();
-            $availabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
+	    $availabilityHelper = new AvailabilityHelper($availabilityConfig['checkparent']);
+	    $availabilityHelper->setSolrDriver($driver);
             if ($parentId = $availabilityHelper->getParentId()) {
                 $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
                 $availabilityHelper->setSolrDriver($parentDriver);
             }
-            $availabilityHelper->setDeliveryConfig($availabilityConfig['default']);
+            $availabilityHelper->setAvailabilityConfig($availabilityConfig['default']);
 
             $signatureCount = $mainConfig['collectedCallnumbers'] ?: 1;
             $signatureList = array_slice($availabilityHelper->getSignatureList(), 0 , $signatureCount);
