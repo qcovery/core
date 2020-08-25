@@ -3,7 +3,7 @@ ArticleFulltextFree:
   856:
     conditions:
       - [field, 3, Volltext]
-      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books']
+      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
       - [indicator, 1, 4]
       - [indicator, 2, 0|1]
     u:
@@ -21,8 +21,8 @@ ArticleFulltextFreeUrlParts2:
   category: marcFulltextCheckDirect
   856:
     conditions:
-      - [field, u, 'doi.org|nbn-resolving.de']
-      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books']
+      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
+      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
       - [indicator, 1, 4]
       - [indicator, 2, 0|1]
     u:
@@ -31,7 +31,7 @@ ArticleFulltextFreeCollection:
   category: marcFulltextCheckIndirect
   912:
     conditions:
-      - [field, a, 'OPENACCESS|GBV_DOAJ|Gutenberg|ZDB-94-OAB|ZDB-23-GOA']
+      - [field, a, 'OPENACCESS|GBV_DOAJ|Gutenberg|ZDB-94-OAB|ZDB-23-GOA|GBV_XBI|GBV_XAR|GBV_XCH']
     a:
       - [name, collection]
 ArticleDirectLink:
