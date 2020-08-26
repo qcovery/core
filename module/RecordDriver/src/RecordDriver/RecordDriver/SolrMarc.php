@@ -46,18 +46,18 @@ class SolrMarc extends SolrDefault
     use \VuFind\RecordDriver\MarcReaderTrait;
 
     /**
-     * Configuration (yaml)
+     * actual Configuration (yaml)
      *
      * @var string
      */
-    protected $solrMarcYaml = 'solrmarc.yaml';
+    protected $solrMarcYamls = [];
 
     /**
      * Specifications to use
      *
      * @var array
      */
-    protected $solrMarcSpecs;
+    protected $solrMarcSpecs = [];
 
     /**
      * Data in original letters
@@ -84,12 +84,25 @@ class SolrMarc extends SolrDefault
      * @param string $marcYaml
      */
     public function __construct($mainConfig = null, $recordConfig = null,
-        $searchSettings = null, $marcYaml = null
+        $searchSettings = null, $solrMarcYaml = null
     ) {
-        if (!empty($marcYaml)) {
-            $this->$solrMarcYaml = $marcYaml;
-        }
+        $this->addSolrMarcYaml($solrMarcYaml, false);
         parent::__construct($mainConfig, $recordConfig, $searchSettings);
+    }
+
+    /**
+     * Set and parse SolrMarcSpecs config.
+     *
+     * @return void
+     */
+    public function addSolrMarcYaml($solrMarcYaml, $parse = true)
+    {
+        if (!in_array($solrMarcYaml, $this->solrMarcYamls)) {
+            $this->solrMarcYamls[] = $solrMarcYaml;
+            if ($parse) {
+                $this->parseSolrMarcSpecs($solrMarcYaml);
+            }
+        }
     }
 
     /**
@@ -100,7 +113,9 @@ class SolrMarc extends SolrDefault
     private function getSolrMarcSpecs($item)
     {
         if (empty($this->solrMarcSpecs)) {
-            $this->parseSolrMarcSpecs();
+            foreach ($this->solrMarcYamls as $solrMarcYaml) {
+                $this->parseSolrMarcSpecs($solrMarcYaml);
+            }
         }
         return $this->solrMarcSpecs[$item] ?? [];
     }
@@ -113,7 +128,9 @@ class SolrMarc extends SolrDefault
     public function getSolrMarcKeys($category = '', $others = false)
     {
         if (empty($this->solrMarcSpecs)) {
-            $this->parseSolrMarcSpecs();
+            foreach ($this->solrMarcYamls as $solrMarcYaml) {
+                $this->parseSolrMarcSpecs($solrMarcYaml);
+            }
         }
         $specKeys = array_keys($this->solrMarcSpecs);
         if (empty($category)) {
@@ -137,11 +154,11 @@ class SolrMarc extends SolrDefault
      *
      * @return null
      */
-    private function parseSolrMarcSpecs()
+    private function parseSolrMarcSpecs($solrMarcYaml)
     {
         $specsReader = new SearchSpecsReader();
-        $rawSolrMarcSpecs = $specsReader->get($this->solrMarcYaml);
-        $solrMarcSpecs = [];
+        $rawSolrMarcSpecs = $specsReader->get($solrMarcYaml);
+        $solrMarcSpecs = $this->solrMarcSpecs;
         foreach ($rawSolrMarcSpecs as $item => $solrMarcSpec) {
             $solrMarcSpecs[$item] = [];
             if (array_key_exists('category', $solrMarcSpec)) {
@@ -559,4 +576,35 @@ class SolrMarc extends SolrDefault
         // Try the parent method:
         return parent::getXML($format, $baseUrl, $recordLink);
     }
+
+    /**
+     * Get the OpenURL parameters to represent this record (useful for the
+     * title attribute of a COinS span tag).
+     *
+     * @param bool $overrideSupportsOpenUrl Flag to override checking
+     * supportsOpenUrl() (default is false)
+     *
+     * @return string OpenURL parameters.
+     */
+    public function getOpenUrl($overrideSupportsOpenUrl = false)
+    {
+        return parent::getOpenUrl($overrideSupportsOpenUrl);
+    }
+
+    /**
+     * Get OpenURL parameters for an article.
+     *
+     * @return array
+     */
+    protected function getArticleOpenUrlParams()
+    {
+        $params = parent::getArticleOpenUrlParams();
+        $pages = $this->getMarcData('Pages');
+        if (strpos($pages, '-') !== false) { 
+            list($spage, $epage) = explode('-', $pages[0]['pages']['data'][0]);
+            $params['rft.epage'] = $epage;
+        }
+        return $params;
+    }
+
 }
