@@ -117,17 +117,9 @@ class MyBib implements DriverInterface {
      * id, availability (boolean), status, location, reserve, callnumber.
      */
     public function sendOrder($orderData) {
-        $orderData = $this->viewRenderer->render('Order/ill-subito-mybib.tbl', $orderData);
+        $orderTemplate = $this->config['orderTemplate'];
+        $orderData = $this->viewRenderer->render('Order/' . $orderTemplate, $orderData);
         $orderData = str_replace('##', "", $orderData);
-
-        $orderDataLines = explode("##", $orderData);
-        $orderDataArray = [];
-        foreach ($orderDataLines as $orderDataLine) {
-            list($key, $val) = explode(':', trim($orderDataLine), 2);
-            if (!empty($key)) {
-                $orderDataArray[$key] = trim($val);
-            }
-        }
 
         $orderStruct = ['type' => 'subito',
                         'data' => $orderData];
@@ -150,19 +142,16 @@ class MyBib implements DriverInterface {
         $parameters = [$this->session_id, $order_id, 'STATE'];
         $parameters = [$this->session_id, $order_id];
         $response = $this->request($method, $parameters);
-        
-        print_r($response);
-        die;
     }    
 
     private function request($method, $parameters) {
-        $config = $this->config;
         if (!isset($this->rpcClient)) {
-            $this->rpcClient = new XmlRpc\Client($config['rpcUrl']);
+            $this->rpcClient = new XmlRpc\Client($this->config['rpcUrl']);
         }
         $response = $this->rpcClient->call($method, $parameters);
-        if (xmlrpc_is_fault($response)) {
+        if (!empty($response['ERROR_struct']['technical'])) {
             $this->rpcErrors[] = $response['ERROR_struct']['message'];
+//            print_r($response['ERROR_struct']);
             return false;
         }
         return $response;

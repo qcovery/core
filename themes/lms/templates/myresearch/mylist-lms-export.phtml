@@ -1,0 +1,8 @@
+<?php if($this->showExportButton): ?>
+  <script type="text/javascript">
+    var lms_list_id_export_message = "<?=$this->transEsc("lms_list_id_export_message")?>";
+  </script>
+  <div class="lms-list-id-export">
+      <button id="copy-lms-id-button" class="btn btn-default" data-clipboard-target="#copy-lms-id-input"><?=$this->transEsc("lms_list_id_export_button")?></button>
+  </div>
+<?php endif; ?>

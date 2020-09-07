@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory for Solr search results objects.
+ * Factory for SolrDefault record drivers.
  *
  * PHP version 7
  *
@@ -20,25 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search_Solr
+ * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace FacetPrefix\Search\Solr;
+namespace RecordDriver\RecordDriver;
 
 use Interop\Container\ContainerInterface;
+use VuFind\RecordDriver\AbstractBaseFactory;
 
 /**
- * Factory for Solr search results objects.
+ * Factory for SolrDefault record drivers.
  *
  * @category VuFind
- * @package  Search_Solr
+ * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ResultsFactory extends \FacetPrefix\Search\Results\ResultsFactory
+class SolrDefaultFactory extends AbstractBaseFactory
 {
     /**
      * Create an object
@@ -57,11 +58,11 @@ class ResultsFactory extends \FacetPrefix\Search\Results\ResultsFactory
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        $solr = parent::__invoke($container, $requestedName, $options);
-        $config = $container->get('VuFind\Config\PluginManager')->get('config');
-        $solr->setSpellingProcessor(
-            new \VuFind\Search\Solr\SpellingProcessor($config->Spelling ?? null)
-        );
-        return $solr;
+        $searchConfig = $container->get('VuFind\Config\PluginManager')->get('searches');
+        $solrMarcYaml = 'solrmarc.yaml';
+        $finalOptions = [null, $searchConfig, $solrMarcYaml];
+        $driver = parent::__invoke($container, $requestedName, $finalOptions);
+        $driver->attachSearchService($container->get('VuFindSearch\Service'));
+        return $driver;
     }
 }

@@ -5,24 +5,29 @@
 namespace Delivery\View\Helper\Delivery;
 
 use Delivery\AvailabilityHelper;
+use Delivery\ConfigurationManager;
+use VuFind\Config\PluginManager as ConfigManager;
 
 class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
 {
 
-    protected $AvailabilityHelper;
+    protected $configManager;
 
-    public function __construct($config)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->AvailabilityHelper = new AvailabilityHelper(null, $config['default']);
+        $this->configManager = $configManager;
     }
 
     /**
      *
      */
-    public function check($driver)
+    public function check($driver, $deliveryDomain = 'main')
     {
-        $this->AvailabilityHelper->setSolrDriver($driver);
-        return ($this->AvailabilityHelper->checkSignature()) ? 'available' : 'not available'; 
+        $configurationManager = new ConfigurationManager($this->configManager, $deliveryDomain);
+        $availabilityConfig = $configurationManager->getAvailabilityConfig();
+        $availabilityHelper = new AvailabilityHelper(null, $availabilityConfig['default']);
+        $availabilityHelper->setSolrDriver($driver);
+        return ($availabilityHelper->checkSignature()) ? 'available' : 'not available'; 
     }
 
     /**
@@ -31,6 +36,6 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
     public function getHierarchyTopID($driver)
     {
         $deliveryArticleData = $driver->getMarcData('DeliveryDataArticle');
-        return $deliveryArticleData[2]['ppn']['data'][0] ?? '';
+        return $deliveryArticleData[3]['ppn']['data'][0] ?? '';
     }
 }

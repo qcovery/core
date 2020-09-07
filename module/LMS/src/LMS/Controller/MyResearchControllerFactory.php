@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory for Solr search params objects.
+ * Generic controller factory.
  *
  * PHP version 7
  *
@@ -20,25 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search_Solr
+ * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace FacetPrefix\Search\Solr;
+namespace LMS\Controller;
 
 use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Factory for Solr search params objects.
+ * Generic controller factory.
  *
  * @category VuFind
- * @package  Search_Solr
+ * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ParamsFactory extends \FacetPrefix\Search\Params\ParamsFactory
+class MyResearchControllerFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -60,7 +61,6 @@ class ParamsFactory extends \FacetPrefix\Search\Params\ParamsFactory
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $facetHelper = $container->get('VuFind\Search\Solr\HierarchicalFacetHelper');
-        return parent::__invoke($container, $requestedName, [$facetHelper]);
+        return new $requestedName($container);
     }
 }

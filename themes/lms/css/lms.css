@@ -9,3 +9,59 @@
 .spinner {
     animation: anim-rotate 2s infinite linear;
 }
+
+.lms-list-id-export {
+    margin: 15px;
+    padding-bottom: 20px;
+}
+
+#lms-mylists-list {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+#lms-mylists-list li {
+    margin-bottom: 10px;
+}
+
+#lms-mylists-list li i {
+  font-size: 30px;
+  margin-bottom: -4px;
+}
+
+#lms-mylists-list li div {
+  display: inline-block;
+}
+
+#lms-mylists-hint {
+  width: 100% !important;
+  padding: 15px !important;
+  border: 1px solid #5597D4 !important;
+  border-radius: 0px !important;
+  margin: 0px !important;
+  text-align: left !important;
+}
+
+#lms-mylists-hint i {
+  font-size: 32px;
+  margin-bottom: -5px;
+}
+
+#lms-mylists-hint p {
+  padding: 10px;
+  margin: 0px;
+}
+
+#lms-hint-login {
+  width: 100% !important;
+  padding: 15px !important;
+  background-color: #ffffff !important;
+  border-radius: 0px !important;
+  margin: 0px !important;
+  text-align: left !important;
+}
+
+#lms-hint-login p {
+  padding: 10px;
+  margin: 0px;
+}

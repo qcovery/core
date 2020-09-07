@@ -1,0 +1,56 @@
+<?
+  $user = $this->auth()->isLoggedIn();
+  $patron = $user ? $this->auth()->getILSPatron() : false;
+  $capabilityParams = $patron ? ['patron' => $patron] : [];
+
+  $showLmsHint = false;
+  if ($lmsConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/lms.ini'), true)) {
+    foreach ($lmsConfig['lms-list-id-export']['allowed-user-types'] as $allowedUserType) {
+      foreach ($patron['type'] as $type) {
+        if ($type == $allowedUserType) {
+          $showLmsHint = true;
+        }
+      }
+    }
+  }
+?>
+
+<?=$this->flashmessages()?>
+
+<div class="<?=$this->layoutClass('mainbody')?>">
+  <h2><?=$list ? $this->escapeHtml($list->title) : $this->transEsc("All Lists")?></h2>
+  <? if($showLmsHint): ?>
+    <?=$this->context($this)->renderInContext('myresearch/mylists-lms-hint.phtml', []); ?>
+  <? endif; ?>
+  <? $lists = $user->getLists() ?>
+  <ul id="lms-mylists-list">
+  <?php /*
+  <li>
+    <i class="bel-schloss02"></i>
+    <a href="<?=$this->url('myresearch-favorites')?>">
+      <b><?=$this->transEsc('Your Favorites')?></b>
+    </a>
+  </li>
+  */ ?>
+  <? foreach ($lists as $list): ?>
+    <li>
+      <?if(!$list['public']):?> <i class="bel-schloss02"></i><? else: ?> <i class="bel-sichtbar"></i><? endif; ?>
+      <div>
+        <a href="<?=$this->url('userList', ['id' => $list['id']])?>">
+          <b><?=$this->escapeHtml($list['title'])?></b>
+        </a>
+        |
+        <?=$list->cnt ?> <?=$this->transEsc("Entries")?>
+      </div>
+    </li>
+  <? endforeach; ?>
+  </ul>
+  <br/>
+  <a href="<?=$this->url('editList', ['id' => 'NEW'])?>">
+    <i class="bel-plus01" aria-hidden="true"></i> <?=$this->transEsc('Create a List') ?>
+  </a>
+</div>
+
+<div class="<?=$this->layoutClass('sidebar')?>">
+  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'mylists'])?>
+</div>
