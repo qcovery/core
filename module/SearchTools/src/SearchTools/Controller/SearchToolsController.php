@@ -32,22 +32,6 @@ class SearchToolsController extends \VuFind\Controller\AbstractBase
      */
     public function homeAction()
     {
-        return $this->forwardTo('SearchTools', 'SearchTool');
+        return $this->createViewModel(['template' => $this->params()->fromQuery('template')]);
     }
-
-    public function searchtoolAction() {       
-        //$this->layout()->setTemplate('searchtools/searchtool');
-        return $this->createViewModel();
-    }
-    
-    public function structuresearchAction() {
-        //$this->layout()->setTemplate('searchtools/structuresearch');
-        return $this->createViewModel();
-    }
-	
-    public function recoverpasswordAction() {
-        //$this->layout()->setTemplate('searchtools/recoverpassword');
-        return $this->createViewModel();
-    }
-
 }
