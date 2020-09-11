@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic factory for search params objects.
+ * Generic factory for search results objects.
  *
  * PHP version 7
  *
@@ -25,13 +25,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace FacetPrefix\Search\Params;
+namespace FacetPrefix\Search\Results;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Generic factory for search params objects.
+ * Generic factory for search results objects.
  *
  * @category VuFind
  * @package  Search
@@ -39,7 +39,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ParamsFactory implements FactoryInterface
+class ResultsFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -58,16 +58,15 @@ class ParamsFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        // Replace trailing "Params" with "Options" to get the options service:
-        $optionsService = preg_replace('/Params$/', 'Options', $requestedName);
-        // Replace leading "SearchKeys" with "VuFind" to get the VuFind options service:
-        $optionsService = preg_replace('/^FacetPrefix/', 'VuFind', $optionsService);
-        $optionsObj = $container->get('VuFind\Search\Options\PluginManager')
-            ->get($optionsService);
-        $configLoader = $container->get('VuFind\Config\PluginManager');
-        // Clone the options instance in case caller modifies it:
+        // Replace trailing "Results" with "Params" to get the params service:
+        $paramsService = preg_replace('/Results$/', 'Params', $requestedName);
+        $paramsService = preg_replace('/^VuFind/', 'FacetPrefix', $paramsService);
+        $params = $container->get('FacetPrefix\Search\Params\PluginManager')
+            ->get($paramsService);
+        $searchService = $container->get('VuFindSearch\Service');
+        $recordLoader = $container->get('VuFind\Record\Loader');
         return new $requestedName(
-            clone $optionsObj, $configLoader, ...($options ?: [])
+            $params, $searchService, $recordLoader, ...($options ?: [])
         );
     }
 }

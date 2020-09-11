@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic factory for search params objects.
+ * Factory for Solr search results objects.
  *
  * PHP version 7
  *
@@ -20,26 +20,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search
+ * @package  Search_Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace FacetPrefix\Search\Params;
+namespace FacetPrefix\Search\Search2;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Generic factory for search params objects.
+ * Factory for Search2 search results objects.
  *
  * @category VuFind
- * @package  Search
+ * @package  Search_Search2
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ParamsFactory implements FactoryInterface
+class ResultsFactory extends \FacetPrefix\Search\Results\ResultsFactory
 {
     /**
      * Create an object
@@ -58,16 +57,11 @@ class ParamsFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
-        // Replace trailing "Params" with "Options" to get the options service:
-        $optionsService = preg_replace('/Params$/', 'Options', $requestedName);
-        // Replace leading "SearchKeys" with "VuFind" to get the VuFind options service:
-        $optionsService = preg_replace('/^FacetPrefix/', 'VuFind', $optionsService);
-        $optionsObj = $container->get('VuFind\Search\Options\PluginManager')
-            ->get($optionsService);
-        $configLoader = $container->get('VuFind\Config\PluginManager');
-        // Clone the options instance in case caller modifies it:
-        return new $requestedName(
-            clone $optionsObj, $configLoader, ...($options ?: [])
+        $solr = parent::__invoke($container, $requestedName, $options);
+        $config = $container->get('VuFind\Config\PluginManager')->get('config');
+        $solr->setSpellingProcessor(
+            new \VuFind\Search\Solr\SpellingProcessor($config->Spelling ?? null)
         );
+        return $solr;
     }
 }
