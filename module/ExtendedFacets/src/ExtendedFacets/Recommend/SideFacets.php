@@ -27,6 +27,8 @@
  */
 namespace ExtendedFacets\Recommend;
 
+use VuFind\Search\Solr\HierarchicalFacetHelper;
+
 /**
  * SideFacets Recommendations Module
  *
@@ -40,6 +42,31 @@ namespace ExtendedFacets\Recommend;
  */
 class SideFacets extends \VuFind\Recommend\SideFacets
 {
+    /**
+     * Translator
+     *
+     * @var \Zend\I18n\Translator\Translator
+     */
+    protected $translator = null;
+
+    /**
+     * Constructor
+     *
+     * @param \VuFind\Config\PluginManager $configLoader Configuration loader
+     * @param HierarchicalFacetHelper      $facetHelper  Helper for handling
+     * @param \Zend\Mvc\I18n\Translator    $translator   Translator
+     * hierarchical facets
+     */
+    public function __construct(
+      \VuFind\Config\PluginManager $configLoader,
+      HierarchicalFacetHelper $facetHelper = null,
+      \Zend\Mvc\I18n\Translator $translator
+    ) {
+      parent::__construct($configLoader);
+      $this->hierarchicalFacetHelper = $facetHelper;
+      $this->translator = $translator;
+    }
+
     /**
      * getYearFacets
      *
@@ -131,15 +158,113 @@ class SideFacets extends \VuFind\Recommend\SideFacets
     }
 
     /**
+     * getFacetHierarchies
+     *
+     * Return dependency informations on facets.
+     *
+     * @param array $oldFacetList list of facets, $label filterlabel.
+     *
+     * @return array list of facets
+     */
+    public function getFacetHierarchies($oldFacetList, $label)
+    {
+        $facetLength = count($oldFacetList);
+        $newFacetList = array();
+        for ($i = 0; $i < $facetLength; $i++) {
+            if (isset($oldFacetList[$i])) {
+                $newFacetList[] = $oldFacetList[$i];
+            }
+            $value = $oldFacetList[$i]['value'];
+            for ($j = $i+1; $j < $facetLength; $j++) {
+                if (strpos($oldFacetList[$j]['value'], $value) > 0) {
+                    $oldFacetList[$j]['parent'] = $value;
+                    $newFacetList[] = $oldFacetList[$j];
+                    unset($oldFacetList[$j]);
+                }
+            }
+        }
+        return $newFacetList;
+    }
+
+    /**
+     * getLocationFacets
+     *
+     * Return location facet information in a format processed for use in the view.
+     *
+     * @param array $oldFacetList list of facets, $label filterlabel.
+     *
+     * @return array list of facets
+     */
+    public function getLocationFacets($sigelFacetList, $sigelLabel) {
+        $filters = $this->results->getParams()->getFilterList();
+
+        $tmpFacetList = array();
+        $filterList = array();
+        $isAppliedGlobal = false;
+        foreach ($sigelFacetList as $sigelFacetItem) {
+            $displayText = $this->translator->translate($sigelFacetItem['displayText']);
+
+            $sigelFacetItemCropped = preg_replace('/-[A-z]+$/', '', $sigelFacetItem['displayText']);
+            if ($displayText == $sigelFacetItem['displayText']) {
+                $displayText = $this->translator->translate($sigelFacetItemCropped);
+            }
+            if ($displayText != $sigelFacetItem['displayText'] && $displayText != $sigelFacetItemCropped) {
+                if (isset($tmpFacetList[$displayText])) {
+                    $tmpFacetList[$displayText]['sort'] += $sigelFacetItem['count'];
+                    $tmpFacetList[$displayText]['count'] += $sigelFacetItem['count'];
+                } else {
+                    $isApplied = (strpos($filters[$sigelLabel][0]['value'], $sigelFacetItem['value']) !== false);
+                    $tmpFacetList[$displayText] = array('sort' => $sigelFacetItem['count'], 'value' => $sigelFacetItem['value'], 'displayText' => $displayText, 'count' => $sigelFacetItem['count'], 'operator' => 'AND', 'isApplied' => $isApplied);
+                    if ($isApplied) {
+                        $isAppliedGlobal = true;
+                    }
+                }
+                if (isset($filterList[$displayText])) {
+                    $filterList[$displayText]['value'] .= ' OR standort_iln_str_mv:"'.$sigelFacetItem['value'].'"';
+                } else {
+                    $filterList[$displayText]['value'] = 'complex:standort_iln_str_mv:"'.$sigelFacetItem['value'].'"';
+                }
+            }
+        }
+        foreach ($tmpFacetList as $name => $data) {
+            if (isset($filterList[$name]['value'])) {
+                $tmpFacetList[$name]['value'] = $filterList[$name]['value'];
+            }
+        }
+        array_multisort($tmpFacetList, SORT_DESC);
+        $newFacetList = array();
+        foreach ($tmpFacetList as $tmpFacetItem) {
+            if (!$isAppliedGlobal || $tmpFacetItem['isApplied']) {
+                $newFacetList[] = $tmpFacetItem;
+            }
+        }
+        return $newFacetList;
+    }
+
+    /**
      * Get facet information from the search results.
      *
      * @return array
      */
     public function getFacetSet()
     {
+        $config = $this->configLoader->get('facets');
+
         $facetSet = \VuFind\Recommend\SideFacets::getFacetSet();
         if (isset($facetSet['publishDate'])) {
             $facetSet['publishDate']['list'] = $this->getYearFacets($facetSet['publishDate']['list'], $facetSet['publishDate']['label']);
+        }
+
+        if ($config->SideFacetsExtras->format_facet) {
+            if (isset($facetSet['format_facet'])) {
+              $facetSet['format_facet']['list'] = $this->getFacetHierarchies($facetSet['format_facet']['list'], $facetSet['format_facet']['label']);
+            }
+        }
+
+        if ($config->SideFacetsExtras->standort_iln_str_mv) {
+            if (isset($facetSet['standort_iln_str_mv'])) {
+              $facetSet['standort_iln_str_mv']['list'] = $this->getLocationFacets($facetSet['standort_iln_str_mv']['list'], $facetSet['standort_iln_str_mv']['label']);
+            }
         }
 
         $facetSet = $this->showFacetValue($facetSet);
