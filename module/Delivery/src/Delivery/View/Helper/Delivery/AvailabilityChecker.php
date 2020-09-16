@@ -25,8 +25,9 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
     {
         $configurationManager = new ConfigurationManager($this->configManager, $deliveryDomain);
         $availabilityConfig = $configurationManager->getAvailabilityConfig();
+        $mainConfig = $configurationManager->getMainConfig();
         $availabilityHelper = new AvailabilityHelper($availabilityConfig['default']);
-        $availabilityHelper->setSolrDriver($driver);
+        $availabilityHelper->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
         return ($availabilityHelper->checkSignature()) ? 'available' : 'not available'; 
     }
 
@@ -35,7 +36,9 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
      */
     public function getHierarchyTopID($driver)
     {
-        $deliveryArticleData = $driver->getMarcData('DeliveryDataArticle');
-        return $deliveryArticleData[3]['ppn']['data'][0] ?? '';
+        $hierarchyTopIDs = $driver->getHierarchyTopID();
+        return $hierarchyTopIDs[0];
+//        $deliveryArticleData = $driver->getMarcData('DeliveryDataArticle');
+//        return $deliveryArticleData[3]['ppn']['data'][0] ?? '';
     }
 }
