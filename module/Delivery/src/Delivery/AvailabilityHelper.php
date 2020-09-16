@@ -26,9 +26,6 @@ class AvailabilityHelper {
 
     public function __construct($availabilityConfig = null) 
     {
-        if (!empty($solrDriver)) {
-            $this->setSolrDriver($solrDriver);
-        }
         if (!empty($availabilityConfig)) {
             $this->setAvailabilityConfig($availabilityConfig);
         }
@@ -50,9 +47,12 @@ class AvailabilityHelper {
         return $flatData;
     }
 
-    public function setSolrDriver($driver)
+    public function setSolrDriver($driver, $deliveryMarcYaml = null)
     {
         $this->solrDriver = $driver;
+        if (!empty($deliveryMarcYaml)) {
+            $this->solrDriver->addSolrMarcYaml($deliveryMarcYaml);
+        }
     }
 
     public function setAvailabilityConfig($config)
@@ -162,6 +162,7 @@ class AvailabilityHelper {
         $licencenote = $signatureDate['licencenote'] ?? '';
         $footnote = $signatureDate['footnote'] ?? '';
         $location = $signatureDate['location'] ?? '';
+        $signature = $signatureDate['signature'] ?? '';
         $format = str_replace(' ', '_', $format);
 
         $sigelOk = $this->performCheck('sigel', $sigel, $format);
@@ -170,6 +171,7 @@ class AvailabilityHelper {
             $sigelOk = $sigelOk && $this->performCheck('licencenote', $licencenote, $format);
             $sigelOk = $sigelOk && $this->performCheck('footnote', $footnote, $format);
             $sigelOk = $sigelOk && $this->performCheck('location', $location, $format);
+            $sigelOk = $sigelOk && $this->performCheck('signature', $signature, $format);
         }
         return $sigelOk;
     }
