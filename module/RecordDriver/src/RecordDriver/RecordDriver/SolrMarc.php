@@ -84,7 +84,7 @@ class SolrMarc extends SolrDefault
      * @param string $marcYaml
      */
     public function __construct($mainConfig = null, $recordConfig = null,
-        $searchSettings = null, $solrMarcYaml = 'solrmarc.yaml'
+        $searchSettings = null, $solrMarcYaml = null
     ) {
         $this->addSolrMarcYaml($solrMarcYaml, false);
         parent::__construct($mainConfig, $recordConfig, $searchSettings);
