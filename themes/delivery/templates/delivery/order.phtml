@@ -10,7 +10,7 @@
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-  <h2 class="lightbox-header"><?=$this->transEsc($this->title) . ' ' . $this->transEsc('Order')?></h2>
+  <h2 class="lightbox-header"><?=$this->transEsc($this->title) . ': ' . $this->transEsc('Order')?></h2>
   <?php if (!empty($errors)): ?>
   <p>
     <?php foreach ($errors as $error): ?>
@@ -26,9 +26,23 @@
 <?php else: ?>
   <form method="post" action="<?=$this->url('delivery-order')?>" name="deliveryRegisterForm" class="form-order">
     <input type="hidden" name="update_email" value="y" />
+    <input type="hidden" name="domain" value="<?=$this->domain ?>" />
+    <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>" />
+  <?php if (!empty($this->selectFormats)): ?>
+    <div class="form-group">
+      <label class="control-label" for="format"><?=$this->transEsc('Format') ?></label>
+      <select name="format" id="format" class="form-control">
+      <?php foreach ($this->selectFormats as $selectFormat): ?>
+        <option value="<?=$selectFormat ?>"><?=$this->transEsc($selectFormat) ?></option>
+      <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="form-group">
+      <input class="btn btn-primary" type="submit" name="sendForm" value="<?=$this->transEsc('Send')?>">
+    </div>
+  <?php else: ?>
     <input type="hidden" name="order" value="y" />
     <input type="hidden" name="id" value="<?=$this->id ?>" />
-    <input type="hidden" name="searchClassId" value="<?=$this->searchClassId ?>" />
     <div class="form-group">
       <h3><?=$this->transEsc($this->formTitle) ?></h3>
     </div>
@@ -82,6 +96,7 @@
       <input class="btn btn-primary" type="submit" name="sendForm" value="<?=$this->transEsc('Order')?>">
       <input class="btn btn-primary" type="reset" name="resetForm" value="<?=$this->transEsc('Reset')?>">
     </div>
+  <?php endif; ?>
   </form>
 <?php endif; ?>
 

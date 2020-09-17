@@ -63,18 +63,24 @@ class ConfigurationManager {
     public function getAvailabilityConfig()
     {
         $availabilityConfigIni = $this->mainConfig['availability_config'];
-        return $this->configManager->get($availabilityConfigIni)->toArray();
+        $availabilityConfig = $this->configManager->get($availabilityConfigIni)->toArray();
+        $availabilityConfig['delivery_marc_yaml'] =  $this->mainConfig['delivery_marc_yaml'];
+        return $availabilityConfig;
     }
 
     public function getOrderDataConfig()
     {
         $orderDataConfigIni = $this->mainConfig['orderdata_config'];
-        return $this->configManager->get($orderDataConfigIni)->toArray();
+        $orderDataConfig = $this->configManager->get($orderDataConfigIni)->toArray();
+        return $orderDataConfig;
     }
 
     public function getPluginConfig()
     {
         $plugin = $this->mainConfig['plugin'];
+        if (!empty($this->mainConfig['orderTemplate'])) {
+            $this->globalConfig[$plugin]['orderTemplate'] = $this->mainConfig['orderTemplate'];
+        }
         return array_merge($this->globalConfig[$plugin], ['plugin' => $plugin]);
     }
 
