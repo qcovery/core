@@ -101,6 +101,7 @@ class MyBib implements DriverInterface {
         $orderData['contactPersonName'] = $user->firstname . ' ' . $user->lastname;
         $orderData['clientIdentifier'] = $user->cat_id;
         $orderData['delEmailAddress'] = $user->delivery_email;
+        $orderData['requesterGroup'] = $user->patron_types;
         return $orderData;
     }
 
