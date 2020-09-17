@@ -72,6 +72,16 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
         }
         $view->resultUserTypes = $resultUserTypes;
 
+        $userIsInLocalNetwork = false;
+        if (isset($resultFeedbackConfig['resultFeedback']['ip_local_network'])) {
+            foreach ($resultFeedbackConfig['resultFeedback']['ip_local_network'] as $ip_local_network) {
+                if ($this->startsWith($_SERVER['REMOTE_ADDR'], $ip_local_network)) {
+                    $userIsInLocalNetwork = true;
+                }
+            }
+        }
+        $view->userIsInLocalNetwork = $userIsInLocalNetwork;
+
         // Process form submission:
         $view->hideForm = false;
         if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
@@ -91,7 +101,11 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
                 );
             }
 
-            $email_message = $translator->translate('resultfeedback_usertype') . ':' . "\n" . $translator->translate($view->usertype) . "\n\n";
+            if(!empty($view->usertype)){
+                $email_message = $translator->translate('resultfeedback_usertype') . ':' . "\n" . $translator->translate($view->usertype) . "\n\n";
+            } else {
+                $email_message = '';
+            }
             $email_message .= empty($view->name) ? '' : 'Name:' . "\n" . $view->name . "\n\n";
             $email_message .= $translator->translate('Email') . ':' . "\n" . $view->email . "\n\n";
             $email_message .= $translator->translate('PPN') . ':' . "\n" . $view->recordid . "\n\n";
@@ -125,5 +139,9 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
         }
 
         return $view;
+    }
+
+    private function startsWith($haystack, $needle) {
+      return substr($haystack, 0, strlen($needle)) === $needle;
     }
 }

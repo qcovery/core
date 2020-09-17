@@ -1,6 +1,11 @@
 <div class="mainbody">
 <h2><?=$this->transEsc("Contact us about this title")?></h2>
 <?=$this->flashmessages() ?>
+<?php if($this->userIsInLocalNetwork): ?>
+  <?=$this->render('resultfeedback/user-is-in-local-network.phtml', []) ?>
+<?php else: ?>
+  <?=$this->render('resultfeedback/user-is-not-in-local-network.phtml', []) ?>
+<?php endif; ?>
 <?php if(!$this->hideForm): ?>
     <div class="resultfeedback-title">
         <?=$this->render('RecordDriver/SolrDefault/recorddriver-core-title.phtml', ['driver' => $this->driver]) ?>
@@ -8,14 +13,16 @@
     <form class="form-feedback result-feedback" name="feedback" method="post" action="<?=$this->url('resultfeedback-email').'?id='.$this->id.'&searchclassid='.$this->searchClassId?>">
       <input type="hidden" id="recordid" name="recordid" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueID() ?? '')?>" />
       <input type="hidden" id="recordtitle" name="recordtitle" value="<?=$this->escapeHtmlAttr($this->driver->getTitle() ?? '')?>" />
-      <div class="form-group">
-        <label class="control-label" for="usertype"><?=$this->transEsc("resultfeedback_usertype")?></label><br/>
-        <select name="usertype">
-          <?php foreach($this->resultUserTypes as $resultUserType): ?>
-            <option value="<?=$resultUserType?>"><?=$this->transEsc($resultUserType)?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+      <? if(!empty($this->resultUserTypes)): ?>
+        <div class="form-group">
+          <label class="control-label" for="usertype"><?=$this->transEsc("resultfeedback_usertype")?></label><br/>
+          <select name="usertype">
+            <?php foreach($this->resultUserTypes as $resultUserType): ?>
+              <option value="<?=$resultUserType?>"><?=$this->transEsc($resultUserType)?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      <?php endif; ?>
       <div class="form-group">
         <label class="control-label" for="name"><?=$this->transEsc("feedback_name")?></label>
         <input type="text" id="name" name="name" value="<?=$this->escapeHtmlAttr($name ?? '')?>" class="form-control"/>

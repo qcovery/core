@@ -17,7 +17,7 @@ use Delivery\Driver\PluginManager;
 
 class DataHandler {
 
-    protected $deliveryConfig;
+    protected $pluginConfig;
 
     protected $solrDriver;
 
@@ -39,9 +39,11 @@ class DataHandler {
 
     protected $order_id;
 
-    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $deliveryConfig)
+    protected $format;
+
+    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $pluginConfig)
     {
-        $this->deliveryConfig = $deliveryConfig;
+        $this->pluginConfig = $pluginConfig;
         $this->dataFields = $orderDataConfig;
         $this->driverManager = $driverManager;
         $this->params = $params;
@@ -50,6 +52,8 @@ class DataHandler {
     public function setSolrDriver($solrDriver)
     {
         $this->solrDriver = $solrDriver;
+        $formats = $solrDriver->getMarcData('Format');
+        $this->format = $formats[0][0]['data'][0];
     }
 
     public function sendOrder($user)
@@ -60,8 +64,11 @@ class DataHandler {
         if ($this->setDeliveryDriver()) {
             $orderData = $this->deliveryDriver->prepareOrder($user);
             foreach ($this->dataFields as $fieldSpecs) {
-                $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
-                $orderData[$fieldSpecs['orderfield']] = $prefix . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+                if (!empty($fieldSpecs['orderfield']) && !empty($fieldSpecs['form_name'])) {
+                    $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
+                    $orderData[$fieldSpecs['orderfield']] .= (empty($orderData[$fieldSpecs['orderfield']])) ? '' : ', ';
+                    $orderData[$fieldSpecs['orderfield']] .= $prefix . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+                }
             }
             if ($this->order_id = $this->deliveryDriver->sendOrder($orderData)) {
                 return true;
@@ -77,7 +84,7 @@ class DataHandler {
         $tableFields = ['record_id', 'title', 'author', 'year'];
         $listData = [];
         foreach ($this->dataFields as $fieldSpecs) {
-            if (isset($fieldSpecs['tablefield']) && in_array($fieldSpecs['tablefield'], $tableFields)) {
+            if (!empty($fieldSpecs['tablefield']) && in_array($fieldSpecs['tablefield'], $tableFields)) {
                 $field = $fieldSpecs['tablefield'];
                 $listData[$field] = $this->params->fromPost($fieldSpecs['form_name']);
             }
@@ -100,15 +107,13 @@ class DataHandler {
     public function getOrderStatus()
     {
         if ($this->setDeliveryDriver()) {
-            $order_id = 'CLD-00000110';
-            $this->deliveryDriver->getOrderStatus($order_id);
-        
+            return $this->deliveryDriver->getOrderStatus($this->order_id);
         }
     }
 
     private function setDeliveryDriver()
     {
-        $deliveryDriver = $this->deliveryConfig['Order']['plugin'];
+        $deliveryDriver = $this->pluginConfig['plugin'];
         if (empty($deliveryDriver)) {
             throw new \Exception('Delivery driver configuration missing');
         }
@@ -117,7 +122,7 @@ class DataHandler {
         }
         $this->deliveryDriver = $this->driverManager->get($deliveryDriver);
         try {
-            $this->deliveryDriver->setConfig($this->deliveryConfig[$deliveryDriver]);
+            $this->deliveryDriver->setConfig($this->pluginConfig);
             $this->deliveryDriver->init();
         } catch (\Exception $e) {
             throw $e;
@@ -130,20 +135,21 @@ class DataHandler {
         $failed = false;
         $this->missingFields = [];
         foreach ($this->dataFields as $fieldSpecs) {
-            if (isset($fieldSpecs['mandantory']) && $fieldSpecs['mandantory'] == 1) {
-                if (empty($this->params->fromPost($fieldSpecs['form_name']))) {
-                    $failed = true;
-                    $this->missingFields[] = $fieldSpecs['form_name'];
+            if (in_array('all', $fieldSpecs['formats']) || in_array($this->format, $fieldSpecs['formats'])) {
+                if (isset($fieldSpecs['mandatory']) && $fieldSpecs['mandatory'] == 1) {
+                    if (empty($this->params->fromPost($fieldSpecs['form_name']))) {
+                        $failed = true;
+                        $this->missingFields[] = $fieldSpecs['form_name'];
+                    }
                 }
             }
         }
         return !$failed;
     }
 
-    public function collectData()
+    public function collectData($presetData = [])
     {
-        $formats = $this->solrDriver->getMarcData('Format');
-        $format = $formats[0][0]['data'][0];
+        $format = $this->format;
 
         if ($format == 'Article' || $format == 'electronic Article') {
             $deliveryData = $this->solrDriver->getMarcData('DeliveryDataArticle');
@@ -159,24 +165,29 @@ class DataHandler {
         foreach ($deliveryData as $deliveryDate) {
             if (is_array($deliveryDate)) {
                 foreach ($deliveryDate as $key => $item) {
-                    $flatData[$key] = $item['data'][0];
+                    $flatData[$key] = implode(', ', $item['data']);
                 }
             }
         }
-        $flatData['format'] = $format;
 
         foreach ($this->dataFields as $fieldKey => $fieldSpecs) {
             if (in_array('all', $fieldSpecs['formats']) || in_array($format, $fieldSpecs['formats'])) {
                 $key = $fieldSpecs['form_name'];
-                $data = $this->params->fromPost($key);
+                if (!empty($presetData[$fieldKey])) {
+                    $data = $presetData[$fieldKey];
+                } else {
+                    $data = $this->params->fromPost($key);
+                }
                 if (empty($data) && !empty($flatData[$fieldKey])) {
                     $data = $flatData[$fieldKey];
                 }
                 $dataArray = array_merge($this->dataFields[$fieldKey], ['value' => $data]);
                 if ($fieldSpecs['type'] == 'info') {
                     $this->infoData['fields'][$fieldKey] = $dataArray;
-                } else {
+                } elseif ($fieldSpecs['type'] == 'form') {
                     $this->formData['fields'][$fieldKey] = $dataArray;
+                } elseif ($fieldSpecs['type'] == 'checkbox') {
+                    $this->formData['checkbox'][$fieldKey] = $dataArray;
                 }
             }
         }
@@ -203,6 +214,10 @@ class DataHandler {
         } else {
             return ($type == 'info') ? 'Book' : 'Copy';
         }
+    }
+
+    public function getOrderId() {
+        return $this->order_id;
     }
 
     public function getErrors() {
