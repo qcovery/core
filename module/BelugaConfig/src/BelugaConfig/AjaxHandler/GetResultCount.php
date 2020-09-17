@@ -84,7 +84,7 @@ class GetResultCount extends AbstractBase
         foreach ($queryArray as $queryItem) {
             $arrayKey = false;
             list($key, $value) = explode('=', $queryItem, 2);
-            if (preg_match('/(\[\]$)/', $key, $matches)) {
+            if (preg_match('/(\[\])$/', $key, $matches)) {
                 $key = str_replace($matches[1], '', $key);
                 $arrayKey = true;
             }
