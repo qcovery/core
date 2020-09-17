@@ -49,11 +49,19 @@ class DataHandler {
         $this->params = $params;
     }
 
-    public function setSolrDriver($solrDriver)
+    public function setSolrDriver($solrDriver, $deliveryMarcYaml = null)
     {
         $this->solrDriver = $solrDriver;
+        if (!empty($deliveryMarcYaml)) {
+            $this->solrDriver->addSolrMarcYaml($deliveryMarcYaml);
+        }
         $formats = $solrDriver->getMarcData('Format');
         $this->format = $formats[0][0]['data'][0];
+    }
+
+    public function setFormat() {
+        $this->format = $this->params->fromPost('format') ?? null;
+        return $this->format;
     }
 
     public function sendOrder($user)
@@ -149,16 +157,19 @@ class DataHandler {
 
     public function collectData($presetData = [])
     {
-        $format = $this->format;
+        $deliveryData = [];
+	$format = $this->format;
 
-        if ($format == 'Article' || $format == 'electronic Article') {
-            $deliveryData = $this->solrDriver->getMarcData('DeliveryDataArticle');
-        } elseif ($format == 'Journal' || $format == 'eJournal') {
-            $deliveryData = $this->solrDriver->getMarcData('DeliveryDataJournal');
-        } elseif ($format == 'Serial Volume') {
-            $deliveryData = $this->solrDriver->getMarcData('DeliveryDataSerialVolume');
-        } else {
-            $deliveryData = $this->solrDriver->getMarcData('DeliveryData');
+        if (isset($this->solrDriver)) {
+            if ($format == 'Article' || $format == 'electronic Article') {
+                $deliveryData = $this->solrDriver->getMarcData('DeliveryDataArticle');
+            } elseif ($format == 'Journal' || $format == 'eJournal') {
+                $deliveryData = $this->solrDriver->getMarcData('DeliveryDataJournal');
+            } elseif ($format == 'Serial Volume') {
+                $deliveryData = $this->solrDriver->getMarcData('DeliveryDataSerialVolume');
+            } else {
+                $deliveryData = $this->solrDriver->getMarcData('DeliveryData');
+	    }
         }
 
         $flatData = [];
