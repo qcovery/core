@@ -27,8 +27,7 @@
  */
 namespace ExtendedFacets\Recommend;
 
-use VuFind\I18n\Translator\TranslatorAwareInterface;
-use Zend\I18n\Translator\TranslatorInterface;
+use VuFind\Search\Solr\HierarchicalFacetHelper;
 
 /**
  * SideFacets Recommendations Module
@@ -51,16 +50,21 @@ class SideFacets extends \VuFind\Recommend\SideFacets implements TranslatorAware
     protected $translator = null;
 
     /**
-     * Set a translator
+     * Constructor
      *
-     * @param \Zend\I18n\Translator\Translator $translator Translator
-     *
-     * @return $translator
+     * @param \VuFind\Config\PluginManager $configLoader Configuration loader
+     * @param HierarchicalFacetHelper      $facetHelper  Helper for handling
+     * @param \Zend\Mvc\I18n\Translator    $translator   Translator
+     * hierarchical facets
      */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-        return $this;
+    public function __construct(
+      \VuFind\Config\PluginManager $configLoader,
+      HierarchicalFacetHelper $facetHelper = null,
+      \Zend\Mvc\I18n\Translator $translator
+    ) {
+      parent::__construct($configLoader);
+      $this->hierarchicalFacetHelper = $facetHelper;
+      $this->translator = $translator;
     }
 
     /**
@@ -244,15 +248,23 @@ class SideFacets extends \VuFind\Recommend\SideFacets implements TranslatorAware
      */
     public function getFacetSet()
     {
+        $config = $this->configLoader->get('facets');
+
         $facetSet = \VuFind\Recommend\SideFacets::getFacetSet();
         if (isset($facetSet['publishDate'])) {
             $facetSet['publishDate']['list'] = $this->getYearFacets($facetSet['publishDate']['list'], $facetSet['publishDate']['label']);
         }
-        if (isset($facetSet['format_facet'])) {
-            $facetSet['format_facet']['list'] = $this->getFacetHierarchies($facetSet['format_facet']['list'], $facetSet['format_facet']['label']);
+        
+        if ($config->SideFacetsExtras->format_facet) {
+            if (isset($facetSet['format_facet'])) {
+              $facetSet['format_facet']['list'] = $this->getFacetHierarchies($facetSet['format_facet']['list'], $facetSet['format_facet']['label']);
+            }
         }
-        if (isset($facetSet['standort_iln_str_mv'])) {
-            $facetSet['standort_iln_str_mv']['list'] = $this->getLocationFacets($facetSet['standort_iln_str_mv']['list'], $facetSet['standort_iln_str_mv']['label']);
+
+        if ($config->SideFacetsExtras->standort_iln_str_mv) {
+            if (isset($facetSet['standort_iln_str_mv'])) {
+              $facetSet['standort_iln_str_mv']['list'] = $this->getLocationFacets($facetSet['standort_iln_str_mv']['list'], $facetSet['standort_iln_str_mv']['label']);
+            }
         }
 
         $facetSet = $this->showFacetValue($facetSet);

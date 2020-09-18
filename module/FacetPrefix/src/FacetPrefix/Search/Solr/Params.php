@@ -67,6 +67,12 @@ class Params extends BaseParams
                 $facetSet["f.{$facet}.facet.prefix"] = $prefix;
             }
         }
+		
+		if (isset($facetConfig->FacetMatches)) {
+            foreach ($facetConfig->FacetMatches as $facet => $matches) {
+                $facetSet["f.{$facet}.facet.matches"] = $matches;
+            }
+        }
 
         return $facetSet;
     }

@@ -1,10 +1,10 @@
 <?php
 /**
- * Recommendation Module Factory Class
+ * ZF2 module definition for the VuFind application
  *
  * PHP version 7
  *
- * Copyright (C) Villanova University 2014.
+ * Copyright (C) Villanova University 2010.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -20,41 +20,49 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Recommendations
+ * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
+ * @link     https://vufind.org
  */
-namespace ExtendedFacets\Recommend;
+namespace ExtendedFeedback;
 
-use Zend\ServiceManager\ServiceManager;
+use Zend\Mvc\MvcEvent;
 
 /**
- * Recommendation Module Factory Class
+ * ZF2 module definition for the VuFind application
  *
  * @category VuFind
- * @package  Recommendations
+ * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
- *
- * @codeCoverageIgnore
+ * @link     https://vufind.org
  */
-class Factory
+class Module
 {
     /**
-     * Factory for SideFacets module.
+     * Get module configuration
      *
-     * @param ServiceManager $sm Service manager.
-     *
-     * @return SideFacets
+     * @return array
      */
-    public static function getSideFacets(ServiceManager $sm)
+    public function getConfig()
     {
-        return new SideFacets(
-            $sm->get('VuFind\Config\PluginManager'),
-            $sm->get('VuFind\Search\Solr\HierarchicalFacetHelper'),
-            $sm->get('Zend\Mvc\I18n\Translator')
-        );
+        return include __DIR__ . '/config/module.config.php';
+    }
+
+    /**
+     * Get autoloader configuration
+     *
+     * @return array
+     */
+    public function getAutoloaderConfig()
+    {
+        return [
+            'Zend\Loader\StandardAutoloader' => [
+                'namespaces' => [
+                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                ],
+            ],
+        ];
     }
 }
