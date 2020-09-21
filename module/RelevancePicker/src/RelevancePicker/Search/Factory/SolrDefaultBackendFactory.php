@@ -30,7 +30,7 @@ namespace RelevancePicker\Search\Factory;
 use RelevancePicker\Backend\Solr\Response\Json\RecordCollectionFactory;
 use Libraries\Backend\Solr\Connector;
 use Libraries\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
-use VuFind\Search\Factory\AbstractSolrBackendFactory;
+use LimitBatch\Search\Factory\AbstractSolrBackendFactory;
 
 class SolrDefaultBackendFactory extends BackendFactory
 {

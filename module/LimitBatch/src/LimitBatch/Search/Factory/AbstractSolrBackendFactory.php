@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Factory for the default SOLR backend.
+ * Abstract factory for SOLR backends.
  *
  * PHP version 7
  *
@@ -26,25 +26,22 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-namespace RecordDriver\Search\Factory;
+namespace LimitBatch\Search\Factory;
 
-use VuFindSearch\Backend\Solr\Backend;
+use VuFind\Search\Factory\AbstractSolrBackendFactory as BackendFactory;
+use LimitBatch\Backend\Solr\Backend;
 use VuFindSearch\Backend\Solr\Connector;
-use VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory;
-use LimitBatch\Search\Factory\AbstractSolrBackendFactory;
-use LuceneHelper\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
 
 /**
- * Factory for the default SOLR backend.
+ * Abstract factory for SOLR backends.
  *
  * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
- * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class SolrDefaultBackendFactory extends BackendFactory
+abstract class AbstractSolrBackendFactory extends BackendFactory
 {
     /**
      * Create the SOLR backend.
@@ -55,10 +52,14 @@ class SolrDefaultBackendFactory extends BackendFactory
      */
     protected function createBackend(Connector $connector)
     {
-        $backend = AbstractSolrBackendFactory::createBackend($connector);
-        $manager = $this->serviceLocator->get('RecordDriver\RecordDriver\PluginManager');
-        $factory = new RecordCollectionFactory([$manager, 'getSolrRecord']);
-        $backend->setRecordCollectionFactory($factory);
+        $config = $this->config->get($this->mainConfig);
+        $backend = new Backend($connector);
+        $backend->setPageSize($config['Index']['limit_batch_per_query']);
+        $backend->setQueryBuilder($this->createQueryBuilder());
+        $backend->setSimilarBuilder($this->createSimilarBuilder());
+        if ($this->logger) {
+            $backend->setLogger($this->logger);
+        }
         return $backend;
     }
 }

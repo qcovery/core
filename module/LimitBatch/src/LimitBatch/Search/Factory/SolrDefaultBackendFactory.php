@@ -26,13 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-namespace RecordDriver\Search\Factory;
+namespace LimitBatch\Search\Factory;
 
-use VuFindSearch\Backend\Solr\Backend;
+use LimitBatch\Backend\Solr\Backend;
 use VuFindSearch\Backend\Solr\Connector;
 use VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory;
-use LimitBatch\Search\Factory\AbstractSolrBackendFactory;
-use LuceneHelper\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
+
 
 /**
  * Factory for the default SOLR backend.
@@ -40,12 +39,34 @@ use LuceneHelper\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
  * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
- * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class SolrDefaultBackendFactory extends BackendFactory
+class SolrDefaultBackendFactory extends AbstractSolrBackendFactory
 {
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->searchConfig = 'searches';
+        $this->searchYaml = 'searchspecs.yaml';
+        $this->facetConfig = 'facets';
+    }
+
+    /**
+     * Get the Solr core.
+     *
+     * @return string
+     */
+    protected function getSolrCore()
+    {
+        $config = $this->config->get($this->mainConfig);
+        return isset($config->Index->default_core)
+            ? $config->Index->default_core : 'biblio';
+    }
+
     /**
      * Create the SOLR backend.
      *
@@ -55,8 +76,8 @@ class SolrDefaultBackendFactory extends BackendFactory
      */
     protected function createBackend(Connector $connector)
     {
-        $backend = AbstractSolrBackendFactory::createBackend($connector);
-        $manager = $this->serviceLocator->get('RecordDriver\RecordDriver\PluginManager');
+        $backend = parent::createBackend($connector);
+        $manager = $this->serviceLocator->get('VuFind\RecordDriver\PluginManager');
         $factory = new RecordCollectionFactory([$manager, 'getSolrRecord']);
         $backend->setRecordCollectionFactory($factory);
         return $backend;
