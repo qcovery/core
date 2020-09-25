@@ -257,7 +257,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     'href' => $urlAccess,
                     'level' => $rawData['list']['url_access_level'],
                     'label' => $this->translate($label),
-                    'doi' => $rawData['list']['doi']
+                    'doi' => $rawData['list']['doi'],
+                    'holdings' => $rawData['list']['holdings']
                 ];
             } else {
                 if (empty($rawData['list']['url_access'])) {
@@ -277,7 +278,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                                 'level' => $item['url_access_level'],
                                 'label' => $this->translate($label, [], $label),
                                 'notification' => $item['access_notification'],
-                                'doi' => $item['doi']
+                                'doi' => $item['doi'],
+                                'holdings' => $item['holdings']
                             ];
                         }
                     }
