@@ -31,8 +31,8 @@ namespace RecordDriver\Search\Factory;
 use VuFindSearch\Backend\Solr\Backend;
 use VuFindSearch\Backend\Solr\Connector;
 use VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory;
-use VuFind\Search\Factory\AbstractSolrBackendFactory;
-use LuceneHelper\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
+use VuFind\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
+use LimitBatch\Search\Factory\AbstractSolrBackendFactory;
 
 /**
  * Factory for the default SOLR backend.
