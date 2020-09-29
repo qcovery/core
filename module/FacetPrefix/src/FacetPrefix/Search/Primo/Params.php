@@ -25,15 +25,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://github.com/subhh/beluga
  */
-namespace FacetPrefix\Search\Search2;
+namespace FacetPrefix\Search\Primo;
 
 use Libraries\Libraries;
 use VuFindSearch\ParamBag;
-use VuFind\Search\Solr\HierarchicalFacetHelper;
-use SearchKeys\Search\SearchKeysHelper;
 
-class Params extends \Libraries\Search\Search2\Params
+class Params extends \Libraries\Search\Primo\Params
 {
+
     /**
      * Constructor
      *
@@ -41,11 +40,9 @@ class Params extends \Libraries\Search\Search2\Params
      * @param \VuFind\Config\PluginManager $configLoader Config loader
      */
     public function __construct($options, \VuFind\Config\PluginManager $configLoader,
-        HierarchicalFacetHelper $facetHelper = null,
-        SearchKeysHelper $searchKeysHelper,
         \VuFind\Search\Memory $searchMemory
     ) {
-        parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper, $searchMemory);
+        parent::__construct($options, $configLoader);
     }
 
     /**
@@ -61,12 +58,6 @@ class Params extends \Libraries\Search\Search2\Params
         if (isset($facetConfig->FacetPrefix)) {
             foreach ($facetConfig->FacetPrefix as $facet => $prefix) {
                 $facetSet["f.{$facet}.facet.prefix"] = $prefix;
-            }
-        }
-		
-		if (isset($facetConfig->FacetMatches)) {
-            foreach ($facetConfig->FacetMatches as $facet => $matches) {
-                $facetSet["f.{$facet}.facet.matches"] = $matches;
             }
         }
 
