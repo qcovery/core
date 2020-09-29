@@ -1,0 +1,39 @@
+transaction-group-qualifier:SemA:<?=date('ymdHis') . rand(0, 9) ?>##
+delivery-service:Transferziel##
+delivery-service-format:eL##
+del-email-address:<?=$this->delEmailAddress ?>##
+ill-service-type:COPY##
+item-type:SERIAL##
+item-call-number:<?=$this->itemCallNumber ?>##
+item-author:<?=$this->itemAuthor ?>##
+item-author-of-article:<?=$this->itemAuthorOfArticle ?>##
+item-title:<?=$this->itemTitle ?>##
+item-title-of-article:<?=$this->itemTitleOfArticle ?>##
+item-edition:<?=$this->itemEdition ?>##
+item-place-of-publication:<?=$this->itemPlaceOfPublication ?>##
+item-publication-date:<?=$this->itemPublicationDate ?>##
+item-note:<?=$this->itemNote ?>##
+item-volume-issue:<?=$this->itemVolumeIssue ?>##
+item-pagination:<?=$this->itemPagination ?>##
+item-system-no:<?=$this->itemSystemNo ?>##
+item-additional-no-letters:<?=$this->itemAdditionalNoLetters ?>##
+item-isbn:<?=$this->itemIsbn ?>##
+item-issn:<?=$this->itemIssn ?>##
+iwc-document-source:<?=$this->itemIwcDocumentSource ?>##
+bill-method:INVOICE##
+bill-email-address:abrechnung@beluga.sub.uni-hamburg.de##
+bill-invoice-type:COLLECTIVE##
+service-date-time:<?=date('YmdHis') ?>##
+requester-id:SemA##
+requester-sub-id:<?=$this->requesterSubId ?>##
+requester-note:<?=$this->requesterNote ?>##
+requester-email-address:bestellcap@beluga.sub.uni-hamburg.de##
+requester-group:<?=$this->requesterGroup ?>##
+customer-no:<?=$this->clientIdentifier ?>##
+bill-delivery-type:EMAIL##
+third-party-info-type-call:FORWARD=N##
+transaction-qualifier:1##
+transaction-group-qualifier:HaDil: <?=date('ymdHis') . rand(0, 9) ?>##
+responder-id:0018##
+client-identifier:<?=$this->clientIdentifier ?>##
+contact-person-name:<?=$this->contactPersonName ?>##

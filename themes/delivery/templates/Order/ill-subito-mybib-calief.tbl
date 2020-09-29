@@ -1,0 +1,33 @@
+transaction-group-qualifier:Campuslieferdienst:<?=date('ymdHis') . rand(0, 9) ?>##
+delivery-service:Email##
+delivery-service-format:PDF##
+del-email-address:<?=$this->delEmailAddress ?>##
+ill-service-type:COPY##
+item-type:SERIAL##
+item-call-number:<?=$this->itemCallNumber ?>##
+item-author:<?=$this->itemAuthor ?>##
+item-author-of-article:<?=$this->itemAuthorOfArticle ?>##
+item-title:<?=$this->itemTitle ?>##
+item-title-of-article:<?=$this->itemTitleOfArticle ?>##
+item-place-of-publication:<?=$this->itemPlaceOfPublication ?>##
+item-publication-date:<?=$this->itemPublicationDate ?>##
+item-volume-issue:<?=$this->itemVolumeIssue ?>##
+item-pagination:<?=$this->itemPagination ?>##
+item-system-no:<?=$this->itemSystemNo ?>##
+item-additional-no-letters:<?=$this->itemAdditionalNoLetters ?>##
+iwc-document-source:<?=$this->itemIwcDocumentSource ?>##
+bill-method:INVOICE##
+bill-email-address:abrechnung@beluga.sub.uni-hamburg.de##
+bill-invoice-type:COLLECTIVE##
+service-date-time:<?=date('YmdHis') ?>##
+requester-id:Campuslieferdienst##
+requester-note:<?=$this->requesterNote ?>##
+requester-email-address:bestellcap@beluga.sub.uni-hamburg.de##
+requester-group:USER-GROUP-0##
+bill-delivery-type:EMAIL##
+third-party-info-type-call:FORWARD=N##
+transaction-qualifier:1##
+transaction-group-qualifier:Campuslieferdienst: <?=date('ymdHis') . rand(0, 9) ?>##
+responder-id:0018##
+client-identifier:<?=$this->clientIdentifier ?>##
+contact-person-name:<?=$this->contactPersonName ?>##
