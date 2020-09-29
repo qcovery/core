@@ -88,38 +88,23 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             $listView = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
             foreach ($ids as $id) {
                 $driver = $this->recordLoader->load($id, $source);
-
                 $urlAccess = '';
-                if (isset($resolverChecks['fulltext']) && $resolverChecks['fulltext'] == 'y') {
-                    $urlAccess = $this->checkFulltext($driver);
-                    if (!empty($urlAccess)) {
-                        $urlAccessLevel = 'article_access_level';
-                        $urlAccessLabel = 'Fulltext';
-                    }
-                }
-                if (empty($urlAccess) && isset($resolverChecks['open_access']) && $resolverChecks['open_access'] == 'y') {
-                    $urlAccess = $this->checkOpenAccess($driver);
-                    if (!empty($urlAccess)) {
-                        $urlAccessLevel = 'article_access_level';
-                        $urlAccessLabel = 'Fulltext (DOAJ)';
-                    }
-                }
-                if (empty($urlAccess) && isset($resolverChecks['doi']) && $resolverChecks['doi'] == 'y') {
-                    $urlAccess = $this->checkDoi($driver);
-                    if (!empty($urlAccess)) {
-                        $urlAccessLevel = 'article_access_level';
-                        $urlAccessLabel = 'Fulltext (DOI)';
-                    }
-                }
-                if (empty($urlAccess) && isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
-                    $urlAccess = $this->checkParentId($driver);
-                    if (!empty($urlAccess)) {
-                        $urlAccessLevel = 'print_access_level';
-                        $urlAccessLabel = 'Journal';
-                    }
+                $daiaplus_check_bool = true;
+                
+                $urlAccessUncertain = $this->checkDirectLink($driver);
+                if (!empty($urlAccessUncertain)) {
+                    $urlAccessLevel = 'uncertain_article_access_level';
+                    $urlAccessLabel = 'Go to Publication';
                 }
 
+                $urlAccess = $this->checkFreeAccess($driver, $urlAccessUncertain);
                 if (!empty($urlAccess)) {
+                    $urlAccessLevel = 'fa_article_access_level';
+                    $urlAccessLabel = 'full_text_fa_article_access_level';
+                    $daiaplus_check_bool = false;
+                }
+
+                if ($daiaplus_check_bool == false) {
                     $response = ['list' => ['url_access' => $urlAccess,
                                             'url_access_level' => $urlAccessLevel,
                                             'url_access_label' => $urlAccessLabel,
@@ -132,7 +117,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                                 ]
                     ];
                 } else {
-                    $url = $this->prepareUrl($driver, $id, $listView);
+                    $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
+                    error_log($url);
                     $response = json_decode($this->makeRequest($url), true);
                 }
 
@@ -144,33 +130,35 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         return $this->formatResponse(['statuses' => $responses]);
     }
 
-    private function checkDoi($driver) {
-        $urlAccess = '';
-        $doiData = $driver->getMarcData('ArticleDoi');
-        foreach ($doiData as $doiDate) {
-            if (!empty(($doiDate['doi']['data'][0]))) {
-                $urlAccess = 'http://dx.doi.org/' . $doiDate['doi']['data'][0];
-                break;
+    private function checkFreeAccess($driver, $urlAccessUncertain = '') {
+        $urlAccess = '';      
+        $categories = array("marcFulltextCheckDirect", "marcFulltextCheckIndirect");
+        
+        foreach ($categories as $category) {
+            foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
+                $data = $driver->getMarcData($solrMarcKey);
+                foreach ($data as $date) {
+                    if ($category == "marcFulltextCheckDirect") {
+                        if (!empty(($date['url']['data'][0]))) {
+                            $urlAccess = $date['url']['data'][0];
+                            break;
+                        }
+                    } else if ($urlAccessUncertain && $category == "marcFulltextCheckIndirect") {
+                        if (!empty(($date))) {
+                            $urlAccess = $urlAccessUncertain;
+                            break;
+                        }
+                    }
+                }
             }
         }
+       
         return $urlAccess;
     }                
 
-    private function checkOpenAccess($driver) {
+    private function checkDirectLink($driver) {
         $urlAccess = '';
-        $doajData = $driver->getMarcData('ArticleDoaj');
-        foreach ($doajData as $doajDate) {
-            if (!empty(($doajDate['url']['data'][0]))) {
-                $urlAccess = $doajDate['url']['data'][0];
-                break;
-            }
-        }
-        return $urlAccess;
-    }                
-
-    private function checkFulltext($driver) {
-        $urlAccess = '';
-        $fulltextData = $driver->getMarcData('ArticleFulltext');
+        $fulltextData = $driver->getMarcData('ArticleDirectLink');
         foreach ($fulltextData as $fulltextDate) {
             if (!empty(($fulltextDate['url']['data'][0]))) {
                 $urlAccess = $fulltextDate['url']['data'][0];
@@ -180,29 +168,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         return $urlAccess;
     }
 
-    private function checkParentId($driver) {
-        $urlAccess = '';
-        $parentData = $driver->getMarcData('ArticleParentId');
-        foreach ($parentData as $parentDate) {
-            if (!empty(($parentDate['id']['data'][0]))) {
-                $parentId = $parentDate['id']['data'][0];
-                break;
-            }
-        }
-        if (!empty($parentId)) {
-            try {
-                $parentDriver = $this->recordLoader->load($parentId, 'Solr');
-                $ilnMatch = $parentDriver->getMarcData('ILN');
-                if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                  $urlAccess = '/vufind/Record/' . $parentId;
-                }
-             } catch (\Exception $e) {
-             }
-        }
-        return $urlAccess;
-    }
-
-    private function prepareUrl($driver, $id, $listView) {
+    private function prepareUrl($driver, $id, $listView, $urlAccess = '', $urlAccessLevel = '') {
         $openUrl = $driver->getOpenUrl();
         $formats = $driver->getFormats();
         $format = strtolower(str_ireplace('electronic ','',$formats[0]));
@@ -241,6 +207,14 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
 
         if ($doi[0]['doi']['data'][0]) {
             $url .= '&doi=' . $doi[0]['doi']['data'][0];
+        }
+        
+        if($urlAccess) {
+            $url .= '&url-access=' . $urlAccess;
+        }
+        
+        if($urlAccessLevel) {
+            $url .= '&url-access-level=' . $urlAccessLevel;
         }
 
         if ($sfxDomain) {
@@ -283,7 +257,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     'href' => $urlAccess,
                     'level' => $rawData['list']['url_access_level'],
                     'label' => $this->translate($label),
-                    'doi' => $rawData['list']['doi']
+                    'doi' => $rawData['list']['doi'],
+                    'holdings' => $rawData['list']['holdings']
                 ];
             } else {
                 if (empty($rawData['list']['url_access'])) {
@@ -303,7 +278,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                                 'level' => $item['url_access_level'],
                                 'label' => $this->translate($label, [], $label),
                                 'notification' => $item['access_notification'],
-                                'doi' => $item['doi']
+                                'doi' => $item['doi'],
+                                'holdings' => $item['holdings']
                             ];
                         }
                     }

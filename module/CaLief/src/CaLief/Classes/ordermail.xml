@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<ordermail>
+    <message-type>REQUEST</message-type>
+    <transaction-id></transaction-id>
+    <transaction-initial-req-id-symbol></transaction-initial-req-id-symbol>
+    <transaction-group-qualifier></transaction-group-qualifier> 
+    <transaction-qualifier>1</transaction-qualifier>
+    <service-date-time></service-date-time> 
+    <requester-id>CaLief</requester-id>
+    <requester-email-address>bestellcap@dodtest.sub.uni-hamburg.de</requester-email-address>
+    <bill-account-system-id>calief</bill-account-system-id>
+    <bill-account-email-address>abrechnung@dodtest.sub.uni-hamburg.de</bill-account-email-address>
+    <requester-group>USER-GROUP-0</requester-group>
+    <country-delivery-target>DE</country-delivery-target>
+    <requester-note></requester-note>
+    <responder-id>0018</responder-id>
+    <client-id></client-id>
+    <client-name></client-name>
+    <client-identifier></client-identifier>
+    <transaction-type>SIMPLE</transaction-type>
+    <delivery-address></delivery-address>
+    <del-postal-name-of-person-or-institution>.</del-postal-name-of-person-or-institution>
+    <del-postal-street-and-number>.</del-postal-street-and-number>
+    <del-postal-city>.</del-postal-city> 
+    <del-postal-country>.</del-postal-country>
+    <del-postal-code>.</del-postal-code>
+    <del-email-address></del-email-address>
+    <del-status-level-user>ALL</del-status-level-user>
+    <del-status-level-requester>NONE</del-status-level-requester>
+    <del-status-level-account>NONE</del-status-level-account>
+    <del-customer-info-to-keep>Y</del-customer-info-to-keep>
+    <delivery-service>EMAIL</delivery-service>
+    <delivery-service-format>PDF</delivery-service-format>
+    <delivery-service-alternative>N</delivery-service-alternative>
+    <contact-person></contact-person>
+    <contact-person-name></contact-person-name>
+    <billing-address></billing-address>
+    <bill-method>INVOICE</bill-method>
+    <bill-delivery-type>EMAIL</bill-delivery-type>
+    <bill-email-address>abrechnung@dodtest.sub.uni-hamburg.de</bill-email-address>
+    <bill-postal-name-of-person-or-institution>.</bill-postal-name-of-person-or-institution>
+    <bill-postal-street-and-number>.</bill-postal-street-and-number>
+    <bill-postal-city>.</bill-postal-city>
+    <bill-postal-country>.</bill-postal-country>
+    <bill-postal-code>.</bill-postal-code>
+    <bill-invoice-type>COLLECTIVE</bill-invoice-type>
+    <bill-bank-authority>N</bill-bank-authority>
+    <ill-service-type>COPY</ill-service-type>
+    <search-type></search-type>
+    <supply-medium-info-type>PRINTED</supply-medium-info-type>
+    <place-on-hold>Y</place-on-hold>
+    <item-id></item-id>
+    <item-type>SERIAL</item-type>
+    <item-held-medium-type>PRINTED</item-held-medium-type>
+    <item-call-number></item-call-number>
+    <item-title></item-title>
+    <item-place-of-publication></item-place-of-publication>
+    <item-publisher></item-publisher>
+    <item-volume-issue></item-volume-issue> 
+    <item-publication-date></item-publication-date>
+    <item-author-of-article></item-author-of-article>
+    <item-title-of-article></item-title-of-article> 
+    <item-pagination></item-pagination>
+    <item-iSSN></item-iSSN>
+    <item-system-no></item-system-no>
+    <item-additional-no-letters></item-additional-no-letters>
+    <item-verification-reference-source></item-verification-reference-source>
+    <supplemental-item-description></supplemental-item-description>
+    <cost-info-type></cost-info-type>
+    <third-party-info-type>FORWARD=N</third-party-info-type>
+    <retry-flag>N</retry-flag>
+</ordermail>

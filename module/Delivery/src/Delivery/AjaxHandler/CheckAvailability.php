@@ -85,7 +85,7 @@ class CheckAvailability extends AbstractBase
         $deliveryDomain = $params->fromQuery('domain', 'main');
         $configurationManager = new ConfigurationManager($this->configManager, $deliveryDomain);
         $availabilityConfig = $configurationManager->getAvailabilityConfig();
-        $availabilityHelper = new AvailabilityHelper(null, $availabilityConfig['default']);
+        $mainConfig = $configurationManager->getMainConfig();
 
         $ppn = $params->fromQuery('ppn');
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
@@ -96,7 +96,9 @@ class CheckAvailability extends AbstractBase
 
         $records = $results->getResults();
         $driver = $records[0];
-        $availabilityHelper->setSolrDriver($driver);
+
+        $availabilityHelper = new AvailabilityHelper($availabilityConfig['default']);
+        $availabilityHelper->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
         $available = ($availabilityHelper->checkSignature()) ? 'available' : 'not available';
         return $this->formatResponse(['available' => $available]);
     }

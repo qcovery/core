@@ -3,15 +3,25 @@ $DAIAplusProcessor = $this->DAIAplusProcessor();
 
 $hideLink = $DAIAplusProcessor->hideAvailabilityInfo($this->driver, true);
 $hideDaia = $DAIAplusProcessor->hideAvailabilityInfo($this->driver);
+
+$formats = $this->driver->getFormats();
+$mediatype = '';
+if (isset($formats[0])) {
+    $mediatype = $formats[0];
+}
+
 if(empty($this->list)){
 $this->list = 0;
 }
-
 ?>
-<?php if (!$hideDaia): ?>
-<div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="<?=$this->list ?>" data-src="<?=$this->searchClassId ?>" data-hide-link="<?=($hideLink ? '1' : '0')?>">
-    <span class="status ajax-availability hidden">
-        <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
-    </span>
-</div>
+<?php if ($hideDaia): ?>
+    <div class="availabilityItem">
+      <?=$this->transEsc('see series/volume information'); ?>
+    </div>
+<?php else: ?>
+    <div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="<?=$this->list ?>" data-src="<?=$this->searchClassId ?>" data-hide-link="<?=($hideLink ? '1' : '0')?>" data-type="<?=$this->availabilityType?>" data-mediatype="<?=$mediatype?>">
+        <span class="status ajax-availability hidden">
+            <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
+        </span>
+    </div>
 <?php endif; ?>
