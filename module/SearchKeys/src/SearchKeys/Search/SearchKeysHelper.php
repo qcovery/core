@@ -40,7 +40,6 @@ class SearchKeysHelper
         }
 
         $defaultType = $options->getDefaultHandler();
-
         $lookfor = trim(preg_replace('/\s+/', ' ', $request->get('lookfor')));
         $lookfor = preg_replace('/""+/', '"', $lookfor);
         $type = $request->get('type');
@@ -48,6 +47,10 @@ class SearchKeysHelper
         $searchItems = [];
         $searchBoolean = ['AND'];
         $limit = 10;
+        if(!empty($config->get('General'))) {
+            $general = $config->get('General')->toArray();
+            if(!empty($general['limit'])) $limit = $general['limit'];
+        } 
 
         while (!empty($lookfor) && $limit-- > 0) {
             $item = $key = '';
@@ -85,6 +88,7 @@ class SearchKeysHelper
         foreach ($searchItems as $type => $items) {
             $types[] = $type;
             $lookfor = implode(' ', $items);
+            
             if (in_array($type, $phrasedKeywords)) {
                 $lookfor = '"' . str_replace('"', '', $lookfor) . '"';
             }
