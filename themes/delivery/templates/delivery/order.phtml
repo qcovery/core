@@ -43,35 +43,39 @@
   <?php else: ?>
     <input type="hidden" name="order" value="y" />
     <input type="hidden" name="id" value="<?=$this->id ?>" />
+    <?php foreach ($this->forms as $form): ?>
+      <?php if (!empty($form['title'])): ?>
     <div class="form-group">
-      <h3><?=$this->transEsc($this->formTitle) ?></h3>
+      <h3><?=$this->transEsc($form['title']) ?></h3>
     </div>
-
-    <?php foreach ($this->formFields as $formField): ?>
-      <?php $mandatory = ($formField['mandatory'] == 1) ? ' *' : ''; ?>
-      <?php $style = (in_array($formField['form_name'], $missingFields)) ? ' style="color:red"' : ''; ?>
+      <?php endif; ?>
+      <?php if ($form['type'] == 'input'): ?>
+        <?php foreach ($form['fields'] as $field): ?>
+          <?php $mandatory = ($field['mandatory'] == 1) ? ' *' : ''; ?>
+          <?php $style = (in_array($field['form_name'], $missingFields)) ? ' style="color:red"' : ''; ?>
     <div class="form-group">
-      <label class="control-label" for="<?=$formField['form_name'] ?>"<?=$style ?>><?=$this->transEsc($formField['display']) ?><?=$mandatory ?></label>
-      <input type="text" name="<?=$formField['form_name'] ?>" id="<?=$formField['form_name'] ?>" value="<?=$formField['value'] ?>" class="form-control"/>
+      <label class="control-label" for="<?=$field['form_name'] ?>"<?=$style ?>><?=$this->transEsc($field['display']) ?><?=$mandatory ?></label>
+      <input type="text" name="<?=$field['form_name'] ?>" id="<?=$field['form_name'] ?>" value="<?=$field['value'] ?>" class="form-control"/>
     </div>
-    <?php endforeach; ?>
-
-    <?php foreach ($this->checkboxFields as $checkboxField): ?>
+        <?php endforeach; ?>
+      <?php endif; ?>
+      <?php if ($form['type'] == 'checkbox'): ?>
+        <?php foreach ($form['fields'] as $field): ?>
     <div class="form-group">
-      <label class="control-label" for="<?=$checkboxField['form_name'] ?>"><?=$this->transEsc($checkboxField['display']) ?></label>
-      <input type="checkbox" name="<?=$checkboxField['form_name'] ?>" id="<?=$checkboxField['form_name'] ?>" value="<?=$checkboxField['form_value'] ?>" style="margin: 0px 10px 0px; vertical-align:middle;"/>
+      <label class="control-label" for="<?=$field['form_name'] ?>"><?=$this->transEsc($field['display']) ?></label>
+      <input type="checkbox" name="<?=$field['form_name'] ?>" id="<?=$field['form_name'] ?>" value="<?=$field['form_value'] ?>" style="margin: 0px 10px 0px; vertical-align:middle;"/>
     </div>
-    <?php endforeach; ?>
-
+        <?php endforeach; ?>
+      <?php endif; ?>
+      <?php if ($form['type'] == 'text'): ?>
+        <?php foreach ($form['fields'] as $field): ?>
+          <?php if (!empty($field['value'])): ?>
     <div class="form-group">
-      <h3><?=$this->transEsc($this->infoTitle) ?></h3>
+      <p><strong><?=$this->transEsc($field['display']) ?>:</strong> <?=$this->transEsc($field['value']) ?></p>
+      <input type="hidden" name="<?=$field['form_name'] ?>" value="<?=$field['value'] ?>"/>
     </div>
-    <?php foreach ($this->infoFields as $infoField): ?>
-      <?php if (!empty($infoField['value'])): ?>
-    <div class="form-group">
-      <p><strong><?=$this->transEsc($infoField['display']) ?>:</strong> <?=$this->transEsc($infoField['value']) ?></p>
-      <input type="hidden" name="<?=$infoField['form_name'] ?>" value="<?=$infoField['value'] ?>"/>
-    </div>
+          <?php endif; ?>
+        <?php endforeach; ?>
       <?php endif; ?>
     <?php endforeach; ?>
 
