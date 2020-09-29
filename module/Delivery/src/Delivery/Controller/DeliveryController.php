@@ -106,7 +106,8 @@ class DeliveryController extends AbstractBase
 
         $view = $this->createViewModel();
         $view->title = $templateParams['title'];
-        $view->message = $message;
+        $view->domain = $deliveryDomain;
+	$view->message = $message;
         $view->error = $error;
         $view->catalog_id = $this->user->cat_id;
         $view->delivery_email = $this->user->delivery_email;
@@ -205,19 +206,41 @@ class DeliveryController extends AbstractBase
                 }
             }
             $dataHandler->collectData($preset);
-            $formData = $dataHandler->getFormData();
-            $infoData = $dataHandler->getInfoData();
+//            $formData = $dataHandler->getFormData();
+//            $infoData = $dataHandler->getInfoData();
 
             if (!empty($id)) {
-                $view->formTitle = $formData['title'];
                 $view->id = $id;
-                $view->formFields = $formData['fields'];
-                $view->checkboxFields = $formData['checkbox'];
-                $view->infoTitle = $infoData['title'];
-                $view->infoFields = $infoData['fields'];
+                $forms = [];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('form'),
+                            'fields' => $dataHandler->getFormData('form')];
+                $forms[] = ['type' => 'checkbox',
+                            'fields' => $dataHandler->getFormData('checkbox')];
+                $forms[] = ['type' => 'text',
+                            'title' => $dataHandler->getFormTitle('info'),
+                            'fields' => $dataHandler->getFormData('info')];
+                $view->forms = $forms;
+/*
+                $view->formTitle = $dataHandler->getFormTitle('form');
+                $view->formFields = $dataHandler->getFormData('form');
+                $view->checkboxFields = $dataHandler->getFormData('checkbox');
+                $view->infoTitle = $dataHandler->getFormTitle('info');
+                $view->infoFields = $dataHandler->getFormData('info');
+*/
             } elseif (!empty($presetFormat)) {
-                $view->formTitle = $formData['title'];
-                $view->formFields = array_merge($formData['fields'], $infoData['fields']);
+                $forms = [];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('openformarticle'),
+                            'fields' => $dataHandler->getFormData('openformarticle')];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('openform'),
+                            'fields' => $dataHandler->getFormData('openform')];
+                $view->forms = $forms;
+/*
+                $view->formTitle = $dataHandler->getFormTitle('openform');
+                $view->formFields = $dataHandler->getFormData('openform');
+*/
             } else {
                 $view->selectFormats = $mainConfig['formats_to_select'];
             }

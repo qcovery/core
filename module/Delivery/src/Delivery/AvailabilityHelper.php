@@ -102,10 +102,17 @@ class AvailabilityHelper {
         }
         if (in_array($format, $availabilityConfig['formats'])) {
             if (empty($sortedSignatureData)) {
-                foreach ($signatureData as $signatureDate) {
-                    if ($this->checkSigel($signatureDate, $format)) {
+                if (empty($signatureData)) {
+                    if ($this->checkSigel([], $format)) {
                         $this->signatureList[] = '!!';
                         return true;
+                    }
+                } else {
+                    foreach ($signatureData as $signatureDate) {
+                        if ($this->checkSigel($signatureDate, $format)) {
+                            $this->signatureList[] = '!!';
+                            return true;
+                        }
                     }
                 }
             }
@@ -134,6 +141,7 @@ class AvailabilityHelper {
         if (empty($this->availabilityConfig[$item.'_'.$format])) {
             $format = 'all';
         }
+//echo $item . '::' . $data . '::' . $format . ' | ';
         if (!empty($this->availabilityConfig[$item.'_'.$format])) {
             foreach ($this->availabilityConfig[$item.'_'.$format] as $regex) {
                 $noMatch = false;

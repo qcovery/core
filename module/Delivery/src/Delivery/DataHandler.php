@@ -27,9 +27,11 @@ class DataHandler {
 
     protected $params;
 
-    protected $formData = ['title' => '', 'fields' => []];
+    protected $formData;
 
-    protected $infoData = ['title' => '', 'fields' => []];
+    protected $formTitle;
+
+//    protected $infoData = ['title' => '', 'fields' => []];
 
     protected $errors = [];
 
@@ -143,7 +145,9 @@ class DataHandler {
         $failed = false;
         $this->missingFields = [];
         foreach ($this->dataFields as $fieldSpecs) {
-            if (in_array('all', $fieldSpecs['formats']) || in_array($this->format, $fieldSpecs['formats'])) {
+            if (null !== $this->params->fromPost($fieldSpecs['form_name'])
+                && (in_array('all', $fieldSpecs['formats']) 
+                    || in_array($this->format, $fieldSpecs['formats']))) {
                 if (isset($fieldSpecs['mandatory']) && $fieldSpecs['mandatory'] == 1) {
                     if (empty($this->params->fromPost($fieldSpecs['form_name']))) {
                         $failed = true;
@@ -193,27 +197,25 @@ class DataHandler {
                     $data = $flatData[$fieldKey];
                 }
                 $dataArray = array_merge($this->dataFields[$fieldKey], ['value' => $data]);
-                if ($fieldSpecs['type'] == 'info') {
-                    $this->infoData['fields'][$fieldKey] = $dataArray;
-                } elseif ($fieldSpecs['type'] == 'form') {
-                    $this->formData['fields'][$fieldKey] = $dataArray;
-                } elseif ($fieldSpecs['type'] == 'checkbox') {
-                    $this->formData['checkbox'][$fieldKey] = $dataArray;
+                $fieldTypes = explode(',', $fieldSpecs['type']);
+                foreach ($fieldTypes as $fieldType) {
+                    $this->formData[$fieldType][$fieldKey] = $dataArray;
+                    if (empty($this->formTitle[$fieldType])) {
+                        $this->formTitle[$fieldType] = $this->getTitle($format, $fieldType);
+                    }
                 }
             }
         }
-        $this->infoData['title'] = $this->getTitle($format, 'info');
-        $this->formData['title'] = $this->getTitle($format, 'form');
     }
 
-    public function getFormData()
+    public function getFormData($fieldType)
     {
-        return $this->formData;
+        return $this->formData[$fieldType];
     }
- 
-    public function getInfoData()
+
+    public function getFormTitle($fieldType)
     {
-        return $this->infoData;
+        return $this->formTitle[$fieldType];
     }
 
     private function getTitle($format, $type = 'info')
@@ -221,9 +223,9 @@ class DataHandler {
         if ($format == 'Article' || $format == 'electronic Article') {
             return ($type == 'info') ? 'Journal' : 'Article';
         } elseif ($format == 'Journal' || $format == 'eJournal' || $format == 'Serial Volume') {
-            return ($type == 'info') ? 'Journal' : 'Article';
+            return ($type == 'info' || $type == 'openform') ? 'Journal' : 'Article';
         } else {
-            return ($type == 'info') ? 'Book' : 'Copy';
+            return ($type == 'info' || $type == 'openform') ? 'Book' : (($type == 'openformarticle') ? 'Article' : 'Copy');
         }
     }
 
