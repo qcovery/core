@@ -172,11 +172,11 @@ foreach ($cumulatedResults as $storage => $cumulatedResult) {
 
             if (!empty($storage_additional_info['content'])) {
                 echo '<strong> / ';
-                if (!empty($storage_additional_info['href'])) {
-                    echo '<a href="' . $storage_additional_info['href'] . '" target="_blank">';
+                if (!empty($storage_additional_info['id'])) {
+                    echo '<a href="' . $storage_additional_info['id'] . '" target="_blank">';
                 }
                 echo $storage_additional_info['content'];
-                if (!empty($storage_additional_info['href'])) {
+                if (!empty($storage_additional_info['id'])) {
                     echo '</a>';
                 }
                 echo '</strong>';

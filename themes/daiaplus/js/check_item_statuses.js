@@ -117,6 +117,7 @@ var itemStatusList = false;
 var itemStatusSource = '';
 var itemStatusHideLink = '';
 var itemStatusType = '';
+var itemStatusMediatype = '';
 
 function runItemAjaxForQueue() {
   // Only run one item status AJAX request at a time:
@@ -136,7 +137,7 @@ function runItemAjaxForQueue() {
       url: VuFind.path + '/AJAX/JSON?method=' + method,
       dataType: 'json',
       method: 'get',
-      data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink}
+      data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink, mediatype:itemStatusMediatype}
     })
     .done(function checkItemStatusDone(response) {
       for (var j = 0; j < response.data.statuses.length; j++) {
@@ -179,6 +180,7 @@ function checkItemStatus(el) {
   itemStatusList = ($item.attr('data-list') == 1);
   itemStatusHideLink = $item.attr('data-hide-link');
   itemStatusType = $item.attr('data-type');
+  itemStatusMediatype = $item.attr('data-mediatype');
   itemQueueAjax(id + '', $item);
 }
 
@@ -196,6 +198,7 @@ function checkItemStatuses(_container) {
     itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
     itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
     itemStatusType = $(availabilityItems[i]).attr('data-type');
+    itemStatusMediatype = $(availabilityItems[i]).attr('data-mediatype');
     itemQueueAjax(id, $(availabilityItems[i]));
   }
   // Stop looking for a scroll loader

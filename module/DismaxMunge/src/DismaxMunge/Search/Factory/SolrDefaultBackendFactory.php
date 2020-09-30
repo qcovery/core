@@ -30,7 +30,7 @@ namespace DismaxMunge\Search\Factory;
 
 use VuFindSearch\Backend\Solr\LuceneSyntaxHelper;
 use DismaxMunge\Backend\Solr\QueryBuilder;
-use VuFind\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
+use LimitBatch\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
 
 /**
  * Factory for the default SOLR backend.

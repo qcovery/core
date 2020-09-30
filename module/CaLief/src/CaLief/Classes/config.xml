@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CONFIG>
+    <DB>
+        <HOST>127.0.0.1</HOST>
+        <NAME>dod25</NAME>
+        <USER>glubsch</USER>
+        <PWD>chiefreader</PWD>
+    </DB>
+    <PATH>
+        <DODHOME>/opt/dod/</DODHOME>
+        <DODWWW>/opt/dod/www/</DODWWW>
+        <DODSCANS>/opt/dod/dod_files/scandateien/</DODSCANS>
+    </PATH>
+    <MAIL>
+        <EMPFAENGER>christen@leuphana.de</EMPFAENGER>
+        <ABSENDER>Bestellung aus LUX</ABSENDER>
+        <SUBJECT>Artikelbestellung LUX</SUBJECT>
+        <ERRORTO>christen@leuphana.de</ERRORTO>
+        <XSENDER>LUX</XSENDER>
+    </MAIL>
+</CONFIG>

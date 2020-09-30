@@ -12,4 +12,14 @@ $(document).ready(function() {
             $(this).html($(this).data('display-more'));
         }
     });
+
+    $('#copy-lms-id-button').on('click', function(e){
+        e.preventDefault();
+        var $temp = $("<input>");
+        $("body").append($temp);
+        $temp.val(window.location.href).select();
+        document.execCommand("copy");
+        $temp.remove();
+        UIkit.modal.alert('<p class="uk-modal-body">'+lms_list_id_export_message+'</p>');
+    });
 });
