@@ -76,8 +76,12 @@ class DataHandler {
             foreach ($this->dataFields as $fieldSpecs) {
                 if (!empty($fieldSpecs['orderfield']) && !empty($fieldSpecs['form_name'])) {
                     $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
-                    $orderData[$fieldSpecs['orderfield']] .= (empty($orderData[$fieldSpecs['orderfield']])) ? '' : ', ';
-                    $orderData[$fieldSpecs['orderfield']] .= $prefix . $this->params->fromPost($fieldSpecs['form_name']) ?: '';
+                    $value = $prefix . $this->params->fromPost($fieldSpecs['form_name']);
+                    if (empty($orderData[$fieldSpecs['orderfield']])) {
+                        $orderData[$fieldSpecs['orderfield']] = $value;
+                    } elseif ($value != $orderData[$fieldSpecs['orderfield']]) {
+                        $orderData[$fieldSpecs['orderfield']] .= ', ' . $value;
+                    }
                 }
             }
             if ($this->order_id = $this->deliveryDriver->sendOrder($orderData)) {
@@ -225,7 +229,7 @@ class DataHandler {
         } elseif ($format == 'Journal' || $format == 'eJournal' || $format == 'Serial Volume') {
             return ($type == 'info' || $type == 'openform') ? 'Journal' : 'Article';
         } else {
-            return ($type == 'info' || $type == 'openform') ? 'Book' : (($type == 'openformarticle') ? 'Article' : 'Copy');
+            return ($type == 'info' || $type == 'openform') ? 'Book' : 'Article';
         }
     }
 

@@ -141,7 +141,6 @@ class AvailabilityHelper {
         if (empty($this->availabilityConfig[$item.'_'.$format])) {
             $format = 'all';
         }
-//echo $item . '::' . $data . '::' . $format . ' | ';
         if (!empty($this->availabilityConfig[$item.'_'.$format])) {
             foreach ($this->availabilityConfig[$item.'_'.$format] as $regex) {
                 $noMatch = false;

@@ -121,7 +121,7 @@ class MyBib implements DriverInterface {
         $orderTemplate = $this->config['orderTemplate'];
         $orderData = $this->viewRenderer->render('Order/' . $orderTemplate, $orderData);
         $orderData = str_replace('##', "", $orderData);
-
+//echo '<pre>';print_r($orderData);echo '</pre>';
         $orderStruct = ['type' => 'subito',
                         'data' => $orderData];
 
