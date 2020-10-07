@@ -1,11 +1,11 @@
 <?php
 return [
     'css' => [
+        'leaflet.css',
         'storageinfo.css',
-        'ol.css',
     ],
     'js' => [
+        'leaflet.js',
         'storageinfo.js',
-        'ol.js',
     ],
 ];
