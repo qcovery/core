@@ -135,12 +135,12 @@ class DeliveryAuthenticator extends ILSAuthenticator
         if ($expireDate < $today) {
             return 'not_authorized';
         }
-/*
+
 $allowed_ids = ['00183037782'];
-if (!in_array($patron['id'], $allowed_ids)) {
+if ($deliveryDomain == 'HaDiL' && !in_array($patron['id'], $allowed_ids)) {
     return 'not_authorized';
 }
-*/
+
         $patronTypes = array_map([$this, 'extractUserType'], $patron['type']);
         $allowedTypes = $this->getAllowedPatronTypes($deliveryDomain);
 
