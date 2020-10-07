@@ -31,7 +31,6 @@ namespace RecordDriver\Search\Factory;
 use VuFindSearch\Backend\Solr\Backend;
 use VuFindSearch\Backend\Solr\Connector;
 use VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory;
-use LimitBatch\Search\Factory\AbstractSolrBackendFactory;
 use LuceneHelper\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
 
 /**
@@ -55,7 +54,7 @@ class SolrDefaultBackendFactory extends BackendFactory
      */
     protected function createBackend(Connector $connector)
     {
-        $backend = AbstractSolrBackendFactory::createBackend($connector);
+        $backend = parent::createBackend($connector);
         $manager = $this->serviceLocator->get('RecordDriver\RecordDriver\PluginManager');
         $factory = new RecordCollectionFactory([$manager, 'getSolrRecord']);
         $backend->setRecordCollectionFactory($factory);
