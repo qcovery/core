@@ -27,6 +27,7 @@ return [
         'rvk',
         'beluga-core-base',
         'rvk',
+        'storageinfo',
     ],
     "less" => [
         "active" => false,
