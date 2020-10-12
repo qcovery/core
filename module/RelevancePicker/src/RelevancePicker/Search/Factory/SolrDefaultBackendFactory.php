@@ -30,7 +30,6 @@ namespace RelevancePicker\Search\Factory;
 use RelevancePicker\Backend\Solr\Response\Json\RecordCollectionFactory;
 use Libraries\Backend\Solr\Connector;
 use Libraries\Search\Factory\SolrDefaultBackendFactory as BackendFactory;
-use LimitBatch\Search\Factory\AbstractSolrBackendFactory;
 
 class SolrDefaultBackendFactory extends BackendFactory
 {
@@ -43,7 +42,7 @@ class SolrDefaultBackendFactory extends BackendFactory
      */
     protected function createBackend(Connector $connector)
     {
-        $backend = AbstractSolrBackendFactory::createBackend($connector);
+        $backend = parent::createBackend($connector);
         $manager = $this->serviceLocator->get('RecordDriver\RecordDriver\PluginManager');
         $factory = new RecordCollectionFactory([$manager, 'getSolrRecord']);
         $backend->setRecordCollectionFactory($factory);
