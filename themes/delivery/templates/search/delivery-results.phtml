@@ -1,7 +1,0 @@
-<?php $domain = 'HaDiL'; ?>
-<?php if ($this->authenticator()->isAuthorized($domain)): ?>
-    <div style="display:block; width:100%; height:30px; padding:4px; margin-bottom:20px; background-color:#FF9900">
-        <i class="bel-pfeil-r02"></i><a href="<?=$this->url('delivery-order')?>?domain=<?=$domain ?>&searchClassId=Solr"><strong><?=$this->transEsc('Open Form') ?></strong></a>
-    </div>
-<?php endif; ?>
-

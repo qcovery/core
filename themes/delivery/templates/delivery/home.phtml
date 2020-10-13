@@ -1,13 +1,14 @@
 <?php
-  // Set up page title:
-  $this->headTitle($this->translate($this->title));
+  $domain = (empty($this->domain)) ? '' : '_' . $this->domain;
+// Set up page title:
+  $this->headTitle($this->translate('delivery_title' . $domain));
 
   // Set up breadcrumbs:
-  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc($this->title) . '</li>';
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('delivery_title' . $domain) . '</li>';
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-    <h2 class="lightbox-header"><?=$this->transEsc($this->title)?></h2>
+    <h2 class="lightbox-header"><?=$this->transEsc('delivery_title' . $domain)?></h2>
 
 <?php if (!empty($this->error)): ?>
     <?=$this->transEsc($this->error) ?>
@@ -15,9 +16,10 @@
 
 <?php if (!empty($this->message) && $this->message == 'authorized'): ?>
     <p>
-        <?=$this->translate('delivery_text') ?>
-        <?=$this->translate('delivery_further_infos') ?><br />
-        <?=$this->translate('delivery_contact') ?>
+	<?=$this->translate('delivery_text' . $domain) ?>
+        <?=$this->translate('delivery_further_infos' . $domain) ?><br />
+        <?=$this->translate('delivery_contact' . $domain) ?><br /><br />
+        <?=$this->translate('delivery_final_infos' . $domain) ?>
     </p>
 
   <form method="post" action="<?=$this->url('delivery-home')?>" name="deliveryEmailForm" class="form-order">
@@ -75,7 +77,7 @@
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
-    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery'])?>
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery' . $this->domain])?>
 </div>
 
 
