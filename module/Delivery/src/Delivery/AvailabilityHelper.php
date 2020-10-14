@@ -102,10 +102,17 @@ class AvailabilityHelper {
         }
         if (in_array($format, $availabilityConfig['formats'])) {
             if (empty($sortedSignatureData)) {
-                foreach ($signatureData as $signatureDate) {
-                    if ($this->checkSigel($signatureDate, $format)) {
+                if (empty($signatureData)) {
+                    if ($this->checkSigel([], $format)) {
                         $this->signatureList[] = '!!';
                         return true;
+                    }
+                } else {
+                    foreach ($signatureData as $signatureDate) {
+                        if ($this->checkSigel($signatureDate, $format)) {
+                            $this->signatureList[] = '!!';
+                            return true;
+                        }
                     }
                 }
             }

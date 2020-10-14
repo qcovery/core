@@ -2,7 +2,7 @@
     <?php if ($this->authenticator()->isAuthorized($domain)): ?>
         <?php $templateParams = $this->authenticator()->getTemplateParams($domain); ?>
         <?php if ($templateParams['show_home'] == 'y'): ?>
-    <a href="<?=$this->url('delivery-home')?>" <?=$this->active == 'delivery' ? ' class="active"' : ''?>>
+    <a href="<?=$this->url('delivery-home')?>?domain=<?=$domain ?>" <?=$this->active == 'delivery' . $domain ? ' class="active"' : ''?>>
             <?php if (!empty($templateParams['icon'])): ?>
 <img src="<?=$this->imageLink($templateParams['icon'])?>" style="height:12px;margin:0px 0px 0px 0px" aria-hidden="true">
             <?php elseif (!empty($templateParams['belugino'])): ?>
