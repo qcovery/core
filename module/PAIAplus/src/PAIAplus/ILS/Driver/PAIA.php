@@ -123,6 +123,22 @@ class PAIA extends PAIAbase
         }
     }
 
+     /**
+     * Mapping the location signet to a proper location name
+     *
+     * @param string $signet
+     *
+     * @return string
+     */
+    protected function mapLocation($signet) {
+        foreach ($this->locationMap as $signetExpression => $locationName) {
+            if (preg_match('#^' . $signetExpression . '$#', $signet)) {
+                return $locationName;
+            }
+        }
+        return '';
+    }
+   
     /**
      * This PAIA helper function allows custom overrides for mapping of PAIA response
      * to getMyHolds data structure.
@@ -150,7 +166,7 @@ class PAIA extends PAIAbase
             $result['available'] = $doc['status'] == 4 ? true : false;
 
             list($signet, ) = explode(':', $doc['label']);
-            $result['institution_name'] = $this->locationMap[$signet] ?? '';
+            $result['institution_name'] = $this->mapLocation($signet);
 
             $results[] = $result;
         }
@@ -247,7 +263,7 @@ class PAIA extends PAIAbase
             $result['callnumber'] = $this->getCallNumber($doc);
 
             list($signet, ) = explode(':', $doc['label']);
-            $result['institution_name'] = $this->locationMap[$signet] ?? '';
+            $result['institution_name'] = $this->mapLocation($signet);
 
             // Optional VuFind fields
             /*

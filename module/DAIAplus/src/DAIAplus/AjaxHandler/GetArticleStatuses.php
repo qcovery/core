@@ -194,8 +194,11 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             $openUrl .= '&rft.genre=' . $format;
         }
 
+        $sfxUrl = $this->config['DAIA']['sfxUrl'] ?? ''
         $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
-        $sfxLink = urlencode('http://sfx.gbv.de/sfx_' . $sfxDomain . '?' . $sfxLink);
+        if (!empty($sfxUrl) && !empty($sfxDomain)) {
+            $sfxLink = urlencode($sfxUrl . '/sfx_' . $sfxDomain . '?' . $sfxLink);
+        }
 
         $isil = $this->config['Global']['isil'];
         $url = $this->config['DAIA_' . $isil]['url'];
@@ -217,7 +220,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             $url .= '&url-access-level=' . $urlAccessLevel;
         }
 
-        if ($sfxDomain) {
+        if (!empty($sfxUrl) && !empty($sfxDomain)) {
             $url .= '&sfx=' . $sfxLink;
         }
 

@@ -93,6 +93,8 @@ class CookieManager
      */
     public function getCookies()
     {
+        $this->cookies = str_ireplace('VuFind','Solr', $this->cookies);
+        $this->cookies = str_ireplace('SolrFindex','Search2', $this->cookies);
         return $this->cookies;
     }
 

@@ -50,7 +50,9 @@ class Backend extends BackendBase
 
     public function setPageSize($pageSize) 
     {
-        $this->pageSize = $pageSize;
+        if(!empty($pageSize)) {
+            $this->pageSize = $pageSize;
+        }
     }
 
     /**

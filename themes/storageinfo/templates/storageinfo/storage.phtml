@@ -1,0 +1,47 @@
+<div class="storage-info">
+    <?php if ($this->name): ?>
+        <div class="storage-info-detail storage-info-name">
+            <?=$this->name?>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->description): ?>
+        <div class="storage-info-detail storage-info-description">
+            <?=$this->description?>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->openinghours): ?>
+        <div class="storage-info-detail storage-info-openinghours">
+            <?=$this->openinghours?>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->address): ?>
+        <div class="storage-info-detail storage-info-address">
+            <?=$this->address?>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->phone): ?>
+        <div class="storage-info-detail storage-info-phone">
+            <?=$this->phone?>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->postal): ?>
+        <div class="storage-info-detail storage-info-postal">
+            <?=$this->postal?>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->locality): ?>
+        <div class="storage-info-detail storage-info-locality">
+            <?=$this->locality?>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->street): ?>
+        <div class="storage-info-detail storage-info-street">
+            <?=$this->street?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($this->geo_long && $this->geo_lat): ?>
+        <div id="storage-info-geo-map" class="storage-info-detail storage-info-geo-map" data-geo-long="<?=$this->geo_long?>" data-geo-lat="<?=$this->geo_lat?>" data-geo-title="<?=$this->name?>">
+        </div>
+    <?php endif; ?>
+</div>
