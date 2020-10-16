@@ -52,7 +52,7 @@ abstract class AbstractSolrBackendFactory extends BackendFactory
      */
     protected function createBackend(Connector $connector)
     {
-        $backend = new $this->backendClass($connector);
+        $backend = new Backend($connector);
         $config = $this->config->get($this->mainConfig);
         $pageSize = $config->Index->record_batch_size ?? 100;
         if ($pageSize > $config->Index->maxBooleanClauses ?? $pageSize) {
