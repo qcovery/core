@@ -83,6 +83,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         $responses = [];
         $ids = $params->fromPost('id', $params->fromQuery('id', ''));
         $source = $params->fromPost('source', $params->fromQuery('source', ''));
+        $language = $params->fromPost('language', $params->fromQuery('language', ''));
+        if(empty($language)) $language = 'de';
         $resolverChecks = $this->config['ResolverChecks'];
         if (!empty($ids) && !empty($source)) {
             $listView = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
@@ -117,7 +119,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                                 ]
                     ];
                 } else {
-                    $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
+                    $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel, $language);
                     error_log($url);
                     $response = json_decode($this->makeRequest($url), true);
                 }
@@ -168,7 +170,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         return $urlAccess;
     }
 
-    private function prepareUrl($driver, $id, $listView, $urlAccess = '', $urlAccessLevel = '') {
+    private function prepareUrl($driver, $id, $listView, $urlAccess = '', $urlAccessLevel = '', $language = 'de') {
         $openUrl = $driver->getOpenUrl();
         $formats = $driver->getFormats();
         $format = strtolower(str_ireplace('electronic ','',$formats[0]));
@@ -222,7 +224,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             $url .= '&sfx=' . $sfxLink;
         }
 
-        $url .= '&language=de';
+        $url .= '&language=' . $language;
         $url .= '&format=json';
         return $url;
     }
