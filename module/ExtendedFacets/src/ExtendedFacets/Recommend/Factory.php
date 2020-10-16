@@ -53,7 +53,8 @@ class Factory
     {
         return new SideFacets(
             $sm->get('VuFind\Config\PluginManager'),
-            $sm->get('VuFind\Search\Solr\HierarchicalFacetHelper')
+            $sm->get('VuFind\Search\Solr\HierarchicalFacetHelper'),
+            $sm->get('Zend\Mvc\I18n\Translator')
         );
     }
 }

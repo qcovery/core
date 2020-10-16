@@ -2,9 +2,9 @@
 <h2><?=$this->transEsc("Contact us about this title")?></h2>
 <?=$this->flashmessages() ?>
 <?php if($this->userIsInLocalNetwork): ?>
-  <?=$this->render('resultfeedback/user-is-in-local-network.phtml', []) ?>
+  <?=$this->render('resultfeedback/user-is-in-local-network.phtml', ['driver' => $this->driver]) ?>
 <?php else: ?>
-  <?=$this->render('resultfeedback/user-is-not-in-local-network.phtml', []) ?>
+  <?=$this->render('resultfeedback/user-is-not-in-local-network.phtml', ['driver' => $this->driver]) ?>
 <?php endif; ?>
 <?php if(!$this->hideForm): ?>
     <div class="resultfeedback-title">

@@ -137,8 +137,14 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
             foreach ($resultListData as $resultListDate) {
                 if (is_array($resultListDate)) {
                     foreach ($resultListDate as $resultKey => $resultListArray) {
-                        if (!isset($resultList[$resultKey]) && isset($resultListArray['data'][0])) {
-                            $resultList[$resultKey] = $resultListArray['data'][0];
+                        if(strpos($resultKey,"_array") !== false) {
+                            if (isset($resultListArray['data'][0])) {
+                                $resultList[$resultKey][] = $resultListArray['data'][0];
+                            }
+                        } else {
+                            if (!isset($resultList[$resultKey]) && isset($resultListArray['data'][0])) {
+                                $resultList[$resultKey] = $resultListArray['data'][0];
+                            }
                         }
                     }
                 }

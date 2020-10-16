@@ -47,7 +47,9 @@ class DeliveryController extends AbstractBase
 {
 
     protected $deliveryAuthenticator;
+
     protected $deliveryTable;
+
     protected $configurationManager;
 
     protected $user;
@@ -104,7 +106,8 @@ class DeliveryController extends AbstractBase
 
         $view = $this->createViewModel();
         $view->title = $templateParams['title'];
-        $view->message = $message;
+        $view->domain = $deliveryDomain;
+	$view->message = $message;
         $view->error = $error;
         $view->catalog_id = $this->user->cat_id;
         $view->delivery_email = $this->user->delivery_email;
@@ -125,26 +128,29 @@ class DeliveryController extends AbstractBase
         if ($message != 'authorized') {
             return $this->forwardTo('MyResearch', 'Profile');
         }
+        $this->configurationManager->setConfigurations($deliveryDomain);
+        $errors = $missingFields = [];
 
         $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
         $searchClassId = $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId');
 
-        $errors = $missingFields = [];
-
-        if (empty($id) || empty($searchClassId)) {
-            $errors[] = 'record id is missing';
+        if (empty($searchClassId)) {
+            $errors[] = 'search class id is missing';
         } else {
-            $driver = $this->getRecordLoader()->load($id, $searchClassId);
+            if ($error = $this->updateDeliveryMail()) {
+                $errors[] = $error;
+            }
 
-            $this->configurationManager->setConfigurations($deliveryDomain);
             $orderDataConfig = $this->configurationManager->getOrderDataConfig();
             $pluginConfig =  $this->configurationManager->getPluginConfig();
             $mainConfig = $this->configurationManager->getMainConfig();
-            $dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $pluginConfig);
-            $dataHandler->setSolrDriver($driver);
-        
-            if ($error = $this->updateDeliveryMail()) {
-                $errors[] = $error;
+            $dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), 
+                                           $this->params(), $orderDataConfig, $pluginConfig);
+            if (!empty($id)) {
+                $driver = $this->getRecordLoader()->load($id, $searchClassId);
+                $dataHandler->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
+            } else {
+                $presetFormat = $dataHandler->setFormat();
             }
 
             if (!empty($this->params()->fromPost('order'))) {
@@ -161,18 +167,20 @@ class DeliveryController extends AbstractBase
                     $missingFields = ['delivery_email'];
                 }
             }
- 
-            $availabilityConfig = $this->configurationManager->getAvailabilityConfig();
-            $availabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
-            if ($parentId = $availabilityHelper->getParentId()) {
-                $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
-                $availabilityHelper->setSolrDriver($parentDriver);
-            }
-            $availabilityHelper->setDeliveryConfig($availabilityConfig['default']);
 
-            $signatureCount = $mainConfig['collectedCallnumbers'] ?: 1;
-            $signatureList = array_slice($availabilityHelper->getSignatureList(), 0 , $signatureCount);
-            $signature = implode("\n", $signatureList);
+            if (!empty($id)) {
+                $availabilityConfig = $this->configurationManager->getAvailabilityConfig();
+	        $availabilityHelper = new AvailabilityHelper($availabilityConfig['checkparent']);
+                $availabilityHelper->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
+                if ($parentId = $availabilityHelper->getParentId()) {
+                    $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
+                    $availabilityHelper->setSolrDriver($parentDriver, $mainConfig['delivery_marc_yaml']);
+                }
+                $availabilityHelper->setAvailabilityConfig($availabilityConfig['default']);
+                $signatureCount = $mainConfig['collectedCallnumbers'] ?: 1;
+                $signatureList = array_slice($availabilityHelper->getSignatureList(), 0 , $signatureCount);
+                $signature = implode("\n", $signatureList);
+            }
         }
 
         $templateParams = $this->deliveryAuthenticator->getTemplateParams($deliveryDomain);
@@ -181,31 +189,61 @@ class DeliveryController extends AbstractBase
         $view->title = $templateParams['title'];
         $view->errors = $errors;
         $view->missingFields = $missingFields;
+        $view->searchClassId = $searchClassId;
+        $view->domain = $deliveryDomain;
+        $view->catalog_id = $this->user->cat_id;
+        $view->delivery_email = $this->user->delivery_email;
+        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
 
         if (!empty($orderId)) {
             $view->id = $id;
-            $view->searchClassId = $searchClassId;
             $view->orderId = $orderId;
-        } elseif (!empty($id) && !empty($signature)) {
+	} else {
             $preset = [];
-            if ($mainConfig['presetCallnumbers'] == 'y') {
-                $preset = ['signature' => $signature];
+            if (!empty($id) && !empty($signature)) {
+                if ($mainConfig['presetCallnumbers'] == 'y') {
+                    $preset = ['signature' => $signature];
+                }
             }
             $dataHandler->collectData($preset);
+//            $formData = $dataHandler->getFormData();
+//            $infoData = $dataHandler->getInfoData();
 
-            $formData = $dataHandler->getFormData();
-            $infoData = $dataHandler->getInfoData();
-
-            $view->id = $id;
-            $view->searchClassId = $searchClassId;
-            $view->formTitle = $formData['title'];
-            $view->formFields = $formData['fields'];
-            $view->checkboxFields = $formData['checkbox'];
-            $view->infoTitle = $infoData['title'];
-            $view->infoFields = $infoData['fields'];
-            $view->catalog_id = $this->user->cat_id;
-            $view->delivery_email = $this->user->delivery_email;
-            $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
+            if (!empty($id)) {
+                $view->id = $id;
+                $forms = [];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('form'),
+                            'fields' => $dataHandler->getFormData('form')];
+                $forms[] = ['type' => 'checkbox',
+                            'fields' => $dataHandler->getFormData('checkbox')];
+                $forms[] = ['type' => 'text',
+                            'title' => $dataHandler->getFormTitle('info'),
+                            'fields' => $dataHandler->getFormData('info')];
+                $view->forms = $forms;
+/*
+                $view->formTitle = $dataHandler->getFormTitle('form');
+                $view->formFields = $dataHandler->getFormData('form');
+                $view->checkboxFields = $dataHandler->getFormData('checkbox');
+                $view->infoTitle = $dataHandler->getFormTitle('info');
+                $view->infoFields = $dataHandler->getFormData('info');
+*/
+            } elseif (!empty($presetFormat)) {
+                $forms = [];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('openformarticle'),
+                            'fields' => $dataHandler->getFormData('openformarticle')];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('openform'),
+                            'fields' => $dataHandler->getFormData('openform')];
+                $view->forms = $forms;
+/*
+                $view->formTitle = $dataHandler->getFormTitle('openform');
+                $view->formFields = $dataHandler->getFormData('openform');
+*/
+            } else {
+                $view->selectFormats = $mainConfig['formats_to_select'];
+            }
         }
         return $view;
     }
