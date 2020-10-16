@@ -204,6 +204,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         $url .= '&openurl=' . urlencode($openUrl);
         $url .= '&list=' . $listView;
         $url .= '&mediatype=' . urlencode($format);
+        $url .= '&ip=' . $_SERVER['REMOTE_ADDR'];
 
         if ($doi[0]['doi']['data'][0]) {
             $url .= '&doi=' . $doi[0]['doi']['data'][0];
