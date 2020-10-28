@@ -136,7 +136,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
             return 'not_authorized';
         }
 
-$allowed_ids = ['00183037782', '00180105116', '00185141641', '00185141668', '00185141625', '00185004156'];
+$allowed_ids = ['00183037782', '00180105116', '00185141641', '00185141668', '00185141625', '00185004156', '00181386321','00183832256 ','00183113039','00180126806'];
 if ($deliveryDomain == 'HaDiL' && !in_array($patron['id'], $allowed_ids)) {
     return 'not_authorized';
 }
