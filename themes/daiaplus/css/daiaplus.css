@@ -58,8 +58,8 @@
 .ill_access_level,
 .issue_access_level,
 .check_ill_access_level,
-.check_sfx_access_level,
 .oa_article_access_level,
+.fa_article_access_level,
 .print_access_level,
 .uncertain_article_access_level,
 .uncertain_homepage_access_level,
@@ -70,10 +70,19 @@
   font-weight: bold;
 }
 
+
+
+.oa_article_access_level::after,
+.oa_homepage_access_level::after,
+.fa_article_access_level::after,
+.fa_homepage_access_level::after {
+    content: url("../images/checkmark_green.png") " " url("../images/OpenAccess_Logo.png");
+    margin-left: 5px;
+}
+
 .article_access_level:after,
 .homepage_access_level:after,
 .issue_access_level:after,
-.oa_article_access_level:after,
 .print_access_level:after,
 .volume_access_level:after {
   content: url("../images/checkmark_green.png");
@@ -90,7 +99,6 @@
 
 .ill_access_level:after,
 .check_ill_access_level:after,
-.check_sfx_access_level:after,
 .uncertain_article_access_level:after,
 .uncertain_homepage_access_level:after,
 .uncertain_issue_access_level:after,
