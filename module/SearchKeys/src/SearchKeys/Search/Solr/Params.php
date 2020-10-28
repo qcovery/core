@@ -5,12 +5,12 @@
 
 namespace SearchKeys\Search\Solr;
 
-//use SearchKeys\Search\QueryAdapter;
 use VuFind\Search\QueryAdapter;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use SearchKeys\Search\SearchKeysHelper;
+use FacetPrefix\Search\Solr\Params as BaseParams;
 
-class Params extends \VuFind\Search\Solr\Params
+class Params extends BaseParams
 {
     /**
      * SearchKeys Helper
@@ -53,42 +53,6 @@ class Params extends \VuFind\Search\Solr\Params
         }
         parent::initSearch($request);
     }
-
-    /**
-     * Build a string for onscreen display showing the
-     *   query used in the search (not the filters).
-     *
-     * @return string user friendly version of 'query'
-     */
-    public function getDisplayQuery()
-    {
-        return $this->getRawQuery();
-    }
-
-    /**
-     * Build a string for onscreen display showing the
-     *   query used in the search (not the filters).
-     *
-     * @return string raw version of 'query'
-     */
-    public function getRawQuery()
-    {
-        $config = $this->configLoader->get('searchkeys');
-        $translate = $config->get('translate-solr');
-        // Build display query:
-        $query = QueryAdapter::display($this->getQuery(), NULL, array($this, 'returnIdentic'));
-        if (isset($translate)) {
-            foreach($translate as $translateTo => $translateFrom) {
-                $query = preg_replace('/{'.$translateTo.'}/', $translateFrom, $query);
-            }
-        }
-        return preg_replace('/^\((.*?)\)/', '$1', $query);
-    }
-
-    public function returnIdentic($item) {
-        return $item;
-    }
-
 }
 
 

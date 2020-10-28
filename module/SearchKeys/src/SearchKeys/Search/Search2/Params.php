@@ -84,38 +84,4 @@ class Params extends \VuFind\Search\Search2\Params
         }
         parent::initSearch($request);
     }
-
-    /**
-     * Build a string for onscreen display showing the
-     *   query used in the search (not the filters).
-     *
-     * @return string user friendly version of 'query'
-     */
-    public function getDisplayQuery()
-    {
-        return $this->getRawQuery();
-    }
-
-    /**
-     * Build a string for onscreen display showing the
-     *   query used in the search (not the filters).
-     *
-     * @return string raw version of 'query'
-     */
-    public function getRawQuery()
-    {
-        // Build display query:
-        $query = QueryAdapter::display($this->getQuery(), NULL, array($this, 'returnIdentic'));
-        if (isset($translate)) {
-            foreach($translate as $translateTo => $translateFrom) {
-                $query = preg_replace('/{'.$translateTo.'}/', $translateFrom, $query);
-            }
-        }
-        return preg_replace('/^\((.*?)\)?/', '$1', $query);
-    }
-
-    public function returnIdentic($item) {
-        return $item;
-    }
-
 }
