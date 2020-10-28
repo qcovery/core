@@ -8,12 +8,6 @@ namespace SearchKeys\Search;
 
 class SearchKeysHelper
 {
-
-    public function test()
-    {
-        return 'TeSt';
-    }
-
     /**
      * Analyzing search keys within search request and adjusting request accordingly
      *
@@ -25,6 +19,7 @@ class SearchKeysHelper
      */
     public function processSearchKeys($request, $options, $config, $searchClassId)
     {
+//return $request;
         $id = strtolower($searchClassId);
         $keywords = [];
         if ($config->get('keys-' . $id)) {
@@ -39,6 +34,8 @@ class SearchKeysHelper
             $hiddenKeywords = $config->get('hiddenKeys-' . $id)->toArray();
         }
 
+        $booleans = ['OR' => ['OR', 'ODER'], 'AND' => ['AND', 'UND'], 'NOT' => ['NOT', 'NICHT']];
+
         $defaultType = $options->getDefaultHandler();
 
         $lookfor = trim(preg_replace('/\s+/', ' ', $request->get('lookfor')));
@@ -46,11 +43,24 @@ class SearchKeysHelper
         $type = $request->get('type');
 
         $searchItems = [];
-        $searchBoolean = ['AND'];
-        $limit = 10;
+        $searchBoolean = 'AND';
+        $join = 'OR';
+        $limit = 30;
+
+        $newQG = false;
+        $qg = 0;
 
         while (!empty($lookfor) && $limit-- > 0) {
             $item = $key = '';
+            if ($newQG && preg_match('#^[^(): ]+\)#', $lookfor)) {
+                $lookfor = preg_replace('#^([^()]+)\)+#', '$1', $lookfor);
+                $newQG = false;
+            }
+            if (!$newQG && strpos($lookfor, '(') === 0) {
+                $lookfor = preg_replace('#^\(+#', '', $lookfor);
+                $newQG = true;
+                $qg++;
+            }
             foreach (array_merge($keywords, $phrasedKeywords, $hiddenKeywords) as $keyword => $searchType) {
                 $upperKey = strtoupper($keyword);
                 $searchName = $options->getHumanReadableFieldName($searchType);
@@ -67,49 +77,47 @@ class SearchKeysHelper
             if (empty($item)) {
                 $type = (empty($type)) ? $defaultType : $type;
                 if (preg_match('#^([^"\s]+|("[^"]+"))((?=\s)|(?=$))#', $lookfor, $matches)) {
-                    $item = $matches[1];
+                    $item = trim($matches[1]);
                     $pos = strpos($lookfor, $item);
                     $lookfor = trim(substr_replace($lookfor, '', $pos, strlen($item)));
-                    if ($item == 'OR') {
-                        $searchBoolean = ['OR'];
+                    foreach ($booleans as $boolean => $boolNames) {
+                        if (in_array($item, $boolNames)) {
+                            if ($newQG || $qg == 0) {
+                                $searchBoolean = $boolean;
+                            } else {
+                                $join = $boolean;
+                            }
+                            $item = '';
+                        }
                     }
                 }
-                if (!isset($searchItems[$type])) {
-                    $searchItems[$type] = [];
+                if (empty($searchBoolean)) {
+                    $searchBoolean = 'AND';
                 }
-                $searchItems[$type][] = $item;
+                if (!empty($item)) {
+                    if (!isset($searchItems[$qg])) {
+                        $searchItems[$qg] = ['types' => [], 'items' => []];
+                    }
+                    $searchItems[$qg]['types'][] = $type;
+                    $searchItems[$qg]['items'][] = $item;
+                    $searchItems[$qg]['bool'] = $searchBoolean;
+                }
             }
         }
-
-        $lookfors = $types = [];
-        foreach ($searchItems as $type => $items) {
-            $types[] = $type;
-            $lookfor = implode(' ', $items);
-            if (in_array($type, $phrasedKeywords)) {
-                $lookfor = '"' . str_replace('"', '', $lookfor) . '"';
-            }
-            $lookfors[] = $lookfor;
-        }
-
-        if (count($lookfors) > 1) {
+        if (!empty($searchItems)) {
             $request->set('lookfor', null);
-            $request->set('lookfor0', $lookfors);
-            $request->set('type0', $types);
-            if (empty($request->get('bool0'))) {
-                $request->set('bool0', $searchBoolean);
+            $request->set('type', null);
+            $qg = 0;
+            foreach ($searchItems as $searchItem) {
+                $request->set('lookfor' . $qg, $searchItem['items']);
+                $request->set('type' . $qg, $searchItem['types']);
+                $request->set('bool' . $qg, [$searchItem['bool']]);
+                $qg++;
             }
-            if (empty($request->get('op0'))) {
+            if (true || empty($request->get('op0'))) {
                 $request->set('op0', ['AND']);
             }
-            if (empty($request->get('join'))) {
-                $request->set('join', 'OR');
-            }
-        } elseif (count($lookfors) == 1) {
-            $request->set('lookfor0', null);
-            $request->set('lookfor', $lookfors[0]);
-            $request->set('type', $types[0]);
-        } else {
-            $request->set('lookfor', null);
+            $request->set('join', $join);
         }
         return $request;
     }
