@@ -34,11 +34,13 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
     /**
      *
      */
-    public function getHierarchyTopID($driver)
+    public function getParent($driver, $deliveryDomain = 'main')
     {
-        $hierarchyTopIDs = $driver->getHierarchyTopID();
-        return $hierarchyTopIDs[0];
-//        $deliveryArticleData = $driver->getMarcData('DeliveryDataArticle');
-//        return $deliveryArticleData[3]['ppn']['data'][0] ?? '';
+        $configurationManager = new ConfigurationManager($this->configManager, $deliveryDomain);
+        $availabilityConfig = $configurationManager->getAvailabilityConfig();
+        $mainConfig = $configurationManager->getMainConfig();
+        $availabilityHelper = new AvailabilityHelper($availabilityConfig['checkparent']);
+        $availabilityHelper->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
+        return $availabilityHelper->getParentId();
     }
 }

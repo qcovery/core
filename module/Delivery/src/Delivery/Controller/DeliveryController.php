@@ -183,6 +183,10 @@ class DeliveryController extends AbstractBase
             }
         }
 
+        if (empty($signature)) {
+            $errors[] = 'no signature found';
+        }
+
         $templateParams = $this->deliveryAuthenticator->getTemplateParams($deliveryDomain);
 
         $view = $this->createViewModel();
@@ -195,54 +199,43 @@ class DeliveryController extends AbstractBase
         $view->delivery_email = $this->user->delivery_email;
         $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
 
-        if (!empty($orderId)) {
-            $view->id = $id;
-            $view->orderId = $orderId;
-	} else {
-            $preset = [];
-            if (!empty($id) && !empty($signature)) {
-                if ($mainConfig['presetCallnumbers'] == 'y') {
-                    $preset = ['signature' => $signature];
-                }
-            }
-            $dataHandler->collectData($preset);
-//            $formData = $dataHandler->getFormData();
-//            $infoData = $dataHandler->getInfoData();
-
-            if (!empty($id)) {
+        if (empty($errors)) {
+            if (!empty($orderId)) {
                 $view->id = $id;
-                $forms = [];
-                $forms[] = ['type' => 'input',
-                            'title' => $dataHandler->getFormTitle('form'),
-                            'fields' => $dataHandler->getFormData('form')];
-                $forms[] = ['type' => 'checkbox',
-                            'fields' => $dataHandler->getFormData('checkbox')];
-                $forms[] = ['type' => 'text',
-                            'title' => $dataHandler->getFormTitle('info'),
-                            'fields' => $dataHandler->getFormData('info')];
-                $view->forms = $forms;
-/*
-                $view->formTitle = $dataHandler->getFormTitle('form');
-                $view->formFields = $dataHandler->getFormData('form');
-                $view->checkboxFields = $dataHandler->getFormData('checkbox');
-                $view->infoTitle = $dataHandler->getFormTitle('info');
-                $view->infoFields = $dataHandler->getFormData('info');
-*/
-            } elseif (!empty($presetFormat)) {
-                $forms = [];
-                $forms[] = ['type' => 'input',
-                            'title' => $dataHandler->getFormTitle('openformarticle'),
-                            'fields' => $dataHandler->getFormData('openformarticle')];
-                $forms[] = ['type' => 'input',
-                            'title' => $dataHandler->getFormTitle('openform'),
-                            'fields' => $dataHandler->getFormData('openform')];
-                $view->forms = $forms;
-/*
-                $view->formTitle = $dataHandler->getFormTitle('openform');
-                $view->formFields = $dataHandler->getFormData('openform');
-*/
+                $view->orderId = $orderId;
             } else {
-                $view->selectFormats = $mainConfig['formats_to_select'];
+                $preset = [];
+                if (!empty($id) && !empty($signature)) {
+                    if ($mainConfig['presetCallnumbers'] == 'y') {
+                        $preset = ['signature' => $signature];
+                    }
+                }
+                $dataHandler->collectData($preset);
+
+                if (!empty($id)) {
+                    $view->id = $id;
+                    $forms = [];
+                    $forms[] = ['type' => 'input',
+                                'title' => $dataHandler->getFormTitle('form'),
+                                'fields' => $dataHandler->getFormData('form')];
+                    $forms[] = ['type' => 'checkbox',
+                                'fields' => $dataHandler->getFormData('checkbox')];
+                    $forms[] = ['type' => 'text',
+                                'title' => $dataHandler->getFormTitle('info'),
+                                'fields' => $dataHandler->getFormData('info')];
+                    $view->forms = $forms;
+                } elseif (!empty($presetFormat)) {
+                    $forms = [];
+                    $forms[] = ['type' => 'input',
+                                'title' => $dataHandler->getFormTitle('openformarticle'),
+                                'fields' => $dataHandler->getFormData('openformarticle')];
+                    $forms[] = ['type' => 'input',
+                                'title' => $dataHandler->getFormTitle('openform'),
+                                'fields' => $dataHandler->getFormData('openform')];
+                    $view->forms = $forms;
+                } else {
+                    $view->selectFormats = $mainConfig['formats_to_select'];
+                }
             }
         }
         return $view;

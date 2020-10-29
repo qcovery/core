@@ -15,7 +15,7 @@
             <?php endif; ?>
 </a>
         <?php else: ?>
-            <?php $hierarchyTopId = $this->availabilitychecker()->getHierarchyTopID($this->driver); ?>
+            <?php $hierarchyTopId = $this->availabilitychecker()->getParent($this->driver); ?>
             <?php if (!empty($hierarchyTopId)): ?>
         <span class="delivery_article" data-top-id="<?=$hierarchyTopId ?>" data-searchclass-id="<?=$this->searchClassId ?>" data-domain="<?=$domain ?>" style="display:none">
             <a href="<?=$this->url('delivery-order') ?>?id=<?=$this->driver->getUniqueId() ?>&domain=<?=$domain ?>&searchClassId=<?=$this->searchClassId ?>" aria-expanded="false" data-uk-tooltip="<?=$deliverText?>" title="<?=$deliverText?>">
