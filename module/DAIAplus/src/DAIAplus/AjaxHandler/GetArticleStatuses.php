@@ -194,10 +194,12 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             $openUrl .= '&rft.genre=' . $format;
         }
 
-        $sfxUrl = $this->config['DAIA']['sfxUrl'] ?? ''
-        $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
-        if (!empty($sfxUrl) && !empty($sfxDomain)) {
-            $sfxLink = urlencode($sfxUrl . '/sfx_' . $sfxDomain . '?' . $sfxLink);
+        if (isset($this->config['DAIA']['sfxUrl']) && isset($this->config['DAIA']['sfxDomain'])) {
+            $sfxUrl = $this->config['DAIA']['sfxUrl'] ?? '';
+            $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
+            if (!empty($sfxUrl) && !empty($sfxDomain)) {
+                $sfxLink = urlencode($sfxUrl . '/sfx_' . $sfxDomain . '?' . $sfxLink);
+            }
         }
 
         $isil = $this->config['Global']['isil'];
