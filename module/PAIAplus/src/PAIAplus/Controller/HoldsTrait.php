@@ -113,10 +113,12 @@ trait HoldsTrait
         $pickupDetails['type'] = $type;
         $pickupDetails['storage_id'] = $this->request->getQuery('storage_id');
 
-        $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
+//This has to be skipped because it causes a placeHold-Request
+//        $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
 
+//There is no "placeHold" Parameter; the placeHold-Request should be executed immediately
         // Process form submissions if necessary:
-        if (null !== $this->params()->fromPost('placeHold')) {
+        if (true || null !== $this->params()->fromPost('placeHold')) {
             // If the form contained a pickup location or request group, make sure
             // they are valid:
             $validGroup = $this->holds()->validateRequestGroupInput(
