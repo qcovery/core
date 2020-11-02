@@ -28,7 +28,9 @@
 namespace Delivery\AjaxHandler;
 
 use Delivery\AvailabilityHelper;
+use Delivery\ConfigurationManager;
 use VuFind\AjaxHandler\AbstractBase;
+use VuFind\Config\PluginManager as ConfigManager;
 use VuFind\Search\Results\PluginManager as ResultsManager;
 use Zend\Http\PhpEnvironment\Request;
 use Zend\Mvc\Controller\Plugin\Params;
@@ -52,7 +54,7 @@ class CheckAvailability extends AbstractBase
      *
      * @var Request
      */
-    protected $AvailabilityHelper;
+    protected $configManager;
 
     protected $resultsManager;
 
@@ -65,8 +67,9 @@ class CheckAvailability extends AbstractBase
      * @param TabManager        $pm       RecordTab plugin manager
      * @param RendererInterface $renderer Renderer
      */
-    public function __construct($config, ResultsManager $resultsManager) {
-        $this->AvailabilityHelper = new AvailabilityHelper(null, $config['default']);
+    public function __construct(ConfigManager $configManager, ResultsManager $resultsManager)
+    {
+        $this->configManager = $configManager;
         $this->resultsManager = $resultsManager;
     }
 
@@ -79,6 +82,11 @@ class CheckAvailability extends AbstractBase
      */
     public function handleRequest(Params $params)
     {
+        $deliveryDomain = $params->fromQuery('domain', 'main');
+        $configurationManager = new ConfigurationManager($this->configManager, $deliveryDomain);
+        $availabilityConfig = $configurationManager->getAvailabilityConfig();
+        $mainConfig = $configurationManager->getMainConfig();
+
         $ppn = $params->fromQuery('ppn');
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
         $backend = DEFAULT_SEARCH_BACKEND;
@@ -88,8 +96,10 @@ class CheckAvailability extends AbstractBase
 
         $records = $results->getResults();
         $driver = $records[0];
-        $this->AvailabilityHelper->setSolrDriver($driver);
-        $available = ($this->AvailabilityHelper->checkSignature()) ? 'available' : 'not available';
+
+        $availabilityHelper = new AvailabilityHelper($availabilityConfig['default']);
+        $availabilityHelper->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
+        $available = ($availabilityHelper->checkSignature()) ? 'available' : 'not available';
         return $this->formatResponse(['available' => $available]);
     }
 }

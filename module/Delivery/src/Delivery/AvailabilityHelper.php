@@ -18,19 +18,16 @@ use VuFind\Search\Factory\SolrDefaultBackendFactory;
 
 class AvailabilityHelper {
 
-    protected $deliveryConfig;
+    protected $availabilityConfig;
 
     protected $solrDriver;
 
-    protected $signature;
+    protected $signatureList;
 
-    public function __construct($solrDriver = null, $deliveryConfig = null) 
+    public function __construct($availabilityConfig = null) 
     {
-        if (!empty($solrDriver)) {
-            $this->setSolrDriver($solrDriver);
-        }
-        if (!empty($deliveryConfig)) {
-            $this->setDeliveryConfig($deliveryConfig);
+        if (!empty($availabilityConfig)) {
+            $this->setAvailabilityConfig($availabilityConfig);
         }
     }
 
@@ -50,21 +47,23 @@ class AvailabilityHelper {
         return $flatData;
     }
 
-    public function setSolrDriver($driver)
+    public function setSolrDriver($driver, $deliveryMarcYaml = null)
     {
         $this->solrDriver = $driver;
+        if (!empty($deliveryMarcYaml)) {
+            $this->solrDriver->addSolrMarcYaml($deliveryMarcYaml);
+        }
     }
 
-    public function setDeliveryConfig($config)
+    public function setAvailabilityConfig($config)
     {
-        $this->deliveryConfig = $config->toArray();
+        $this->availabilityConfig = $config;
     }
 
-    public function checkParent() 
+    public function getParentId() 
     {
         $format = array_shift(array_shift($this->getMarcData('Format')));
-        if (in_array($format, $this->deliveryConfig['formats'])) {
-            $parentId = '';
+        if (in_array($format, $this->availabilityConfig['formats'])) {
             $articleData = $this->getMarcData('DeliveryDataArticle');
             foreach ($articleData as $articleDate) {
                 if (!empty($articleDate['ppn'])) {
@@ -75,37 +74,45 @@ class AvailabilityHelper {
         return null;
     }
 
-    public function getSignature() 
+    public function getSignatureList() 
     {
         $this->checkSignature();
-        return $this->signature;
+        return $this->signatureList;
     }
 
     public function checkSignature() 
     {
-        $deliveryConfig = $this->deliveryConfig;
+        $availabilityConfig = $this->availabilityConfig;
         $format = array_shift(array_shift($this->getMarcData('Format')));
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
 
-        $this->signature = '';
+        $checkPassed = false;
+        $this->signatureList = [];
 
         $sortedSignatureData = [];
-        foreach ($deliveryConfig['sigel_all'] as $sigel) {
+        foreach ($availabilityConfig['sigel_all'] as $sigel) {
             foreach ($signatureData as $index => $signatureDate) {
                 if (isset($signatureDate['sigel']) && preg_match('#'.$sigel.'$#', $signatureDate['sigel'])) {
                     $sortedSignatureData[] = $signatureDate;
                     unset($signatureData[$index]);
-                    break;
+                    //break;
                 }
             }
         }
-        if (in_array($format, $deliveryConfig['formats'])) {
+        if (in_array($format, $availabilityConfig['formats'])) {
             if (empty($sortedSignatureData)) {
-                foreach ($signatureData as $signatureDate) {
-                    if ($this->checkSigel($signatureDate, $format)) {
-                        $this->signature = '!!';
+                if (empty($signatureData)) {
+                    if ($this->checkSigel([], $format)) {
+                        $this->signatureList[] = '!!';
                         return true;
+                    }
+                } else {
+                    foreach ($signatureData as $signatureDate) {
+                        if ($this->checkSigel($signatureDate, $format)) {
+                            $this->signatureList[] = '!!';
+                            return true;
+                        }
                     }
                 }
             }
@@ -121,21 +128,21 @@ class AvailabilityHelper {
                             }
                         }
                     }
-                    $this->signature = '!' . $sigel . '! ' . $signature;
-                    return true;
+                    $this->signatureList[] = '!' . $sigel . '! ' . $signature;
+                    $checkPassed = true;
                 }
             }
         }
-        return false;
+        return $checkPassed;
     }
 
     private function performCheck($item, $data, $format) 
     {
-        if (empty($this->deliveryConfig[$item.'_'.$format])) {
+        if (empty($this->availabilityConfig[$item.'_'.$format])) {
             $format = 'all';
         }
-        if (!empty($this->deliveryConfig[$item.'_'.$format])) {
-            foreach ($this->deliveryConfig[$item.'_'.$format] as $regex) {
+        if (!empty($this->availabilityConfig[$item.'_'.$format])) {
+            foreach ($this->availabilityConfig[$item.'_'.$format] as $regex) {
                 $noMatch = false;
                 if (strpos($regex, '!') === 0) {
                     if (empty($data)) {
@@ -158,16 +165,20 @@ class AvailabilityHelper {
     private function checkSigel($signatureDate, $format, $sigelOnly = false) 
     {
         $sigel = $signatureDate['sigel'] ?? '';
+        $indicator = $signatureDate['indicator'] ?? '';
         $licencenote = $signatureDate['licencenote'] ?? '';
         $footnote = $signatureDate['footnote'] ?? '';
         $location = $signatureDate['location'] ?? '';
+        $signature = $signatureDate['signature'] ?? '';
         $format = str_replace(' ', '_', $format);
 
         $sigelOk = $this->performCheck('sigel', $sigel, $format);
         if ($sigelOk && !$sigelOnly) {
-            $sigelOk = $this->performCheck('licencenote', $licencenote, $format);
+            $sigelOk = $this->performCheck('indicator', $indicator, $format);
+            $sigelOk = $sigelOk && $this->performCheck('licencenote', $licencenote, $format);
             $sigelOk = $sigelOk && $this->performCheck('footnote', $footnote, $format);
             $sigelOk = $sigelOk && $this->performCheck('location', $location, $format);
+            $sigelOk = $sigelOk && $this->performCheck('signature', $signature, $format);
         }
         return $sigelOk;
     }

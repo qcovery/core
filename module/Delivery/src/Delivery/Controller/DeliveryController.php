@@ -31,6 +31,7 @@ namespace Delivery\Controller;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use VuFind\Controller\AbstractBase;
 use Delivery\AvailabilityHelper;
+use Delivery\ConfigurationManager;
 use Delivery\DataHandler;
 
 /**
@@ -46,9 +47,10 @@ class DeliveryController extends AbstractBase
 {
 
     protected $deliveryAuthenticator;
-    protected $dataHandler;
+
     protected $deliveryTable;
-    protected $deliveryGlobalConfig;
+
+    protected $configurationManager;
 
     protected $user;
 
@@ -59,7 +61,7 @@ class DeliveryController extends AbstractBase
     {
         parent::__construct($sm);
         $this->deliveryAuthenticator = $sm->get('Delivery\Auth\DeliveryAuthenticator');
-        $this->deliveryGlobalConfig = $this->getConfig('deliveryGlobal')->toArray();
+        $this->configurationManager = new ConfigurationManager($sm->get('VuFind\Config\PluginManager'));
     }
 
     /**
@@ -74,12 +76,11 @@ class DeliveryController extends AbstractBase
         return $this->serviceLocator->get('Delivery\Db\Table\PluginManager')->get($table);
     }
     
-    private function authenticate($asAdmin = false)
+    private function authenticate($deliveryDomain, $asAdmin = false)
     {
-        $message = $this->deliveryAuthenticator->authenticate($asAdmin);
+        $message = $this->deliveryAuthenticator->authenticate($deliveryDomain, $asAdmin);
         if ($message != 'not_logged_in') {
-            $user = $this->deliveryAuthenticator->getUser();
-            $this->user = $user;
+            $this->user = $this->deliveryAuthenticator->getUser();
         }
         return $message;
     }
@@ -91,156 +92,181 @@ class DeliveryController extends AbstractBase
      */
     public function homeAction()
     {
-        $message = $this->authenticate();
-        if ($message == 'not_logged_in') {
-            return $this->forceLogin();
-        }
-
-        $view = $this->createViewModel();
-        $view->message = $message;
-        $view->catalog_id = $this->user->cat_id;
-        $view->delivery_email = $this->user->delivery_email;
-        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
-        return $view;
-    }
-
-    /**
-     * Email action
-     *
-     * @return mixed
-     */
-    public function emailAction()
-    {
-        $message = $this->authenticate();
+        $deliveryDomain = $this->params()->fromQuery('domain') ?? $this->params()->fromPost('domain');
+        $message = $this->authenticate($deliveryDomain);
         if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-
-        $deliveryEmail = $this->params()->fromPost('delivery_email');
-        $update = $this->params()->fromPost('update');
-        $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
-
-        if (!empty($update) && !empty($deliveryEmail)) {
-            if ($this->checkEmail($deliveryEmail)) {
-                $deliveryTable = $this->getTable('delivery');
-                $deliveryTable->update(['delivery_email' => $deliveryEmail], ['user_id' => $this->user->id]);
-                return $this->forwardTo('Delivery', 'Home');
-            } else {
-                return $this->forwardTo('Delivery', 'Home');
-            }
-        }
-        return $this->forwardTo('Delivery', 'Home');
-    }
-
-    public function orderAction()
-    {
-        $message = $this->authenticate();
-        if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-        $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
-        $searchClassId = $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId');
-        if (empty($id)) {
-            return $this->forwardTo('Delivery', 'Home');
-        }
-
-        $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
-        $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
-
-        $errors = $missingFields = [];
-        
-        if (!empty($this->params()->fromPost('order'))) {
-            if ($this->dataHandler->sendOrder($this->user)) {
-                $this->dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
-                return $this->forwardTo('Delivery', 'List');
-            } else {
-                $errors = $this->dataHandler->getErrors();
-                $missingFields = $this->dataHandler->getMissingFields();
-            }
-        }
- 
-        $driver = $this->getRecordLoader()->load($id, $searchClassId);
-        $availabilityConfig = $this->getConfig('deliveryAvailability');
-        $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['checkparent']);
-
-        if ($parentId = $AvailabilityHelper->checkParent()) {
-            $searchClassId = DEFAULT_SEARCH_BACKEND;
-            $parentDriver = $this->getRecordLoader()->load($parentId, $searchClassId);
-            $AvailabilityHelper = new AvailabilityHelper($parentDriver, $availabilityConfig['default']);
-        } else {
-            $AvailabilityHelper = new AvailabilityHelper($driver, $availabilityConfig['default']);
-        }
-        $signature = $AvailabilityHelper->getSignature();
-
-//echo $signature; die;
-
-        if (empty($signature)) {
-            return $this->forwardTo('Delivery', 'Home');
-       	}
-
-        $view = $this->createViewModel();
-
-        $view->errors = $errors;
-        $view->missingFields = $missingFields;
-        $this->dataHandler->setSolrDriver($driver);
-        $this->dataHandler->collectData();
-
-        $formData = $this->dataHandler->getFormData();
-        $infoData = $this->dataHandler->getInfoData();
-
-        $view->id = $id;
-        $view->searchClassId = $searchClassId;
-        $view->formTitle = $formData['title'];
-        $view->formFields = $formData['fields'];
-        $view->infoTitle = $infoData['title'];
-        $view->infoFields = $infoData['fields'];
-        return $view;
-    }
-
-    public function listAction()
-    {
-/*
-        $orderDataConfig = $this->getConfig('deliveryOrderData')->toArray();
-        $this->dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), $this->params(), $orderDataConfig, $this->deliveryGlobalConfig);
-        $this->dataHandler->getOrderStatus();
-*/
-
-
-        $message = $this->authenticate();
-        if ($message != 'authorized') {
-            return $this->forwardTo('Delivery', 'Home');
+            return $this->forwardTo('MyResearch', 'Profile');
         }
 
         $deliveryTable = $this->getTable('delivery');
         $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
- 
+        $templateParams = $this->deliveryAuthenticator->getTemplateParams($deliveryDomain);
+
+        $error = $this->updateDeliveryMail();
+
         $view = $this->createViewModel();
+        $view->title = $templateParams['title'];
+        $view->domain = $deliveryDomain;
+	$view->message = $message;
+        $view->error = $error;
+        $view->catalog_id = $this->user->cat_id;
+        $view->delivery_email = $this->user->delivery_email;
+        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
         $view->listData = $listData;
         return $view;
     }
 
-    private function sendDeliveryMail($emailType)
+    /**
+     * Order action
+     *
+     * @return mixed
+     */
+    public function orderAction()
     {
-        $mailer = $this->serviceLocator->get('VuFind\Mailer');
-        $mailConfig = $this->deliveryGlobalConfig['Email'];
-
-        $mailTo = $this->user->delivery_email;
-        $mailFrom = $mailConfig['mailFrom'];
-        $admin = $mailConfig['deliveryAdmin'];
-        if ($emailType == 'request') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['requestSubject'], $mailConfig['requestText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['requestSubject'], $mailConfig['requestText']);
-        } elseif ($emailType == 'revoke') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['revokeSubject'], $mailConfig['revokeText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['revokeSubject'], $mailConfig['revokeText']);
-        } elseif ($emailType == 'refuse') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['refuseSubject'], $mailConfig['refuseText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['refuseSubject'], $mailConfig['refuseText']);
-        } elseif ($emailType == 'authorize') {
-            $mailer->send($mailTo, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
-            $mailer->send($admin, $mailFrom, $mailConfig['authorizeSubject'], $mailConfig['authorizeText']);
+        $deliveryDomain = $this->params()->fromQuery('domain') ?? $this->params()->fromPost('domain');
+        $message = $this->authenticate($deliveryDomain);
+        if ($message != 'authorized') {
+            return $this->forwardTo('MyResearch', 'Profile');
         }
+        $this->configurationManager->setConfigurations($deliveryDomain);
+        $errors = $missingFields = [];
+
+        $id = $this->params()->fromQuery('id') ?? $this->params()->fromPost('id');
+        $searchClassId = $this->params()->fromQuery('searchClassId') ?? $this->params()->fromPost('searchClassId');
+
+        if (empty($searchClassId)) {
+            $errors[] = 'search class id is missing';
+        } else {
+            if ($error = $this->updateDeliveryMail()) {
+                $errors[] = $error;
+            }
+
+            $orderDataConfig = $this->configurationManager->getOrderDataConfig();
+            $pluginConfig =  $this->configurationManager->getPluginConfig();
+            $mainConfig = $this->configurationManager->getMainConfig();
+            $dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), 
+                                           $this->params(), $orderDataConfig, $pluginConfig);
+            if (!empty($id)) {
+                $driver = $this->getRecordLoader()->load($id, $searchClassId);
+                $dataHandler->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
+            } else {
+                $presetFormat = $dataHandler->setFormat();
+            }
+
+            if (!empty($this->params()->fromPost('order'))) {
+                if ($this->checkEmail($this->params()->fromPost('delivery_email'))) {
+                    $this->user->delivery_email = $this->params()->fromPost('delivery_email');
+                    if ($dataHandler->sendOrder($this->user)) {
+                        $dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
+                        $orderId = $dataHandler->getOrderId();
+                    } else {
+                        $errors = $dataHandler->getErrors();
+                        $missingFields = $dataHandler->getMissingFields();
+                    }
+                } else {
+                    $missingFields = ['delivery_email'];
+                }
+            }
+
+            if (!empty($id)) {
+                $availabilityConfig = $this->configurationManager->getAvailabilityConfig();
+	        $availabilityHelper = new AvailabilityHelper($availabilityConfig['checkparent']);
+                $availabilityHelper->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
+                if ($parentId = $availabilityHelper->getParentId()) {
+                    $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
+                    $availabilityHelper->setSolrDriver($parentDriver, $mainConfig['delivery_marc_yaml']);
+                }
+                $availabilityHelper->setAvailabilityConfig($availabilityConfig['default']);
+                $signatureCount = $mainConfig['collectedCallnumbers'] ?: 1;
+                $signatureList = array_slice($availabilityHelper->getSignatureList(), 0 , $signatureCount);
+                $signature = implode("\n", $signatureList);
+            }
+        }
+
+        $templateParams = $this->deliveryAuthenticator->getTemplateParams($deliveryDomain);
+
+        $view = $this->createViewModel();
+        $view->title = $templateParams['title'];
+        $view->errors = $errors;
+        $view->missingFields = $missingFields;
+        $view->searchClassId = $searchClassId;
+        $view->domain = $deliveryDomain;
+        $view->catalog_id = $this->user->cat_id;
+        $view->delivery_email = $this->user->delivery_email;
+        $view->name = trim($this->user->firstname . ' ' . $this->user->lastname);
+
+        if (!empty($orderId)) {
+            $view->id = $id;
+            $view->orderId = $orderId;
+	} else {
+            $preset = [];
+            if (!empty($id) && !empty($signature)) {
+                if ($mainConfig['presetCallnumbers'] == 'y') {
+                    $preset = ['signature' => $signature];
+                }
+            }
+            $dataHandler->collectData($preset);
+//            $formData = $dataHandler->getFormData();
+//            $infoData = $dataHandler->getInfoData();
+
+            if (!empty($id)) {
+                $view->id = $id;
+                $forms = [];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('form'),
+                            'fields' => $dataHandler->getFormData('form')];
+                $forms[] = ['type' => 'checkbox',
+                            'fields' => $dataHandler->getFormData('checkbox')];
+                $forms[] = ['type' => 'text',
+                            'title' => $dataHandler->getFormTitle('info'),
+                            'fields' => $dataHandler->getFormData('info')];
+                $view->forms = $forms;
+/*
+                $view->formTitle = $dataHandler->getFormTitle('form');
+                $view->formFields = $dataHandler->getFormData('form');
+                $view->checkboxFields = $dataHandler->getFormData('checkbox');
+                $view->infoTitle = $dataHandler->getFormTitle('info');
+                $view->infoFields = $dataHandler->getFormData('info');
+*/
+            } elseif (!empty($presetFormat)) {
+                $forms = [];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('openformarticle'),
+                            'fields' => $dataHandler->getFormData('openformarticle')];
+                $forms[] = ['type' => 'input',
+                            'title' => $dataHandler->getFormTitle('openform'),
+                            'fields' => $dataHandler->getFormData('openform')];
+                $view->forms = $forms;
+/*
+                $view->formTitle = $dataHandler->getFormTitle('openform');
+                $view->formFields = $dataHandler->getFormData('openform');
+*/
+            } else {
+                $view->selectFormats = $mainConfig['formats_to_select'];
+            }
+        }
+        return $view;
     }
+
+    private function updateDeliveryMail()
+    {
+        $error = '';
+        $deliveryEmail = $this->params()->fromPost('delivery_email');
+        $update = $this->params()->fromPost('update_email');
+        if (!empty($update) && !empty($deliveryEmail)) {
+            if ($deliveryEmail != $this->user->delivery_email) {
+                if ($this->checkEmail($deliveryEmail)) {
+                    $userDeliveryTable = $this->getTable('userdelivery');
+                    $userDeliveryTable->update(['delivery_email' => $deliveryEmail], ['user_id' => $this->user->id]);
+                    $this->authenticate();
+                } else {
+                    $error = 'wrong email format';
+                }
+            }
+        }
+        return $error;
+    }
+
     
     private function checkEmail($email)
     {

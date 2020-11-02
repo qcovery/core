@@ -112,8 +112,25 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             );
 
             if (!$export) {
+                $showExportButton = false;
+                if ($results->getListObject() && $results->getListObject()->isPublic()) {
+                  if ($lmsConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/lms.ini'), true)) {
+                      if ($this->getAuthManager()->isLoggedIn()) {
+                          $patron = $this->catalogLogin();
+                          if (is_array($patron)) {
+                              foreach ($lmsConfig['lms-list-id-export']['allowed-user-types'] as $allowedUserType) {
+                                  foreach ($patron['type'] as $type) {
+                                      if ($type == $allowedUserType) {
+                                          $showExportButton = true;
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+                }
                 return $this->createViewModel(
-                    ['params' => $results->getParams(), 'results' => $results]
+                    ['params' => $results->getParams(), 'results' => $results, 'showExportButton' => $showExportButton]
                 );
             } else {
                 $response = $this->getResponse();
@@ -183,4 +200,37 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $marcxml->addChild('format', implode(',', $record->getFormats()));
         return $marcxml->asXML();
     }
+
+  /**
+   * Display list of lists
+   *
+   * @return mixed
+   */
+  public function mylistsAction()
+  {
+    // Fail if lists are disabled:
+    if (!$this->listsEnabled()) {
+      throw new ForbiddenException('Lists disabled');
+    }
+
+    if (!$this->getAuthManager()->isLoggedIn()) {
+      return $this->forceLogin();
+    }
+
+    return $this->createViewModel(
+      []
+    );
+  }
+
+  /**
+   * Login Action
+   *
+   * @return mixed
+   */
+  public function loginAction()
+  {
+    $view = parent::loginAction();
+    $view->showLmsHint = $this->params()->fromQuery('showLmsHint');
+    return $view;
+  }
 }

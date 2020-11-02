@@ -53,9 +53,19 @@ class Authenticator extends \Zend\View\Helper\AbstractHelper
         $this->authenticator = $authenticator;
     }
 
-    public function isAuthorized()
+    public function isAuthorized($deliveryDomain = 'main', $asAdmin = false)
     {
-        $status = $this->authenticator->authenticate();
+        $status = $this->authenticator->authenticate($deliveryDomain, $asAdmin);
         return ($status == 'authorized');
+    }
+
+    public function getDeliveryDomains()
+    {
+        return $this->authenticator->getDeliveryDomains();
+    }
+
+    public function getTemplateParams($deliveryDomain)
+    {
+        return $this->authenticator->getTemplateParams($deliveryDomain);
     }
 }

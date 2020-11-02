@@ -1,32 +1,83 @@
 <?php
-  // Set up page title:
-  $this->headTitle($this->translate('Delivery Home'));
+  $domain = (empty($this->domain)) ? '' : '_' . $this->domain;
+// Set up page title:
+  $this->headTitle($this->translate('delivery_title' . $domain));
 
   // Set up breadcrumbs:
-  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('Delivery Home') . '</li><li><a href="' . $this->url('delivery-edit') . '">' . $this->transEsc('Delivery Edit') . '</a></li>';
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('delivery_title' . $domain) . '</li>';
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-    <h2 class="lightbox-header"><?=$this->transEsc('Delivery Home')?></h2>
+    <h2 class="lightbox-header"><?=$this->transEsc('delivery_title' . $domain)?></h2>
 
 <?php if (!empty($this->error)): ?>
     <?=$this->transEsc($this->error) ?>
 <?php endif; ?>
-    
+
 <?php if (!empty($this->message) && $this->message == 'authorized'): ?>
-    <a href="<?=$this->url('delivery-list')?>"><?=$this->transEsc('View delivery list') ?></a>
-    <h3><?=$this->name . ', ' . $this->transEsc('welcome to our delivery service') ?>.</h3>
-    <ul>
-        <li><strong><?=$this->transEsc('Catalog Id') ?>:</strong> <?=$this->catalog_id ?></li>
-        <li><strong><?=$this->transEsc('Delivery Email') ?>:</strong> <?=$this->delivery_email ?> (<a href="#"><?=$this->transEsc('change') ?></a>)</li>
-    <ul>
+    <p>
+	<?=$this->translate('delivery_text' . $domain) ?>
+        <?=$this->translate('delivery_further_infos' . $domain) ?><br />
+        <?=$this->translate('delivery_contact' . $domain) ?><br /><br />
+        <?=$this->translate('delivery_final_infos' . $domain) ?>
+    </p>
+
+  <form method="post" action="<?=$this->url('delivery-home')?>" name="deliveryEmailForm" class="form-order">
+    <input type="hidden" name="update_email" value="y" />
+    <div class="form-group">
+      <p><strong><?=$this->transEsc('Name') ?>:</strong> <?=$this->name ?></p>
+    </div>
+    <div class="form-group">
+      <p><strong><?=$this->transEsc('Catalog Id') ?>:</strong> <?=$this->catalog_id ?></p>
+    </div>
+    <div class="form-group">
+      <p id="delivery_email">
+          <strong><?=$this->transEsc('Delivery Email') ?>:</strong> 
+          <span id="delivery_email_text" style="display:inline"><?=$this->delivery_email ?> <a href="#"><?=$this->transEsc('Edit') ?></a></span>
+          <span id="delivery_email_field" style="display:none"><input type="text" name="delivery_email" id="delivery_email" value="<?=$this->delivery_email ?>" style="width:340px;"/>
+          <input class="btn btn-primary" type="submit" name="updateEmail" value="<?=$this->transEsc('Change')?>"></span>
+      </p>
+    </div>
+  </form>
+
+<?php if (false): ?>
+    <?php if (count($this->listData) > 0): ?>
+    <h3><?=$this->transEsc('Order List') ?></h3>
+    <table class="recordSet mobile_serialize">
+      <thead>
+        <tr>
+            <th><?=$this->transEsc('Title') ?></th>
+            <th><?=$this->transEsc('order_id') ?></th>
+            <th><?=$this->transEsc('Status') ?></th>
+            <th><?=$this->transEsc('Date') ?></th>
+            <th><?=$this->transEsc('Comment') ?></th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($this->listData as $listItem): ?>
+            <?php $status = (!empty($listItem['rejected'])) ? 'rejected' : (!empty($listItem['delivered'])) ? 'delivered' : 'ordered'; ?>
+        <tr>
+            <td><a href="/vufind/Record/<?=$listItem['record_id'] ?>"><?=$listItem['title'] ?></a></td>
+            <td><?=$listItem['order_id'] ?></td>
+            <td><?=$this->transEsc($status) ?></td>
+            <td><?=$listItem[$status] ?></td>
+            <td><?=$listItem['comment'] ?></td>
+        </tr>
+      </tbody>
+        <?php endforeach; ?>
+    </table>
+    <?php else: ?>
+    <p><?=$this->transEsc('Your delivery list is empty.') ?></p>
+    <?php endif; ?>
+<?php endif; ?>
+
 <?php else: ?>
     <?=$this->name . ', ' . $this->transEsc('You are not authorized to use our delivery service.') ?>
 <?php endif; ?>
-  <p>Platz für weitere Erläuterungen</p>
 </div>
+
 <div class="<?=$this->layoutClass('sidebar')?>">
-    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery'])?>
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery' . $this->domain])?>
 </div>
 
 

@@ -45,7 +45,7 @@ class Params extends \Libraries\Search\Search2\Params
         SearchKeysHelper $searchKeysHelper,
         \VuFind\Search\Memory $searchMemory
     ) {
-        parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper);
+        parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper, $searchMemory);
     }
 
     /**
@@ -61,6 +61,12 @@ class Params extends \Libraries\Search\Search2\Params
         if (isset($facetConfig->FacetPrefix)) {
             foreach ($facetConfig->FacetPrefix as $facet => $prefix) {
                 $facetSet["f.{$facet}.facet.prefix"] = $prefix;
+            }
+        }
+		
+		if (isset($facetConfig->FacetMatches)) {
+            foreach ($facetConfig->FacetMatches as $facet => $matches) {
+                $facetSet["f.{$facet}.facet.matches"] = $matches;
             }
         }
 

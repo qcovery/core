@@ -87,31 +87,37 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
     {
         $limit = $this->config['Global']['limit'] ?? 1;
         $sortFlag = $this->config['Global']['sort'] ?? SORT_REGULAR;
-        $switchToRegularSearch = ($this->config['Global']['switch_to_regular_search'] == 'y');
+
+        $switchToRegularSearch = empty($this->config['Global']['switch_to_regular_search']) ?
+            false : ($this->config['Global']['switch_to_regular_search'] == 'y');
+        $searchfield = empty($this->config['Global']['searchfield']) ?
+            'hierarchy_top_id' : $this->config['Global']['searchfield'];
+        $filter = empty($this->config['Global']['filter']) ?
+            '' : $this->config['Global']['filter'];
 
         $ppn = $params->fromQuery('ppn');
         if (empty($ppn)) {
             return $this->formatResponse([]);
         }
-        $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
+        $backend = $params->fromQuery('source');
         $results = $this->resultsManager->get($backend);
         $results->getOptions()->setLimitOptions([$limit, $limit]);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => 'hierarchy_top_id:'.$ppn.' -id:'.$ppn]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => $searchfield.':'.$ppn.' -id:'.$ppn, 'filter' => $filter]));
 
         $records = $results->getResults();
         $resultTotal = $results->getResultTotal();
 
         if ($switchToRegularSearch && $resultTotal > $limit) {
             $resultString = $resultTotal . ' ' . $this->translate('results') . ': ' . $this->translate('show all');
-            return $this->formatResponse([['resultString' => (string) $resultString]]);
+            return $this->formatResponse([['resultString' => (string) $resultString, 'searchfield' => $searchfield, 'filter' => $filter]]);
         }
 
         $data = [];
         foreach ($records as $i => $record) {
             $dependentWorksData = $record->getMarcData('DependentWorksData');
             $title = $part = $date = $sort = '';
-            $sort = $i; // Keep this default setting outside inner foreach loop, otherwise $sort gets reset to $i even if value of $dependentWorksDate['sort']['data'][0] was previously set.
+            $sort = $i;
             foreach ($dependentWorksData as $dependentWorksDate) {
                 if (empty($title) && !empty($dependentWorksDate['title']['data'][0])) {
                     $title = $dependentWorksDate['title']['data'][0];
@@ -125,9 +131,6 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
                 if (!empty($dependentWorksDate['sort']['data'][0])) {
                     $sort = $dependentWorksDate['sort']['data'][0];
                 }
-            }
-            if (empty($sort)) {
-                $sort = $i;
             }
             $prefix = (empty($date)) ? $part . '. ' : $part . ', ' . $date . '. ';
             $data[$sort] = ['id' => $record->getUniqueID(),
