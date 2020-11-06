@@ -42,6 +42,7 @@ class FeedbackController extends BasicFeedbackController
         $view->name = $this->params()->fromPost('name');
         $view->email = $this->params()->fromPost('email');
         $view->comments = $this->params()->fromPost('comments');
+        $view->category = $this->params()->fromPost('category');
 
         // Process form submission:
         if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
@@ -74,6 +75,7 @@ class FeedbackController extends BasicFeedbackController
 
             $email_message = empty($view->name) ? '' : 'Name: ' . $view->name . "\n";
             $email_message .= 'Email: ' . $view->email . "\n";
+            $email_message .= 'Category: ' . $view->category . "\n";
             $email_message .= 'Comments: ' . $view->comments . "\n\n";
 
             // This sets up the email to be sent
