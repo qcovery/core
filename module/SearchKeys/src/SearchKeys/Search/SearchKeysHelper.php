@@ -41,7 +41,10 @@ class SearchKeysHelper
         if ($config->get('hiddenKeys-' . $id)) {
             $hiddenKeywords = $config->get('hiddenKeys-' . $id)->toArray();
         }
-        foreach (array_merge($keywords, $hiddenKeywords) as $keyword => $searchType) {
+        if ($config->get('phraseKeys-' . $id)) {
+            $phraseKeywords = $config->get('phraseKeys-' . $id)->toArray();
+        }
+        foreach (array_merge($keywords, $hiddenKeywords, $phraseKeywords) as $keyword => $searchType) {
             $upperKey = strtoupper($keyword);
             $searchName = $options->getHumanReadableFieldName($searchType);
             $keyRegexList[$searchType] = '(('.$keyword.'\s)|('.$upperKey.'\s)|('.$searchType.':)|('.$searchName.':))';
@@ -116,23 +119,20 @@ class SearchKeysHelper
                         $item = $type = $key = '';
                         foreach ($keyRegexList as $searchType => $keyRegex) {
                             if (preg_match('#^' . $keyRegex . '([^"\s]*|("[^"]*"))((?=\s)|(?=$))#', $lookfor, $matches)) {
-                                $key = $matches[1];
-                                $item = $matches[6];
                                 $type = $searchType;
-                                $pos = strpos($item, $key);//?? strpos($lookfor, $key)
-                                $lookfor = trim(substr_replace($lookfor, '', $pos, strlen($key)));
+                                $lookfor = trim(substr_replace($lookfor, '', 0, strlen($matches[1])));
+                                $item = (in_array($type, $phraseKeywords)) ? $lookfor : $matches[6];
                                 break;
                             }
                         }
                         if (empty($item)) {
                             if (preg_match('/^([^"\s]+|("[^"]+"))((?=\s)|(?=$))/', $lookfor, $matches)) {
-                                $item = trim($matches[1]);
                                 $type = $type ?? $orignalType;
+                                $item = $matches[1];
                             }
                         }
                         if (!empty($item)) {
-                            $pos = strpos($lookfor, $item);
-                            $lookfor = trim(substr_replace($lookfor, '', $pos, strlen($item)));
+                            $lookfor = trim(substr_replace($lookfor, '', 0, strlen($item)));
                             $searchItems[$qg]['lookfors'][] = $item;
                             $searchItems[$qg]['types'][] = $type;
                             if ($countUpItems) {
@@ -148,15 +148,21 @@ class SearchKeysHelper
         }
 
         if (!empty($searchItems)) {
-            $request->set('lookfor', null);
-            $request->set('type', null);
-            foreach ($searchItems as $qg => $searchItem) {
-                $request->set('lookfor' . $qg, $searchItem['lookfors']);
-                $request->set('type' . $qg, $searchItem['types']);
-                $request->set('bool' . $qg, $searchItem['bools']);
-            }
-            if (!empty($join)) {
-                $request->set('join', $join);
+            if (count($searchItems) == 1) {
+                $searchItem = array_shift($searchItems);
+                $request->set('lookfor', $searchItem['lookfors']);
+                $request->set('type', $searchItem['types']);
+            } else {
+                $request->set('lookfor', null);
+                $request->set('type', null);
+                foreach ($searchItems as $qg => $searchItem) {
+                    $request->set('lookfor' . $qg, $searchItem['lookfors']);
+                    $request->set('type' . $qg, $searchItem['types']);
+                    $request->set('bool' . $qg, $searchItem['bools']);
+                }
+                if (!empty($join)) {
+                    $request->set('join', $join);
+                }
             }
         }
         return $request;
