@@ -33,7 +33,7 @@ class SearchKeysHelper
      */
     public function processSearchKeys($request, $options, $config, $searchClassId)
     {
-        $keywords = $hiddenKeywords = $keyRegexList = [];
+        $keywords = $hiddenKeywords = $phraseKeywords = $keyRegexList = [];
         $id = strtolower($searchClassId);
         if ($config->get('keys-' . $id)) {
             $keywords = $config->get('keys-' . $id)->toArray();
