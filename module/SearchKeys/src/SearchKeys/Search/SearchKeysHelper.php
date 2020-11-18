@@ -148,10 +148,9 @@ class SearchKeysHelper
         }
 
         if (!empty($searchItems)) {
-            if (count($searchItems) == 1) {
-                $searchItem = array_shift($searchItems);
-                $request->set('lookfor', $searchItem['lookfors']);
-                $request->set('type', $searchItem['types']);
+            if (count($searchItems) == 1 && count($searchItems[0]['lookfors']) == 1 && !in_array($searchItems[0]['types'][0], $hiddenKeywords)) {
+                $request->set('lookfor', $searchItems[0]['lookfors'][0]);
+                $request->set('type', $searchItems[0]['types'][0]);
             } else {
                 $request->set('lookfor', null);
                 $request->set('type', null);
