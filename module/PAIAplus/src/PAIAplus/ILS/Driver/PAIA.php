@@ -32,7 +32,7 @@
 namespace PAIAplus\ILS\Driver;
 
 use VuFind\Exception\ILS as ILSException;
-use VuFind\ILS\Driver\PAIA as PAIAbase;
+use DAIAplus\ILS\Driver\PAIA as PAIAbase;
 
 /**
  * PAIA ILS Driver for VuFind to get patron information

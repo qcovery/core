@@ -28,7 +28,7 @@
 namespace Libraries\AjaxHandler;
 
 use Libraries\Selector;
-use Libraries\Search\Results\PluginManager as ResultsManager;
+use VuFind\Search\Results\PluginManager as ResultsManager;
 use VuFind\Search\Memory;
 use Libraries\Libraries;
 use VuFind\AjaxHandler\AbstractBase;

@@ -28,7 +28,7 @@
 namespace PAIAplus\Auth;
 
 use VuFind\Auth\Manager as AuthManager;
-use PAIAplus\ILS\Connection as ILSConnection;
+use VuFind\ILS\Connection as ILSConnection;
 
 /**
  * Class for managing ILS-specific authentication.

@@ -2,13 +2,17 @@
 namespace DependentWorks\Module\Configuration;
 
 $config = [
-    'service_manager' => [
-        'allow_override' => true,
-        'factories' => [
-            'DependentWorks\AjaxHandler\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-        ],
-        'aliases' => [
-            'VuFind\AjaxHandler\PluginManager' => 'DependentWorks\AjaxHandler\PluginManager'
+    'vufind' => [
+        'plugin_managers' => [
+            'ajaxhandler' => [
+                'factories' => [
+                    'DependentWorks\AjaxHandler\GetDependentWorks' =>
+                        'DependentWorks\AjaxHandler\GetDependentWorksFactory',
+                ],
+                'aliases' => [
+                    'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
+                ]
+            ],
         ],
     ],
 ];

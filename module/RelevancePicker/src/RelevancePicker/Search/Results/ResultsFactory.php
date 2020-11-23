@@ -61,7 +61,7 @@ class ResultsFactory implements FactoryInterface
         // Replace trailing "Results" with "Params" to get the params service:
         $paramsService = preg_replace('/Results$/', 'Params', $requestedName);
 //        $paramsService = preg_replace('/^VuFind/', 'RelevancePicker', $paramsService);
-        $params = $container->get('RelevancePicker\Search\Params\PluginManager')
+        $params = $container->get('VuFind\Search\Params\PluginManager')
             ->get($paramsService);
         $searchService = $container->get('VuFindSearch\Service');
         $recordLoader = $container->get('VuFind\Record\Loader');

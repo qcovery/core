@@ -2,15 +2,18 @@
 namespace FacetPrefix\Module\Configuration;
 
 $config = [
-    'service_manager' => [
-        'allow_override' => true,
-        'factories' => [
-            'FacetPrefix\Search\Params\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-            'FacetPrefix\Search\Results\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-        ],
-        'aliases' => [
-            'VuFind\Search\Params\PluginManager' => 'FacetPrefix\Search\Params\PluginManager',
-            'VuFind\Search\Results\PluginManager' => 'FacetPrefix\Search\Results\PluginManager',
+    'vufind' => [
+        'plugin_managers' => [
+            'search_params' => [
+                'factories' => [
+                    'FacetPrefix\Search\Search2\Params' => 'FacetPrefix\Search\Solr\ParamsFactory',
+                    'FacetPrefix\Search\Solr\Params' => 'FacetPrefix\Search\Solr\ParamsFactory',
+                ],
+                'aliases' => [
+                    'search2' => 'FacetPrefix\Search\Search2\Params',
+                    'solr' => 'FacetPrefix\Search\Solr\Params',
+                ]
+            ],
         ],
     ],
 ];

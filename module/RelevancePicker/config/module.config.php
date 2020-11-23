@@ -5,16 +5,34 @@ $config = [
     'service_manager' => [
         'allow_override' => true,
         'factories' => [
-//            'Libraries\AjaxHandler\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
             'RelevancePicker\Search\BackendManager' => 'RelevancePicker\Search\BackendManagerFactory',
-            'RelevancePicker\Search\Params\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-            'RelevancePicker\Search\Results\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
         ],
         'aliases' => [
-//            'VuFind\AjaxHandler\PluginManager' => 'Libraries\AjaxHandler\PluginManager',
             'VuFind\Search\BackendManager' => 'RelevancePicker\Search\BackendManager',
-            'VuFind\Search\Params\PluginManager' => 'RelevancePicker\Search\Params\PluginManager',
-            'VuFind\Search\Results\PluginManager' => 'RelevancePicker\Search\Results\PluginManager',
+        ],
+    ],
+    'vufind' => [
+        'plugin_managers' => [
+            'search_params' => [
+                'factories' => [
+                    'RelevancePicker\Search\Search2\Params' => 'RelevancePicker\Search\Search2\ParamsFactory',
+                    'RelevancePicker\Search\Solr\Params' => 'RelevancePicker\Search\Solr\ParamsFactory',
+                ],
+                'aliases' => [
+                    'search2' => 'RelevancePicker\Search\Search2\Params',
+                    'solr' => 'RelevancePicker\Search\Solr\Params',
+                ]
+            ],
+            'search_results' => [
+                'factories' => [
+                    'RelevancePicker\Search\Search2\Results' => 'RelevancePicker\Search\Search2\ResultsFactory',
+                    'RelevancePicker\Search\Solr\Results' => 'RelevancePicker\Search\Solr\ResultsFactory',
+                ],
+                'aliases' => [
+                    'search2' => 'RelevancePicker\Search\Search2\Results',
+                    'solr' => 'RelevancePicker\Search\Solr\Results',
+                ]
+            ],
         ],
     ],
 ];

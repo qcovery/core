@@ -69,7 +69,7 @@ class ILSAuthenticatorFactory implements FactoryInterface
         $callback = function (& $wrapped, $proxy) use ($container, $requestedName) {
             // Generate wrapped object:
             $auth = $container->get('VuFind\Auth\Manager');
-            $catalog = $container->get('PAIAplus\ILS\Connection');
+            $catalog = $container->get('VuFind\ILS\Connection');
             $wrapped = new $requestedName($auth, $catalog);
 
             // Indicate that initialization is complete to avoid reinitialization:

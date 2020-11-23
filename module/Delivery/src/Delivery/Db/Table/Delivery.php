@@ -28,6 +28,7 @@
 namespace Delivery\Db\Table;
 use VuFind\Db\Table\Gateway;
 use VuFind\Db\Row\RowGateway;
+use VuFind\Db\Table\PluginManager;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Expression;
 use VuFind\Exception\LoginRequired as LoginRequiredException;

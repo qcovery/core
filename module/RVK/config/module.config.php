@@ -1,13 +1,18 @@
 <?php
 
 return array (
-    'service_manager' => [
-        'allow_override' => true,
-        'factories' => [
-            'RVK\AjaxHandler\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-        ],
-        'aliases' => [
-            'VuFind\AjaxHandler\PluginManager' => 'RVK\AjaxHandler\PluginManager',
+    'vufind' => [
+        'plugin_managers' => [
+            'ajaxhandler' => [
+                'factories' => [
+                    'RVK\AjaxHandler\GetRVKStatus' => 'RVK\AjaxHandler\GetRVKStatusFactory',
+                    'RVK\AjaxHandler\GetRVKTree' => 'RVK\AjaxHandler\GetRVKTreeFactory',
+                ],
+                'aliases' => [
+                    'getRVKStatus' => 'RVK\AjaxHandler\GetRVKStatus',
+                    'getRVKTree' => 'RVK\AjaxHandler\GetRVKTree',
+                ]
+            ],
         ],
     ],
-);
+];

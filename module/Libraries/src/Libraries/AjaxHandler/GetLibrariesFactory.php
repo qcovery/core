@@ -67,7 +67,7 @@ class GetLibrariesFactory
         }
         return new $requestedName(
             $container->get('VuFind\Config\PluginManager')->get('libraries'),
-            $container->get('Libraries\Search\Results\PluginManager'),
+            $container->get('VuFind\Search\Results\PluginManager'),
             $container->get('VuFind\Search\Memory'),
             $container->get('VuFind\Translator')
         );
