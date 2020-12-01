@@ -129,5 +129,49 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         );
     }
 
+    /**
+     * Login Action
+     *
+     * @return mixed
+     */
+    public function loginAction()
+    {
+        // If this authentication method doesn't use a VuFind-generated login
+        // form, force it through:
+        if ($this->getSessionInitiator()) {
+            // Don't get stuck in an infinite loop -- if processLogin is already
+            // set, it probably means Home action is forwarding back here to
+            // report an error!
+            //
+            // Also don't attempt to process a login that hasn't happened yet;
+            // if we've just been forced here from another page, we need the user
+            // to click the session initiator link before anything can happen.
+            if (!$this->params()->fromPost('processLogin', false)
+                && !$this->params()->fromPost('forcingLogin', false)
+            ) {
+                $this->getRequest()->getPost()->set('processLogin', true);
+                return $this->forwardTo('MyResearch', 'Home');
+            }
+        }
 
+        // Make request available to view for form updating:
+        $view = $this->createViewModel();
+
+        // Check for multiple PAIA backends
+        $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
+        $paiaBackends = [];
+        foreach ($paiaConfig as $key => $value) {
+            if (stristr($key, 'PAIA')) {
+                $name = $key;
+                if (isset($paiaConfig[$key]['name'])) {
+                    $name = $paiaConfig[$key]['name'];
+                }
+                $paiaBackends[$key] = $name;
+            }
+        }
+        $view->paiaBackends = $paiaBackends;
+
+        $view->request = $this->getRequest()->getPost();
+        return $view;
+    }
 }

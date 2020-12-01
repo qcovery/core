@@ -1,0 +1,10 @@
+<?php if (sizeof($this->paiaBackends) > 1): ?>
+<div class="form-group">
+    <label class="control-label" for="login_paia_select"><?=$this->transEsc('PAIA Select')?>:</label>
+    <select name="paia-select" id="login_paia_select">
+        <?php foreach ($this->paiaBackends as $key => $value): ?>
+            <option value="<?=$key?>" <?php if ($this->request->get('paia-select') == $key): ?>selected="selected"<?php endif; ?>><?=$value?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+<?php endif; ?>

@@ -366,7 +366,12 @@ class PAIA extends PAIAbase
     {
         $session = $this->getSession();
         if (empty($session->paia_domain)) {
-            $session->paia_domain  = 'PAIA';
+            // Get PAIA domain from login form.
+            $paiaDomain = 'PAIA';
+            if (isset($_POST['paia-select'])) {
+                $paiaDomain = $_POST['paia-select'];
+            }
+            $session->paia_domain  = $paiaDomain;
         }
         return $session->paia_domain;
     }
