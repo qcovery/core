@@ -25,6 +25,7 @@ return [
         'recorddriver',
         'helptooltips',
         'rvk',
+        'paiaplus',
         'beluga-core-base',
         'rvk',
         'storageinfo',
