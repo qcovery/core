@@ -158,7 +158,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $view = $this->createViewModel();
 
         // Check for multiple PAIA backends
-        $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
+        $paiaConfig = $this->getConfig('PAIA');
         $paiaBackends = [];
         foreach ($paiaConfig as $key => $value) {
             if (stristr($key, 'PAIA')) {
