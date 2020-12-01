@@ -64,7 +64,7 @@ class GetResultCountFactory
             throw new \Exception('Unexpected options passed to factory.');
         }
         return new $requestedName(
-            $container->get('Libraries\Search\Results\PluginManager')
+            $container->get('VuFind\Search\Results\PluginManager')
         );
     }
 }
