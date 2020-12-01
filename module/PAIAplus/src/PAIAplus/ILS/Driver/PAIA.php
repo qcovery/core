@@ -375,13 +375,17 @@ class PAIA extends PAIAbase
     public function getPickUpLocations($patron = null, $holdDetails = null)
     {
         $pickupLocation = [];
-
         $item = $holdDetails['item_id'];
 
         $doc = [];
+	//autoconfirm fees
+	//$doc = '{"doc":[{"edition":"'.$documentId.'","item":"'.$itemId.'","confirm":{ "http://purl.org/ontology/paia#FeeCondition": ["http://purl.org/ontology/dso#Reservation"] }}]}';
+  	$confirm = [];
+        $confirm['http://purl.org/ontology/paia#FeeCondition'][] = 'http://purl.org/ontology/dso#Reservation';
+	$doc['confirm'] = $confirm;
+
         $doc['item'] = stripslashes($item);
         $post_data['doc'][] = $doc;
-
         try {
             $array_response = $this->paiaPostAsArray(
                 'core/' . $patron['cat_username'] . '/request', $post_data
@@ -393,7 +397,6 @@ class PAIA extends PAIAbase
                 'sysMessage' => $e->getMessage(),
             ];
         }
-
         if ($holdDetails['type'] == 'order') {
             if (isset($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
                 if (is_array($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
@@ -414,7 +417,6 @@ class PAIA extends PAIAbase
                 }
             }
         }
-
         return $pickupLocation;
     }
 }
