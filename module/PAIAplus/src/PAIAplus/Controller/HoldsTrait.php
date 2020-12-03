@@ -188,6 +188,8 @@ trait HoldsTrait
             $defaultRequestGroup = false;
         }
 
+        $referer = $_SERVER['HTTP_REFERER'];
+
         $view = $this->createViewModel(
             [
                 'gatheredDetails' => $gatheredDetails,
@@ -201,6 +203,7 @@ trait HoldsTrait
                 'requestGroupNeeded' => $requestGroupNeeded,
                 'helpText' => $checkHolds['helpText'] ?? null,
                 'type' => $type,
+                'referer' => $referer,
             ]
         );
         $view->setTemplate('record/hold');
