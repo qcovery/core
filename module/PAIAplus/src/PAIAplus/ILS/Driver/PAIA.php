@@ -278,6 +278,10 @@ class PAIA extends PAIAbase
             $result['upc'] = null;
             $result['institution_name'] = null;
             */
+            if (isset($this->config['Global']['renewLimit'])) {
+                $result['renewLimit'] = $this->config['Global']['renewLimit'];
+            }
+
             list($m, $d, $y) = explode('-', $result['dueTime']);
             $i = ($index < 10) ? '0' . $index : $index;
             $sort = $y.$m.$d.$i;
