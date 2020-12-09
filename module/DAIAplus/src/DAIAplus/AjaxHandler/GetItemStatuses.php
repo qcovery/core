@@ -223,6 +223,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                 );
 //neu A
                 $current['record_number'] = array_search($current['id'], $ids);
+
+                $current['daiaBackend'] = $recordNumber;
+
                 $statuses[] = $current;
 
                 // The current ID is not missing -- remove it from the missing list.
@@ -242,7 +245,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
                 'reserve_message'      => $this->translate('Not On Reserve'),
                 'callnumber'           => '',
                 'missing_data'         => true,
-                'record_number'        => $recordNumber
+                'record_number'        => $recordNumber,
+                'daiaBackend'          => ''
             ];
         }
 
