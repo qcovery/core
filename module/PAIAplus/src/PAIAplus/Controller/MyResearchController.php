@@ -166,7 +166,14 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 if (isset($paiaConfig[$key]['name'])) {
                     $name = $paiaConfig[$key]['name'];
                 }
-                $paiaBackends[$key] = $name;
+                $docIdPattern = '';
+                if (isset($paiaConfig[$key]['docIdPattern'])) {
+                    $docIdPattern = $paiaConfig[$key]['docIdPattern'];
+                }
+                $paiaBackends[$key] = [
+                    'name' => $name,
+                    'docIdPattern' => $docIdPattern
+                ];
             }
         }
         $view->paiaBackends = $paiaBackends;
