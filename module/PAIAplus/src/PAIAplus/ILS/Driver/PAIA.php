@@ -278,6 +278,10 @@ class PAIA extends PAIAbase
             $result['upc'] = null;
             $result['institution_name'] = null;
             */
+            if (isset($this->config['Global']['renewLimit'])) {
+                $result['renewLimit'] = $this->config['Global']['renewLimit'];
+            }
+
             list($m, $d, $y) = explode('-', $result['dueTime']);
             $i = ($index < 10) ? '0' . $index : $index;
             $sort = $y.$m.$d.$i;
@@ -366,7 +370,12 @@ class PAIA extends PAIAbase
     {
         $session = $this->getSession();
         if (empty($session->paia_domain)) {
-            $session->paia_domain  = 'PAIA';
+            // Get PAIA domain from login form.
+            $paiaDomain = 'PAIA';
+            if (isset($_POST['paia-select'])) {
+                $paiaDomain = $_POST['paia-select'];
+            }
+            $session->paia_domain  = $paiaDomain;
         }
         return $session->paia_domain;
     }

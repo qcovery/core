@@ -362,7 +362,12 @@ class CaLiefController extends AbstractBase
         }
         $view->format = $format;
             
-        $signature = $available->getSignature($format);
+        //$signature = $available->getSignature($format);
+        $signatureMarcData = $driver->getMarcData('Signature');
+        $signature= '';
+        if (isset($signatureMarcData[0]['signature']['data'][0])) {
+            $signature = $signatureMarcData[0]['signature']['data'][0];
+        }
 
         if (!$this->caliefConfig['global']['useCaliefForVufindUsers']) {
            	if (!$this->caliefCheckAuthorize($userCalief) || empty($signature) ) {

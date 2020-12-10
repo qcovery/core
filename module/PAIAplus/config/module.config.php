@@ -21,10 +21,13 @@ $config = [
     'controllers' => [
         'factories' => [
             'PAIAplus\Controller\RecordController' => 'PAIAplus\Controller\AbstractBaseWithConfigFactory',
+            'PAIAplus\Controller\MyResearchController' => 'PAIAplus\Controller\MyResearchControllerFactory',
         ],
         'aliases' => [
             'Record' => 'PAIAplus\Controller\RecordController',
             'record' => 'PAIAplus\Controller\RecordController',
+            'MyResearch' => 'PAIAplus\Controller\MyResearchController',
+            'myresearch' => 'PAIAplus\Controller\MyResearchController',
         ],
     ],
 ];

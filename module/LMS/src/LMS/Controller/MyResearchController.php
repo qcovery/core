@@ -115,16 +115,18 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $showExportButton = false;
                 if ($results->getListObject() && $results->getListObject()->isPublic()) {
                   if ($lmsConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/lms.ini'), true)) {
-                    $patron = $this->catalogLogin();
-                    if (is_array($patron)) {
-	                  foreach ($lmsConfig['lms-list-id-export']['allowed-user-types'] as $allowedUserType) {
-	                    foreach ($patron['type'] as $type) {
-	                      if ($type == $allowedUserType) {
-	                        $showExportButton = true;
-	                      }
-	                    }
-	                  }
-                    }
+                      if ($this->getAuthManager()->isLoggedIn()) {
+                          $patron = $this->catalogLogin();
+                          if (is_array($patron)) {
+                              foreach ($lmsConfig['lms-list-id-export']['allowed-user-types'] as $allowedUserType) {
+                                  foreach ($patron['type'] as $type) {
+                                      if ($type == $allowedUserType) {
+                                          $showExportButton = true;
+                                      }
+                                  }
+                              }
+                          }
+                      }
                   }
                 }
                 return $this->createViewModel(

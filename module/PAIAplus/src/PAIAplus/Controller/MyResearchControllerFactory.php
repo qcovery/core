@@ -1,6 +1,6 @@
 <?php
 /**
- * Generic factory for search results objects.
+ * Generic controller factory.
  *
  * PHP version 7
  *
@@ -20,26 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  Search
+ * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace FacetPrefix\Search\Results;
+namespace PAIAplus\Controller;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Generic factory for search results objects.
+ * Generic controller factory.
  *
  * @category VuFind
- * @package  Search
+ * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ResultsFactory implements FactoryInterface
+class MyResearchControllerFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -56,17 +56,11 @@ class ResultsFactory implements FactoryInterface
      * @throws ContainerException if any other error occurs
      */
     public function __invoke(ContainerInterface $container, $requestedName,
-        array $options = null
+                             array $options = null
     ) {
-        // Replace trailing "Results" with "Params" to get the params service:
-        $paramsService = preg_replace('/Results$/', 'Params', $requestedName);
-        $paramsService = preg_replace('/^VuFind/', 'FacetPrefix', $paramsService);
-        $params = $container->get('FacetPrefix\Search\Params\PluginManager')
-            ->get($paramsService);
-        $searchService = $container->get('VuFindSearch\Service');
-        $recordLoader = $container->get('VuFind\Record\Loader');
-        return new $requestedName(
-            $params, $searchService, $recordLoader, ...($options ?: [])
-        );
+        if (!empty($options)) {
+            throw new \Exception('Unexpected options sent to factory.');
+        }
+        return new $requestedName($container);
     }
 }

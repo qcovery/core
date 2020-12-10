@@ -52,9 +52,15 @@ abstract class AbstractSolrBackendFactory extends BackendFactory
      */
     protected function createBackend(Connector $connector)
     {
-        $config = $this->config->get($this->mainConfig);
         $backend = new Backend($connector);
-        $backend->setPageSize($config['Index']['limit_batch_per_query']);
+        $config = $this->config->get($this->mainConfig);
+        $pageSize = $config->Index->record_batch_size ?? 100;
+        if ($pageSize > $config->Index->maxBooleanClauses ?? $pageSize) {
+            $pageSize = $config->Index->maxBooleanClauses;
+        }
+        if ($pageSize > 0) {
+            $backend->setPageSize($pageSize);
+        }
         $backend->setQueryBuilder($this->createQueryBuilder());
         $backend->setSimilarBuilder($this->createSimilarBuilder());
         if ($this->logger) {

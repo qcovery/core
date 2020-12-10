@@ -112,22 +112,6 @@ class PluginManager extends \VuFind\Search\Params\PluginManager
     public function __construct($configOrContainerInstance = null,
         array $v3config = []
     ) {
-        // These objects are not meant to be shared -- every time we retrieve one,
-        // we are building a brand new object.
-        $this->sharedByDefault = false;
-
-        $this->addAbstractFactory('VuFind\Search\Params\PluginFactory');
         parent::__construct($configOrContainerInstance, $v3config);
-    }
-
-    /**
-     * Return the name of the base class or interface that plug-ins must conform
-     * to.
-     *
-     * @return string
-     */
-    protected function getExpectedInterface()
-    {
-        return 'VuFind\Search\Base\Params';
     }
 }
