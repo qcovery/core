@@ -158,11 +158,23 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
             }
         }
 
+        $paiaDomain = $this->getPAIADomain();
+        $paiaIsil = '';
+        if (isset($this->config[$paiaDomain]['isil'])) {
+            $paiaIsil = $this->config[$paiaDomain]['isil'];
+        }
+
         $status = [];
         foreach ($daiaBackends as $daiaBackend) {
 
             $this->baseUrl = $daiaBackend['baseUrl'];
             $this->apiKey = $daiaBackend['daiaplus_api_key'];
+            $isCurrentIsil = true;
+            if (isset($daiaBackend['isil'])) {
+                if ($paiaIsil != $daiaBackend['isil']) {
+                    $isCurrentIsil = false;
+                }
+            }
 
             // check cache for given ids and skip these ids if availability data is found
             foreach ($ids as $key => $id) {
@@ -192,7 +204,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                             if (null !== $doc) {
                                 // a document with the corresponding id exists, which
                                 // means we got status information for that record
-                                $data = $this->parseDaiaDoc($id, $doc);
+                                $data = $this->parseDaiaDoc($id, $doc, $isCurrentIsil);
                                 // cache the status information
                                 if ($this->daiaCacheEnabled) {
                                     $this->putCachedData($this->generateURI($id), $data);
@@ -212,7 +224,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                             if (null !== $doc) {
                                 // parse the extracted DAIA document and save the status
                                 // info
-                                $data = $this->parseDaiaDoc($id, $doc);
+                                $data = $this->parseDaiaDoc($id, $doc, $isCurrentIsil);
                                 // cache the status information
                                 if ($this->daiaCacheEnabled) {
                                     $this->putCachedData($this->generateURI($id), $data);
@@ -312,7 +324,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
      *
      * @return array            Array with VuFind compatible status information.
      */
-    protected function parseDaiaArray($id, $daiaArray)
+    protected function parseDaiaArray($id, $daiaArray, $isCurrentIsil)
     {
         $doc_id = null;
         $doc_href = null;
@@ -373,6 +385,8 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                     $result_item['chronology'] = $item['chronology'];
                 }
 
+                $result_item['isCurrentIsil'] = $isCurrentIsil;
+
                 $result[] = $result_item;
             } // end iteration on item
         }
@@ -399,10 +413,10 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
      * @return array An array with status information for the record
      * @throws ILSException
      */
-    protected function parseDaiaDoc($id, $daiaDoc)
+    protected function parseDaiaDoc($id, $daiaDoc, $isCurrentIsil)
     {
         if (is_array($daiaDoc)) {
-            return $this->parseDaiaArray($id, $daiaDoc);
+            return $this->parseDaiaArray($id, $daiaDoc, $isCurrentIsil);
         } else {
             throw new ILSException(
                 'Unsupported document type (did not match Array or DOMNode).'
@@ -426,4 +440,17 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
         return $session->daia_domain;
     }
 
+    protected function getPAIADomain()
+    {
+        $session = $this->getSession();
+        if (empty($session->paia_domain)) {
+            // Get PAIA domain from login form.
+            $paiaDomain = 'PAIA';
+            if (isset($_POST['paia-select'])) {
+                $paiaDomain = $_POST['paia-select'];
+            }
+            $session->paia_domain  = $paiaDomain;
+        }
+        return $session->paia_domain;
+    }
 }
