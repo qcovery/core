@@ -130,17 +130,21 @@ foreach ($cumulatedResults as $storage => $cumulatedResult) {
                         }
 
                         if (!$hideLink) {
-                            if ($status != '' && (in_array($actionEntry['service'], array("loan", "presentation")))) {
-                                echo ' &#10141;';
-                            }
+                            if ($daiaResult['isCurrentIsil']) {
+                                if ($status != '' && (in_array($actionEntry['service'], array("loan", "presentation")))) {
+                                    echo ' &#10141;';
+                                }
 
-                            echo ' <span class="daia_action">';
-                            if ($action_href) {
-                                echo '<a class="' . $actionEntry['link_status'] . '" href="' . $action_href . '" target="_blank">' . $action_label . '</a>';
+                                echo ' <span class="daia_action">';
+                                if ($action_href) {
+                                    echo '<a class="' . $actionEntry['link_status'] . '" href="' . $action_href . '" target="_blank">' . $action_label . '</a>';
+                                } else {
+                                    echo $action_label;
+                                }
+                                echo '</span>';
                             } else {
-                                echo $action_label;
+                                echo '<span class="daia_backend_not_matching">'.$this->transEsc('Please login with a matching account').'</span>';
                             }
-                            echo '</span>';
                         }
                     }
                 }

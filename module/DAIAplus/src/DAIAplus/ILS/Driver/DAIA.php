@@ -170,7 +170,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
             $this->baseUrl = $daiaBackend['baseUrl'];
             $this->apiKey = $daiaBackend['daiaplus_api_key'];
             $isCurrentIsil = true;
-            if (isset($daiaBackend['isil'])) {
+            if (isset($daiaBackend['isil']) && $paiaIsil != '') {
                 if ($paiaIsil != $daiaBackend['isil']) {
                     $isCurrentIsil = false;
                 }
@@ -443,14 +443,6 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
     protected function getPAIADomain()
     {
         $session = $this->getSession();
-        if (empty($session->paia_domain)) {
-            // Get PAIA domain from login form.
-            $paiaDomain = 'PAIA';
-            if (isset($_POST['paia-select'])) {
-                $paiaDomain = $_POST['paia-select'];
-            }
-            $session->paia_domain  = $paiaDomain;
-        }
         return $session->paia_domain;
     }
 }
