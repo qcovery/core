@@ -31,8 +31,13 @@ function displayArticleStatus(results, $item) {
 }
 
 function displayItemStatus(result, $item) {
+  if (typeof(result.daiaBackend) != 'undefined') {
+      $item.find('.status').append('<h3>'+result.daiaBackend+'</h3>');
+  }
+
   $item.removeClass('js-item-pending');
-  $item.find('.status').empty().append(result.availability_message);
+  $item.find('.status').find('.label').remove();
+  $item.find('.status').append(result.availability_message);
   $item.find('.ajax-availability').removeClass('ajax-availability hidden');
   if (typeof(result.error) != 'undefined'
     && result.error.length > 0
@@ -95,7 +100,8 @@ function displayItemStatus(result, $item) {
   }
   if (typeof(result.daiaplus) != 'undefined' && result.daiaplus.length > 0) {
     $item.find('.callnumAndLocation').addClass('hidden');
-    $item.find('.status').empty().append(result.daiaplus);
+    $item.find('.status').find('.label').remove();
+    $item.find('.status').append(result.daiaplus);
     $item.find('.status').removeClass('hidden');
   }
 }

@@ -111,3 +111,9 @@
   content: url("../images/questionmark_orange.png");
   margin-left: 5px;
 }
+
+.daia_backend_not_matching {
+    font-weight: bold;
+    display: block;
+    font-style: italic;
+}
