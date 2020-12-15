@@ -199,6 +199,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
             if (!empty($sfxUrl) && !empty($sfxDomain)) {
                 $sfxLink = urlencode($sfxUrl . '/sfx_' . $sfxDomain . '?' . $sfxLink);
+                $this->sfxLink = urldecode($sfxLink);
             }
         }
 
@@ -289,6 +290,13 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                         }
                     }
                 }
+	    }
+            if ($data[0]['level'] == 'check_ill_access_level') {
+                $data[] = [
+                    'href' => $this->sfxLink,
+                    'level' => 'check_ill_access_level',
+                    'label' => $this->translate('AZB-Copy')
+                ];
             }
         }
         return $data;
