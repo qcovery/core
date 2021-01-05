@@ -394,6 +394,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
         // keep DAIA+ data
         if (isset($daiaArray['daiaplus_best_result'])) {
             $result['daiaplus_best_result'] = $daiaArray['daiaplus_best_result'];
+            $result['daiaplus_best_result']['isCurrentIsil'] = $isCurrentIsil;
         }
 
         return $result;
