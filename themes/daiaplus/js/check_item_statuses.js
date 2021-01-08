@@ -219,7 +219,10 @@ $(document).ready(function() {
     } else {
       itemStatusObserver = new Hunt(
         $('.availabilityItem').toArray(),
-        { enter: checkItemStatus }
+        {
+          enter: checkItemStatus,
+          offset: 100000
+        }
       );
     }
   }
