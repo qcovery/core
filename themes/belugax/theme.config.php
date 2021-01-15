@@ -29,6 +29,7 @@ return [
         'beluga-core-base',
         'rvk',
         'storageinfo',
+        'fulltextfinder',
     ],
     "less" => [
         "active" => false,
