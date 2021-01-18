@@ -1,0 +1,55 @@
+<?php $resultList = $this->solrDetails()->getResultListLine($this->driver); ?>
+      <div>
+        <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>">
+        <?=$resultList['title'] ?>
+    <?php if(!empty($resultList['subtitle'])): ?>
+        : <?=$resultList['subtitle'] ?>
+    <?php endif; ?>
+    <?php if(!empty($resultList['partnumber'])): ?>
+        <?=$resultList['partnumber'] ?>
+    <?php endif; ?>
+    <?php if(!empty($resultList['partname'])): ?>
+        <?=$resultList['partname'] ?>
+    <?php endif; ?>
+        </a>
+    <?php if(!empty($resultList['edition'])): ?>
+        <?=$resultList['edition'] ?>
+    <?php endif; ?>
+    <?php if(!empty($resultList['volume'])): ?>
+        <?=$resultList['volume'] ?>
+    <?php endif; ?>
+      </div>
+    <?php if(!empty($resultList['author'])): ?>
+      <div>
+        <?=$this->transEsc('by')?> <a href="<?=$this->record($this->driver)->getLink('person', $resultList['author'])?>">
+            <?=$resultList['author'] ?>
+        </a>
+      </div>
+    <?php endif; ?>
+    <?php if(!empty($resultList['journal'])): ?>
+      <div>
+        <?php if(!empty($resultList['relation'])): ?>
+          <?=strtolower($this->transEsc($resultList['relation']))?>:
+        <?php endif; ?>
+        <?php if(!empty($resultList['journallink'])): ?>
+          <a href="<?=$this->record($this->driver)->getLink('issnj', $resultList['journallink'])?>">
+            <?=$resultList['journal'] ?>
+          </a>
+        <?php else: ?>
+          <?=$resultList['journal'] ?>
+        <?php endif; ?>
+      </div>
+    <?php elseif(!empty($resultList['publisher']) || !empty($resultList['publishdate'])): ?>
+       <div>
+            <?=$this->transEsc('Published')?>:
+        <?php if(!empty($resultList['publisher'])): ?>
+            <?php if(!empty($resultList['publishplace'])): ?>
+                <?=$resultList['publishplace'] ?>,
+            <?php endif; ?>
+            <?=$resultList['publisher'] ?>,
+        <?php endif; ?>
+        <?php if(!empty($resultList['publishdate'])): ?>
+            <?=$resultList['publishdate'] ?>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>

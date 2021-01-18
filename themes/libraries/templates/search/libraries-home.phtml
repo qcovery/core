@@ -1,0 +1,45 @@
+<?php
+
+$libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId);
+$selectedLibrary = $this->connectedlibraries()->getSelectedLibrary();
+
+?>
+
+<div class="uk-child-width-1-1" uk-grid>
+<?php if (count($libraryList) > 1): ?>
+    <div class="">
+        <button id="infobutton" class="uk-button uk-button-default" type="button"><?=$this->transEsc("Select library")?><i class="bel-pfeil-u01"></i></button>
+        <div uk-dropdown>
+            <ul class="uk-nav uk-dropdown-nav">
+                <? foreach($libraryList as $library): ?>
+                    <? $disabled = (empty($library[strtolower($this->searchClassId)])) ? ' disabled' : ''; ?>
+                    <? if ($library['code'] == $selectedLibrary['code']): ?>
+                        <li class="uk-active"><strong><?=$this->transEsc($library['fullname']) ?></strong></li>
+                    <? else: ?>
+                        <li><a href=""><?=$this->transEsc($library['fullname']) ?></a></li>
+                    <? endif; ?>
+                <? endforeach; ?>
+            </ul>
+        </div>
+    </div>
+<?php endif; ?>
+    <div class="" uk-grid>
+        <div class="uk-width-3-4">
+            <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
+                <img id="infoimage" src="/vufind/themes/libraries/images/library_icons/<?=$selectedLibrary['logo'] ?>" height="40" alt="Library Logo" /><br/>
+            </a>
+        </div>
+        <?php if (!empty($selectedLibrary['infosite'])): ?>
+            <div class="uk-width-1-4">
+                <div class="">
+                    <a href="<?=$selectedLibrary['infosite'] ?>" id="infoopen" target="_blank"><i class="bel-auskunft" aria-hidden="true" title="<?=$this->transEsc('Library Informations') ?>"></i></a>
+                </div>
+            </div>
+        <?php endif; ?>
+        <div class="uk-width-1-1 uk-margin-remove-top">
+            <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
+                <div class="uk-margin-top"><?=$this->transEsc($selectedLibrary['fullname']) ?></div>
+            </a>
+        </div>
+    </div>
+</div>

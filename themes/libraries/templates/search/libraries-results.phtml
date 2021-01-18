@@ -1,0 +1,57 @@
+<?php
+  $selectedLibrary = [];
+  $libraryList = [];
+  if (method_exists($this->params, 'getLibraries')) {
+      $Libraries = $this->params->getLibraries();
+      $selectedLibrary = $Libraries->selectLibrary();
+      $libraryList = $Libraries->getLibraryList(true, true, $this->searchClassId);
+  }
+  $searchLink = $this->url($this->searchOptions($this->searchClassId)->getSearchAction());
+?>
+    <div id="LibrarySelector">
+<?php if (empty($selectedLibrary['show-library']) || $selectedLibrary['show-library'] != 'no' || count($libraryList) > 1): ?>
+      <div id="LibraryData">
+          <div class="" uk-grid>
+              <?php if (!empty($selectedLibrary['logo'])): ?>
+              <div class="uk-width-3-4">
+                  <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
+                      <img id="infoimage" src="/vufind/themes/libraries/images/library_icons/<?=$selectedLibrary['logo'] ?>" height="40" alt="Library Logo" /><br/>
+                  </a>
+              </div>
+              <?php endif; ?>
+              <?php if (!empty($selectedLibrary['infosite'])): ?>
+                  <div class="uk-width-1-4">
+                      <div class="">
+                          <a href="<?=$selectedLibrary['infosite'] ?>" id="infoopen" target="_blank"><i class="bel-auskunft" aria-hidden="true" title="<?=$this->transEsc('Library Informations') ?>"></i></a>
+                      </div>
+                  </div>
+              <?php endif; ?>
+              <div class="uk-width-1-1 uk-margin-remove-top uk-margin-bottom">
+              <?php if (!empty($selectedLibrary['website'])): ?>
+                  <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
+                      <div class="uk-margin-top"><?=$this->transEsc($selectedLibrary['fullname']) ?></div>
+                  </a>
+              <?php else: ?>
+                  <strong><?=$this->transEsc($selectedLibrary['fullname']) ?></strong>
+              <?php endif; ?>
+              </div>
+          </div>
+      </div>
+<?php endif; ?>
+      <div class="facet-group" id="side-panel-library">
+          <button class="title collapsed" data-toggle="collapse" href="#side-collapse-library"><?=$this->transEsc("Library")?></button>
+          <div id="side-collapse-library" class="collapse out">
+              <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchlink='<?=$searchLink ?>' data-searchclass='<?=$this->searchClassId ?>'>
+                  <a href="" class="facet facetAND library-item"><span class="badge library-item-count"></span><span class="text library-item-text"></span></a>
+              </div>
+          </div>
+      </div>
+      <div class="facet-group" id="side-panel-location">
+          <button class="title collapsed" data-toggle="collapse" href="#side-collapse-location"><?=$this->transEsc("Location")?></button>
+          <div id="side-collapse-location" class="collapse out">
+              <div id="location-list">
+                  <a href="" class="facet facetAND location-item"><span class="badge location-item-count"></span><span class="text location-item-text"></span></a>
+              </div>
+          </div>
+      </div>
+    </div>

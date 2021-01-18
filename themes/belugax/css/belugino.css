@@ -1,0 +1,825 @@
+@font-face {
+  font-family: 'belugino';
+  src:  url('fonts/belugino.eot?wx2m99');
+  src:  url('fonts/belugino.eot?wx2m99#iefix') format('embedded-opentype'),
+  url('fonts/belugino.ttf?wx2m99') format('truetype'),
+  url('fonts/belugino.woff?wx2m99') format('woff'),
+  url('fonts/belugino.svg?wx2m99#belugino') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="bel-"], [class*=" bel-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'belugino' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  font-size: 22px;
+  display: inline-table;
+  vertical-align: bottom;
+}
+
+.bel-haus:before {
+  content: "\e900";
+}
+.bel-welt:before {
+  content: "\e901";
+}
+.bel-globus:before {
+  content: "\e902";
+}
+.bel-nutzer:before {
+  content: "\e903";
+}
+.bel-stern01:before {
+  content: "\e904";
+}
+.bel-stern02:before {
+  content: "\e905";
+}
+.bel-eingang:before {
+  content: "\e906";
+}
+.bel-ausgang:before {
+  content: "\e907";
+}
+.bel-rettung:before {
+  content: "\e908";
+}
+.bel-hilfe01:before {
+  content: "\e909";
+}
+.bel-hilfe02:before {
+  content: "\e90a";
+}
+.bel-ende01:before {
+  content: "\e90b";
+}
+.bel-ende02:before {
+  content: "\e90c";
+}
+.bel-ende03:before {
+  content: "\e90d";
+}
+.bel-ok01:before {
+  content: "\e90e";
+}
+.bel-ok02:before {
+  content: "\e90f";
+}
+.bel-ok03:before {
+  content: "\e910";
+}
+.bel-plus01:before {
+  content: "\e911";
+}
+.bel-minus01:before {
+  content: "\e912";
+}
+.bel-plus02:before {
+  content: "\e913";
+}
+.bel-minus02:before {
+  content: "\e914";
+}
+.bel-achtung:before {
+  content: "\e915";
+}
+.bel-info:before {
+  content: "\e916";
+}
+.bel-auskunft:before {
+  content: "\e917";
+}
+.bel-menu:before {
+  content: "\e918";
+}
+.bel-lupe:before {
+  content: "\e919";
+}
+.bel-rss:before {
+  content: "\e91a";
+}
+.bel-inhalt:before {
+  content: "\e91b";
+}
+.bel-stift:before {
+  content: "\e91c";
+}
+.bel-telefon:before {
+  content: "\e91d";
+}
+.bel-mobile:before {
+  content: "\e91e";
+}
+.bel-brief01:before {
+  content: "\e91f";
+}
+.bel-brief02:before {
+  content: "\e920";
+}
+.bel-notiz:before {
+  content: "\e921";
+}
+.bel-sichtbar:before {
+  content: "\e922";
+}
+.bel-unsichtbar:before {
+  content: "\e923";
+}
+.bel-schloss01:before {
+  content: "\e924";
+}
+.bel-schloss02:before {
+  content: "\e925";
+}
+.bel-pfeil-u01:before {
+  content: "\e926";
+}
+.bel-pfeil-o01:before {
+  content: "\e927";
+}
+.bel-pfeil-l01:before {
+  content: "\e928";
+}
+.bel-pfeil-r01:before {
+  content: "\e929";
+}
+.bel-pfeil-u02:before {
+  content: "\e92a";
+}
+.bel-pfeil-o02:before {
+  content: "\e92b";
+}
+.bel-pfeil-r02:before {
+  content: "\e92c";
+}
+.bel-pfeil-l02:before {
+  content: "\e92d";
+}
+.bel-zitat01:before {
+  content: "\e92e";
+}
+.bel-zitat02:before {
+  content: "\e92f";
+}
+.bel-liste01:before {
+  content: "\e930";
+}
+.bel-liste02:before {
+  content: "\e931";
+}
+.bel-herz01:before {
+  content: "\e932";
+}
+.bel-herz02:before {
+  content: "\e933";
+}
+.bel-sprache01:before {
+  content: "\e934";
+}
+.bel-sprache02:before {
+  content: "\e935";
+}
+.bel-frage:before {
+  content: "\e936";
+}
+.bel-laden01:before {
+  content: "\e937";
+}
+.bel-laden02:before {
+  content: "\e938";
+}
+.bel-zurueck01:before {
+  content: "\e939";
+}
+.bel-zurueck02:before {
+  content: "\e93a";
+}
+.bel-groesser:before {
+  content: "\e93b";
+}
+.bel-kleiner:before {
+  content: "\e93c";
+}
+.bel-sortieren01:before {
+  content: "\e93d";
+}
+.bel-sortieren02:before {
+  content: "\e93e";
+}
+.bel-sortieren03:before {
+  content: "\e93f";
+}
+.bel-zahnrad:before {
+  content: "\e940";
+}
+.bel-trichter:before {
+  content: "\e941";
+}
+.bel-regler01:before {
+  content: "\e942";
+}
+.bel-regler02:before {
+  content: "\e943";
+}
+.bel-profil:before {
+  content: "\e944";
+}
+.bel-lesezeichen:before {
+  content: "\e945";
+}
+.bel-lesestern:before {
+  content: "\e946";
+}
+.bel-leseherz:before {
+  content: "\e947";
+}
+.bel-tempel:before {
+  content: "\e948";
+}
+.bel-speichern:before {
+  content: "\e949";
+}
+.bel-verboten:before {
+  content: "\e94a";
+}
+.bel-register:before {
+  content: "\e94b";
+}
+.bel-ordner:before {
+  content: "\e94c";
+}
+.bel-flagge:before {
+  content: "\e94d";
+}
+.bel-oeffnen:before {
+  content: "\e94e";
+}
+.bel-link01:before {
+  content: "\e94f";
+}
+.bel-link02:before {
+  content: "\e950";
+}
+.bel-link03:before {
+  content: "\e951";
+}
+.bel-kalender01:before {
+  content: "\e952";
+}
+.bel-kalender02:before {
+  content: "\e953";
+}
+.bel-postin:before {
+  content: "\e954";
+}
+.bel-postout:before {
+  content: "\e955";
+}
+.bel-drucker:before {
+  content: "\e956";
+}
+.bel-navigieren:before {
+  content: "\e957";
+}
+.bel-marker:before {
+  content: "\e958";
+}
+.bel-tastertur:before {
+  content: "\e959";
+}
+.bel-idkarte:before {
+  content: "\e95a";
+}
+.bel-orgaform:before {
+  content: "\e95b";
+}
+.bel-kreis01:before {
+  content: "\e95c";
+}
+.bel-kreis02:before {
+  content: "\e95d";
+}
+.bel-kontrast:before {
+  content: "\e95e";
+}
+.bel-uhr:before {
+  content: "\e95f";
+}
+.bel-unbek:before {
+  content: "\e960";
+}
+.bel-unbeke:before {
+  content: "\e961";
+}
+.bel-papier:before {
+  content: "\e962";
+}
+.bel-papiere:before {
+  content: "\e963";
+}
+.bel-papiere2:before {
+  content: "\e964";
+}
+.bel-zeit:before {
+  content: "\e965";
+}
+.bel-zeite:before {
+  content: "\e966";
+}
+.bel-mag:before {
+  content: "\e967";
+}
+.bel-mage:before {
+  content: "\e968";
+}
+.bel-buch:before {
+  content: "\e969";
+}
+.bel-buche:before {
+  content: "\e96a";
+}
+.bel-brief:before {
+  content: "\e96b";
+}
+.bel-briefe:before {
+  content: "\e96c";
+}
+.bel-cd:before {
+  content: "\e96d";
+}
+.bel-cde:before {
+  content: "\e96e";
+}
+.bel-cdfilm:before {
+  content: "\e96f";
+}
+.bel-lp:before {
+  content: "\e970";
+}
+.bel-lpe:before {
+  content: "\e971";
+}
+.bel-note01:before {
+  content: "\e972";
+}
+.bel-note02:before {
+  content: "\e973";
+}
+.bel-klang:before {
+  content: "\e974";
+}
+.bel-klange:before {
+  content: "\e975";
+}
+.bel-ton:before {
+  content: "\e976";
+}
+.bel-tone:before {
+  content: "\e977";
+}
+.bel-browser:before {
+  content: "\e978";
+}
+.bel-browsere:before {
+  content: "\e979";
+}
+.bel-online01:before {
+  content: "\e97a";
+}
+.bel-online02:before {
+  content: "\e97b";
+}
+.bel-online03:before {
+  content: "\e97c";
+}
+.bel-tablet:before {
+  content: "\e97d";
+}
+.bel-mobile2:before {
+  content: "\e97e";
+}
+.bel-mobilee:before {
+  content: "\e97f";
+}
+.bel-mobilee2:before {
+  content: "\e980";
+}
+.bel-foto:before {
+  content: "\e981";
+}
+.bel-fotoe:before {
+  content: "\e982";
+}
+.bel-kamera:before {
+  content: "\e983";
+}
+.bel-kamerae:before {
+  content: "\e984";
+}
+.bel-spiel:before {
+  content: "\e985";
+}
+.bel-spiele:before {
+  content: "\e986";
+}
+.bel-platte:before {
+  content: "\e987";
+}
+.bel-plattee:before {
+  content: "\e988";
+}
+.bel-kassette:before {
+  content: "\e989";
+}
+.bel-lautstaerke:before {
+  content: "\e98a";
+}
+.bel-note:before {
+  content: "\e98b";
+}
+.bel-film:before {
+  content: "\e98c";
+}
+.bel-filme:before {
+  content: "\e98d";
+}
+.bel-micro:before {
+  content: "\e98e";
+}
+.bel-microe:before {
+  content: "\e98f";
+}
+.bel-papkom01:before {
+  content: "\e990";
+}
+.bel-papkom02:before {
+  content: "\e991";
+}
+.bel-zeitkom:before {
+  content: "\e992";
+}
+.bel-magkom:before {
+  content: "\e993";
+}
+.bel-notekom01:before {
+  content: "\e994";
+}
+.bel-notekom02:before {
+  content: "\e995";
+}
+.bel-mkombo01:before {
+  content: "\e996";
+}
+.bel-mkombo01e:before {
+  content: "\e997";
+}
+.bel-mkombo02:before {
+  content: "\e998";
+}
+.bel-mkombo02e:before {
+  content: "\e999";
+}
+.bel-mkombo03:before {
+  content: "\e99a";
+}
+.bel-mkombo04:before {
+  content: "\e99b";
+}
+.bel-mkombo05:before {
+  content: "\e99c";
+}
+.bel-mkombo06:before {
+  content: "\e99d";
+}
+.bel-mkombo07:before {
+  content: "\e99e";
+}
+.bel-stat:before {
+  content: "\e99f";
+}
+.bel-state:before {
+  content: "\e9a0";
+}
+.bel-torte:before {
+  content: "\e9a1";
+}
+.bel-tortee:before {
+  content: "\e9a2";
+}
+.bel-handsch:before {
+  content: "\e9a3";
+}
+.bel-handsche:before {
+  content: "\e9a4";
+}
+.bel-zertifikat:before {
+  content: "\e9a5";
+}
+.bel-urkunde:before {
+  content: "\e9a6";
+}
+.bel-urkundee:before {
+  content: "\e9a7";
+}
+.bel-leer:before {
+  content: "\e9a8";
+}
+.bel-leere:before {
+  content: "\e9a9";
+}
+.bel-artikel:before {
+  content: "\e9aa";
+}
+.bel-artikele:before {
+  content: "\e9ab";
+}
+.bel-daten:before {
+  content: "\e9ac";
+}
+.bel-datene:before {
+  content: "\e9ad";
+}
+.bel-karte:before {
+  content: "\e9ae";
+}
+.bel-kartee:before {
+  content: "\e9af";
+}
+.bel-schreiben:before {
+  content: "\e9b0";
+}
+.bel-schreibene:before {
+  content: "\e9b1";
+}
+.bel-kombo:before {
+  content: "\e9b2";
+}
+.bel-komboe:before {
+  content: "\e9b3";
+}
+.bel-tvanalog:before {
+  content: "\e9b4";
+}
+.bel-radio:before {
+  content: "\e9b5";
+}
+.bel-pc:before {
+  content: "\e9b6";
+}
+.bel-pcfilm:before {
+  content: "\e9b7";
+}
+.bel-pcwww:before {
+  content: "\e9b8";
+}
+.bel-pcbrowser:before {
+  content: "\e9b9";
+}
+.bel-pcbild:before {
+  content: "\e9ba";
+}
+.bel-pce:before {
+  content: "\e9bb";
+}
+.bel-rakete:before {
+  content: "\e9bc";
+}
+.bel-beluga01:before {
+  content: "\e9bd";
+}
+.bel-beluga02:before {
+  content: "\e9be";
+}
+.bel-belugalogo:before {
+  content: "\e9bf";
+}
+.bel-pcsuche:before {
+  content: "\e9c0";
+}
+.bel-pcliste:before {
+  content: "\e9c1";
+}
+.bel-pckacheln:before {
+  content: "\e9c2";
+}
+.bel-pcspalten:before {
+  content: "\e9c3";
+}
+.bel-spalten:before {
+  content: "\e9c4";
+}
+.bel-zeilen:before {
+  content: "\e9c5";
+}
+.bel-raster:before {
+  content: "\e9c6";
+}
+.bel-kacheln:before {
+  content: "\e9c7";
+}
+.bel-tabelle:before {
+  content: "\e9c8";
+}
+.bel-barrierefrei:before {
+  content: "\e9c9";
+}
+.bel-sprache03:before {
+  content: "\e9ca";
+}
+.bel-sprache04:before {
+  content: "\e9cb";
+}
+.bel-antworten:before {
+  content: "\e9cc";
+}
+.bel-uebernehmen:before {
+  content: "\e9cd";
+}
+.bel-verbinden:before {
+  content: "\e9ce";
+}
+.bel-teilen:before {
+  content: "\e9cf";
+}
+.bel-verzeichnis:before {
+  content: "\e9d0";
+}
+.bel-sanduhr01:before {
+  content: "\e9d1";
+}
+.bel-sanduhr02:before {
+  content: "\e9d2";
+}
+.bel-trichter02:before {
+  content: "\e9d3";
+}
+.bel-trichter03:before {
+  content: "\e9d4";
+}
+.bel-flagge02:before {
+  content: "\e9d5";
+}
+.bel-ordner02:before {
+  content: "\e9d6";
+}
+.bel-ordner03:before {
+  content: "\e9d7";
+}
+.bel-sortieren04:before {
+  content: "\e9d8";
+}
+.bel-sortieren05:before {
+  content: "\e9d9";
+}
+.bel-sortieren06:before {
+  content: "\e9da";
+}
+.bel-sortieren07:before {
+  content: "\e9db";
+}
+.bel-nutzer02:before {
+  content: "\e9dc";
+}
+.bel-nutzer03:before {
+  content: "\e9dd";
+}
+.bel-nutzer04:before {
+  content: "\e9de";
+}
+.bel-nutzergruppe:before {
+  content: "\e9df";
+}
+.bel-nutzer05:before {
+  content: "\e9e0";
+}
+.bel-nutzer06:before {
+  content: "\e9e1";
+}
+.bel-nutzer07:before {
+  content: "\e9e2";
+}
+.bel-nutzerplus:before {
+  content: "\e9e3";
+}
+.bel-nutzerminus:before {
+  content: "\e9e4";
+}
+.bel-quadrat01:before {
+  content: "\e9e5";
+}
+.bel-quadrat02:before {
+  content: "\e9e6";
+}
+.bel-quadratok:before {
+  content: "\e9e7";
+}
+.bel-quadratx:before {
+  content: "\e9e8";
+}
+.bel-lupeplus:before {
+  content: "\e9e9";
+}
+.bel-lupeminus:before {
+  content: "\e9ea";
+}
+.bel-lupefrage:before {
+  content: "\e9eb";
+}
+.bel-pfeil-u03:before {
+  content: "\e9ec";
+}
+.bel-pfeil-o03:before {
+  content: "\e9ed";
+}
+.bel-pfeil-l03:before {
+  content: "\e9ee";
+}
+.bel-pfeil-r03:before {
+  content: "\e9ef";
+}
+.bel-recht01:before {
+  content: "\e9f0";
+}
+.bel-recht02:before {
+  content: "\e9f1";
+}
+.bel-glocke01:before {
+  content: "\e9f2";
+}
+.bel-glocke02:before {
+  content: "\e9f3";
+}
+.bel-lautstaerkeaus:before {
+  content: "\e9f4";
+}
+.bel-mikrofon:before {
+  content: "\e9f5";
+}
+.bel-playerplay:before {
+  content: "\e9f6";
+}
+.bel-playerpause:before {
+  content: "\e9f7";
+}
+.bel-playervor:before {
+  content: "\e9f8";
+}
+.bel-playerzurueck:before {
+  content: "\e9f9";
+}
+.bel-playerende:before {
+  content: "\e9fa";
+}
+.bel-playerstart:before {
+  content: "\e9fb";
+}
+.bel-stern03:before {
+  content: "\e9fc";
+}
+.bel-herz03:before {
+  content: "\e9fd";
+}
+.bel-stern04:before {
+  content: "\e9fe";
+}
+.bel-herz04:before {
+  content: "\e9ff";
+}
+.bel-statue:before {
+  content: "\ea00";
+}
+.bel-statuee:before {
+  content: "\ea01";
+}
+.bel-theater:before {
+  content: "\ea02";
+}
+.bel-theatere:before {
+  content: "\ea03";
+}
+.bel-wolke01:before {
+  content: "\ea04";
+}
+.bel-wolke02:before {
+  content: "\ea05";
+}
+.bel-belugacore01:before {
+  content: "\ea06";
+}
+.bel-belugacore02:before {
+  content: "\ea07";
+}
+.bel-keinzeichen:before {
+  content: "\ea08";
+}

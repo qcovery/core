@@ -1,0 +1,10 @@
+<?php $libraryList = $this->connectedlibraries()->getConnectedLibraries($this->searchClassId, $this->driver); ?>
+<?php if (!empty($libraryList)): ?>
+       <div>
+    <?=$this->transEsc('Libraries')?>: 
+    <?php foreach ($libraryList as $library): ?>
+        <?=$library['abbrieviation'] . ' ' ?>;
+    <?php endforeach; ?>
+       </div>
+<?php endif; ?>
+

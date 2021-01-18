@@ -1,0 +1,74 @@
+<\?xml version="1.0" encoding="ISO-8859-1"?>
+<ordermail>
+    <message-type>REQUEST</message-type>
+    <transaction-id></transaction-id>
+    <transaction-initial-req-id-symbol>CaLiefORDER</transaction-initial-req-id-symbol>
+    <transaction-group-qualifier><?='CaLief:' . date('ymdHis') . rand(0, 9) ?></transaction-group-qualifier>
+    <transaction-qualifier>1</transaction-qualifier>
+    <service-date-time><?=date('YmdHis') ?></service-date-time>
+    <requester-id>CaLief</requester-id>
+    <requester-email-address>bestellcap@beluga.sub.uni-hamburg.de</requester-email-address>
+    <bill-account-system-id>calief</bill-account-system-id>
+    <bill-account-email-address>abrechnung@beluga.sub.uni-hamburg.de</bill-account-email-address>
+    <requester-group>USER-GROUP-0</requester-group>
+    <country-delivery-target>DE</country-delivery-target>
+    <requester-note><?=$this->requesterNote ?></requester-note>
+    <responder-id>0018</responder-id>
+    <client-id></client-id>
+    <client-name><?=$this->clientName ?></client-name>
+    <client-identifier><?=$this->clientIdentifier ?></client-identifier>
+    <transaction-type>SIMPLE</transaction-type>
+    <delivery-address></delivery-address>
+    <del-postal-name-of-person-or-institution>.</del-postal-name-of-person-or-institution>
+    <del-postal-street-and-number>.</del-postal-street-and-number>
+    <del-postal-city>.</del-postal-city>
+    <del-postal-country>.</del-postal-country>
+    <del-postal-code>.</del-postal-code>
+    <del-email-address><?=$this->delEmailAddress ?></del-email-address>
+    <del-status-level-user>ALL</del-status-level-user>
+    <del-status-level-requester>NONE</del-status-level-requester>
+    <del-status-level-account>NONE</del-status-level-account>
+    <del-customer-info-to-keep>Y</del-customer-info-to-keep>
+    <delivery-service>EMAIL</delivery-service>
+    <delivery-service-format>PDF</delivery-service-format>
+    <delivery-service-alternative>N</delivery-service-alternative>
+    <contact-person></contact-person>
+    <contact-person-name><?=$this->contactPersonName ?></contact-person-name>
+    <billing-address></billing-address>
+    <bill-method>INVOICE</bill-method>
+    <bill-delivery-type>EMAIL</bill-delivery-type>
+    <bill-email-address>abrechnung@beluga.sub.uni-hamburg.de</bill-email-address>
+    <bill-postal-name-of-person-or-institution>.</bill-postal-name-of-person-or-institution>
+    <bill-postal-street-and-number>.</bill-postal-street-and-number>
+    <bill-postal-city>.</bill-postal-city>
+    <bill-postal-country>.</bill-postal-country>
+    <bill-postal-code>.</bill-postal-code>
+    <bill-invoice-type>COLLECTIVE</bill-invoice-type>
+    <bill-bank-authority>N</bill-bank-authority>
+    <ill-service-type>COPY</ill-service-type>
+    <search-type></search-type>
+    <supply-medium-info-type>PRINTED</supply-medium-info-type>
+    <place-on-hold>Y</place-on-hold>
+    <item-id></item-id>
+    <item-type>SERIAL</item-type>
+    <item-held-medium-type><?=$this->itemHeldMediumType ?></item-held-medium-type>
+    <item-call-number><?=$this->itemCallNumber ?></item-call-number>
+    <item-author><?=$this->itemAuthor ?></item-author>
+    <item-title><?=$this->itemTitle ?></item-title>
+    <item-place-of-publication><?=$this->itemPlaceOfPublication ?></item-place-of-publication>
+    <item-publisher></item-publisher>
+    <item-volume-issue><?=$this->itemVolumeIssue ?></item-volume-issue>
+    <item-publication-date><?=$this->itemPublicationDate ?></item-publication-date>
+    <item-author-of-article><?=$this->itemAuthorOfArticle ?></item-author-of-article>
+    <item-title-of-article><?=$this->itemTitleOfArticle ?></item-title-of-article>
+    <item-pagination><?=$this->itemPagination ?></item-pagination>
+    <item-iSSN></item-iSSN>
+    <item-system-no><?=$this->itemSystemNo ?></item-system-no>
+    <item-additional-no-letters><?=$this->itemAdditionalNoLetters ?></item-additional-no-letters>
+    <item-verification-reference-source></item-verification-reference-source>
+    <supplemental-item-description></supplemental-item-description>
+    <cost-info-type></cost-info-type>
+    <third-party-info-type>FORWARD=N</third-party-info-type>
+    <retry-flag>N</retry-flag>
+</ordermail>
+

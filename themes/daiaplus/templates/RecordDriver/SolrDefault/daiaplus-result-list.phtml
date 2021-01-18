@@ -1,0 +1,14 @@
+<?php
+$DAIAplusProcessor = $this->DAIAplusProcessor();
+
+$hideLink = $DAIAplusProcessor->hideAvailabilityInfo($this->driver, true);
+$hideDaia = $DAIAplusProcessor->hideAvailabilityInfo($this->driver);
+?>
+<?php if (!$hideDaia): ?>
+<?php global $rank; ?>
+<div class="availabilityItem" data-rank="<?=$rank ?>" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->searchClassId ?>" data-hierarchy-top-id="<?=($hideLink ? '1' : '0')?>" data-type="<?=$this->availabilityType?>">
+    <span class="status ajax-availability hidden">
+        <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
+    </span>
+</div>
+<?php endif; ?>

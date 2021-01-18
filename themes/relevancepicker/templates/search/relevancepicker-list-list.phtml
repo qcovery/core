@@ -1,0 +1,7 @@
+<?php
+    $explainData = $this->results->getExplain(); 
+    $this->relevancetooltip()->setData($explainData[$this->id]);
+    $tooltip = $this->relevancetooltip()->getResults();
+?>
+<a href="javascript:void(0)" title='<?=$this->render('tooltip-text.phtml', ['tooltip' => $tooltip]) ?>'>&nbsp;&nbsp;&nbsp;</a>
+
