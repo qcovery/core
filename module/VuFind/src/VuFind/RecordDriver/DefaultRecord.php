@@ -1146,8 +1146,11 @@ class DefaultRecord extends AbstractBase
      */
     public function getShortTitle()
     {
-        return isset($this->fields['title_short']) ?
-            $this->fields['title_short'] : '';
+        if (isset($this->fields['title_short'])) {
+            return is_array($this->fields['title_short']) ?
+                $this->fields['title_short'][0] : $this->fields['title_short'];
+        }
+        return '';
     }
 
     /**
@@ -1278,8 +1281,11 @@ class DefaultRecord extends AbstractBase
      */
     public function getTitle()
     {
-        return isset($this->fields['title']) ?
-            $this->fields['title'] : '';
+        if (isset($this->fields['title'])) {
+            return is_array($this->fields['title']) ?
+                $this->fields['title'][0] : $this->fields['title'];
+        }
+        return '';
     }
 
     /**
