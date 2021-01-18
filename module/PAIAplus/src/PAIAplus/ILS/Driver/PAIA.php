@@ -112,6 +112,7 @@ class PAIA extends PAIAbase
      *
      * @return mixed Array of the patron's holds on success.
      */
+/*
     public function getMyHolds($patron)
     {
         if (isset($this->config['Holds']['status'])) {
@@ -122,7 +123,7 @@ class PAIA extends PAIAbase
             return parent::getMyHolds($patron);
         }
     }
-
+*/
      /**
      * Mapping the location signet to a proper location name
      *
@@ -183,6 +184,7 @@ class PAIA extends PAIAbase
      *
      * @return array Array of the patron's transactions on success,
      */
+/*
     public function getMyTransactions($patron)
     {
         if (isset($this->config['Transactions']['status'])) {
@@ -193,7 +195,7 @@ class PAIA extends PAIAbase
             return parent::getMyTransactions($patron);
         }
     }
-
+*/
 
 
     /**
@@ -298,6 +300,7 @@ class PAIA extends PAIAbase
      *
      * @return array Array of the patron's storage retrieval requests on success,
      */
+/*
     public function getMyStorageRetrievalRequests($patron)
     {
         if (isset($this->config['StorageRetrievalRequests']['status'])) {
@@ -308,6 +311,7 @@ class PAIA extends PAIAbase
             return parent::getMyStorageRetrievalRequests($patron);
         }
     }
+*/
 
     /**
      * Get Patron Profile
