@@ -372,6 +372,11 @@ class PAIA extends PAIAbase
      * @return array        An array of associative arrays with locationID and
      * locationDisplay keys
      */
+
+	/**
+	* BS COVID19 change return to pickuplocation
+	*/
+
     public function getPickUpLocations($patron = null, $holdDetails = null)
     {
         $pickupLocation = [];
@@ -397,6 +402,14 @@ class PAIA extends PAIAbase
                 'sysMessage' => $e->getMessage(),
             ];
         }
+ //error_log ("JAOH PUP". var_dump($array_response));
+ $PAIA_STATUS_CODE = $array_response['doc'][0]['status'];
+// error_log ("JAOH PUP". var_dump($this->PAIA_STATUS_CODE));
+
+	if($PAIA_STATUS_CODE == 5) {
+	        //$this->flashMessenger() ->addMessage('hold_invalid_request_group', 'error');
+	}
+
         if ($holdDetails['type'] == 'order') {
             if (isset($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
                 if (is_array($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
@@ -417,6 +430,8 @@ class PAIA extends PAIAbase
                 }
             }
         }
-        return $pickupLocation;
+	//error_log ("JAOH PUP". var_dump($pickupLocation));
+	return ['status' => $PAIA_STATUS_CODE, 'location' => $pickupLocation,];
+        //return $pickupLocation;
     }
 }

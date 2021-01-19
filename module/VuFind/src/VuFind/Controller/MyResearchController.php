@@ -411,6 +411,7 @@ class MyResearchController extends AbstractBase
      * Gather user profile data
      *
      * @return mixed
+     * Covid 19
      */
     public function profileAction()
     {
@@ -438,7 +439,7 @@ class MyResearchController extends AbstractBase
             $profile['home_library'] = $user->home_library;
             $view->profile = $profile;
             try {
-                $view->pickup = $catalog->getPickUpLocations($patron);
+                $view->pickup = $catalog->getPickUpLocations($patron)['location'];
                 $view->defaultPickupLocation
                     = $catalog->getDefaultPickUpLocation($patron);
             } catch (\Exception $e) {
@@ -990,6 +991,7 @@ class MyResearchController extends AbstractBase
      * Send list of holds to view
      *
      * @return mixed
+     *COVID19
      */
     public function holdsAction()
     {
@@ -1036,7 +1038,7 @@ class MyResearchController extends AbstractBase
 
         // Get List of PickUp Libraries based on patron's home library
         try {
-            $view->pickup = $catalog->getPickUpLocations($patron);
+            $view->pickup = $catalog->getPickUpLocations($patron)['location'];
         } catch (\Exception $e) {
             // Do nothing; if we're unable to load information about pickup
             // locations, they are not supported and we should ignore them.
@@ -1049,6 +1051,7 @@ class MyResearchController extends AbstractBase
      * Send list of storage retrieval requests to view
      *
      * @return mixed
+     * COVID 19
      */
     public function storageRetrievalRequestsAction()
     {
@@ -1101,7 +1104,7 @@ class MyResearchController extends AbstractBase
 
         // Get List of PickUp Libraries based on patron's home library
         try {
-            $view->pickup = $catalog->getPickUpLocations($patron);
+            $view->pickup = $catalog->getPickUpLocations($patron)['location'];
         } catch (\Exception $e) {
             // Do nothing; if we're unable to load information about pickup
             // locations, they are not supported and we should ignore them.
