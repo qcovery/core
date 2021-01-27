@@ -30,6 +30,7 @@ return [
         'rvk',
         'storageinfo',
         'fulltextfinder',
+        'listadmin',
     ],
     "less" => [
         "active" => false,
