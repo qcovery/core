@@ -42,6 +42,11 @@ use VuFind\Controller\AbstractBase;
 class ListAdminController extends AbstractBase
 {
     public function migrateAction () {
+        $account = $this->getAuthManager();
+        if ($account->isLoggedIn() == false) {
+            return $this->forceLogin();
+        }
+
         $translator = $this->serviceLocator->get('Zend\Mvc\I18n\Translator');
         $view = $this->createViewModel();
 
