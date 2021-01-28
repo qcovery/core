@@ -102,9 +102,14 @@ class ListAdminController extends AbstractBase
         $newAccount = $this->getAccount($new_account)->toArray();
 
         $userListTable = $this->serviceLocator->get('VuFind\Db\Table\PluginManager')->get('userlist');
-        if ($lists = $userListTable->update(array('user_id' => $newAccount['id']), array('user_id' => $oldAccount['id']))) {
-            return $lists;
+        $lists = $userListTable->update(array('user_id' => $newAccount['id']), array('user_id' => $oldAccount['id']));
+        if ($lists) {
+            $userResourceTable = $this->serviceLocator->get('VuFind\Db\Table\PluginManager')->get('userResource');
+            if ($userResourceTable->update(array('user_id' => $newAccount['id']), array('user_id' => $oldAccount['id']))) {
+                return $lists;
+            }
         }
+
         return false;
     }
 }
