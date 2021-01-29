@@ -1,0 +1,39 @@
+<div class="mainbody">
+<h2><?=$this->pageTitle?></h2>
+<?=$this->flashmessages() ?>
+<?php if(!$this->hideForm): ?>
+    <div class="resultfeedback-formtitle">
+        <?=$this->formTitle?>
+    </div>
+    <div class="resultfeedback-formtext">
+        <?=$this->formText?>
+    </div>
+    <div class="resultfeedback-info">
+        <b>Title:</b> <i><?=$this->title?></i><br/>
+        <b>Autor:</b> <i><?=$this->author?></i>
+    </div>
+    <div class="resultfeedback-patron">
+        <b>Nutzerkennung:</b> <?=$this->userName?><br/>
+        <b>Name:</b> <?=$this->userFullname?><br/>
+        <b>E-Mail:</b> <?=$this->userEmail?>
+    </div>
+
+    <form class="form-feedback result-feedback" name="feedback" method="post" action="<?=$this->url('availabilityfeedback-email').'?id='.$this->id.'&type='.$this->type?>">
+      <input type="hidden" id="recordid" name="recordid" value="<?=$this->id?>" />
+      <div class="form-group">
+        <label class="control-label" for="comments" style="vertical-align:top;"><?=$this->transEsc("Comments")?>: </label>
+        <textarea id="comments" name="comments" class="form-control" required><?=$this->escapeHtml($comments ?? '')?></textarea>
+      </div>
+      <?php /*
+      <div class="form-group">
+        <input type="checkbox" name="privacy" required />
+        <label class="control-label privacy" for="privacy"><?=$this->translate("I Accept The Privacy Policy")?></label>
+      </div>
+      */ ?>
+      <?=$this->recaptcha()->html($this->useRecaptcha) ?>
+      <div class="form-group">
+        <input type="submit" name="submit" class="btn btn-primary" value="<?=$this->transEsc("Send")?>" />
+      </div>
+    </form>
+<?php endif; ?>
+</div>

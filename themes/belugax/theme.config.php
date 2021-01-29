@@ -31,6 +31,7 @@ return [
         'storageinfo',
         'fulltextfinder',
         'listadmin',
+        'availabilityfeedback',
     ],
     "less" => [
         "active" => false,
