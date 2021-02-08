@@ -27,7 +27,7 @@
  */
 namespace RecordDriver\View\Helper\RecordDriver;
 
-use VuFind\View\Helper\Root\AbstractClassBasedTemplateRenderer;
+//use VuFind\View\Helper\Root\AbstractClassBasedTemplateRenderer;
 use RecordDriver\RecordDriver\SolrMarc as RecordDriver;
 
 /**
@@ -39,9 +39,9 @@ use RecordDriver\RecordDriver\SolrMarc as RecordDriver;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class SolrDetails extends AbstractClassBasedTemplateRenderer
+class SolrDetails extends \Laminas\View\Helper\AbstractHelper
 {
-
+    use \VuFind\View\Helper\Root\ClassBasedTemplateRendererTrait;
 
     protected $driver;
 
