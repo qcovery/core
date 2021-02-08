@@ -27,7 +27,6 @@
  */
 namespace RecordDriver\View\Helper\RecordDriver;
 
-//use VuFind\View\Helper\Root\AbstractClassBasedTemplateRenderer;
 use RecordDriver\RecordDriver\SolrMarc as RecordDriver;
 
 /**
