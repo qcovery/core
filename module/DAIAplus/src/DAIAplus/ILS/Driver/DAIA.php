@@ -33,9 +33,9 @@
 namespace DAIAplus\ILS\Driver;
 
 use DOMDocument;
+use Laminas\Log\LoggerAwareInterface as LoggerAwareInterface;
 use VuFind\Exception\ILS as ILSException;
 use VuFindHttp\HttpServiceAwareInterface as HttpServiceAwareInterface;
-use Laminas\Log\LoggerAwareInterface as LoggerAwareInterface;
 
 /**
  * ILS Driver for VuFind to query availability information via DAIA.
@@ -132,6 +132,123 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
     }
 
     /**
+     * Get Statuses
+     *
+     * This is responsible for retrieving the status information for a
+     * collection of records.
+     * As the DAIA Query API supports querying multiple ids simultaneously
+     * (all ids divided by "|") getStatuses(ids) would call getStatus(id) only
+     * once, id containing the list of ids to be retrieved. This would cause some
+     * trouble as the list of ids does not necessarily correspond to the VuFind
+     * Record-id. Therefore getStatuses(ids) has its own logic for multiQuery-support
+     * and performs the HTTPRequest itself, retrieving one DAIA response for all ids
+     * and uses helper functions to split this one response into documents
+     * corresponding to the queried ids.
+     *
+     * @param array $ids The array of record ids to retrieve the status for
+     *
+     * @return array    An array of status information values on success.
+     */
+    public function getStatuses($ids)
+    {
+        $daiaBackends = [];
+        foreach ($this->config as $key => $value) {
+            if (stristr($key, 'DAIA')) {
+                $daiaBackends[$key] = $value;
+            }
+        }
+
+        $paiaDomain = $this->getPAIADomain();
+        $paiaIsil = '';
+        if (isset($this->config[$paiaDomain]['isil'])) {
+            $paiaIsil = $this->config[$paiaDomain]['isil'];
+        }
+
+        $status = [];
+        foreach ($daiaBackends as $daiaBackend) {
+
+            $this->baseUrl = $daiaBackend['baseUrl'];
+            $this->apiKey = $daiaBackend['daiaplus_api_key'];
+            $isCurrentIsil = true;
+            if (isset($daiaBackend['isil']) && $paiaIsil != '') {
+                if ($paiaIsil != $daiaBackend['isil']) {
+                    $isCurrentIsil = false;
+                }
+            }
+
+/*
+Hajo Seng: hier lieber status = array_merge($status, parent::getStatuses($ids));
+*/
+
+            // check cache for given ids and skip these ids if availability data is found
+            foreach ($ids as $key => $id) {
+                if ($this->daiaCacheEnabled
+                    && $item = $this->getCachedData($this->generateURI($id))
+                ) {
+                    if ($item != null) {
+                        $status[] = $item;
+                        unset($ids[$key]);
+                    }
+                }
+            }
+
+            // only query DAIA service if we have some ids left
+            if (count($ids) > 0) {
+                try {
+                    if ($this->multiQuery) {
+                        // perform one DAIA query with multiple URIs
+                        $rawResult = $this
+                            ->doHTTPRequest($this->generateMultiURIs($ids));
+                        // the id used in VuFind can differ from the document-URI
+                        // (depending on how the URI is generated)
+                        foreach ($ids as $id) {
+                            // it is assumed that each DAIA document has a unique URI,
+                            // so get the document with the corresponding id
+                            $doc = $this->extractDaiaDoc($id, $rawResult);
+                            if (null !== $doc) {
+                                // a document with the corresponding id exists, which
+                                // means we got status information for that record
+                                $data = $this->parseDaiaDoc($id, $doc, $isCurrentIsil);
+                                // cache the status information
+                                if ($this->daiaCacheEnabled) {
+                                    $this->putCachedData($this->generateURI($id), $data);
+                                }
+                                $status[$daiaBackend['name']] = $data;
+                            }
+                            unset($doc);
+                        }
+                    } else {
+                        // multiQuery is not supported, so retrieve DAIA documents one by
+                        // one
+                        foreach ($ids as $id) {
+                            $rawResult = $this->doHTTPRequest($this->generateURI($id));
+                            // extract the DAIA document for the current id from the
+                            // HTTPRequest's result
+                            $doc = $this->extractDaiaDoc($id, $rawResult);
+                            if (null !== $doc) {
+                                // parse the extracted DAIA document and save the status
+                                // info
+                                $data = $this->parseDaiaDoc($id, $doc, $isCurrentIsil);
+                                // cache the status information
+                                if ($this->daiaCacheEnabled) {
+                                    $this->putCachedData($this->generateURI($id), $data);
+                                }
+                                $status[$daiaBackend['name']] = $data;
+                            }
+                        }
+                    }
+                } catch (ILSException $e) {
+                    $this->debug($e->getMessage());
+                }
+            }
+/*
+Hajo Seng: bis hier
+*/
+        }
+        return $status;
+    }
+
+    /**
      * Perform an HTTP request.
      *
      * @param string $id id for query in daia
@@ -186,7 +303,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                 list($responseMediaType) = array_pad(
                     explode(
                         ';',
-                        $result->getHeaders()->get('ContentType')->getFieldValue(),
+                        $result->getHeaders()->get('Content-type')->getFieldValue(),
                         2
                     ),
                     2,
@@ -214,7 +331,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
      *
      * @return array            Array with VuFind compatible status information.
      */
-    protected function parseDaiaArray($id, $daiaArray)
+    protected function parseDaiaArray($id, $daiaArray, $isCurrentIsil)
     {
         $doc_id = null;
         $doc_href = null;
@@ -265,7 +382,9 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                 // status and availability will be calculated in own function
                 $result_item = $this->getItemStatus($item) + $result_item;
                 // add result_item to the result array
-
+/*
+Hajo Seng: Hier erst parent::parseDaiaArray Aufruf, dann weitere Interation (?)
+*/
                 // keep DAIA+ data
                 if (isset($item['daiaplus'])) {
                     $result_item['daiaplus'] = $item['daiaplus'];
@@ -275,6 +394,8 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                     $result_item['chronology'] = $item['chronology'];
                 }
 
+                $result_item['isCurrentIsil'] = $isCurrentIsil;
+
                 $result[] = $result_item;
             } // end iteration on item
         }
@@ -282,6 +403,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
         // keep DAIA+ data
         if (isset($daiaArray['daiaplus_best_result'])) {
             $result['daiaplus_best_result'] = $daiaArray['daiaplus_best_result'];
+            $result['daiaplus_best_result']['isCurrentIsil'] = $isCurrentIsil;
         }
 
         return $result;
@@ -301,10 +423,10 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
      * @return array An array with status information for the record
      * @throws ILSException
      */
-    protected function parseDaiaDoc($id, $daiaDoc)
+    protected function parseDaiaDoc($id, $daiaDoc, $isCurrentIsil)
     {
         if (is_array($daiaDoc)) {
-            return $this->parseDaiaArray($id, $daiaDoc);
+            return $this->parseDaiaArray($id, $daiaDoc, $isCurrentIsil);
         } else {
             throw new ILSException(
                 'Unsupported document type (did not match Array or DOMNode).'
@@ -328,4 +450,9 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
         return $session->daia_domain;
     }
 
+    protected function getPAIADomain()
+    {
+        $session = $this->getSession();
+        return $session->paia_domain;
+    }
 }
