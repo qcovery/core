@@ -58,14 +58,16 @@ class GetFulltextFinder  extends AbstractBase
 {
 
     protected $config;
+    protected $renderer;
 
     /**
      * Constructor
      *
      * @param Config            $config    Top-level configuration
      */
-    public function __construct(Config $config) {
+    public function __construct(Config $config, RendererInterface $renderer) {
         $this->config = $config;
+        $this->renderer = $renderer;
     }
 
     /**
@@ -77,8 +79,44 @@ class GetFulltextFinder  extends AbstractBase
      */
     public function handleRequest(Params $params)
     {
+        $openUrl = $params->fromQuery('openurl');
 
-        return $this->formatResponse('FulltextFinder');
+        $fulltextfinderApiUrl = 'https://api.ebsco.io/ftf/ftfaccount/'.$this->config['FulltextFinder']['account'].'.main.ftf/openurl?'.$openUrl;
+        $ch = curl_init();
+        $timeout = 0;
+        curl_setopt($ch, CURLOPT_URL, $fulltextfinderApiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'password: '.$this->config['FulltextFinder']['password']
+        ]);
+
+        $fulltextfinderApiResult = json_decode(curl_exec($ch));
+        curl_close($ch);
+
+        $links = [];
+        if (isset($fulltextfinderApiResult->contextObjects)) {
+            foreach ($fulltextfinderApiResult->contextObjects as $contextObject) {
+                if (isset($contextObject->targetLinks)) {
+                    foreach ($contextObject->targetLinks as $targetLink) {
+                        if ($targetLink->targetUrl && !stristr($targetLink->linkName, 'Web-Service') && !stristr($targetLink->linkName, 'Feedback Formular')) {
+                            $links[] = $targetLink;
+                        }
+                    }
+                }
+            }
+        }
+
+        $html = $this->renderer->render(
+            'fulltextfinder/result.phtml', [
+                'links' => $links,
+            ]
+        );
+
+        return $this->formatResponse(compact('html'));
     }
 
 }
