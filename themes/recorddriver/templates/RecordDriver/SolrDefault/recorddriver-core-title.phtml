@@ -12,9 +12,11 @@
         <?php endif; ?>
         : <?=$titleFields['SubTitle'][0] ?>
     <?php endif; ?>
-    <?=$titleFields['TitleSection'][0] ?? '' ?>
-    <?php if (!empty($titleFields['TitleSection']['originalLetters'])): ?>
-        <?php $originalLetters .= ' ' . $titleFields['TitleSection']['originalLetters']; ?>
+    <?php if (!empty($titleFields['TitleSection'])): ?>
+        / <?=$titleFields['TitleSection'][0] ?>
+        <?php if (!empty($titleFields['TitleSection']['originalLetters'])): ?>
+            <?php $originalLetters .= ' ' . $titleFields['TitleSection']['originalLetters']; ?>
+        <?php endif; ?>
     <?php endif; ?>
     <?= !empty($titleFields['TitleStatement'][0]) ? '/ ' . $titleFields['TitleStatement'][0] : '' ?>
     <?php if (!empty($titleFields['TitleStatement']['originalLetters'])): ?>
