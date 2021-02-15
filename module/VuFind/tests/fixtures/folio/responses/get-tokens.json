@@ -1,4 +1,0 @@
-[
-  { "headers": { "X-Okapi-Token": "x-okapi-token-config-tenant" } },
-  { "body": "{ \"users\": [ { \"id\": \"id\" } ] }" }
-]

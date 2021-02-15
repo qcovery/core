@@ -1,6 +1,0 @@
-<?php if (!empty($this->authors)): ?><?=$this->escapeHtml($this->authors)?>. <?php endif; ?>
-<i><?=$this->escapeHtml($this->title)?></i><?php if ($this->periodAfterTitle): ?>.<?php endif ?>
-<?php if (!empty($this->edition)): ?> <?=$this->escapeHtml($this->edition)?> <?php endif; ?>
-<?php $publisherAndYear = array_filter([$this->publisher ?? null, $this->year ?? null]); ?>
-<?php if (!empty($publisherAndYear)): ?> <?=$this->escapeHtml(implode(', ', $publisherAndYear))?>.<?php endif; ?>
-<?php if (isset($this->doiPrefix) && !empty($this->doi)): ?> <?=$this->escapeHtml($this->doiPrefix . $this->doi)?>.<?php endif; ?>

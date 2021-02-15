@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<phpunit bootstrap="../../../VuFind/tests/bootstrap.php">
-  <testsuites>
-    <testsuite name="VuFindAdmin">
-      <directory>src</directory>
-    </testsuite>
-  </testsuites>
-</phpunit>
