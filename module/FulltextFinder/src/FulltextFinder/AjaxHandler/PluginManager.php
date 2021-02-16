@@ -72,7 +72,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'relaisOrder' => 'VuFind\AjaxHandler\RelaisOrder',
         'systemStatus' => 'VuFind\AjaxHandler\SystemStatus',
         'tagRecord' => 'VuFind\AjaxHandler\TagRecord',
-        'getfulltextFinder' => 'FulltextFinder\AjaxHandler\GetFulltextFinder',
+        'getFulltextFinder' => 'FulltextFinder\AjaxHandler\GetFulltextFinder',
     ];
 
     /**

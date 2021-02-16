@@ -296,7 +296,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                 list($responseMediaType) = array_pad(
                     explode(
                         ';',
-                        $result->getHeaders()->get('ContentType')->getFieldValue(),
+                        $result->getHeaders()->get('Content-type')->getFieldValue(),
                         2
                     ),
                     2,

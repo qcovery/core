@@ -1,0 +1,13 @@
+<?php if(!empty($this->links)): ?>
+    <div class="fulltextfinder-result">
+        <h3>FulltextFinder</h3>
+        <ul>
+            <?php foreach ($this->links as $link): ?>
+                <li><a href="<?=$link->targetUrl?>" title="<?=$link->linkText?>" target="_blank"><?=$link->linkName?></a></li>
+            <?php endforeach; ?>
+        </ul>
+        <!--
+        <?php print_r($this->links); ?>
+        -->
+    </div>
+<?php endif; ?>

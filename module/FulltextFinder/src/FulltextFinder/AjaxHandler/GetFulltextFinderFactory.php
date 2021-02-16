@@ -63,7 +63,8 @@ class GetFulltextFinderFactory implements \Zend\ServiceManager\Factory\FactoryIn
             throw new \Exception('Unexpected options passed to factory.');
         }
         return new $requestedName(
-            $container->get('VuFind\Config\PluginManager')->get('FulltextFinder')
+            $container->get('VuFind\Config\PluginManager')->get('FulltextFinder'),
+            $container->get('ViewRenderer')
         );
     }
 }

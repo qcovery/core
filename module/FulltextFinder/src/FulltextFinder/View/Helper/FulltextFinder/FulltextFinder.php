@@ -15,8 +15,4 @@ class FulltextFinder extends \Zend\View\Helper\AbstractHelper
     {
         $this->config = $config;
     }
-
-    public function show() {
-        return 'FulltextFinder';
-    }
 }
