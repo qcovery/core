@@ -113,6 +113,7 @@ class GetFulltextFinder  extends AbstractBase
         $html = $this->renderer->render(
             'fulltextfinder/result.phtml', [
                 'links' => $links,
+                'url' => $fulltextfinderApiUrl,
             ]
         );
 
