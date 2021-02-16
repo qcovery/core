@@ -43,8 +43,13 @@ class ListAdminController extends AbstractBase
 {
     public function migrateAction () {
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        $user = $account->isLoggedIn();
+        if ($user == false) {
             return $this->forceLogin();
+        }
+
+        if (!$this->isAdmin($user)) {
+            return $this->redirect()->toRoute('myresearch-home');
         }
 
         $translator = $this->serviceLocator->get('Zend\Mvc\I18n\Translator');
@@ -77,6 +82,18 @@ class ListAdminController extends AbstractBase
         }
 
         return $view;
+    }
+
+    private function isAdmin($user) {
+        $config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('ListAdmin');
+        if (isset($config->ListAdmin->admins)) {
+            foreach ($config->ListAdmin->admins as $adminId) {
+                if ($user->username == $adminId) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private function getAccount($account) {
