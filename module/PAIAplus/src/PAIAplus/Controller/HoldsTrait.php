@@ -113,7 +113,10 @@ trait HoldsTrait
         $pickupDetails['type'] = $type;
         $pickupDetails['storage_id'] = $this->request->getQuery('storage_id');
 
-        $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
+        $pickup = [];
+        if (in_array('pickUpLocation', $extraHoldFields)) {
+            $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
+        }
 
         // Process form submissions if necessary:
         if (null !== $this->params()->fromPost('placeHold')) {
