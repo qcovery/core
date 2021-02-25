@@ -61,8 +61,10 @@ class ParamsFactory extends \RelevancePicker\Search\Params\ParamsFactory
             throw new \Exception('Unexpected options sent to factory.');
         }
         $facetHelper = $container->get('VuFind\Search\Solr\HierarchicalFacetHelper');
-        $searchKeysHelper = $container->get('SearchKeys\Search\SearchKeysHelper');
-        $searchMemory = $container->get('VuFind\Search\Memory');
+        $searchMemory = ($container->has('Libraries\Search\Solr\Params'))
+            ? $container->get('VuFind\Search\Memory') : null;
+        $searchKeysHelper = ($container->has('SearchKeys\Search\SearchKeysHelper'))
+            ? $container->get('SearchKeys\Search\SearchKeysHelper') : null;
         return parent::__invoke($container, $requestedName, [$facetHelper, $searchKeysHelper, $searchMemory]);
     }
 }
