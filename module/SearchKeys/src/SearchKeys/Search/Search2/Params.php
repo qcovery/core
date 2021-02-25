@@ -30,6 +30,7 @@ namespace SearchKeys\Search\Search2;
 
 use VuFind\Search\QueryAdapter;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
+use VuFind\Search\Search2\Params as BaseParams;
 use SearchKeys\Search\SearchKeysHelper;
 
 /**
@@ -41,7 +42,7 @@ use SearchKeys\Search\SearchKeysHelper;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class Params extends \VuFind\Search\Search2\Params
+class Params extends BaseParams
 {
     /**
      * SearchKeys Helper

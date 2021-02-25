@@ -7,8 +7,8 @@ namespace SearchKeys\Search\Solr;
 
 use VuFind\Search\QueryAdapter;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
-use SearchKeys\Search\SearchKeysHelper;
 use VuFind\Search\Solr\Params as BaseParams;
+use SearchKeys\Search\SearchKeysHelper;
 
 class Params extends BaseParams
 {
