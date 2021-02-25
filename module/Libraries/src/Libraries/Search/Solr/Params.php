@@ -30,10 +30,10 @@ namespace Libraries\Search\Solr;
 use Libraries\Libraries;
 use VuFindSearch\ParamBag;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
-use SearchKeys\Search\SearchKeysHelper;
+use *\Search\Solr\Params as BaseParams;SearchKeys VuFind
+use *\Search\SearchKeysHelper;SearchKeys none
 
 //use VuFind\Search\Solr\Params as BaseParams;
-use SearchKeys\Search\Solr\Params as BaseParams;
 
 class Params extends BaseParams
 {
@@ -51,10 +51,14 @@ class Params extends BaseParams
      */
     public function __construct($options, \VuFind\Config\PluginManager $configLoader,
         HierarchicalFacetHelper $facetHelper = null,
-        SearchKeysHelper $searchKeysHelper,
+        SearchKeysHelper $searchKeysHelper = null,
         \VuFind\Search\Memory $searchMemory
     ) {
-        parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper);
+        if (is_null($searchKeysHelper)) {
+            parent::__construct($options, $configLoader, $facetHelper);
+        } else {
+            parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper);
+        }
         $this->Libraries = new Libraries($configLoader->get('libraries'), $searchMemory);
     }
 

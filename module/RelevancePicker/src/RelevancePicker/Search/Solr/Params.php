@@ -29,10 +29,10 @@ namespace RelevancePicker\Search\Solr;
 
 use VuFindSearch\ParamBag;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
-use SearchKeys\Search\SearchKeysHelper;
+use *\Search\Solr\Params as BaseParams;Libraries SearchKeys VuFind
+use *\Search\SearchKeysHelper;SearchKeys none
 
 //use VuFind\Search\Solr\Params as BaseParams;
-use Libraries\Search\Solr\Params as BaseParams;
 
 class Params extends BaseParams
 {
@@ -50,10 +50,16 @@ class Params extends BaseParams
      */
     public function __construct($options, \VuFind\Config\PluginManager $configLoader,
         HierarchicalFacetHelper $facetHelper = null,
-        SearchKeysHelper $searchKeysHelper,
-        \VuFind\Search\Memory $searchMemory
+        SearchKeysHelper $searchKeysHelper = null,
+        \VuFind\Search\Memory $searchMemory = null
     ) {
-        parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper, $searchMemory);
+        if (is_null($searchMemory) && is_null($searchKeysHelper)) {
+             parent::__construct($options, $configLoader, $facetHelper);
+        } elseif (is_null($searchMemory)) {
+             parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper);
+        } else {
+              parent::__construct($options, $configLoader, $facetHelper, $searchKeysHelper, $searchMemory);
+        }
     }
 
     /**
