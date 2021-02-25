@@ -27,7 +27,6 @@
  */
 namespace RelevancePicker\Search\Solr;
 
-//use VuFind\Search\Solr\Params as BaseParams;
 use VuFind\Search\Solr\Results as BaseResults;
 
 class Results extends BaseResults
