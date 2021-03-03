@@ -1,0 +1,21 @@
+<?php if (!isset($this->indexStart)) $this->indexStart = 0; ?>
+<?php $i = $this->indexStart; ?>
+<?php foreach ($this->results->getResults() as $current): ?>
+  <?php $recordNumber = $this->results->getStartRecord() + $i - $this->indexStart; ?>
+  <div id="result<?=$i++ ?>" class="result<?=$current->supportsAjaxStatus()?' ajaxItem':''?>">
+    <?php if (isset($this->showCheckboxes) && $this->showCheckboxes): ?>
+      <?=$this->record($current)->getCheckbox('', 'search-cart-form', $recordNumber)?>
+    <?php endif; ?>
+    <div class="record-number">
+      <?=$recordNumber ?>
+    </div>
+    <?=$this->record($current)->getSearchResult('list')?>
+    <div>
+<!-- Module RelevancePicker -->
+<?php if ($this->params->getSearchClassId() == 'Solr'): ?>
+ <?=$this->render('search/relevancepicker-list-list.phtml', ['id' => $current->getUniqueId(), 'results' => $this->results]) ?>
+<?php endif; ?>
+<!-- Module RelevancePicker -->
+    </div>
+  </div>
+<?php endforeach; ?>
