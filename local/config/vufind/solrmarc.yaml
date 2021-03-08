@@ -1,0 +1,996 @@
+---
+# Listing of data to be read from marc bibliographic data
+#
+# Format is:
+# <name of the data set>:
+#   category:               <categories corresponding to categories chosen in the core-template>
+#                               title should be set; other categories are mandatory
+#   originalletters:        <yes|no> whether item in original letters should be
+#                               shown or not (see marc 880)
+#   <main field>:           at least one should be set; fields with a leading 0 should be quoted
+#                               if only parent methods are used the main field is '000'
+#     conditions:           conditions which should be fulfilled if the data is read
+#       - [<item>, <key>, <value>]          <item> is either field or indicator
+#                                           <key> is the name of the field or indicator
+#                                           <value> is the value it should have
+#     parent:               use a parent method (from SolrDefault driver)
+#       - [<method name>]       the method to use
+#     subfields:            only read the fields
+#       - [<field list>]        list of fields to read
+#     <subfield>:           enhanced processing of a subfield
+#       - [name, <name>]                     name it
+#       - [replace, <from>, <to>]            replace a substring from <from> to <to> (using a regex)
+#       - [match, <what>, <which>]           match a substring (<what>) and use the <which>th parantesis
+#                                                (using a regex)
+#       - [function, <php-function>]         use th return value of a php-function
+#
+#-----------------------------------------------------------------------------------
+#
+ShortTitle:
+  category: title
+  originalletters: yes 
+  245:
+    subfields:
+      - [a]
+  490:
+    subfields:
+      - [a, v]
+SubTitle:
+  category: title
+  245:
+    subfields:
+      - [b]
+TitleSection:
+  category: title
+  245:
+    subfields:
+      - [n, p]
+TitleStatement:
+  category: title
+  245:
+    subfields:
+      - [c]
+TitleAdditionalPart:
+  category: title
+  249:
+    subfields:
+      - [a, b]
+TitleAdditionalVolume:
+  category: title
+  249:
+    subfields:
+      - [v]
+TitleAdditionalStatement:
+  category: title
+  249:
+    subfields:
+      - [c]
+DependentWorksData:
+  category: dependentworkslist
+  245:
+    a:
+      - [name, title]
+    n:
+      - [name, part]
+  264:
+    c:
+      - [name, date]
+  490:
+    a:
+      - [name, title]
+  830:
+    9:
+      - [name, sort]
+    v:
+      - [name, part]
+  800:
+    v:
+      - [name, part]
+    9:
+      - [name, sort]
+  773:
+    q:
+      - [name, sort]
+ResultList:
+  category: resultlist
+  '000':
+    parent:
+      - [method, getEdition]
+      - [name, edition]
+  245:
+    a:
+      - [name, title]
+    b:
+      - [name, subtitle]
+    p:
+      - [name, partname]
+  490:
+    a:
+      - [name, title]
+  100:
+    a:
+      - [name, author]
+  700:
+  264:
+    a:
+      - [name, publishplace]
+    b:
+      - [name, publisher]
+    c:
+      - [name, publishdate]
+  260:
+  773:
+    d:
+      - [name, publisher]
+    g:
+      - [name, volume]
+    i:
+      - [name, relation]
+    t:
+      - [name, journal]
+    x:
+      - [name, journallink]
+Summary:
+  category: title
+  520:
+    subfields:
+      - [a]
+Ppn:
+  category: id
+  '000':
+    parent:
+      - [method, getUniqueID]
+TitleVariation:
+  category: title2
+  246:
+    conditions:
+      - [indicator, 1, '!3']
+      - [indicator, 2, '!1']
+      - [field, i, '!Ansetzungssachtitel']
+    i:
+      - [name, prefix]
+    a:
+      - [name, title]
+WorkTitle:
+  category: title2
+  mandatory-field: link
+  view-method: search-link
+  130:
+    a:
+      - [name, link]
+      - [replace, '@', '']
+    g:
+      - [name, link]
+    f:
+      - [name, link]
+    k:
+      - [name, link] 
+    m:
+      - [name, link] 
+    n:
+      - [name, link] 
+    o:
+      - [name, link] 
+    p:
+      - [name, link] 
+    r:
+      - [name, link] 
+  240:
+  100:
+    a:
+      - [name, description]
+    c:
+      - [name, description]
+    d:
+      - [name, description] 
+    g:
+      - [name, description] 
+    e:
+      - [name, description] 
+      - [function, 'mb_convert_case', 2]
+      - [replace, 'er( |$)$', 'eR$1']
+      - [replace, 'in( |$)$', 'In$1']
+  110:
+PreviousTitles:
+  category: title2
+  view-method: zdb-link
+  780:
+    t:
+      - [name, linkname]
+    w:
+      - [name, link]
+      - [match, '\(DE-(599)|(600)\)([0-9xX-]+)', 3]
+NewerTitles:
+  category: title2
+  view-method: zdb-link
+  785:
+    i:
+      - [name, prefix]
+    t:
+      - [name, linkname]
+    w:
+      - [name, link]
+      - [match, '\(DE-(599)|(600)\)([0-9xX-]+)', 3]
+    a:
+      - [name, author]
+    d:
+      - [name, additional]
+OtherTitles:
+  category: title2
+  247:
+    f:
+      - [name, prefix]
+    a:
+      - [name, title]
+    b:
+      - [name, additionaltitle]
+Persons:
+  category: person
+  view-method: person-link
+  100:
+    a:
+      - [name, link]
+    b:
+      - [name, number]
+    c:
+      - [name, link]
+    d:
+      - [name, date]
+    e:
+      - [name, description]
+      - [function, 'mb_convert_case', 2]
+      - [replace, 'er( |$)$', 'eR$1']
+      - [replace, 'in( |$)$', 'In$1']
+  700:
+Cooperations:
+  category: person
+  view-method: person-link
+  110:
+    a:
+      - [name, link]
+    b:
+      - [name, additional]
+    g:
+      - [name, description]
+    x:
+      - [name, description]
+    z:
+      - [name, description]
+    c:
+      - [name, location]
+    d:
+      - [name, date]
+    e:
+      - [name, description]
+      - [function, 'mb_convert_case', 2]
+      - [replace, 'er( |$)$', 'eR$1']
+      - [replace, 'in( |$)$', 'In$1']
+    f:
+      - [name, description]
+    j:
+      - [name, description]
+    m:
+      - [name, description]
+    n:
+      - [name, description]
+    p:
+      - [name, description]
+    r:
+      - [name, description]
+    s:
+      - [name, description]
+  710:
+Congresses:
+  category: person
+  view-method: search-link
+  111:
+    a:
+      - [name, link]
+    d:
+      - [name, link]
+    c:
+      - [name, link]
+    g:
+      - [name, description]
+    x:
+      - [name, description]
+    z:
+      - [name, description]
+    e:
+      - [name, description]
+      - [function, 'mb_convert_case', 2]
+      - [replace, 'er( |$)$', 'eR$1']
+      - [replace, 'in( |$)$', 'In$1']
+    f:
+      - [name, description]
+    j:
+      - [name, description]
+    m:
+      - [name, description]
+    n:
+      - [name, description]
+    p:
+      - [name, description]
+    r:
+      - [name, description]
+    s:
+      - [name, description]
+  711:
+UniversityNote:
+  category: person
+  502:
+    subfields:
+      - [a, b, c, d]
+Performers:
+  category: person
+  511:
+    subfields:
+      - [a]
+Format:
+  category: description
+  '000':
+    parent:
+      - [method, getFormats]
+FormNote:
+  category: description
+  655:
+    subfields:
+      - [a, y, z]
+PhysicalDescription:
+  category: description
+  300:
+    subfields:
+      - [a, b, c, e]
+Languages:
+  category: description
+  '041':
+    subfields:
+      - [a]
+Note:
+  category: description
+  546:
+    subfields:
+      - [a]
+RecordingDate:
+  category: description
+  518:
+    subfields:
+      - [a]
+Publication:
+  category: publication
+  originalletters: yes
+  776:
+    conditions:
+      - [field, i, 'Elektronische Reproduktion von']
+    i:
+      - [name, prefix]
+      - [replace, '^.*$', 'Original-Ausgabe:']
+  264:
+    a:
+      - [name, prefix]
+      - [replace, ' ;.*$', '']
+    b:
+      - [name, 1]
+    c:
+      - [name, 2]
+  260:
+  362:
+    a:
+      - [name, 3]
+Edition:
+  category: publication
+  originalletters: yes
+  250:
+    subfields:
+      - [a]
+  '000':
+    parent:
+      - [method, getEdition]
+IncludedItems:
+  category: publication
+  501:
+    a:
+      - [replace, 'Enth..?.?lt:\s?', '']
+  505:
+LocationOfOriginal:
+  category: publication
+  535:
+    subfields:
+      - [a, 3]
+LicenceInformation:
+  category: publication
+  view-method: directlink
+  540:
+    conditions:
+      - [field, q, 'DE-18']
+    a:
+      - [name, linkname]
+    u:
+      - [name, link]
+SeriesUncounted:
+  category: related
+  view-method: title-link
+  490:
+    conditions:
+      - [indicator, 1, 0]
+    a:
+      - [name, link]
+    v:
+      - [name, volume]
+SeriesJournal:
+  category: related
+  view-method: ppn-link
+  match-key: volume
+  490:
+    conditions:
+      - [indicator, 1, 1]
+    a:
+      - [name, linkname]
+    v:
+      - [name, volume]
+  830:
+    t:
+      - [name, linkname]
+    b:
+      - [name, supplement]
+    p:
+      - [name, location]
+    v:
+      - [name, volume]
+    w:
+      - [name, link]
+      - [match, '\(DE-627\)([0-9xX]+)', 1]
+  800:
+  810:
+  811:
+ContainingWork:
+  category: related
+  view-method: title-link
+  773:
+    conditions:
+      - [field, w, '!\(DE-627\)']
+      - [field, x, '!*']
+    i:
+      - [name, prefix]
+    t:
+      - [name, linkname]
+      - [name, link]
+    b:
+      - [name, work]
+    d:
+      - [name, location]
+      - [replace, ', [0-9]+$', '']
+    g:
+      - [name, volume]
+    v:
+      - [name, volume]
+ContainingWorkIsn:
+  category: related
+  view-method: issnj-link
+  773:
+    conditions:
+      - [field, x, '*']
+      - [field, w, '!\(DE-627\)']
+    i:
+      - [name, prefix]
+    t:
+      - [name, linkname]
+    x:
+      - [name, link]
+    b:
+      - [name, work]
+    d:
+      - [name, location]
+      - [replace, ', [0-9]+$', '']
+    g:
+      - [name, volume]
+    v:
+      - [name, volume]
+ContainingWorkPpn:
+  category: related
+  view-method: ppn-link
+  773:
+    conditions:
+      - [field, w, '\(DE-627\)']
+    i:
+      - [name, prefix]
+    t:
+      - [name, linkname]
+    w:
+      - [name, link]
+      - [match, '\(DE-627\)([^()]+)', 1]
+    b:
+      - [name, work]
+    d:
+      - [name, location]
+      - [replace, ', [0-9]+$', '']
+    g:
+      - [name, volume]
+    v:
+      - [name, volume]
+  245:
+    a:
+      - [name, linkname]
+TableOfContents:
+  category: related
+  505:
+    t:
+      - [name, content]
+    r:
+      - [name, author]
+BasicClassifications:
+  category: subject
+  view-method: bkl-link-1
+  936:
+    conditions:
+      - [indicator, 1, 'b']
+      - [indicator, 2, 'k']
+    a:
+      - [name, link]
+      - [name, linkname]
+    j:
+      - [name, linkname]
+    x:
+      - [name, linkname]
+Nlm:
+  category: subject
+  view-method: class-link
+  '060':
+    a:
+      - [name, link]
+Rvk:
+  category: subject
+  view-method: rvk-link
+  936:
+    conditions:
+      - [indicator, 1, 'r']
+      - [indicator, 2, 'v']
+    a:
+      - [name, link]
+      - [name, linkname]
+    b:
+      - [name, linkname]
+    k:
+      - [name, description]
+Classifications:
+  category: subject
+  view-method: subject-link
+  983:
+    conditions:
+      - [field, 2, '^22$']
+    a:
+      - [name, link]
+SubjectChains:
+  category: subject
+  mandatory-field: link
+  view-method: chain
+  689:
+    conditions:
+      - [indicator, 2, '*']
+    indicator2:
+      - [name, sequence]
+    a:
+      - [name, link]
+    b:
+      - [name, link]
+    n:
+      - [name, link]
+    d:
+      - [name, link]
+    c:
+      - [name, link]
+    g:
+      - [name, link]
+    t:
+      - [name, link]
+    f:
+      - [name, link]
+    x:
+      - [name, link]
+    z:
+      - [name, link]
+  650:
+    conditions:
+      - [field, 8, '*']
+    8:
+      - [name, sequence]
+    a:
+      - [name, link]
+Subjects:
+  category: subject
+  mandatory-field: link
+  view-method: subject-link
+  600:
+    conditions:
+      - [field, 8, '!*']
+    a:
+      - [name, link]
+    c:
+      - [name, link]
+    d:
+      - [name, link]
+    g:
+      - [name, link]
+    p:
+      - [name, link]
+    t:
+      - [name, link]
+    v:
+      - [name, link]
+    x:
+      - [name, link]
+    y:
+      - [name, link]
+    z:
+      - [name, link]
+  610:
+  611:
+  630:
+  647:
+  648:
+  650:
+  651:
+  982:
+    conditions:
+      - [field, 2, '^22$']
+    a:
+      - [name, link]
+LocalSubjects:
+  category: subject
+  950:
+    subfields:
+      - [a]
+TargetGroup:
+  category: subject
+  385:
+    subfields:
+      - [a]
+GeneralNotes:
+  category: physical
+  500:
+    subfields:
+      - [a]
+MapInfos:
+  category: physical
+  255:
+    subfields:
+      - [a, b, c, d, e, f, g]
+SystemDetails:
+  category: physical
+  538:
+    subfields:
+      - [a]
+Remark:
+  category: physical
+  583:
+    subfields:
+      - [a, c, z]
+    3:
+      - [replace, '^(.+)$', 'Bestand $1']
+RelationshipNotes:
+  category: related
+  580:
+    subfields:
+      - [a]
+SecondaryEditions:
+  category: related
+  533:
+    subfields:
+      - [a, b, c, d, e, f]
+OtherEditions:
+  category: related
+  787:
+    conditions:
+      - [field, i, '*']
+      - [field, w, '!(DE-627)']
+      - [field, w, '!(DE-600)']
+    i:
+      - [name, prefix]
+    n:
+      - [name, prefix]
+    a:
+      - [name, author]
+    b:
+      - [name, volume]
+    d:
+      - [name, published]
+    h:
+      - [name, pages]
+    t:
+      - [name, title]
+  770:
+  775:
+  780:
+  776:
+    conditions:
+      - [field, i, '*']
+      - [field, w, '!(DE-627)']
+      - [field, w, '!(DE-600)']
+    i:
+      - [name, prefix]
+    n:
+      - [name, prefix]
+    a:
+      - [name, author]
+    b:
+      - [name, volume]
+    d:
+      - [name, published]
+    h:
+      - [name, pages]
+    t:
+      - [name, title]
+OtherEditionsPPN:
+  category: related
+  mandatory-field: link
+  view-method: ppn-link
+  787:
+    conditions:
+      - [field, i, '*']
+    i:
+      - [name, prefix]
+      - [replace, '\(.\)$', '$1: ']
+    n:
+      - [name, prefix]
+    a:
+      - [name, author]
+    b:
+      - [name, volume]
+    d:
+      - [name, published]
+    h:
+      - [name, pages]
+    t:
+      - [name, linkname]
+    w:
+      - [name, link]
+      - [match, '\(DE-627\)([^()]+)', 1]
+  770:
+  775:
+  780:
+  776:
+    conditions:
+      - [field, i, '*']
+    i:
+      - [name, prefix]
+    n:
+      - [name, prefix]
+    a:
+      - [name, author]
+    b:
+      - [name, volume]
+    d:
+      - [name, published]
+    h:
+      - [name, pages]
+    t:
+      - [name, linkname]
+    w:
+      - [name, link]
+      - [match, '\(DE-627\)([^()]+)', 1]
+OtherEditionsZDB:
+  category: related
+  mandatory-field: link
+  view-method: zdb-link
+  787:
+    conditions:
+      - [field, i, '*']
+      - [field, w, '!(DE-627)']
+    i:
+      - [name, prefix]
+      - [replace, '\(.\)$', '$1: ']
+    n:
+      - [name, prefix]
+    a:
+      - [name, author]
+    b:
+      - [name, volume]
+    d:
+      - [name, published]
+    h:
+      - [name, pages]
+    t:
+      - [name, linkname]
+    w:
+      - [name, link]
+      - [match, '\(DE-600\)([^()]+)', 1]
+  770:
+  775:
+  780:
+  776:
+    conditions:
+      - [field, i, '*']
+      - [field, w, '!(DE-627)']
+    i:
+      - [name, prefix]
+    n:
+      - [name, prefix]
+    a:
+      - [name, author]
+    b:
+      - [name, volume]
+    d:
+      - [name, published]
+    h:
+      - [name, pages]
+    t:
+      - [name, linkname]
+    w:
+      - [name, link]
+      - [match, '\(DE-600\)([^()]+)', 1]
+Urls:
+  category: link
+  view-method: directlink
+  856:
+    conditions:
+      - [indicator, 2, 2]
+    u:
+      - [name, link]
+    3:
+      - [name, linkname]
+    y:
+      - [name, linkname]
+    z:
+      - [name, description]
+  555:
+    conditions:
+      - [field, y, '!C']
+    u:
+      - [name, link]
+    a:
+      - [name, description]
+Isbns:
+  category: link
+  view-method: isn-link
+  '020':
+    a:
+      - [name, link]
+    9:
+      - [name, linkname]
+OtherIsbns:
+  category: link
+  776:
+    conditions:
+      - [field, i, '!*']
+    9:
+      - [name, isbn]
+    c:
+      - [name, description]
+      - [replace, '[:\(\)]', '']
+Issns:
+  category: link
+  view-method: isn-link
+  '022':
+    a:
+      - [name, link]
+      - [match, '([0-9xX-]+)', 1]
+ZDB-ID:
+  category: link
+  view-method: zdb-link
+  '016':
+    conditions:
+      - [field, 2, 'DE-600']
+    a:
+      - [name, link]
+DoiUrn:
+  category: internal
+  '024':
+    conditions:
+      - [field, 2, doi|urn]
+    a:
+      - [name, number]
+ISMN:
+  category: internal
+  '024':
+    conditions:
+      - [indicator, 1, 2]
+    9:
+      - [name, number]
+EanUpc:
+  category: internal
+  '024':
+    conditions:
+      - [indicator, 1, 1|3]
+    a:
+      - [name, number]
+WrongIsbns:
+  category: link
+  '020':
+    subfields:
+      - [z]
+WrongIssns:
+  category: internal
+  '022':
+    subfields:
+      - [y]
+WrongIsmns:
+  category: internal
+  '024':
+    subfields:
+      - [c]
+Fingerprints:
+  category: internal
+  '026':
+    subfields:
+      - [e]
+Platenumber:
+  category: internal
+  '028':
+    subfields:
+      - [a]
+Pages:
+  952:
+    h:
+      - [name, pages]
+SFX:
+  category: resolver
+  773:
+    t:
+    - [name, title]
+    x:
+    - [name, eissn]
+    g:
+    - [name, issue]
+  952:
+    d:
+    - [name, volume]
+    j:
+    - [name, year]
+    e:
+    - [name, issue]
+    h:
+    - [name, pages]
+ArticleDoi:
+  category: resolver
+  match-key: doi
+  '024':
+    conditions:
+      - [field, 2, doi]
+    a:
+      - [name, doi]
+  856:
+    conditions:
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, doi]
+      - [match, '^http:\/\/dx.doi.org\/(.+)$', 1]
+Doi:
+  856:
+    conditions:
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, doi]
+      - [match, '^http:\/\/dx.doi.org\/(.+)$', 1]
+ArticleDoaj:
+  category: resolver
+  856:
+    conditions:
+      - [field, y, DOAJ]
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+ArticleFulltext:
+  category: resolver
+  856:
+    conditions:
+      - [field, 3, Volltext]
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+ArticleParentId:
+  category: resolver
+  773:
+     w:
+      - [name, id]
+      - [match, '^\(DE-627\)([0-9xX]+)$', 1]
+ILN:
+  category: resolver
+  980:
+    conditions:
+      - [field, 2, '^22$']
+    2:
+      - [name, iln]
