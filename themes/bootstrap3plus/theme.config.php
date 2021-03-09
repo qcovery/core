@@ -16,6 +16,7 @@ return [
     ],
     'mixins' => [
 MIXINS
+        'beluga-core-base',
     ],
     "less" => [
         "active" => false,
