@@ -1,7 +1,0 @@
-<? foreach ($this->driver->getFormats() as $format): ?>
-  <? if ($belugino = $this->configreader()->getConfigData('belugino', $format)): ?>
-    <i class="<?=$belugino?> belugino-icon-result-list" aria-hidden="true" title="<?=$this->transEsc($format) ?>"></i>
-  <? else: ?>
-    <i class="bel-unbek belugino-icon-result-list" aria-hidden="true" title="<?=$this->transEsc($format) ?>"></i>
-  <? endif; ?>
-<? endforeach; ?>
