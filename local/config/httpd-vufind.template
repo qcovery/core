@@ -1,4 +1,4 @@
-<VirtualHost 134.100.172.149:80>
+<VirtualHost *:80>
     ServerName <ServerName>
     ServerAdmin <AdminEmail>
 
