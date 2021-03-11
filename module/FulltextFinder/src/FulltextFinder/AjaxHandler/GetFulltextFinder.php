@@ -80,6 +80,8 @@ class GetFulltextFinder  extends AbstractBase
     public function handleRequest(Params $params)
     {
         $openUrl = $params->fromQuery('openurl');
+        $list = $params->fromQuery('list');
+        $searchClassId = $params->fromQuery('searchClassId');
 
         $fulltextfinderApiUrl = 'https://api.ebsco.io/ftf/ftfaccount/'.$this->config['FulltextFinder']['account'].'.main.ftf/openurl?'.$openUrl;
         $ch = curl_init();
@@ -110,8 +112,11 @@ class GetFulltextFinder  extends AbstractBase
             }
         }
 
+
+
         $html = $this->renderer->render(
             'fulltextfinder/result.phtml', [
+                'searchClassId' => $searchClassId,
                 'links' => $links,
                 'url' => $fulltextfinderApiUrl,
             ]
