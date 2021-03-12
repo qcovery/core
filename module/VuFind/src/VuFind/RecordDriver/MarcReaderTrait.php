@@ -58,7 +58,11 @@ trait MarcReaderTrait
     public function getMarcRecord()
     {
         if (null === $this->lazyMarcRecord) {
-            $marc = trim($this->fields['fullrecord']);
+            // eWW Bugfix
+            // Change of K10plus from fullrecord to fullrecord_marcxml
+            //$marc = trim($this->fields['fullrecord']);
+            $marc = trim($this->fields['fullrecord_marcxml']);
+            // eWW Bugfix
 
             // check if we are dealing with MARCXML
             if (substr($marc, 0, 1) == '<') {
