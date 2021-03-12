@@ -442,4 +442,23 @@ class PAIA extends PAIAbase
 
         return $pickupLocation;
     }
+
+    /**
+     * Map a PAIA document to an array for use in generating a VuFind request
+     * (holds, storage retrieval, etc).
+     *
+     * @param array $doc Array of PAIA document to be mapped.
+     *
+     * @return array
+     */
+    protected function getBasicDetails($doc)
+    {
+        $result = parent::getBasicDetails($doc);
+
+        if (!isset($result['status']) && isset($doc['status'])) {
+            $result['status'] = $doc['status'];
+        }
+
+        return $result;
+    }
 }

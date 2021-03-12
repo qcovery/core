@@ -239,10 +239,10 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             }
         }
 
-        $isil = $this->config['Global']['isil'];
-        $url = $this->config['DAIA_' . $isil]['url'];
-        $url .= 'electronicavailability/' . $id . '?';
-        $url .= 'apikey=' . $this->config['DAIA_' . $isil]['daiaplus_api_key'];
+        $url = $this->config['DAIA']['baseUrl'];
+        $url = str_ireplace('/availability/', '/electronicavailability/', $url);
+        $url .= $id . '?';
+        $url .= 'apikey=' . $this->config['DAIA']['daiaplus_api_key'];
         $url .= '&openurl=' . urlencode($openUrl);
         $url .= '&list=' . $listView;
         $url .= '&mediatype=' . urlencode($format);

@@ -22,7 +22,7 @@
       <input type="hidden" id="recordid" name="recordid" value="<?=$this->id?>" />
       <div class="form-group">
         <label class="control-label" for="comments" style="vertical-align:top;"><?=$this->transEsc("Comments")?>: </label>
-        <textarea id="comments" name="comments" class="form-control" required><?=$this->escapeHtml($comments ?? '')?></textarea>
+        <textarea id="comments" name="comments" class="form-control"><?=$this->escapeHtml($comments ?? '')?></textarea>
       </div>
       <?php /*
       <div class="form-group">
