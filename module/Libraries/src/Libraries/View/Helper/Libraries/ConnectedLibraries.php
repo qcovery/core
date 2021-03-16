@@ -23,19 +23,7 @@ class ConnectedLibraries extends \Laminas\View\Helper\AbstractHelper
      */
     public function getConnectedLibraries($searchClassId, $driver = null)
     {
-        $libraryCodes = $this->Libraries->getLibraryCodes($searchClassId);
-        if (!empty($driver)) {
-            $collectionDetails = $driver->getMarcData('CollectionDetails');
-            $holdingCodes = [];
-            if (is_array($collectionDetails)) {
-                foreach ($collectionDetails as $collectionDetail) {
-                    if (isset($collectionDetail['code']['data'][0])) {
-                        $holdingCodes[] = $collectionDetail['code']['data'][0];
-                    }
-                }
-            }
-            $libraryCodes = array_intersect($libraryCodes, $holdingCodes);
-        }
+        $libraryCodes = $this->getConnectedLibrariesCodes($searchClassId, $driver);
         $connectedLibraries = [];
         foreach ($libraryCodes as $libraryCode) {
             $connectedLibraries[] = $this->Libraries->getLibrary($libraryCode);
@@ -50,8 +38,21 @@ class ConnectedLibraries extends \Laminas\View\Helper\AbstractHelper
     /**
      *
      */
-    public function getConnectedLibrariesCodes($searchClassId) {
-        return array_unique($this->Libraries->getLibraryCodes($searchClassId));
+    public function getConnectedLibrariesCodes($searchClassId, $driver = null) {
+        $libraryCodes = array_unique($this->Libraries->getLibraryCodes($searchClassId));
+        if (!empty($driver)) {
+            $collectionDetails = $driver->getMarcData('CollectionDetails');
+            $holdingCodes = [];
+            if (is_array($collectionDetails)) {
+                foreach ($collectionDetails as $collectionDetail) {
+                    if (isset($collectionDetail['code']['data'][0])) {
+                        $holdingCodes[] = $collectionDetail['code']['data'][0];
+                    }
+                }
+            }
+            $libraryCodes = array_intersect($libraryCodes, $holdingCodes);
+        }
+        return $libraryCodes;
     }
 
     /**
