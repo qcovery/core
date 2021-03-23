@@ -15,16 +15,7 @@ return [
         'belugax.js',
     ],
     'mixins' => [
-        'relevancepicker',
-        'notifications',
-        'belugaconfig',
-        'delivery',
-        'daiaplus',
-        'extendedfacets',
-        'libraries',
-        'searchkeys',
-        'dependentworks',
-        'recorddriver',
+MIXINS
         'beluga-core-base',
     ],
     "less" => [
