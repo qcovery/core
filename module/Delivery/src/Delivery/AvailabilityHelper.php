@@ -50,7 +50,7 @@ class AvailabilityHelper {
     public function setSolrDriver($driver, $deliveryMarcYaml = null)
     {
         $this->solrDriver = $driver;
-        if (!empty($deliveryMarcYaml)) {
+        if (!is_null($driver) && !empty($deliveryMarcYaml)) {
             $this->solrDriver->addSolrMarcYaml($deliveryMarcYaml);
         }
     }
@@ -62,7 +62,8 @@ class AvailabilityHelper {
 
     public function getParentId() 
     {
-        $format = array_shift(array_shift($this->getMarcData('Format')));
+        $formatData = $this->getMarcData('Format');
+        $format = array_shift(array_shift($formatData));
         if (in_array($format, $this->availabilityConfig['formats'])) {
             $articleData = $this->getMarcData('DeliveryDataArticle');
             foreach ($articleData as $articleDate) {
@@ -83,7 +84,8 @@ class AvailabilityHelper {
     public function checkSignature() 
     {
         $availabilityConfig = $this->availabilityConfig;
-        $format = array_shift(array_shift($this->getMarcData('Format')));
+        $formatData = $this->getMarcData('Format');
+        $format = array_shift(array_shift($formatData));
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
 

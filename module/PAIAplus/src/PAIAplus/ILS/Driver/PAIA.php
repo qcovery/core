@@ -392,6 +392,7 @@ class PAIA extends PAIAbase
      * @return array        An array of associative arrays with locationID and
      * locationDisplay keys
      */
+/*
     public function getPickUpLocations($patron = null, $holdDetails = null)
     {
         $pickupLocation = [];
@@ -437,4 +438,5 @@ class PAIA extends PAIAbase
 
         return $pickupLocation;
     }
+*/
 }

@@ -174,7 +174,9 @@ class DeliveryController extends AbstractBase
                 $availabilityHelper->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
                 if ($parentId = $availabilityHelper->getParentId()) {
                     $parentDriver = $this->getRecordLoader()->load($parentId, DEFAULT_SEARCH_BACKEND);
-                    $availabilityHelper->setSolrDriver($parentDriver, $mainConfig['delivery_marc_yaml']);
+                    if (!is_null($parentDriver)) {
+                        $availabilityHelper->setSolrDriver($parentDriver, $mainConfig['delivery_marc_yaml']);
+                    }
                 }
                 $availabilityHelper->setAvailabilityConfig($availabilityConfig['default']);
                 $signatureCount = $mainConfig['collectedCallnumbers'] ?: 1;
