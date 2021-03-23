@@ -57,7 +57,7 @@
             <?=$this->transEsc('Published') . ' ' . $this->escapeHtml($summDate[0])?>
           <? endif; ?>
 <!-- Module Libraries -->
-<?=$this->render('RecordDriver/SolrDefault/libraries-result-list.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
+<?=$this->render('RecordDriver/DefaultRecord/libraries-result-list.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
 <!-- Module Libraries -->
           <? $summInCollection = $this->driver->getContainingCollections(); if (!empty($summInCollection)): ?>
             <? foreach ($summInCollection as $collId => $collText): ?>
@@ -251,7 +251,7 @@
         <? endif; ?>
 
 <!--Module DAIAplus-->
-<?=$this->render('RecordDriver/SolrDefault/daiaplus-result-list.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
+<?=$this->render('RecordDriver/DefaultRecord/daiaplus-result-list.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
 <!--Module DAIAplus-->
 
     </div>

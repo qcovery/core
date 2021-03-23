@@ -38,6 +38,6 @@
     <li><a class="addThis addthis_button" href="https://www.addthis.com/bookmark.php?v=250&amp;pub=<?=urlencode($addThis)?>"><i class="bel-stern01" aria-hidden="true"></i> <?=$this->transEsc('Bookmark')?></a></li>
   <? endif; ?>
   <?=$this->render('record/cart-buttons.phtml', ['id' => $this->driver->getUniqueId(), 'source' => $this->driver->getSourceIdentifier()]); ?>
-  <?=$this->render('RecordDriver/SolrDefault/delivery-toolbar.phtml'); ?>
+  <?=$this->render('RecordDriver/DefaultRecord/delivery-toolbar.phtml'); ?>
   <li><?=$this->searchMemory()->getLastSearchLink('<i class="bel-antworten"></i> '.$this->transEsc('Back to Search Results'))?></li>
 </ul>

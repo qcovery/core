@@ -32,7 +32,7 @@
   <? endif; ?>
   <div class="media-body">
 <!-- Module RecordDriver -->
-    <?=$this->render('RecordDriver/SolrDefault/recorddriver-core-title.phtml', ['driver' => $driver]) ?>
+    <?=$this->render('RecordDriver/DefaultRecord/recorddriver-core-title.phtml', ['driver' => $driver]) ?>
 <!-- Module RecordDriver -->
 
     <? if ($this->userlist()->getMode() !== 'disabled'): ?>
@@ -48,16 +48,16 @@
 //coreFieldCategory according to category in solrmarc.yaml
 $coreFieldCategories = ['title2', 'person', 'publication', 'subject', 'description', 'related'];
 ?>
-<?=$this->render('RecordDriver/SolrDefault/recorddriver-core-data.phtml', ['driver' => $driver, 'coreFieldCategories' => $coreFieldCategories]) ?>
+<?=$this->render('RecordDriver/DefaultRecord/recorddriver-core-data.phtml', ['driver' => $driver, 'coreFieldCategories' => $coreFieldCategories]) ?>
 <!-- Module RecordDriver -->
 <!-- Module Libraries -->
-<?=$this->render('RecordDriver/SolrDefault/libraries-core.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
+<?=$this->render('RecordDriver/DefaultRecord/libraries-core.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
 <!-- Module Libraries -->
 <!-- Module DAIA -->
     <?//=$this->context($this)->renderInContext('RecordDriver/SolrDefault/daia-check.phtml', ['list' => '0']); ?>
 <!-- Module DAIA -->
 <!-- Module DependentWorks -->
-    <?=$this->render('RecordDriver/SolrDefault/dependentworks-core.phtml') ?>
+    <?=$this->render('RecordDriver/DefaultRecord/dependentworks-core.phtml') ?>
 <!-- Module DependentWorks -->
     <?=$this->context($this)->renderInContext('RecordTab/staffviewmarc', []) ?>
   </div>
