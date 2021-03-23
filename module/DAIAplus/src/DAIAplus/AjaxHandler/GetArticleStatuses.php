@@ -122,6 +122,24 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     $response = json_decode($this->makeRequest($url), true);
                 }
 
+                if ((empty($response) || $response['list']['url_access_level'] == 'check_ill_access_level')
+                  && isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
+                    $urlAccess = $this->checkParentId($driver);
+                    if (!empty($urlAccess)) {
+                        $response = ['list' => ['url_access' => $urlAccess,
+                                                'url_access_level' => 'print_access_level',
+                                                'url_access_label' => 'Journal',
+                                                'link_status' => 1],
+                                     'items' => ['lr_check' =>
+                                                    ['url_access' => $urlAccess,
+                                                     'url_access_level' => 'print_access_level',
+                                                     'url_access_label' => 'Journal',
+                                                     'link_status' => 1]
+                                                 ]
+                                    ];
+                    }
+                }
+
                 $response = $this->prepareData($response, $listView);
                 $response['id'] = $id;
                 $responses[] = $response;
@@ -155,6 +173,25 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
        
         return $urlAccess;
     }                
+
+    private function checkParentId($driver) {
+        $urlAccess = '';
+        $parentData = $driver->getMarcData('ArticleParentId');
+        foreach ($parentData as $parentDate) {
+            if (!empty(($parentDate['id']['data'][0]))) {
+                $parentId = $parentDate['id']['data'][0];
+                break;
+            }
+        }
+        if (!empty($parentId)) {
+            $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+            $ilnMatch = $parentDriver->getMarcData('ILN');
+            if (!empty($ilnMatch[0]['iln']['data'][0])) {
+                $urlAccess = '/vufind/Record/' . $parentId;
+            }
+        }
+        return $urlAccess;
+    }
 
     private function checkDirectLink($driver) {
         $urlAccess = '';
