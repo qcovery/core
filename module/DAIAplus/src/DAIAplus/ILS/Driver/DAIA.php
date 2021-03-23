@@ -331,7 +331,7 @@ Hajo Seng: bis hier
      *
      * @return array            Array with VuFind compatible status information.
      */
-    protected function parseDaiaArray($id, $daiaArray, $isCurrentIsil)
+    protected function parseDaiaArray($id, $daiaArray, $isCurrentIsil = '')
     {
         $doc_id = null;
         $doc_href = null;
@@ -423,7 +423,7 @@ Hajo Seng: Hier erst parent::parseDaiaArray Aufruf, dann weitere Interation (?)
      * @return array An array with status information for the record
      * @throws ILSException
      */
-    protected function parseDaiaDoc($id, $daiaDoc, $isCurrentIsil)
+    protected function parseDaiaDoc($id, $daiaDoc, $isCurrentIsil = '')
     {
         if (is_array($daiaDoc)) {
             return $this->parseDaiaArray($id, $daiaDoc, $isCurrentIsil);
