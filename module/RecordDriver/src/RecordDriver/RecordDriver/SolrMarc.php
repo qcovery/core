@@ -599,10 +599,13 @@ class SolrMarc extends SolrDefault
     protected function getArticleOpenUrlParams()
     {
         $params = parent::getArticleOpenUrlParams();
-        $pages = $this->getMarcData('Pages');
-        if (strpos($pages, '-') !== false) { 
-            list($spage, $epage) = explode('-', $pages[0]['pages']['data'][0]);
-            $params['rft.epage'] = $epage;
+        $pagesData = $this->getMarcData('Pages');
+        if (isset($pagesData[0]['pages']['data'][0])) {
+            $pages = $pagesData[0]['pages']['data'][0];
+            if (strpos($pages, '-') !== false) { 
+                list($spage, $epage) = explode('-', $pages[0]['pages']['data'][0]);
+                $params['rft.epage'] = $epage;
+            }
         }
         return $params;
     }

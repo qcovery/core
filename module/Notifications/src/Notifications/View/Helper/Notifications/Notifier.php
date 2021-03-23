@@ -17,8 +17,8 @@ class Notifier extends AbstractHelper
      */
     public function __construct($config, $notificationsConfig)
     {
-        $defaultModule = $config['Search']['defaultModule'] ?: 'Search';
-        $defaultAction = $config['Search']['defaultAction'] ?: 'Home';
+        $defaultModule = $config['Site']['defaultModule'] ?: 'Search';
+        $defaultAction = $config['Site']['defaultAction'] ?: 'Home';
         $this->defaultHome = '/vufind/' . $defaultModule . '/' . $defaultAction;
         $this->notificationsConfig = $notificationsConfig;
     }

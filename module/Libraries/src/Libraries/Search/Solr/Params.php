@@ -107,7 +107,10 @@ class Params extends BaseParams
     public function getBackendParameters()
     {
         $backendParams = parent::getBackendParameters();
-        if (!empty($this->includedLibraries)) {
+        if (empty($this->includedLibraries)) {
+	    $this->initLibraries();
+	}
+	if (!empty($this->includedLibraries)) {
             $backendParams->add('included_libraries', $this->includedLibraries);
         }
         if (!empty($this->excludedLibraries)) {

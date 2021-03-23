@@ -60,31 +60,35 @@ class ToolTip extends \Zend\View\Helper\AbstractHelper
 
         foreach ($this->scores['bq'] as $key => $value) {
             $key = str_replace('bq-', '', $key);
-            $term = $this->searchTerm[$key.$value];
             if ($key != 'all') {
+                $term = $this->searchTerm[$key.$value];
                 $this->results['boosting-'.$key][$term] = array('field' => $key, 'term' => $term, 'value' => $value, 'percent' => round( 100 * $value / $allBoostings));
                 $this->results['all']['boosting-'.$key] = array('percent' => round(100 * $value / $all));
             }
         }
 
-        foreach ($this->results['fields-terms'] as $term => $data) {
-        $cluster = $this->getCluster($data['field']);
-        $percent = round(100 * $data['value'] / $allFields);
-            if (isset( $cluster ) && $percent > 0) {
-                $this->results['fields-terms'][$term]['cluster'] = $this->clusterName[$cluster];
-                $this->results['fields-terms'][$term]['percent'] = round(100 * $data['value'] / $allFields);
-            } else {
-                unset($this->results['fields-terms'][$term]);
+        if (isset($this->results['fields-terms'])) {
+            foreach ($this->results['fields-terms'] as $term => $data) {
+                $cluster = $this->getCluster($data['field']);
+                $percent = round(100 * $data['value'] / $allFields);
+                if (isset( $cluster ) && $percent > 0) {
+                    $this->results['fields-terms'][$term]['cluster'] = $this->clusterName[$cluster];
+                    $this->results['fields-terms'][$term]['percent'] = round(100 * $data['value'] / $allFields);
+                } else {
+                    unset($this->results['fields-terms'][$term]);
+                }
             }
         }
-        foreach ($this->results['fields-phrase'] as $term => $data) {
-        $cluster = $this->getCluster($data['field']);
-        $percent = round(100 * $data['value'] / $allFields);
-            if (isset($cluster) && $percent > 0) {
-                $this->results['fields-phrase'][$term]['cluster'] = $this->clusterName[$cluster];
-                $this->results['fields-phrase'][$term]['percent'] = round(100 * $data['value'] / $allFields);
-            } else {
-                unset($this->results['fields-phrase'][$term]);
+        if (isset($this->results['fields-phrase'])) {
+            foreach ($this->results['fields-phrase'] as $term => $data) {
+                $cluster = $this->getCluster($data['field']);
+                $percent = round(100 * $data['value'] / $allFields);
+                if (isset($cluster) && $percent > 0) {
+                    $this->results['fields-phrase'][$term]['cluster'] = $this->clusterName[$cluster];
+                    $this->results['fields-phrase'][$term]['percent'] = round(100 * $data['value'] / $allFields);
+                } else {
+                    unset($this->results['fields-phrase'][$term]);
+                }
             }
         }
         $this->results['all']['fields-terms'] = array('percent' => round(100 * $allFieldTerms / $all));
@@ -178,46 +182,48 @@ class ToolTip extends \Zend\View\Helper\AbstractHelper
         $maxItem = ['fields-phrase' => '' , 'fields-terms' => ''];
         $maxValue = ['fields-phrase' => 0 , 'fields-terms'  => 0];
         foreach ( $scores as $area => $areaScores ) {
-            foreach ( $areaScores as $item => $value ) {
-                $item = str_replace( '_unstemmed' , '' , $item );
-                if ( strpos( $area , 'fields-' ) === 0 ) {
-                    $suffix = ( strpos( $area , 'terms' ) !== false ) ? 'terms' : 'phrase';
-                    $this->scores['all']['all'] += $tie * $value;
-                    $this->scores['all']['br'] += $tie * $value;
-                    $this->scores['br']['all'] += $tie * $value;
-                    $this->scores['br'][$suffix] += $tie * $value;
-                    $this->scores['fields-all']['all'] += $tie * $value;
-                    $this->scores['fields-all'][$item] += $tie * $value;
-                    $this->scores[$area][$item] += $tie * $value;
-                    $this->scores[$area]['all'] += $tie * $value;
-                    if ( $value > $maxValue[$area] ) {
-                        $maxItem[$area] = $item;
-                        $maxValue[$area] = $value;
-                    }
-                } else {
-                    $this->scores['all']['all'] += $value;
-                    $this->scores[$area]['all'] += $value;
-                    if ( !isset( $this->scores[$area][$item])) {
-                        $this->scores[$area][$item] = 0;
-                    }
-                    $this->scores[$area][$item] += $value;
-                    if (strpos( $area , 'bq-' ) === 0 ) {
-                        if (!isset( $this->scoreStructure['bq'][$area])) {
-                            $this->scoreStructure['bq'][$area] = 0;
+            if ( is_array( $areaScores ) ) {
+                foreach ( $areaScores as $item => $value ) {
+                    $item = str_replace( '_unstemmed' , '' , $item );
+                    if ( strpos( $area , 'fields-' ) === 0 ) {
+                        $suffix = ( strpos( $area , 'terms' ) !== false ) ? 'terms' : 'phrase';
+                        $this->scores['all']['all'] += $tie * $value;
+                        $this->scores['all']['br'] += $tie * $value;
+                        $this->scores['br']['all'] += $tie * $value;
+                        $this->scores['br'][$suffix] += $tie * $value;
+                        $this->scores['fields-all']['all'] += $tie * $value;
+                        $this->scores['fields-all'][$item] += $tie * $value;
+                        $this->scores[$area][$item] += $tie * $value;
+                        $this->scores[$area]['all'] += $tie * $value;
+                        if ( $value > $maxValue[$area] ) {
+                            $maxItem[$area] = $item;
+                            $maxValue[$area] = $value;
                         }
-                        $this->scores['all']['bq'] += $value;
-                        $this->scores['bq']['all'] += $value;
-                        if (!isset( $this->scores['bq'][$area])) {
-                            $this->scores['bq'][$area] = 0;
+                    } else {
+                        $this->scores['all']['all'] += $value;
+                        $this->scores[$area]['all'] += $value;
+                        if ( !isset( $this->scores[$area][$item])) {
+                            $this->scores[$area][$item] = 0;
                         }
-                        $this->scores['bq'][$area] += $value;
-                    } elseif ($area == 'bf') {
-                        $this->scores['all']['bf'] += $value;
-                        if (!isset( $this->minimumBoostingValues[$item] ) || $value < $this->minimumBoostingValues[$item]) {
-                            $this->minimumBoostingValues[$item] = $value;
+                        $this->scores[$area][$item] += $value;
+                        if (strpos( $area , 'bq-' ) === 0 ) {
+                            if (!isset( $this->scoreStructure['bq'][$area])) {
+                                $this->scoreStructure['bq'][$area] = 0;
+                            }
+                            $this->scores['all']['bq'] += $value;
+                            $this->scores['bq']['all'] += $value;
+                            if (!isset( $this->scores['bq'][$area])) {
+                                $this->scores['bq'][$area] = 0;
+                            }
+                            $this->scores['bq'][$area] += $value;
+                        } elseif ($area == 'bf') {
+                            $this->scores['all']['bf'] += $value;
+                            if (!isset( $this->minimumBoostingValues[$item] ) || $value < $this->minimumBoostingValues[$item]) {
+                                $this->minimumBoostingValues[$item] = $value;
+                            }
                         }
                     }
-                }
+		}
             }
             if (strpos($area, 'fields-') === 0 && $maxValue[$area] > 0) {
                 $term = $this->searchTerm[$maxItem[$area].$maxValue[$area]];

@@ -146,11 +146,12 @@ trait HoldsTrait
 
                 // Success: Go to Display Holds
                 if (isset($results['success']) && $results['success'] == true) {
-                    $msg = [
+                    $route = ($type == 'order') ? 'myresearch-checkedout' : 'myresearch-holds';    
+		    $msg = [
                         'html' => true,
                         'msg' => 'hold_place_success_html',
                         'tokens' => [
-                            '%%url%%' => $this->url()->fromRoute('myresearch-holds')
+                            '%%url%%' => $this->url()->fromRoute($route)
                         ],
                     ];
                     $this->flashMessenger()->addMessage($msg, 'success');

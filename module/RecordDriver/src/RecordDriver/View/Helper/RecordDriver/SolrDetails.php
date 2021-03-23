@@ -99,11 +99,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 }
                 $templateData = [];
                 if (strpos($viewMethod, '-link') > 0) {
-                    list($key, , $separators) = explode('-', $viewMethod);
-                    if (empty($separators)) {
-                        $separators = 0;
-                    }
-                    $templateData = $this->makeLink($solrMarcData[$solrMarcKey], $key, $separators);
+                    $viewData = explode('-', $viewMethod);
+                    $viewData[2] = $viewData[2] ?: 0;
+                    $templateData = $this->makeLink($solrMarcData[$solrMarcKey], $viewData[0], $viewData[2]);
                 } elseif ($viewMethod == 'directlink') {
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeDirectLink($data);
@@ -111,11 +109,9 @@ class SolrDetails extends AbstractClassBasedTemplateRenderer
                 } elseif ($viewMethod == 'chain') {
                     $templateData = $this->makeChain($solrMarcData[$solrMarcKey]);
                 } elseif (strpos($viewMethod, '-template') > 0) {
-                    list($key, , $separators) = explode('-', $viewMethod);
-                    if (empty($separators)) {
-                        $separators = 0;
-                    }
-                    $templateData[] = $this->makeTemplate($solrMarcData[$solrMarcKey], $key, $separators);
+                    $viewData = explode('-', $viewMethod);
+                    $viewData[2] = $viewData[2] ?: 0;
+                    $templateData[] = $this->makeTemplate($solrMarcData[$solrMarcKey], $viewData[0], $viewData[2]);
                 } else {
                     foreach ($solrMarcData[$solrMarcKey] as $data) {
                         $templateData[] = $this->makeText($data);
