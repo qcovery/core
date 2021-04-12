@@ -23,7 +23,14 @@ class FulltextFinder extends \Zend\View\Helper\AbstractHelper
             $openUrl .= '&rft.issn='.(string)$driver->getCleanISSN();
         }
         if (!stristr($openUrl, 'rft.isbn') || stristr($openUrl, 'rft.isbn=&')) {
-            $openUrl .= '&rft.isbn='.(string)$driver->getCleanISBN();
+            $isbn = $driver->getCleanISBN();
+            if ($isbn == '') {
+                $isbnsFromMarc = $driver->getMarcData('Isbns');
+                if (isset($isbnsFromMarc[0]['link']['data'][0])) {
+                    $isbn = $isbnsFromMarc[0]['link']['data'][0];
+                }
+            }
+            $openUrl .= '&rft.isbn='.$isbn;
         }
 
         return $openUrl;
