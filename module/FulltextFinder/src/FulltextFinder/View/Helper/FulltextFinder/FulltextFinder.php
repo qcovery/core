@@ -20,7 +20,12 @@ class FulltextFinder extends \Zend\View\Helper\AbstractHelper
         $openUrl = $driver->getOpenUrl();
 
         if (!stristr($openUrl, 'rft.issn') || stristr($openUrl, 'rft.issn=&')) {
-            $openUrl .= '&rft.issn='.(string)$driver->getCleanISSN();
+            $issn = $driver->getCleanISSN();
+            if (!stristr($openUrl, 'rft.issn')) {
+                $openUrl .= '&rft.issn='.$issn;
+            } else if (stristr($openUrl, 'rft.issn=&')) {
+                $openUrl = str_ireplace('rft.issn=&', 'rft.issn='.$issn.'&');
+            }
         }
         if (!stristr($openUrl, 'rft.isbn') || stristr($openUrl, 'rft.isbn=&')) {
             $isbn = $driver->getCleanISBN();
@@ -30,7 +35,11 @@ class FulltextFinder extends \Zend\View\Helper\AbstractHelper
                     $isbn = $isbnsFromMarc[0]['link']['data'][0];
                 }
             }
-            $openUrl .= '&rft.isbn='.$isbn;
+            if (!stristr($openUrl, 'rft.isbn')) {
+                $openUrl .= '&rft.isbn='.$isbn;
+            } else if (stristr($openUrl, 'rft.isbn=&')) {
+                $openUrl = str_ireplace('rft.isbn=&', 'rft.isbn='.$isbn.'&');
+            }
         }
 
         return $openUrl;
