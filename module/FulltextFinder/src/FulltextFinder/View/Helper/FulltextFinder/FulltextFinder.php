@@ -19,10 +19,10 @@ class FulltextFinder extends \Zend\View\Helper\AbstractHelper
     public function getOpenUrl($driver) {
         $openUrl = $driver->getOpenUrl();
 
-        if (!stristr($openUrl, 'rft.issn')) {
+        if (!stristr($openUrl, 'rft.issn') || stristr($openUrl, 'rft.issn=&')) {
             $openUrl .= '&rft.issn='.(string)$driver->getCleanISSN();
         }
-        if (!stristr($openUrl, 'rft.isbn')) {
+        if (!stristr($openUrl, 'rft.isbn') || stristr($openUrl, 'rft.isbn=&')) {
             $openUrl .= '&rft.isbn='.(string)$driver->getCleanISBN();
         }
 
