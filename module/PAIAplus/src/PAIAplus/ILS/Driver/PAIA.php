@@ -459,6 +459,10 @@ class PAIA extends PAIAbase
             $result['status'] = $doc['status'];
         }
 
+        if (!isset($result['queue']) && isset($doc['queue'])) {
+            $result['queue'] = $doc['queue'];
+        }
+
         return $result;
     }
 }
