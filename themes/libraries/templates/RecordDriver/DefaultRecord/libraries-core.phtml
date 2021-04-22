@@ -2,7 +2,7 @@
 <?php if (!empty($libraryList)): ?>
 <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
   <tr><th><?=$this->transEsc('Libraries')?>:</th><td>
-    <p style="margin:0px">
+    <p class="detail-line">
       <? foreach ($libraryList as $library):?>
         <?=$library['abbrieviation']?> 
       <? endforeach;?>
