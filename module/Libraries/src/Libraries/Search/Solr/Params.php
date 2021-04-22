@@ -33,8 +33,6 @@ use VuFind\Search\Solr\HierarchicalFacetHelper;
 use *\Search\Solr\Params as BaseParams;SearchKeys VuFind
 use *\Search\SearchKeysHelper;SearchKeys none
 
-//use VuFind\Search\Solr\Params as BaseParams;
-
 class Params extends BaseParams
 {
     protected $Libraries = null;
