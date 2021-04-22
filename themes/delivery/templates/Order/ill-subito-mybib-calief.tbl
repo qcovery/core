@@ -9,6 +9,7 @@ item-author:<?=$this->itemAuthor ?>##
 item-author-of-article:<?=$this->itemAuthorOfArticle ?>##
 item-title:<?=$this->itemTitle ?>##
 item-title-of-article:<?=$this->itemTitleOfArticle ?>##
+item-edition:<?=$this->itemEdition ?>##
 item-place-of-publication:<?=$this->itemPlaceOfPublication ?>##
 item-publication-date:<?=$this->itemPublicationDate ?>##
 item-volume-issue:<?=$this->itemVolumeIssue ?>##
