@@ -118,7 +118,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     ];
                 } else {
                     $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
-                    error_log($url);
+		    # error_log($url);
                     $response = json_decode($this->makeRequest($url), true);
                 }
 
