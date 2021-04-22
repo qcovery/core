@@ -79,9 +79,9 @@ read CORE;
 echo -n "Theme belugax verwenden? [n]: ";
 read BELUGAX;
 if [ "$BELUGAX" = "y" -o "$BELUGAX" = "j" ]; then
-    THEME=belugax;
+    MAINTHEME=belugax;
 else
-    THEME=bootstrap3plus;
+    MAINTHEME=bootstrap3plus;
     rm -rf ${ABSMODDIR}/themes/belugax;
 fi;
 
@@ -109,7 +109,6 @@ if ! [ -d ".git" ]; then
     php composer-setup.php;
     php -r "unlink('composer-setup.php');";
     php composer.phar install;
-    composer install;
 else
     git pull;
 fi;
@@ -217,7 +216,7 @@ CONFIG=${ABSMODDIR}/local/config/vufind/config.ini;
 echo "[Site]" > $CONFIG;
 echo "url = "$URL >> $CONFIG;
 echo "email = "$EMAIL >> $CONFIG;
-echo "theme = "$THEME >> $CONFIG;
+echo "theme = "$MAINTHEME >> $CONFIG;
 echo >> $CONFIG;
 echo "[Index]" >> $CONFIG;
 echo "url = "$INDEX >> $CONFIG;
@@ -235,7 +234,7 @@ cp ${ABSMODDIR}/local/config/vufind/* .;
 cp ${ABSMODDIR}/local/config/httpd-vufind.conf ${ABSAPPDIR}/local/config/;
 
 # theme.config.php schreiben
-cd ${ABSMODDIR}/themes/${THEME};
+cd ${ABSMODDIR}/themes/${MAINTHEME};
 echo "theme.config.php schreiben ...";
 touch theme.config.tmp;
 while IFS= read -r LINE; do
