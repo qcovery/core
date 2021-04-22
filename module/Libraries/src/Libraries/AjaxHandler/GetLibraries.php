@@ -125,6 +125,7 @@ class GetLibraries extends AbstractBase
         $libraryFacetValues = $this->Libraries->getLibraryFacetValues($backend);
         $facetSearch = $this->Libraries->getFacetSearch($backend);
         $selectedLibraryCode = $libraryCode;
+        $this->Libraries->resetLibraries();
 
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();

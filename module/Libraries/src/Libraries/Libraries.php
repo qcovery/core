@@ -171,6 +171,11 @@ class Libraries
         return $this->selectedLibrary;
     }
 
+    public function resetLibraries() {
+        $this->selectedLibrary = null;
+        $this->searchMemory->rememberLastSettings('Libraries', array('selectedLibrary' => ''));
+    }
+
     /**
      * Get the library data
      *
