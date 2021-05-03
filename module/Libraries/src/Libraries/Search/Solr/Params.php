@@ -77,7 +77,7 @@ class Params extends BaseParams
             $field, $value, $operator, $translate
         );
         if ($filter['field'] == '#') {
-            $filter['field'] = 'Location';
+            //$filter['field'] = 'Location';
             $filter['displayText'] = $this->Libraries->getLocationValue($filter['displayText']);
         }
         return $filter;
