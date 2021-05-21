@@ -44,7 +44,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'dod' => 'Delivery\Driver\Dod',
+        'dod' => 'Delivery\Driver\Dod3',
         'mybib' => 'Delivery\Driver\MyBib',
     ];
 
@@ -54,7 +54,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'Delivery\Driver\Dod' => 'Delivery\Driver\DriverFactory',
+        'Delivery\Driver\Dod3' => 'Delivery\Driver\DriverFactory',
         'Delivery\Driver\MyBib' => 'Delivery\Driver\DriverFactory',
     ];
 

@@ -88,6 +88,7 @@ class CheckRequestIsValid extends AbstractIlsAndUserAction
      */
     public function handleRequest(Params $params)
     {
+
         $this->disableSessionWrites();  // avoid session write timing bug
         $id = $params->fromQuery('id');
         $data = $params->fromQuery('data');

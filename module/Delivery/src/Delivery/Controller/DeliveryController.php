@@ -195,7 +195,9 @@ class DeliveryController extends AbstractBase
 
             $formData = $dataHandler->getFormData();
             $infoData = $dataHandler->getInfoData();
-
+           
+            error_log("JAOH delivery fields". print_r( $infoData, true ) ); 
+           
             $view->id = $id;
             $view->searchClassId = $searchClassId;
             $view->formTitle = $formData['title'];

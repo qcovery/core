@@ -118,6 +118,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
             }
         }
 
+	error_log("JAOH DAIA GetItemStatus". print_r( $results, true ));
+
+
         if (!is_array($results)) {
             // If getStatuses returned garbage, let's turn it into an empty array
             // to avoid triggering a notice in the foreach loop below.
@@ -151,6 +154,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
         foreach ($results as $recordNumber => $record) {
             // Filter out suppressed locations:
             $record = $this->filterSuppressedLocations($record);
+
+		        error_log("JAOH DAIA GetItemStatus2". print_r( $recordNumber, true ));
+
 
             // Skip empty records:
             if (count($record)) {

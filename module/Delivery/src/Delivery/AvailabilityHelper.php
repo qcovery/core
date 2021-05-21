@@ -82,10 +82,16 @@ class AvailabilityHelper {
 
     public function checkSignature() 
     {
+
+	
+	
+
+
         $deliveryConfig = $this->deliveryConfig;
         $format = array_shift(array_shift($this->getMarcData('Format')));
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
+
 
         $checkPassed = false;
         $this->signatureList = [];
@@ -100,11 +106,17 @@ class AvailabilityHelper {
                 }
             }
         }
+	
+
+
         if (in_array($format, $deliveryConfig['formats'])) {
+
             if (empty($sortedSignatureData)) {
                 foreach ($signatureData as $signatureDate) {
                     if ($this->checkSigel($signatureDate, $format)) {
                         $this->signatureList[] = '!!';
+			   
+
                         return true;
                     }
                 }
@@ -126,11 +138,15 @@ class AvailabilityHelper {
                 }
             }
         }
-        return $checkPassed;
+	    
+
+      return $checkPassed;
     }
 
     private function performCheck($item, $data, $format) 
     {
+
+
         if (empty($this->deliveryConfig[$item.'_'.$format])) {
             $format = 'all';
         }

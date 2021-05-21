@@ -23,10 +23,15 @@ class AvailabilityChecker extends \Zend\View\Helper\AbstractHelper
      */
     public function check($driver, $deliveryDomain = 'main')
     {
+	
+	 
+
+
         $configurationManager = new ConfigurationManager($this->configManager, $deliveryDomain);
         $availabilityConfig = $configurationManager->getAvailabilityConfig();
         $availabilityHelper = new AvailabilityHelper(null, $availabilityConfig['default']);
         $availabilityHelper->setSolrDriver($driver);
+
         return ($availabilityHelper->checkSignature()) ? 'available' : 'not available'; 
     }
 
