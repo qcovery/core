@@ -65,6 +65,7 @@
 .uncertain_homepage_access_level,
 .uncertain_issue_access_level,
 .uncertain_volume_access_level,
+.uncertain_abstract_access_level,
 .unknown_access_level,
 .volume_access_level {
   font-weight: bold;
