@@ -1,0 +1,56 @@
+<?php
+
+$items = $prefixes = $links = $linknames = $descriptions = $additionals = [];
+
+foreach ($this->data as $index => $date):
+    if (!is_int($index)):
+        continue;
+    endif;
+    if (!empty($date['link'])):
+        if (!empty($date['prefix'])):
+            $prefixes[$index] = implode(' ', $date['prefix']['data']);
+        endif;
+        $links[$index] = implode(', ', $date['link']['data']);
+    endif;
+    if (!empty($date['linkname'])):
+        $linknames[$index] = implode(' / ', $date['linkname']['data']);
+    endif;
+    if (!isset($links[$index]) && $index > 0):
+        $index--;
+    endif;
+    if (!empty($date['description'])):
+        $descriptions[$index] = implode(', ', $date['description']['data']);
+    endif;
+    unset($date['prefix'], $date['link'], $date['linkname'], $date['description']);
+    $additional = [];
+    foreach ($date as $key => $value):
+        $additional[] = implode(', ', $value['data']);
+    endforeach;
+    if (!empty($additional)):
+        $additionals[$index] = $additional;
+    endif;
+endforeach;
+if (count($links) == 1):
+    $prefixes = array_values($prefixes);
+    $links = array_values($links);
+    $linknames = array_values($linknames);
+    $descriptions = array_values($descriptions);
+    $additionals = array_values($additionals);
+endif;
+foreach ($links as $index => $link):
+    $string = (!empty($prefixes[$index])) ? $prefixes[$index] . ': ' : '';
+    $linkname = (!empty($linknames[$index])) ? $linknames[$index] : $link;
+    $string .= '<a href="' . $this->record($this->driver)->getLink($this->linkType, $link) . '" title="' . $linkname . '">' . $linkname . '</a>';
+    $string .= (!empty($additionals[$index])) ? ' - ' . implode(', ', $additionals[$index]) : '';
+    $string .= (!empty($descriptions[$index])) ? ' [' . $descriptions[$index] . ']' : '';
+    if (!empty($string)):
+        $items[] = $string;
+    endif;
+endforeach;
+
+?>
+<?php foreach ($items as $item): ?>
+             <p class="detail-line">
+                 <?=$item ?>
+             </p>
+<?php endforeach; ?>

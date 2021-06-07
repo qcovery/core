@@ -179,11 +179,11 @@ class SolrMarc extends SolrDefault
                 $solrMarcSpecs[$item]['mandatory-field'] = $solrMarcSpec['mandatory-field'];
             }
             unset($solrMarcSpec['mandatory-field']);
-            $solrMarcSpecs[$item]['view-method'] = 'default';
-	    if (!empty($solrMarcSpec['view-method'])) {
-                $solrMarcSpecs[$item]['view-method'] = $solrMarcSpec['view-method'];
+            $solrMarcSpecs[$item]['template'] = '';
+	    if (!empty($solrMarcSpec['template'])) {
+                $solrMarcSpecs[$item]['template'] = $solrMarcSpec['template'];
             }
-            unset($solrMarcSpec['view-method']);
+            unset($solrMarcSpec['template']);
             $solrMarcSpecs[$item]['match-key'] = '';
 	    if (!empty($solrMarcSpec['match-key'])) {
                 $solrMarcSpecs[$item]['match-key'] = $solrMarcSpec['match-key'];
@@ -446,7 +446,7 @@ class SolrMarc extends SolrDefault
             }
         }
         if (!empty($returnData)) {
-            $returnData['view-method'] = $solrMarcSpecs['view-method'];
+            $returnData['template'] = $solrMarcSpecs['template'];
             $returnData['match-key'] = $solrMarcSpecs['match-key'];
 	}
         if (!$mandatoryFieldSet) {

@@ -1,0 +1,36 @@
+<?php
+
+$items = [];
+foreach ($this->data as $index => $date):
+    if (!empty($date['sequence'])):
+        $sequence = intval($date['sequence']['data'][0]);
+        if (!empty($date['link'])):
+            $link = $date['link']['data'][0];
+            $string = '<a href="' . $this->record($this->driver)->getLink('subject', $link) . '" title="' . $link . '">' . $link . '</a>';
+        else:
+            $string = $date['text']['data'][0];
+        endif;
+        if (!empty($date['description'])):
+            $string .= ' [' . implode(', ', $date['description']['data']) . ']';
+        endif;
+
+        if ($sequence == 0):
+            if (!empty($chain)):
+                ksort($chain);
+                $items[] = implode(' / ', $chain);
+            endif;
+            $chain = [];
+        endif;
+        $chain[$sequence] = $string;
+    endif;
+endforeach;
+if (!empty($chain)):
+    $items[] = implode(' / ', $chain);
+endif;
+
+?>
+<?php foreach ($items as $item): ?>
+             <p class="detail-line">
+                 <?=$item ?>
+             </p>
+<?php endforeach; ?>

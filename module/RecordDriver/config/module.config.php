@@ -5,12 +5,14 @@ $config = [
     'vufind' => [
         'plugin_managers' => [
             'recorddriver' => [
+                'delegators' => [
+                    \RecordDriver\RecordDriver\SolrMarc::class => [\VuFind\RecordDriver\IlsAwareDelegatorFactory::class],
+                ],
                 'factories' => [
-                    'RecordDriver\RecordDriver\SolrMarc' =>
-                        'RecordDriver\RecordDriver\SolrDefaultFactory',
+                    \RecordDriver\RecordDriver\SolrMarc::class => \RecordDriver\RecordDriver\SolrDefaultFactory::class,
                 ],
                 'aliases' => [
-                    'solrmarc' => 'RecordDriver\RecordDriver\SolrMarc',
+                    'solrmarc' => \RecordDriver\RecordDriver\SolrMarc::class,
                 ]
             ],
         ],

@@ -1,49 +1,50 @@
 <?php $titleFields = $this->solrDetails()->getCoreFields($this->driver, ['title']); ?>
 <h3 property="name">
 <?php $originalLetters = ''; ?>
-<?php if (!empty($titleFields['ShortTitle'][0])): ?>
+<?php if (!empty($titleFields['ShortTitle'][0][0]['data'][0])): ?>
     <?php if (!empty($titleFields['ShortTitle']['originalLetters'])): ?>
         <?php $originalLetters = $titleFields['ShortTitle']['originalLetters']; ?>
     <?php endif; ?>
-    <?=$titleFields['ShortTitle'][0] ?>
-    <?php if (!empty($titleFields['SubTitle'][0])): ?>
+    <?=$titleFields['ShortTitle'][0][0]['data'][0] ?>
+    <?php if (!empty($titleFields['SubTitle'][0][0]['data'][0])): ?>
         <?php if (!empty($titleFields['SubTitle']['originalLetters'])): ?>
             <?php $originalLetters .= ' : ' . $titleFields['SubTitle']['originalLetters']; ?>
         <?php endif; ?>
-        : <?=$titleFields['SubTitle'][0] ?>
+        : <?=$titleFields['SubTitle'][0][0]['data'][0] ?>
     <?php endif; ?>
-    <?php if (!empty($titleFields['TitleSection'])): ?>
-        / <?=$titleFields['TitleSection'][0] ?>
+    <?php if (!empty($titleFields['TitleSection'][0][0]['data'][0])): ?>
+        / <?=$titleFields['TitleSection'][0][0]['data'][0] ?>
         <?php if (!empty($titleFields['TitleSection']['originalLetters'])): ?>
             <?php $originalLetters .= ' ' . $titleFields['TitleSection']['originalLetters']; ?>
         <?php endif; ?>
     <?php endif; ?>
-    <?= !empty($titleFields['TitleStatement'][0]) ? '/ ' . $titleFields['TitleStatement'][0] : '' ?>
+    <?= !empty($titleFields['TitleStatement'][0][0]['data'][0]) ? '/ ' . $titleFields['TitleStatement'][0][0]['data'][0] : '' ?>
     <?php if (!empty($titleFields['TitleStatement']['originalLetters'])): ?>
         <?php $originalLetters .= ' / ' . $titleFields['TitleStatement']['originalLetters']; ?>
     <?php endif; ?>
-    <?php if (!empty($titleFields['TitleAdditionalPart'])): ?>
-        <?= ' ; ' . implode(' ; ', $titleFields['TitleAdditionalPart']) ?>
-        <?php if (!empty($titleFields['TitleAdditionalVolume'])): ?>
-            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalVolume']) ?>
+    <?php if (!empty($titleFields['TitleAdditionalPart'][0][0]['data'][0])): ?>
+        <?= ' ; ' . implode(' ; ', $titleFields['TitleAdditionalPart'][0][0]['data'][0]) ?>
+        <?php if (!empty($titleFields['TitleAdditionalVolume'][0][0]['data'][0])): ?>
+            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalVolume'][0][0]['data'][0]) ?>
         <?php endif; ?>
-        <?php if (!empty($titleFields['TitleAdditionalStatement'])): ?>
-            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalStatement']) ?>
+        <?php if (!empty($titleFields['TitleAdditionalStatement'][0][0]['data'][0])): ?>
+            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalStatement'][0][0]['data'][0]) ?>
         <?php endif; ?>
     <?php endif; ?>
 <?php else: ?>
     <?=$this->transEsc('no title') ?>
 <?php endif; ?>
 </h3>
-<?php if (!empty($titleFields['Summary'][0])): ?>
-    <?php $summary = $titleFields['Summary'][0]; ?>
+<?php if (!empty($titleFields['Summary'][0][0]['data'][0])): ?>
+    <?php $summary = $titleFields['Summary'][0][0]['data'][0]; ?>
 <p id="short_summary">
-    <?=$this->truncate($summary, 300) ?>
-    <?php if(strlen($summary) > 300): ?>
+    <?=$this->truncate($summary, 150) ?>
+    <?php if(strlen($summary) > 150): ?>
     <br /><a href="" class="showSummary"><?=$this->transEsc('Full description')?><i class="bel-pfeil-u01"></i></a>
 </p>
 <p id="long_summary" style="display:none">
     <?=$summary ?>
+    <br /><a href="" class="hideSummary"><?=$this->transEsc('Full description')?><i class="bel-pfeil-o01"></i></a>
 </p>
    <?php else: ?>
 </p>

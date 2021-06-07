@@ -1,0 +1,37 @@
+<?php
+
+$items = [];
+foreach ($this->data as $solrMarcdata):
+    if (empty($solrMarcdata['link'])):
+        continue;
+    endif;
+    $link = array_shift($solrMarcdata['link']['data']);
+    if (!empty($solrMarcdata['linkname'])):
+        $linkname = array_shift($solrMarcdata['linkname']['data']);
+    else:
+        $linkname = $link;
+    endif;
+    $string = '<a href="' . $link . '" title="' . $link . '">' . $linkname . '</a>';
+    $additionalData = [];
+    foreach ($solrMarcdata as $key => $date):
+        if ($key != 'link' && $key != 'linkname' && $key != 'description'):
+            $additionalData[] = implode(', ', $date['data']);
+        endif;
+    endforeach;
+    if (!empty($additionalData)):
+        $string .= ' (' . implode(', ', $additionalData) . ')';
+    endif;
+    if (!empty($data['description']['data'])):
+        $string .= ' [' . implode(', ', $data['description']['data']) . ']';
+    endif;
+    if (!empty($string)):
+        $items[] = $string;
+    endif;
+endforeach;
+
+?>
+<?php foreach ($items as $item): ?>
+             <p class="detail-line">
+                 <?=$item ?>
+             </p>
+<?php endforeach; ?>

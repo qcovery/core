@@ -1,0 +1,39 @@
+<?php
+
+if (!empty($this->data['originalLetters'])):
+    $items = ['originalLetters' => $this->data['originalLetters']];
+    unset($this->data['originalLetters']);
+else:
+    $items = [];
+endif;
+
+foreach ($this->data as $solrMarcdata):
+    $string = '';
+    foreach ($solrMarcdata as $key => $date):
+        $translatedData = [];
+        foreach ($date['data'] as $value):
+            $translatedData[] = $this->transEsc($value);
+        endforeach;
+        if ($key === 'description'):
+            $string .= ' [' . implode(' ; ', $translatedData) . ']';
+        elseif ($key === 'prefix'):
+            $string = implode(' ', $translatedData) . ': ' . $string;
+        else:
+            $string .= implode(' ; ', $translatedData) . ' ; ';
+        endif;
+    endforeach;
+    if (!empty($string)):
+        $items[] = preg_replace('/( ; |: )$/', '', $string);
+    endif;
+endforeach;
+
+?>
+
+<?php foreach ($items as $key => $item): ?>
+             <p class="detail-line">
+    <?php if ($key === 'originalLetters'): ?>
+                 <strong><?=$this->transEsc('Original Letters') ?>:</strong>
+    <?php endif; ?>
+                 <?=$item ?>
+             </p>
+<?php endforeach; ?>

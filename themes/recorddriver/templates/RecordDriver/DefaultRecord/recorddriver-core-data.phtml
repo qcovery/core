@@ -1,4 +1,5 @@
 <?php
+
 if (empty($this->coreFieldCategories)):
     $coreFieldList = [$this->solrDetails()->getCoreFields($this->driver, [])];
 else:
@@ -7,27 +8,39 @@ else:
         $coreFieldList[] = $this->solrDetails()->getCoreFields($this->driver, [$category]);
     endforeach;
 endif;
+
+foreach ($coreFieldList as $coreFields):
+    if (!empty($coreFields)):
+
 ?>
-<?php //print_r($coreFieldList); ?>
-<?php foreach ($coreFieldList as $coreFields): ?>
-    <?php if (!empty($coreFields)): ?>
       <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
-        <?php foreach ($coreFields as $field => $items): ?>
-            <?php if (!empty($items[0])): ?>
+<?php
+
+        foreach ($coreFields as $field => $items):
+            if (!empty($items[0])):
+                $template = $items['template'] ?: 'plaintext';
+                unset($items['template']);
+                if (strpos($template, '-link') !== false):
+                    list($linkType, $template) = explode('-', $template);
+                endif;
+                $snippet = $this->render('RecordDriver/DefaultRecord/solrmarc-' . $template . '.phtml', ['driver' => $this->driver, 'data' => $items, 'linkType' => $linkType ?? '']);
+                if (!empty($snippet)):
+
+?>
           <tr><th><?=$this->transEsc($field)?>:</th><td>
-                <?php foreach ($items as $key => $item): ?>
-             <p class="detail-line">
-                 <?php if(!empty($item)): ?>
-                    <?php if ($key === 'originalLetters'): ?>
-                 <strong><?=$this->transEsc('Original Letters') ?>:</strong>
-                    <?php endif; ?>
-                    <?=$item ?>
-                 <?php endif; ?>
-             </p>
-                <?php endforeach; ?>
+                <?=$snippet ?>
           </td></tr>
-             <?php endif; ?>
-        <?php endforeach; ?>
+<?php
+
+                endif;
+            endif;
+        endforeach;
+
+?>
       </table>
-    <?php endif; ?>
-<?php endforeach; ?>
+<?php
+
+    endif;
+endforeach;
+
+?>
