@@ -104,28 +104,20 @@ class GetLibraries extends AbstractBase
         foreach ($queryArray as $queryItem) {
             $arrayKey = false;
             list($key, $value) = explode('=', $queryItem, 2);
-            if (preg_match('/[0-9](\[\]$)/', $key, $matches)) {
-                $key = str_replace($matches[1], '', $key);
-                $arrayKey = true;
-            }
             if ($key == 'library') {
-                $libraryCode = $value;
+                $selectedLibraryCode = $value;
+            } elseif (preg_match('/[0-9](\[\]$)/', $key, $matches)) {
+                $key = str_replace($matches[1], '', $key);
+                $searchParams[$key][] = $value;
             } else {
-                if ($arrayKey) {
-                    $searchParams[$key][] = $value;
-                } else {
-                    $searchParams[$key] = $value;
-                }
+                $selectedLibraryCode = $value;
             }
         }
+        $this->Libraries->selectLibrary($selectedLibraryCode);
         $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
-        $selectedLibrary = $this->Libraries->selectLibrary($libraryCode);
         $locationFilter = $this->Libraries->getLocationFilter();
         $libraryFacet = $this->Libraries->getLibraryFacetField($backend);
-        $libraryFacetValues = $this->Libraries->getLibraryFacetValues($backend);
         $facetSearch = $this->Libraries->getFacetSearch($backend);
-        $selectedLibraryCode = $libraryCode;
-        $this->Libraries->resetLibraries();
 
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
@@ -141,10 +133,9 @@ class GetLibraries extends AbstractBase
         if (!empty($facetSearch)) {
             $this->Libraries->selectLibrary($facetSearch);
         }
+        $this->Libraries->resetLibraries();
         $paramsObj->initFromRequest(new Parameters($searchParams));
-        if (!empty($facetSearch)) {
-            $this->Libraries->selectLibrary($libraryCode);
-        }
+        $this->Libraries->selectLibrary($selectedLibraryCode);
 
         $facetList = $results->getFacetList();
         $libraryList = $facetList[$libraryFacet]['list'];
@@ -154,7 +145,7 @@ class GetLibraries extends AbstractBase
         array_unshift($libraryList, ['value' => $defaultLibraryCode, 'count' => $results->getResultTotal()]);
         $libraryData = [];
 
-        foreach ($libraryFacetValues as $libraryCode => $libraryFacetValue) {
+        foreach ($this->Libraries->getLibraryFacetValues($backend) as $libraryCode => $libraryFacetValue) {
             $library = $this->Libraries->getLibrary($libraryCode);
             $facetValues = explode(',', $libraryFacetValue);
             $count = 0;
