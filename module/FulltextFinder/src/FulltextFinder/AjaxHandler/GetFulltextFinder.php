@@ -99,12 +99,20 @@ class GetFulltextFinder  extends AbstractBase
         $fulltextfinderApiResult = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        $categories = [];
+        if (isset($this->config['FulltextFinder']['categories'])) {
+            $categories = $this->config['FulltextFinder']['categories']->toArray();
+        }
         $links = [];
         if (isset($fulltextfinderApiResult->contextObjects)) {
             foreach ($fulltextfinderApiResult->contextObjects as $contextObject) {
                 if (isset($contextObject->targetLinks)) {
                     foreach ($contextObject->targetLinks as $targetLink) {
-                        if ($targetLink->targetUrl && !stristr($targetLink->linkName, 'Web-Service') && !stristr($targetLink->linkName, 'Feedback Formular')) {
+                        if (!empty($categories)) {
+                            if (in_array($targetLink->category, $categories)) {
+                                $links[] = $targetLink;
+                            }
+                        } else {
                             $links[] = $targetLink;
                         }
                     }
