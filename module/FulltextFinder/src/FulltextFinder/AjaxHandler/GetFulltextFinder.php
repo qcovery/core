@@ -120,8 +120,6 @@ class GetFulltextFinder  extends AbstractBase
             }
         }
 
-
-
         $html = $this->renderer->render(
             'fulltextfinder/result.phtml', [
                 'searchClassId' => $searchClassId,
