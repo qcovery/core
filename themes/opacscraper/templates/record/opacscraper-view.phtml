@@ -1,0 +1,37 @@
+<?php
+
+$holdings = $this->driver->getRealTimeHoldings();
+
+foreach ($holdings['holdings'] as $holding):
+    foreach ($holding['items'] as $libraryItem):
+          if (isset($libraryItem['LibraryCode'])):
+            echo '<strong>' . $libraryItem['LibraryName'] . '</strong><br />';
+            unset($libraryItem['Library']);
+            foreach ($libraryItem as $mediaItems):
+                foreach ($mediaItems as $mediaItem):
+                    foreach ($mediaItem as $key => $values):
+                        echo '<strong>' . $key . ': </strong>';
+                        foreach ($values as $value):
+                            if (is_array($value)):
+                                if (!empty($value['link'])):
+                                    echo '<a href="' . $value['link']['target'] . '" target="_blank">' . $value['link']['name'] . '</a>';
+                                endif;
+                            else:
+                                echo $value;
+                            endif;
+                            echo '<br />';
+                        endforeach;
+                    endforeach;
+                endforeach;
+//                echo '<br />';
+            endforeach;
+            echo '<br />';
+        endif;
+    endforeach;
+endforeach;
+
+//echo '<pre>';
+//print_r($holding);
+//echo '</pre>';
+
+?>
