@@ -1,0 +1,25 @@
+<?php
+//  echo $this->inlineScript(\Laminas\View\Helper\HeadScript::FILE, 'openurl.js', 'SET');
+  $classes = '';
+  if ($this->openUrlEmbed) {
+    $classes = "fulltext";
+  } elseif ($this->openUrlWindow) {
+    $classes = 'fulltext openUrlWindow window_settings:' . $this->escapeHtmlAttr($this->openUrlWindow);
+  }
+  $class = (!empty($classes)) ? ' class="' . $classes . '"' : '';
+?>
+
+
+
+<span class="openUrlControls<?php if ($this->openUrlEmbed): ?> openUrlEmbed<?php if ($this->openUrlEmbedAutoLoad): ?> openUrlEmbedAutoLoad<?php endif; ?><?php endif; ?>">
+</span>
+
+  <a href="<?=$this->escapeHtmlAttr($this->resolverUrl)?>"<?=$class?> data-search-class-id="<?=$this->escapeHtmlAttr($this->searchClassId) ?>">
+    <?php /* put the openUrl here in a span (COinS almost) so we can retrieve it later */ ?>
+    <span title="<?=$this->escapeHtmlAttr($this->openUrl)?>" class="openUrl"></span>
+      <?=$this->transEsc('Get full text')?>
+  </a>
+
+<?php if ($this->openUrlEmbed): ?>
+  <div class="resolver hidden"><?=$this->transEsc('Loading')?>...</div>
+<?php endif; ?>
