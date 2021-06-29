@@ -100,9 +100,6 @@ JS;
     </header>
     <nav class="breadcrumbs" aria-label="<?=$this->transEscAttr('Breadcrumbs') ?>">
       <div class="container">
-<!-- Module Notifications -->
-  <?=$this->render('layout/notifications-layout.phtml', ['url' => $this->url, 'notifier' => $this->notifier]) ?>
-<!-- Module Notifications -->
         <?php if((!isset($this->layout()->showBreadcrumbs) || $this->layout()->showBreadcrumbs == true)
           && !empty($this->layout()->breadcrumbs)
           && $this->layout()->breadcrumbs !== false
