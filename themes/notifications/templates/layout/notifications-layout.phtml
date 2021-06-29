@@ -1,8 +1,0 @@
-<?php
-$url = $this->url();
-$messages = $this->notifier()->getNotifications($url);
-#echo implode(' - ', $messages);
-foreach ($messages as $message):
-  echo '<div id="belugax-notification">' . $this->translate($message) . '</div>';
-endforeach;
-?>
