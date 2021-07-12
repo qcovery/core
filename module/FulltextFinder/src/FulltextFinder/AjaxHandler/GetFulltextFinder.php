@@ -99,20 +99,39 @@ class GetFulltextFinder  extends AbstractBase
         $fulltextfinderApiResult = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        $categories = [];
+        if (isset($this->config['FulltextFinder']['categories'])) {
+            $categoriesConfig = $this->config['FulltextFinder']['categories']->toArray();
+            foreach ($categoriesConfig as $categoryConfig) {
+                $categoryConfigArray = explode('|', $categoryConfig);
+                if (isset($categoryConfigArray[1])) {
+                    $categories[$categoryConfigArray[0]] = $categoryConfigArray[1];
+                } else {
+                    $categories[$categoryConfigArray[0]] = -1;
+                }
+            }
+        }
         $links = [];
         if (isset($fulltextfinderApiResult->contextObjects)) {
             foreach ($fulltextfinderApiResult->contextObjects as $contextObject) {
                 if (isset($contextObject->targetLinks)) {
                     foreach ($contextObject->targetLinks as $targetLink) {
-                        if ($targetLink->targetUrl && !stristr($targetLink->linkName, 'Web-Service') && !stristr($targetLink->linkName, 'Feedback Formular')) {
+                        if (!empty($categories)) {
+                            if (in_array($targetLink->category, array_keys($categories))) {
+                                if ($categories[$targetLink->category] == -1) {
+                                    $links[] = $targetLink;
+                                } else if ($categories[$targetLink->category] > 0) {
+                                    $links[] = $targetLink;
+                                    $categories[$targetLink->category]--;
+                                }
+                            }
+                        } else {
                             $links[] = $targetLink;
                         }
                     }
                 }
             }
         }
-
-
 
         $html = $this->renderer->render(
             'fulltextfinder/result.phtml', [
