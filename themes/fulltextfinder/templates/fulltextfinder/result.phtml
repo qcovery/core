@@ -6,25 +6,5 @@
                 <li><a href="<?=$link->targetUrl?>" title="<?=$link->linkText?>" target="_blank"><?=$link->linkName?></a></li>
             <?php endforeach; ?>
         </ul>
-        <!--
-        <?php print_r($this->links); ?>
-        -->
-    </div>
-<?php else: ?>
-    <div class="fulltextfinder-result">
-        <h3>FulltextFinder</h3>
-        <ul>
-            <li>
-                <a href="https://search.ebscohost.com/login.aspx?site=ftf-live&authtype=ip,guest&custid=s2982038&groupid=main&direct=true" target="_blank">Verfügbarkeit prüfen</a>
-            </li>
-        </ul>
-        <!--
-        <?php print_r($this->links); ?>
-        -->
     </div>
 <?php endif; ?>
-<?php /*
-<?php if (isset($this->url)): ?>
-    <a href="<?=$this->url?>" style="font-size:10px; color:#cccccc;" target="_blank">FulltextFinder API Link</a>
-<?php endif; ?>
-*/ ?>
