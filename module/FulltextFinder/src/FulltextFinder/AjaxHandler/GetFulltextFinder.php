@@ -138,6 +138,7 @@ class GetFulltextFinder  extends AbstractBase
             $checkAvailabilityLink->targetUrl = 'https://search.ebscohost.com/login.aspx?site=ftf-live&authtype=ip,guest&custid=s2982038&groupid=main&direct=true&'.$openUrl;
             $checkAvailabilityLink->linkText = 'Verfügbarkeit prüfen';
             $checkAvailabilityLink->linkName = 'Verfügbarkeit prüfen';
+            $checkAvailabilityLink->category = 'CheckAvailability';
             $links[] = $checkAvailabilityLink;
         }
 
@@ -151,5 +152,4 @@ class GetFulltextFinder  extends AbstractBase
 
         return $this->formatResponse(compact('html'));
     }
-
 }

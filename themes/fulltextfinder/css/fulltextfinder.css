@@ -1,12 +1,5 @@
 .fulltextfinder-result {
-    border: 1px solid #7d212a;
-    margin: 15px 0 0 0;
-    padding: 10px;
-}
-
-.fulltextfinder-result h3 {
-    font-size: 16px;
-    margin: 0 0 5px 0;
+    margin: 10px 0 0 0;
 }
 
 .fulltextfinder-result ul {
