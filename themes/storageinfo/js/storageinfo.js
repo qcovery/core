@@ -12,9 +12,10 @@ function storageMap (element) {
     }
 }
 
-function initStorageInfo (elementIdentifer) {
+function initStorageInfo (parentElement, elementIdentifer) {
     jQuery(document).ready(function () {
-        tippy(elementIdentifer, {
+        tippy.delegate(parentElement, {
+            target: elementIdentifer,
             content: 'Loading...',
             placement: 'left',
             interactive: true,
