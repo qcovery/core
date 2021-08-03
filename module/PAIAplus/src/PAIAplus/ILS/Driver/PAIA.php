@@ -314,60 +314,6 @@ class PAIA extends PAIAbase
     }
 
     /**
-     * Get Patron Holds
-     *
-     * This is responsible for retrieving all holds by a specific patron.
-     *
-     * @param array $patron The patron array from patronLogin
-     *
-     * @return mixed Array of the patron's holds on success.
-     */
-    public function getMyRecalls($patron)
-    {
-        //if (isset($this->config['Holds']['status'])) {
-            //$filter = ['status' => explode(':', $this->config['Holds']['status'])];
-            $items = $this->paiaGetItems($patron, []);
-            return $this->mapPaiaItems($items, 'myRecallsMapping');
-        //} else {
-        //return parent::getMyHolds($patron);
-        //}
-    }
-
-    /**
-     * This PAIA helper function allows custom overrides for mapping of PAIA response
-     * to getMyHolds data structure.
-     *
-     * @param array $items Array of PAIA items to be mapped.
-     *
-     * @return array
-     */
-    protected function myRecallsMapping($items)
-    {
-        $results = [];
-
-        foreach ($items as $doc) {
-            $result = $this->getBasicDetails($doc);
-
-            if ($doc['status'] == '4') {
-                $result['expire'] = (isset($doc['endtime'])
-                    ? $this->convertDatetime($doc['endtime']) : '');
-            } else {
-                $result['duedate'] = (isset($doc['endtime'])
-                    ? $this->convertDatetime($doc['endtime']) : '');
-            }
-
-            // status: provided (the document is ready to be used by the patron)
-            $result['available'] = $doc['status'] == 4 ? true : false;
-
-            list($signet, ) = explode(':', $doc['label']);
-            $result['institution_name'] = $this->mapLocation($signet);
-
-            $results[] = $result;
-        }
-        return $results;
-    }
-
-    /**
      * Get Patron Profile
      *
      * This is responsible for retrieving the profile for a specific patron.
@@ -495,5 +441,24 @@ class PAIA extends PAIAbase
         }
 
         return $pickupLocation;
+    }
+
+    /**
+     * Map a PAIA document to an array for use in generating a VuFind request
+     * (holds, storage retrieval, etc).
+     *
+     * @param array $doc Array of PAIA document to be mapped.
+     *
+     * @return array
+     */
+    protected function getBasicDetails($doc)
+    {
+        $result = parent::getBasicDetails($doc);
+
+        if (!isset($result['status']) && isset($doc['status'])) {
+            $result['status'] = $doc['status'];
+        }
+
+        return $result;
     }
 }
