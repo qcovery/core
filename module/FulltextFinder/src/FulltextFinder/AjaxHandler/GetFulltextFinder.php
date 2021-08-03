@@ -133,15 +133,23 @@ class GetFulltextFinder  extends AbstractBase
             }
         }
 
+        if (empty($links)) {
+            $checkAvailabilityLink = new \stdClass();
+            $checkAvailabilityLink->targetUrl = 'https://search.ebscohost.com/login.aspx?site=ftf-live&authtype=ip,guest&custid=s2982038&groupid=main&direct=true&'.$openUrl;
+            $checkAvailabilityLink->linkText = 'Verfügbarkeit prüfen';
+            $checkAvailabilityLink->linkName = 'Verfügbarkeit prüfen';
+            $checkAvailabilityLink->category = 'CheckAvailability';
+            $links[] = $checkAvailabilityLink;
+        }
+
         $html = $this->renderer->render(
             'fulltextfinder/result.phtml', [
                 'searchClassId' => $searchClassId,
                 'links' => $links,
-                'url' => $fulltextfinderApiUrl,
+                'url' => $fulltextfinderApiUrl
             ]
         );
 
         return $this->formatResponse(compact('html'));
     }
-
 }
