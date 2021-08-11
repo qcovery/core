@@ -3,17 +3,7 @@
     <label class="control-label" for="login_paia_select"><?=$this->transEsc('PAIA Select')?>:</label>
     <select name="paia-select" id="login_paia_select">
         <?php foreach ($this->paiaBackends as $key => $value): ?>
-            <?php
-                $selected = false;
-                if ($this->request->get('paia-select') == $key) {
-                    $selected = true;
-                } else if (isset($_GET['doc_id'])) {
-                    if (stristr($_GET['doc_id'], $value['docIdPattern'])) {
-                        $selected = true;
-                    }
-                }
-            ?>
-            <option value="<?=$key?>" <?php if($selected): ?>selected="selected"<?php endif; ?>><?=$value['name']?></option>
+            <option value="<?=$key?>" <?php if ($this->request->get('paia-select') == $key): ?>selected="selected"<?php endif; ?>><?=$value?></option>
         <?php endforeach; ?>
     </select>
 </div>
