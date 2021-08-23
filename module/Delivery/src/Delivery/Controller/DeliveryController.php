@@ -185,7 +185,7 @@ class DeliveryController extends AbstractBase
             }
         }
 
-        if (empty($signature)) {
+        if (false && empty($signature)) {
             $errors[] = 'no signature found';
         }
 
