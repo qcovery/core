@@ -30,7 +30,7 @@ requester-sub-id:<?=$this->requesterSubId ?>##
 requester-note:<?=$this->requesterNote ?>##
 requester-email-address:bestellcap@beluga.sub.uni-hamburg.de##
 requester-group:<?=$this->requesterGroup ?>##
-customer-no:<?=$this->clientIdentifier ?>##
+iwc-lls-customer-number:<?=$this->clientIdentifier ?>##
 bill-delivery-type:EMAIL##
 third-party-info-type-call:FORWARD=N##
 transaction-qualifier:1##
@@ -38,3 +38,4 @@ transaction-group-qualifier:SemA: <?=date('ymdHis') . rand(0, 9) ?>##
 responder-id:0018##
 client-identifier:<?=$this->clientIdentifier ?>##
 contact-person-name:<?=$this->contactPersonName ?>##
+del-postal-name-of-person-or-institution:<?=$this->contactPersonName ?>##
