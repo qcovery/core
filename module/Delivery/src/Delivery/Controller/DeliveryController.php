@@ -162,6 +162,10 @@ class DeliveryController extends AbstractBase
                     } else {
                         $errors = $dataHandler->getErrors();
                         $missingFields = $dataHandler->getMissingFields();
+                        //if no fields are missing something technical went wrong and we want to keep the order
+                        if (empty($missingFields)) {
+                            $dataHandler->insertOrderData($this->user, $this->getTable('delivery'));
+                        }
                     }
                 } else {
                     $missingFields = ['delivery_email'];
@@ -185,7 +189,7 @@ class DeliveryController extends AbstractBase
             }
         }
 
-        if (empty($signature)) {
+        if (false && empty($signature)) {
             $errors[] = 'no signature found';
         }
 

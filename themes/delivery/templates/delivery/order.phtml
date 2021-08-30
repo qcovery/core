@@ -53,9 +53,10 @@
         <?php foreach ($form['fields'] as $field): ?>
           <?php $mandatory = ($field['mandatory'] == 1) ? ' *' : ''; ?>
           <?php $style = (in_array($field['form_name'], $missingFields)) ? ' style="color:red"' : ''; ?>
+          <?php $placeholder = (!empty($field['placeholder'])) ? ' placeholder="' . $field['placeholder'] . '"' : ''; ?>
     <div class="form-group">
       <label class="control-label" for="<?=$field['form_name'] ?>"<?=$style ?>><?=$this->transEsc($field['display']) ?><?=$mandatory ?></label>
-      <input type="text" name="<?=$field['form_name'] ?>" id="<?=$field['form_name'] ?>" value="<?=$field['value'] ?>" class="form-control"/>
+      <input type="text" name="<?=$field['form_name'] ?>" id="<?=$field['form_name'] ?>" value="<?=$field['value'] ?>"<?=$placeholder ?> class="form-control"/>
     </div>
         <?php endforeach; ?>
       <?php endif; ?>
