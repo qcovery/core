@@ -51,30 +51,26 @@ class Connector extends \VuFindSearch\Backend\Solr\Connector
      *
      * @return string Response body
      */
-    public function query($handler, ParamBag $params)
+    public function query($handler, ParamBag $params, bool $cacheable = false)
     {
         $url = $this->addLibraryFilter($handler, $params);
+        $urlSuffix = '/' . $handler;
         $paramString = implode('&', $params->request());
         if (strlen($paramString) > self::MAX_GET_URL_LENGTH) {
             $method = Request::METHOD_POST;
-        } else {
+            $callback = function ($client) use ($paramString) {
+                $client->setRawBody($paramString);
+                $client->setEncType(HttpClient::ENC_URLENCODED);
+                $client->setHeaders(['Content-Length' => strlen($paramString)]);
+	    };
+	} else {
             $method = Request::METHOD_GET;
+            $urlSuffix .= '?' . $paramString;
+            $callback = null;
         }
 
-        if ($method === Request::METHOD_POST) {
-            $client = $this->createClient($url, $method);
-            $client->setRawBody($paramString);
-            $client->setEncType(HttpClient::ENC_URLENCODED);
-            $client->setHeaders(array('Content-Length' => strlen($paramString)));
-        } else {
-            $url = (strpos($url, '?') === false) ? $url . '?' . $paramString : $url . '&' . $paramString;
-            $client = $this->createClient($url, $method);
-        }
-        if ($this->logger) {
-            $this->logger->debug('Query' . urldecode($paramString));
-        }
-
-        return $this->send($client);
+        $this->debug(sprintf('Query %s', $paramString));
+	return $this->trySolrUrls($method, $urlSuffix, $callback, $cacheable);
     }
 
     /**
