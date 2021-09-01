@@ -42,8 +42,8 @@ use VuFind\RecordDriver\SolrDefault;
  */
 class SolrMarc extends SolrDefault
 {
-    use \VuFind\RecordDriver\IlsAwareTrait;
-    use \VuFind\RecordDriver\MarcReaderTrait;
+    use \VuFind\RecordDriver\Feature\IlsAwareTrait;
+    use \VuFind\RecordDriver\Feature\MarcReaderTrait;
 
     /**
      * actual Configuration (yaml)
