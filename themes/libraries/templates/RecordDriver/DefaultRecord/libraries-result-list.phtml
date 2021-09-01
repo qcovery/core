@@ -3,7 +3,7 @@
        <div>
     <strong><?=$this->transEsc('Libraries')?>: </strong>
     <?php foreach($libraryList as $library):?>
-        <?=$library['abbrieviation'] ?>
+        <span title="<?=$library['fullname']?>"><?=$library['abbrieviation'] ?></span>
     <?php endforeach; ?>
        </div>
 <?php endif; ?>
