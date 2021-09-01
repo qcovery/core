@@ -41,6 +41,8 @@ class SolrDefaultBackendFactory extends BackendFactory
     protected function createConnector()
     {
         $config = $this->config->get($this->mainConfig);
+        $searchConfig = $this->config->get($this->searchConfig);
+        $defaultFields = $searchConfig->General->default_record_fields ?? '*';
 
         $handlers = [
             'select' => [
@@ -57,18 +59,36 @@ class SolrDefaultBackendFactory extends BackendFactory
             array_push($handlers['select']['appends']['fq'], $filter);
         }
 
+        $httpService = $this->serviceLocator->get(\VuFindHttp\HttpService::class);
+
+	$client = $httpService->createClient();
+
         $connector = new Connector(
-            $this->getSolrUrl(), new HandlerMap($handlers), $this->uniqueKey
+            $this->getSolrUrl(), new HandlerMap($handlers), $this->uniqueKey, $client
         );
-        $connector->setTimeout(
-            isset($config->Index->timeout) ? $config->Index->timeout : 30
-        );
+        $connector->setTimeout($config->Index->timeout ?? 30);
 
         if ($this->logger) {
             $connector->setLogger($this->logger);
-        }
-        if ($this->serviceLocator->has('VuFind\Http')) {
-            $connector->setProxy($this->serviceLocator->get('VuFind\Http'));
+	}
+
+        if (!empty($searchConfig->SearchCache->adapter)) {
+            $cacheConfig = $searchConfig->SearchCache->toArray();
+            $options = $cacheConfig['options'] ?? [];
+            if (empty($options['namespace'])) {
+                $options['namespace'] = 'Index';
+            }
+            if (empty($options['ttl'])) {
+                $options['ttl'] = 300;
+            }
+            $settings = [
+                'adapter' => [
+                    'name' => $cacheConfig['adapter'],
+                    'options' => $options,
+                ]
+            ];
+            $cache = \Laminas\Cache\StorageFactory::factory($settings);
+            $connector->setCache($cache);
         }
         return $connector;
     }
