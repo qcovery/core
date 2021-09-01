@@ -165,7 +165,7 @@ class Libraries
         if (!empty($validatedLibraryCode)) {
             $this->selectedLibrary = $this->getLibrary($validatedLibraryCode);
         }
-        if (!empty($this->searchMemory)) {
+        if (!empty($this->searchMemory) && !empty($this->selectedLibrary)) {
             $this->searchMemory->rememberLastSettings('Libraries', array('selectedLibrary' => $this->selectedLibrary['code']));
         }
         return $this->selectedLibrary;
