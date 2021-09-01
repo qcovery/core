@@ -67,7 +67,7 @@
         // Deal with cart stuff:
         $cart = $this->cart();
         if ($cart->isActive()) {
-          $this->headScript()->appendFile("vendor/cookies.js");
+          $this->headScript()->appendFile("vendor/js.cookies.js");
           $this->headScript()->appendFile("cart.js");
           $domain = $cart->getCookieDomain();
           if (!empty($domain)) {
@@ -205,7 +205,7 @@ JS;
     <?=$this->googleanalytics()?>
     <?=$this->piwik()?>
     <? if ($this->recaptcha()->active()): ?>
-      <?=$this->inlineScript(\Zend\View\Helper\HeadScript::FILE, "https://www.google.com/recaptcha/api.js?onload=recaptchaOnLoad&render=explicit&hl=" . $this->layout()->userLang, 'SET')?>
+      <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::FILE, "https://www.google.com/recaptcha/api.js?onload=recaptchaOnLoad&render=explicit&hl=" . $this->layout()->userLang, 'SET')?>
     <? endif; ?>
 <? endif; ?>
   </body>
