@@ -26,7 +26,7 @@ class ConnectedLibraries extends \Laminas\View\Helper\AbstractHelper
         $libraryCodes = $this->getConnectedLibrariesCodes($searchClassId, $driver);
         $connectedLibraries = [];
         foreach ($libraryCodes as $libraryCode) {
-            $connectedLibraries[] = $this->Libraries->getLibrary($libraryCode);
+            $connectedLibraries[$libraryCode] = $this->Libraries->getLibrary($libraryCode);
         }
         return $connectedLibraries;
     }
