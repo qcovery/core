@@ -42,12 +42,27 @@ use VuFind\Resolver\Driver\AbstractBase;
  */
 class KVK extends AbstractBase
 {
+
+    use OpenUrlMapTrait;
+
     /**
      * Parameters for link resolver
      *
      * @var array
      */
     protected $parameters;
+
+    /**
+     * Map
+     *
+     * @var array
+     */
+    protected $map = [
+        'TI' => 'title',
+        'AU' => 'author',
+        'PY' => 'date',
+        'SB' => 'isbn',
+        'SS' => 'issn'];
 
     /**
      * Constructor
@@ -99,35 +114,14 @@ class KVK extends AbstractBase
     public function getResolverUrl($openURL)
     {
         $this->baseUrl .= '?' . implode('&', $this->parameters);
-        $params = $this->mapOpenUrl($openURL);
-        return parent::getResolverUrl($params);
-    }
-
-    protected function mapOpenUrl($openURL)
-    {
-        $mappedArray = [];
-        $parameterArray = explode('&', $openURL);
-        foreach ($parameterArray as $parameter) {
-            list($key, $val) = explode('=', $parameter);
-            switch ($key) {
-                case 'rft.title%5B0%5D':
-                    $mappedArray[] = 'TI=' . $val;
-                    break;
-                case 'rft.creator':
-                    $mappedArray[] = 'AU=' . $val;
-                    break;
-                case 'rft.date':
-                    $mappedArray[] = 'PY=' . $val;
-                    break;
-                case 'rft.isbn':
-                    $mappedArray[] = 'SB=' . $val;
-                    break;
-                case 'rft.issn':
-                    $mappedArray[] = 'SS=' . $val;
-                    break;
-            }
+        $paramsList = [];
+        $paramsArray = $this->mapOpenUrl($openURL);
+        unset($paramsArray['format']);
+        foreach ($paramsArray as $key => $value) {
+            $paramsList[] = $key . '=' . urlencode($value);
         }
-	return implode('&', $mappedArray);
+        $params = implode('&', $paramsList);
+        return parent::getResolverUrl($params);
     }
 
     /**
@@ -141,7 +135,7 @@ class KVK extends AbstractBase
      */
     public function fetchLinks($openURL)
     {
-        return $openURL;
+        return $this->getResolverUrl($openURL);
     }
 
     /**
@@ -158,21 +152,12 @@ class KVK extends AbstractBase
     {
         return [
             [
-                'href' => 'https://vufind.org/wiki?' . $data . '#print',
-                'title' => 'Print',
-                'coverage' => 'fake1',
-                'service_type' => 'getHolding',
-                'access' => 'unknown',
-                'notes' => 'General notes',
-            ],
-            [
-                'href' => 'https://vufind.org/wiki?' . $data . '#electronic',
-                'title' => 'Electronic',
-                'coverage' => 'fake2',
-                'service_type' => 'getFullTxt',
-                'access' => 'open',
-                'authentication' => 'Authentication notes',
-                'notes' => 'General notes',
+                'href' => $data,
+                'title' => 'KVK-Link',
+                'coverage' => '',
+                'service_type' => 'getWebService',
+                'access' => '',
+                'notes' => '',
             ],
         ];
     }
