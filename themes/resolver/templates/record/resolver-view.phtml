@@ -1,16 +1,4 @@
 <?php
-$openUrl = $this->driver->getOpenUrl();
-?>
-<!--<p class="openUrlControls openUrlEmbedAutoLoad openUrlEmbed">
-  <a href="#">CLICK
-    <span class="openUrl" title="<?=$this->escapeHtmlAttr($openUrl) ?>">
-      <?=$openUrl ?>
-    </span>
-  </a>
-<div class="resolver hidden"><?=$this->transEsc('Loading')?>...</div>-->
-</p>
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-<?php
 $openUrlHelper = $this->openUrl($this->driver, 'record');
 if ($openUrlHelper->isActive()):
   foreach ($openUrlHelper->resolve() as $snippet):
@@ -18,4 +6,3 @@ if ($openUrlHelper->isActive()):
   endforeach;
 endif;
 ?>
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
