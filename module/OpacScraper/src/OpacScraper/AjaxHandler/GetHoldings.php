@@ -149,7 +149,7 @@ class GetHoldings extends \VuFind\AjaxHandler\AbstractBase implements Translator
                 }
             }
         }
-print_r($holdStatements);
+//print_r($holdStatements);
         // Done
         return $this->formatResponse($holdStatements);
     }
