@@ -53,8 +53,8 @@ class Connector extends \VuFindSearch\Backend\Solr\Connector
      */
     public function query($handler, ParamBag $params, bool $cacheable = false)
     {
-        $url = $this->addLibraryFilter($handler, $params);
-        $urlSuffix = '/' . $handler;
+        $this->addLibraryFilter($handler, $params);
+        $urlSuffix = '';
         $paramString = implode('&', $params->request());
         if (strlen($paramString) > self::MAX_GET_URL_LENGTH) {
             $method = Request::METHOD_POST;
@@ -65,7 +65,7 @@ class Connector extends \VuFindSearch\Backend\Solr\Connector
 	    };
 	} else {
             $method = Request::METHOD_GET;
-            $urlSuffix .= '?' . $paramString;
+            $urlSuffix .= ((strpos($this->url, '?') === false) ? '?' : '&') . $paramString;
             $callback = null;
         }
 
@@ -80,7 +80,7 @@ class Connector extends \VuFindSearch\Backend\Solr\Connector
      * param string   $handler SOLR request handler to use
      * @param ParamBag $params  Request parameters
      *
-     * @return string
+     * @return void
      */
     private function addLibraryFilter($handler, ParamBag $params)
     {
@@ -97,9 +97,9 @@ class Connector extends \VuFindSearch\Backend\Solr\Connector
             }
         }
         if (self::LIBRARY_FILTER_TYPE == 'url') {
-            return (empty($libraryFilter)) ? $this->url . '/filter/' . $handler : $this->url . '/filter/' . $libraryFilter . '/' . $handler;
+            $this->url = (empty($libraryFilter)) ? $this->url . '/filter/' . $handler : $this->url . '/filter/' . $libraryFilter . '/' . $handler;
         } else {
-            return (empty($libraryFilter)) ? $this->url . '/' . $handler : $this->url . '/' . $handler . '?fq=' . $libraryFilter;
+            $this->url = (empty($libraryFilter)) ? $this->url . '/' . $handler : $this->url . '/' . $handler . '?fq=' . $libraryFilter;
         }
     }
 }
