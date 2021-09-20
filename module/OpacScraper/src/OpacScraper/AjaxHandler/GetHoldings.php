@@ -93,9 +93,10 @@ class GetHoldings extends \VuFind\AjaxHandler\AbstractBase implements Translator
     public function handleRequest(Params $params)
     {
         $id = $params->fromPost('id', $params->fromQuery('id', ''));
-        $libraryCodes = $params->fromPost('codes', $params->fromQuery('code', []));
+	$codeString = $params->fromPost('codeString', $params->fromQuery('codeString', []));
+        $libraryCodes = explode(',', $codeString);
         try {
-            $holdings = $this->holdLogic->getHoldings($id, $libraryCodes);
+            $holdings = $this->holdLogic->getHoldings($id, null, $libraryCodes);
         } catch (ILSException $e) {
             // If the ILS fails, send an error response instead of a fatal
             // error; we don't want to confuse the end user unnecessarily.
@@ -120,8 +121,13 @@ class GetHoldings extends \VuFind\AjaxHandler\AbstractBase implements Translator
         foreach ($holdings['holdings'] as $holding) {
             foreach ($holding['items'] as $libraryItems) {
                 if (isset($libraryItems['LibraryCode'])) {
-                    $holdStatement = ['LibraryName' => $libraryItems['LibraryName']];
-                    unset($libraryItem['LibraryCode'], $libraryItems['LibraryName']);
+                    $holdStatement = ['LibraryName' => $libraryItems['LibraryName'],
+                                      'LibraryCode' => $libraryItems['LibraryCode']];
+                    unset($libraryItems['LibraryCode'], $libraryItems['LibraryName']);
+                    if (!empty($libraryItems['OrderLink'])) {
+                        $holdStatement['OrderLink'] = $libraryItems['OrderLink'] . $id;
+                        unset($libraryItems['OrderLink']);
+                    }
                     foreach ($libraryItems as $mediaItems) {
                         $mediaStatements = [];
                         foreach ($mediaItems as $mediaItem) {
@@ -131,7 +137,7 @@ class GetHoldings extends \VuFind\AjaxHandler\AbstractBase implements Translator
                                     if (is_array($value)) {
                                         if (!empty($value['link'])) {
                                             $statement[] = ['target' => $value['link']['target'], 
-                                                                  'text' => $value['link']['name']];
+                                                            'text' => $value['link']['name']];
                                         }
                                     } else {
                                         $statement[] = ['text' => $value];

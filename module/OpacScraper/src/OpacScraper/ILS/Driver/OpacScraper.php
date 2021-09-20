@@ -101,15 +101,18 @@ class OpacScraper extends \VuFind\ILS\Driver\AbstractBase
     public function getStatus($id, $libraryCodes = [])
     {
         $status = [];
-        foreach ($this->config as $libraryConfig) {
+	foreach ($this->config as $libraryConfig) {
             if (!empty($libraryConfig['code']) 
               && !empty($libraryConfig['opac-link'])
-              && (in_array($libraryConfig['code'], $libraryCodes)
-                 || empty($libraryCodes))) {
+              && (in_array($libraryConfig['code'], $libraryCodes) || empty($libraryCodes))) {
                 $result = $this->doHTTPRequest($id, $libraryConfig['opac-link'], $libraryConfig['code']);
                 $resultArray = json_decode($result, true);
-                if (!empty($resultArray)) {
-                    $status[] = array_merge($resultArray, ['LibraryCode' => $libraryConfig['code'], 'LibraryName' => $libraryConfig['fullname']]);
+		if (!empty($resultArray)) {
+                    $libraryData = ['LibraryCode' => $libraryConfig['code'], 'LibraryName' => $libraryConfig['fullname']];
+                    if (!empty($libraryConfig['order-link'])) {
+                        $libraryData['OrderLink'] = $libraryConfig['order-link'];
+                    }
+                    $status[] = array_merge($resultArray, $libraryData);
                 }
             }
         }
@@ -153,7 +156,7 @@ class OpacScraper extends \VuFind\ILS\Driver\AbstractBase
      */
     public function getHolding($id, array $patron = null, array $options = [])
     {
-        return $this->getStatus($id);
+        return $this->getStatus($id, $options);
     }
 
     /**
