@@ -1,0 +1,6 @@
+<?php
+$openUrlHelper = $this->openUrl($this->driver, 'record');
+foreach ($openUrlHelper->getActiveServices() as $service):
+  echo $service . ' ';
+endforeach;
+?>

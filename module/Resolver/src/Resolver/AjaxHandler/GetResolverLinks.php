@@ -103,10 +103,14 @@ class GetResolverLinks extends AbstractBase implements TranslatorAwareInterface
     {
         $this->disableSessionWrites();  // avoid session write timing bug
         $openUrl = $params->fromQuery('openurl', '');
+        $resolverService = $params->fromQuery('resolverservice', ''); 
         $searchClassId = $params->fromQuery('searchClassId', '');
 
         $snippets = [];
         foreach($this->resolverConfig as $service => $params) {
+            if (!empty($resolverService) && $resolverService != $service) {
+                continue;
+            }
             if (!empty($params['resolver'])) {
                 $resolverType = $params['resolver'];
                 if (!$this->pluginManager->has($resolverType)) {

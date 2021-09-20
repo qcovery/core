@@ -28,7 +28,6 @@
 namespace Resolver\View\Helper\Resolver;
 
 use VuFind\View\Helper\Root\Context;
-//use Resolver\Resolver\Driver\PluginManager;
 use VuFind\Resolver\Driver\PluginManager;
 
 /**
@@ -57,18 +56,32 @@ class OpenUrl extends \VuFind\View\Helper\Root\OpenUrl
      * @param PluginManager          $pluginManager Resolver plugin manager
      * @param \Laminas\Config\Config $config        VuFind OpenURL config
      */
-    public function __construct(Context $context, $openUrlRules,
-        PluginManager $pluginManager, $config = null, $resolverConfig = null
+    public function __construct(
+        Context $context,
+        $openUrlRules,
+        PluginManager $pluginManager,
+        $config = null,
+        $resolverConfig = null
     ) {
         parent::__construct($context, $openUrlRules, $pluginManager, $config);
         $this->resolverConfig = $resolverConfig->toArray();
+    }
+
+    public function getActiveServices()
+    {
+        $services = [];        foreach($this->resolverConfig as $service => $params) {
+            if (!empty($params['url']) && $this->isActive($service)) {
+                $services[] = $service;
+            }
+        }
+        return $services;
     }
 
     public function resolve()
     {
         $snippets = [];
         foreach($this->resolverConfig as $service => $params) {
-            if (!empty($params['url'])) {
+            if (!empty($params['url']) && $this->isActive($service)) {
                 $snippets[] = $this->renderTemplateForService($service);
             }
         }
@@ -76,6 +89,49 @@ class OpenUrl extends \VuFind\View\Helper\Root\OpenUrl
             $snippets[] = parent::renderTemplate();
         }
         return $snippets;
+    }
+
+    /**
+     * Public method to check whether OpenURLs are active for current record
+     *
+     * @return bool
+     */
+    public function isActive($resolver = null)
+    {
+        // check first if OpenURLs are enabled for this RecordDriver
+        // check second if OpenURLs are enabled for this context
+        // check last if any rules apply
+        if (!$this->recordDriver->getOpenUrl()
+            || !$this->checkContext()
+            || !$this->checkIfRulesApply($resolver)
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if the rulesets found apply to the current record. First match counts.
+     *
+     * @return bool
+     */
+    protected function checkIfRulesApply($resolver = null)
+    {
+        // special case if no rules are defined at all assume that any record is
+        // valid for openUrls
+//print_r($this->openUrlRules);
+        if (!isset($this->openUrlRules) || count($this->openUrlRules) < 1) {
+            return true;
+        }
+        foreach ($this->openUrlRules as $rules) {
+            if ((empty($resolver) || $rules['resolver'] == $resolver)
+                && !$this->checkExcludedRecordsRules($rules)
+                && $this->checkSupportedRecordsRules($rules)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected function renderTemplateForService($service)
@@ -120,6 +176,7 @@ class OpenUrl extends \VuFind\View\Helper\Root\OpenUrl
 
         // Build parameters needed to display the control:
         $params = [
+            'service' => $service,
             'resolverUrl' => $resolverUrl,
             'openUrl' => $openurl,
             'openUrlBase' => empty($baseUrl) ? false : $baseUrl,
