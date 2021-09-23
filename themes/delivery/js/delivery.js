@@ -5,7 +5,7 @@ jQuery(document).ready(function() {
         var domain = element.attr('data-domain');
         var searchClassId = element.attr('data-searchclass-id');
         jQuery.ajax({
-            url:'/vufind/AJAX/JSON?method=checkAvailability',
+            url:VuFind.path + '/AJAX/JSON?method=checkAvailability',
             dataType:'json',
             data:{ppn:topId, source:searchClassId, domain:domain},
             success:function(data, textStatus) {

@@ -26,7 +26,7 @@ $(document).ready(function() {
         var searchClass = $(this).data('searchclass');
         var queryString = $(this).data('query');
         jQuery.ajax({
-            url:'/vufind/AJAX/JSON?method=getResultCount',
+            url:VuFind.path + '/AJAX/JSON?method=getResultCount',
             dataType:'json',
             data:{querystring:queryString, source:searchClass},
             success:function(data, textStatus){
@@ -35,6 +35,7 @@ $(document).ready(function() {
         });
     });
 });
+//facets (neue Implementierung)
 // Sidebar
 function moreFacets(id) {
   $('.' + id).removeClass('hidden');

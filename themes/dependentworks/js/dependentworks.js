@@ -1,8 +1,8 @@
 jQuery(document).ready(function() {
     var recordId;
     var SearchClassId = 'Solr';
-    var ResultPath = 'Search';
-    var RecordPath = 'Record';
+    var ResultPath = VuFind.path + '/Search/Results';
+    var RecordPath = VuFind.path + '/Record/';
     var pathParts = window.location.pathname.split('/');
     var recordIndex = pathParts.length - 1;
     if (pathParts[recordIndex] == 'Record' || pathParts[recordIndex] == 'Search2Record') {
@@ -18,21 +18,21 @@ jQuery(document).ready(function() {
     
     if (pathParts[recordIndex] == 'Search2Record') {
       var SearchClassId = 'Search2';
-      var ResultPath = 'Search2';
-      var RecordPath = 'Search2Record';
+      var ResultPath = VuFind.path + '/Search2/Results';
+      var RecordPath = VuFind.path + '/Search2Record/';
     }
 
     jQuery.ajax({
-        url:'/vufind/AJAX/JSON?method=getDependentWorks',
+        url:VuFind.path + '/AJAX/JSON?method=getDependentWorks',
         dataType:'json',
         data:{ppn:recordId, source:SearchClassId},
         success:function(data, textStatus) {
             if (data.data.length > 0) {
                 if (data.data[0]['resultString'] !== undefined) {
-                    var href = '<a href="/vufind/'+ResultPath+'/Results?lookfor='+data.data[0]['searchfield']+':'
+                    var href = '<a href="' + ResultPath + '?lookfor=' + data.data[0]['searchfield'] + ':'
                             + recordId + ' -id:'  + recordId;
                     if (data.data[0]['filter'].length > 0) {
-                        href += '&filter[]='+data.data[0]['filter'];
+                        href += '&filter[]=' + data.data[0]['filter'];
                     }
                     href += '&sort=year">' + data.data[0]['resultString'] + '</a>';
                     jQuery('ul#DependentWorks').append('<li>' + href + '</li>');
@@ -40,7 +40,7 @@ jQuery(document).ready(function() {
                     var visibleItems = (data.data.length < 3) ? data.data.length : 3;
                     for (var i = 0; i < visibleItems; i++) {
                         var title = data.data[i]['title'];
-                        var href = '<a href="/vufind/'+RecordPath+'/' + data.data[i]['id'] + '">' + title + '</a>';
+                        var href = '<a href="' + RecordPath + data.data[i]['id'] + '">' + title + '</a>';
                         var item = data.data[i]['prefix'] + href;
                         jQuery('ul#DependentWorks').append('<li>' + item + '</li>');
                     }
@@ -48,7 +48,7 @@ jQuery(document).ready(function() {
                         jQuery('p#ToggleDependentWorksMore').attr('style', 'display:block');
                         for (var i = visibleItems; i < data.data.length; i++) {
                             var title = data.data[i]['title'];
-                            var href = '<a href="/vufind/'+RecordPath+'/' + data.data[i]['id'] + '">' + title + '</a>';
+                            var href = '<a href="' + RecordPath + data.data[i]['id'] + '">' + title + '</a>';
                             var item = data.data[i]['prefix'] + href;
                             jQuery('ul#DependentWorksHidden').append('<li>' + item + '</li>');
                         }

@@ -55,7 +55,7 @@ jQuery(document).ready(function() {
         if (typeof(queryString) != "undefined") {
             queryString = queryString.substring(1, queryString.length - 1);
             jQuery.ajax({
-                url:'/vufind/AJAX/JSON?method=getLibraries',
+                url:VuFind.path + '/AJAX/JSON?method=getLibraries',
                 dataType:'json',
                 data:{querystring:queryString, source:searchClass},
                 success:function(data, textStatus) {
