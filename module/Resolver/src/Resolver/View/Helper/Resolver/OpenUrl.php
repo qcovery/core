@@ -69,7 +69,8 @@ class OpenUrl extends \VuFind\View\Helper\Root\OpenUrl
 
     public function getActiveServices()
     {
-        $services = [];        foreach($this->resolverConfig as $service => $params) {
+        $services = [];
+        foreach($this->resolverConfig as $service => $params) {
             if (!empty($params['url']) && $this->isActive($service)) {
                 $services[] = $service;
             }

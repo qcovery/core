@@ -54,7 +54,7 @@ class JOP extends AbstractBase
     protected $parameters;
 
     /**
-     * Mapr
+     * Map
      *
      * @var array
      */
@@ -62,6 +62,24 @@ class JOP extends AbstractBase
         'title' => 'title',
         'genre' => 'genre',
         'issn' => 'issn'];
+
+    /**
+     * states
+     *
+     * @var array
+     */
+    protected $states = [
+        'electronic' => [
+            '0' => 'free access',
+            '1' => 'partly access',
+            '2' => 'licenced',
+            '3' => 'partly licenced'
+        ],
+        'print' => [
+            '2' => 'available',
+            '3' => 'partly available'
+        ]
+    ];
 
     /**
      * HTTP client
@@ -145,6 +163,7 @@ class JOP extends AbstractBase
             foreach ($paramsArray as $key => $value) {
                 $paramsList[] = $key . '=' . urlencode($value);
             }
+// else: keine URL, keine Anzeige
         }
         $params = implode('&', $paramsList);
         return parent::getResolverUrl($params);
@@ -173,8 +192,9 @@ class JOP extends AbstractBase
     {
         // Get the actual resolver url for the given openUrl
         $url = $this->getResolverUrl($openURL);
-        // Make the call to the EZB and load results
+        // Make the call to the fize-service and load results
         $feed = $this->httpClient->setUri($url)->send()->getBody();
+//echo $feed;
         return $feed;
     }
 
@@ -200,10 +220,16 @@ class JOP extends AbstractBase
         $root = $xml->xpath("//ElectronicData//ResultList");
         $xml = $root[0];
         foreach ($xml->children() as $target) {
+            $state = (int)$target->attributes()->state;
+            $url = (string)$target->AccessURL;
+            if (!in_array($state, array_keys($this->states['electronic']))
+                   || empty($url)) {
+                continue;
+            }
             $record = [];
             $record['title'] = (string)$target->Title;
-            $record['href'] = (string)$target->AccessURL;
-            $record['coverage'] = '';
+            $record['href'] = $url;
+            $record['coverage'] = $this->states['electronic'][$state];
             $record['service_type'] = 'electronic';
             $record['access'] = (string)$target->AccessLevel;
             $notes = [];
@@ -217,13 +243,23 @@ class JOP extends AbstractBase
         $root = $xml->xpath("//PrintData//ResultList");
         $xml = $root[0];
         foreach ($xml->children() as $target) {
+            $state = (int)$target->attributes()->state;
+            $location = (string)$target->Location;
+            if (!in_array($state, array_keys($this->states['print']))
+                   || empty($location)) {
+                continue;
+            }
             $record = [];
             $record['title'] = (string)$target->Title;
-            $record['href'] = (string)$target->AccessURL;
-            $record['coverage'] = '';
+            $record['href'] = '';
+            $record['coverage'] = (string)$target->Period;
             $record['service_type'] = 'getHolding';
-            $record['access'] = (string)$target->AccessLevel;
+            $record['access'] = '';
             $notes = [];
+            $notes[] = $location;
+            if (!empty($target->Signature)) {
+                $notes[] = (string)$target->Signature;
+            }
             foreach ((array)$target->Additionals as $additional) {
                 $notes[] = $additional;
             }
