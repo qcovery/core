@@ -37,8 +37,8 @@
   <? endif; ?>
 
   <? if ($title == 'format'): ?>
-    <? if ($belugino = $this->configreader()->getConfigData('belugino', 'useInFormatFacet')): ?>
-      <? if ($belugino = $this->configreader()->getConfigData('belugino', $thisFacet['value'])): ?>
+    <? if ($belugino = $this->configreader()->getConfigData('useInFormatFacet')): ?>
+      <? if ($belugino = $this->configreader()->getConfigData($thisFacet['value'])): ?>
         <i class="<?=$belugino?>"></i>
       <? else: ?>
         <i class="bel-unbek"></i>

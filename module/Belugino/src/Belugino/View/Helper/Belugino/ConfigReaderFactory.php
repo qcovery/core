@@ -3,7 +3,7 @@
  * Factory for RecordDriver view helper
  *
  */
-namespace BelugaConfig\View\Helper\BelugaConfig;
+namespace Belugino\View\Helper\BelugaConfig;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -29,7 +29,7 @@ class ConfigReaderFactory implements FactoryInterface
             throw new \Exception('Unexpected options sent to factory.');
         }
         return new $requestedName(
-            $container->get('VuFind\Config')->get('BelugaConfig')
+            $container->get('VuFind\Config')->get('belugino')
         );
     }
 }
