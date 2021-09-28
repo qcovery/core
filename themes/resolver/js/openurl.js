@@ -62,6 +62,7 @@ VuFind.register('openurl', function OpenUrl() {
     });
 
     if (typeof Hunt === 'undefined') {
+      container.find('.openUrlEmbed a').trigger('click');
       container.find('.openUrlEmbed.openUrlEmbedAutoLoad a').trigger('click');
     } else {
       new Hunt(
