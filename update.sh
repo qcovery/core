@@ -40,6 +40,9 @@ while [ -z "$APP" ]; do
     read APP;
 done;
 
+# $APP = $ACTUALPATH
+# $MOD = $APP-module
+
 TMPPATH=$(echo $ACTUALPATH | sed -s "s/^\(.\+\)\/\([^/]\+\)$/\\2/");
 echo -n "Pfad der Module (relativ zum Basispfad) ["$TMPPATH"]: ";
 read MOD;
