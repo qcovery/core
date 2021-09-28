@@ -3,7 +3,7 @@
  * Factory for RecordDriver view helper
  *
  */
-namespace Belugino\View\Helper\BelugaConfig;
+namespace Belugino\View\Helper\Belugino;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;

@@ -13,7 +13,7 @@ class ConfigReader extends AbstractHelper
 
     public function __construct($beluginoConfig)
     {
-        $this->beluginoConfig = (array)$beluginoConfig;
+        $this->beluginoConfig = $beluginoConfig;
     }
 
     /**
