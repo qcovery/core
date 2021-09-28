@@ -62,7 +62,13 @@
     <i class="fa <?=$thisFacet['isApplied'] ? 'fa-check-square-o' : 'fa-square-o' ?>" aria-hidden="true"></i>
   <? endif; ?>
 
-  <?=$this->transEsc($thisFacet['displayText'])?>
+  <? $displayText = $this->transEsc($thisFacet['displayText']);?>
+
+  <? if ($thisFacet['indent'] ?? '') : ?>
+  <?  $displayText = '<span style="margin-left:10px">' . $displayText . '</span>';?>
+  <? endif; ?>
+
+  <?=$displayText?>
 
   <? if (!$thisFacet['isApplied'] && $this->allowExclude): ?>
       </a>

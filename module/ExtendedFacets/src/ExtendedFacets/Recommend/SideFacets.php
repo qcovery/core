@@ -106,44 +106,64 @@ class SideFacets extends \VuFind\Recommend\SideFacets
         return $newFacetList;
     }
 
-    /**
-     * Process show facet value
-     *
-     * @return array
-     */
-    protected function showFacetValue($facetSet)
+    protected function getFormatFacets($oldFacetList)
     {
-        $facetSettings = $this->configLoader->get('facets');
-
-        if ($facetSettings->ShowFacetValue && is_array($facetSettings->ShowFacetValue->toArray())) {
-            foreach ($facetSettings->ShowFacetValue as $showFacet => $showFacetValues) {
-                if (isset($facetSet[$showFacet]['list'])) {
-                    foreach ($facetSet[$showFacet]['list'] as $facet => $value) {
-                        if (!in_array($value['value'], $showFacetValues->toArray())) {
-                            unset($facetSet[$showFacet]['list'][$facet]);
-                        }
-                    }
+        $facetList = $tmpFacetList = [];
+        foreach ($oldFacetList as $index => $facet) {
+            $i = 10 * $index;
+            if (strpos($facet['value'], ' ') > 0) {
+                list($fType, $fName) = explode(' ', $facet['value']);
+                if (in_array($fName,array_keys($tmpFacetList))) {
+                    $i = ++$tmpFacetList[$fName];
+                    $facet['indent'] = 'y';
                 }
+                $facetList[$i] = $facet;
+            } else {
+                $tmpFacetList[$facet['value']] = $i;
+                $facetList[$i] = $facet;
             }
         }
-
-        return $facetSet;
+        ksort($facetList,SORT_NUMERIC);
+        return array_values($facetList);
     }
 
     /**
+     * Store the configuration of the recommendation module.
+     *
+     * @param string $settings Settings from searches.ini.
+     *
+     * @return void
+     */
+    public function setConfig($settings)
+    {
+        parent::setConfig($settings);
+        $config = $this->configLoader->get('facets');
+        if (isset($config->SpecialFacets->indentedFacets)) {
+            $this->indentedFacets = $config->SpecialFacets->indentedFacets->toArray();
+        }
+        if (isset($config->SpecialFacets->numberDrillFacets)) {
+            $this->numberDrillFacets = $config->SpecialFacets->numberDrillFacets->toArray();
+        }
+    }
+
+     /**
      * Get facet information from the search results.
      *
      * @return array
      */
     public function getFacetSet()
     {
-        $facetSet = \VuFind\Recommend\SideFacets::getFacetSet();
-        if (isset($facetSet['publishDate'])) {
-            $facetSet['publishDate']['list'] = $this->getYearFacets($facetSet['publishDate']['list'], $facetSet['publishDate']['label']);
+        $facetSet = parent::getFacetSet();
+        foreach ($this->numberDrillFacets as $facetName) {
+            if (isset($facetSet[$facetName])) {
+                $facetSet[$facetName]['list'] = $this->getYearFacets($facetSet[$facetName]['list'], $facetSet[$facetName]['label']);
+            }
         }
-
-        $facetSet = $this->showFacetValue($facetSet);
-
+        foreach ($this->indentedFacets as $facetName) {
+            if (isset($facetSet[$facetName])) {
+                $facetSet[$facetName]['list'] = $this->getFormatFacets($facetSet[$facetName]['list']);
+            }
+        }
         return $facetSet;
     }
 }
