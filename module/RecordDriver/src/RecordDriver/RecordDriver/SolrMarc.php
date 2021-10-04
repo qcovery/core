@@ -189,6 +189,9 @@ class SolrMarc extends SolrDefault
                 $solrMarcSpecs[$item]['match-key'] = $solrMarcSpec['match-key'];
             }
             unset($solrMarcSpec['match-key']);
+            if (empty($solrMarcSpec)) {
+                continue;
+            }
             $conditions = $subfields = $parentMethods = $description = [];
 	    foreach ($solrMarcSpec as $marcField => $fieldSpec) {
                 if (!empty($fieldSpec)) {
