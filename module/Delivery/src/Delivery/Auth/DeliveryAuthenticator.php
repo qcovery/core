@@ -148,9 +148,7 @@ class DeliveryAuthenticator extends ILSAuthenticator
             $user->delivery_email = $deliveryUser->delivery_email;
             $user->user_delivery_id = $deliveryUser->id;
             $user->patron_types = implode(', ', $patronTypes);
-            if ($asAdmin) {
-                $user->is_admin = $deliveryUser->is_admin;
-            }
+            $user->is_admin = $deliveryUser->is_admin;
             $this->user = $user;
             if (!$asAdmin || $user->is_admin == 'y') {
                 return 'authorized';

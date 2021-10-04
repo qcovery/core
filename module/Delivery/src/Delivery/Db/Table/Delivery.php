@@ -44,6 +44,9 @@ use VuFind\Exception\LoginRequired as LoginRequiredException;
  */
 class Delivery extends Gateway
 {
+
+    protected $resourceFields = ['record_id', 'title', 'author', 'year', 'source'];
+
     /**
      * Constructor
      *
@@ -75,35 +78,83 @@ class Delivery extends Gateway
         return $resource->select($callback)->toArray();
     }
 
-    public function getCompleteList()
+    public function getCount($deliveryDomain, $notDelivered = true)
     {
-        $callback = function ($select) use ($user_delivery_id) {
-            $select->columns(['*']);
-            $select->join(
-                ['d' => 'delivery'],
-                'resource.id = d.resource_id',
-                ['*']
-            );
-            //$select->where->equalTo('d.user_delivery_id', $user_delivery_id);
-        };
+        if ($notDelivered) {
+            $callback = function ($select) use ($deliveryDomain) {
+                $select->columns(['id' => new Expression('COUNT(id)')]);
+                $select->where->isNull('delivered');
+                $select->where->and->equalTo('delivery_domain', $deliveryDomain);
+            };
+            return $this->select($callback)->toArray();
+
+        }
+        return [];
+    }
+
+    public function getCompleteList($deliveryDomain, $notDelivered = true)
+    {
+        if ($notDelivered) {
+            //$callback = function ($select) use ($user_delivery_id) {
+            $callback = function ($select) use ($deliveryDomain) {
+                $select->columns(['*']);
+                $select->join(
+                    ['d' => 'delivery'],
+                    'resource.id = d.resource_id',
+                    ['delivery' => 'id', 'order' => 'order_id', 'ordered' => 'ordered']
+                );
+                $select->join(
+                    ['ud' => 'user_delivery'],
+                    'd.user_delivery_id = ud.id',
+                    ['email' => 'delivery_email']
+                );
+                $select->join(
+                    ['u' => 'user'],
+                    'ud.user_id = u.id',
+                    ['user' => 'id', 'firstname' => 'firstname', 'lastname' => 'lastname', 'userid' => 'cat_id']
+                );
+                $select->where->isNull('d.delivered');
+                $select->where->and->equalTo('d.delivery_domain', $deliveryDomain);
+            };
+        } else {
+            $callback = function ($select) use ($user_delivery_id) {
+                $select->columns(['*']);
+                $select->join(
+                    ['d' => 'delivery'],
+                    'resource.id = d.resource_id',
+                    ['*']
+                );
+            };
+        }
         $resource = $this->getDbTable('Resource');
         return $resource->select($callback)->toArray();
     }
 
-    public function createRowForUserDeliveryId($user_delivery_id, $order_id, $data)
+    public function createRowForUserDeliveryId($user_delivery_id, $order_id, $deliveryDomain, $data)
     {
-        if (empty($data['record_id']) || empty($user_delivery_id)) {
+        if (empty($user_delivery_id)) {
             return false;
+        }
+        if (empty($data['record_id'])) {
+            $data['record_id'] = '-';
         }
         $resource = $this->getDbTable('Resource');
         $resourceRow = $resource->createRow();
-        $resourceRow->record_id = $data['record_id'];
-        $resourceRow->title = $data['title'] ?? '';
-        $resourceRow->author = $data['author'] ?? '';
-        if (!empty($data['year'])) {
-            $resourceRow->year = intval($data['year']);
+
+        $extraMetadata = [];
+        foreach ($data as $field => $value) {
+            if (!empty($value)) {
+                if (strpos($field, 'extra:') === 0) {
+                    $extraMetadata[] = substr($field, 6) . ':' . $value;
+                } elseif (in_array($field, $this->resourceFields)) {
+                    $resourceRow->$field = $value;
+                }
+            }
         }
-        $resourceRow->source = $data['source'] ?? 'Solr';
+        if (!empty($extraMetadata)) {
+            $resourceRow->extra_metadata = implode(';', $extraMetadata);
+        }
+
         $resourceRow->save();
         $resource_id = $resourceRow->id;
 
@@ -111,11 +162,22 @@ class Delivery extends Gateway
         $row = $this->createRow();
         $row->user_delivery_id = $user_delivery_id;
         $row->resource_id = $resource_id;
+        $row->delivery_domain = $deliveryDomain;
         if (isset($order_id)) {
             $row->order_id = $order_id;
+            $row->delivered = $date->format('Y-m-d H:i:s');
         }
         $row->ordered = $date->format('Y-m-d H:i:s');
         $row->save();
         return $row->id;
+    }
+
+    public function upDateOrder($delivery_id, $order_id)
+    {
+        $delivery = $this->select(['id' => $delivery_id])->current();
+        $delivery->order_id = $order_id;
+        $date = new \DateTime();
+        $delivery->delivered = $date->format('Y-m-d H:i:s');
+        $delivery->save();
     }
 }

@@ -17,6 +17,8 @@ use Delivery\Driver\PluginManager;
 
 class DataHandler {
 
+    protected $deliveryDomain;
+
     protected $pluginConfig;
 
     protected $solrDriver;
@@ -43,8 +45,9 @@ class DataHandler {
 
     protected $format;
 
-    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $pluginConfig)
+    public function __construct(PluginManager $driverManager, $params, $orderDataConfig, $pluginConfig, $deliveryDomain)
     {
+        $this->deliveryDomain = $deliveryDomain;
         $this->pluginConfig = $pluginConfig;
         $this->dataFields = $orderDataConfig;
         $this->driverManager = $driverManager;
@@ -95,16 +98,15 @@ class DataHandler {
 
     public function insertOrderData($user, $table)
     {
-        $tableFields = ['record_id', 'title', 'author', 'year'];
         $listData = [];
         foreach ($this->dataFields as $fieldSpecs) {
-            if (!empty($fieldSpecs['tablefield']) && in_array($fieldSpecs['tablefield'], $tableFields)) {
+            if (!empty($fieldSpecs['tablefield'])) {
                 $field = $fieldSpecs['tablefield'];
                 $listData[$field] = $this->params->fromPost($fieldSpecs['form_name']);
             }
         }
         foreach ($this->dataFields as $fieldSpecs) {
-            if (isset($fieldSpecs['fallbacktablefield']) && in_array($fieldSpecs['fallbacktablefield'], $tableFields)) {
+            if (isset($fieldSpecs['fallbacktablefield'])) {
                 $field = $fieldSpecs['fallbacktablefield'];
                 if (empty($listData[$field])) {
                     $listData[$field] = $this->params->fromPost($fieldSpecs['form_name']);
@@ -112,10 +114,84 @@ class DataHandler {
             }
         }
         $listData['source'] = $this->params->fromQuery('searchClassId') ?? $this->params->fromPost('searchClassId');
+        $table->createRowForUserDeliveryId($user->user_delivery_id, $this->order_id, $this->deliveryDomain, $listData);
+    }
 
-        if (!empty($listData['record_id'])) {
-            $table->createRowForUserDeliveryId($user->user_delivery_id, $this->order_id, $listData);
+    public function getSavedOrderData($table, $notDelivered = true) {
+        $savedOrderData = $table->getCompleteList($this->deliveryDomain, $notDelivered);
+        foreach ($savedOrderData as $index => $order) {
+            if (!empty($order['extra_metadata'])) {
+                $extraData = explode(';', $order['extra_metadata']);
+                foreach ($extraData as $data) {
+                    list($key, $value) = explode(':', $data, 2);
+                    if (!empty($value)) {
+                        $savedOrderData[$index][$key] = $value;
+                    }
+                }
+            }
+            unset($savedOrderData[$index]['extra_metadata']);
         }
+        return $savedOrderData;
+    }
+
+    public function reOrderAll($recordLoader, $deliveryMarcYaml, $table) {
+        $orderData = $this->getSavedOrderData($table, true);
+        foreach ($orderData as $orderValues) {
+            $id = $orderValues['record_id'];
+            $searchClassId = $orderValues['source'];
+            try {
+                $driver = $recordLoader->load($id, $searchClassId);
+            } catch (\Exception $e) {
+                $driver = null;
+            }
+            if ($driver) {
+                $this->setSolrDriver($driver, $deliveryMarcYaml);
+                $this->reOrder($table, $orderValues);
+            }
+        }
+    }
+
+    public function reOrder($table, $orderValues) {
+        if ($this->setDeliveryDriver()) {
+	    $this->collectData();
+            $user = (object) [
+                'firstname' => $orderValues['firstname'],
+                'lastname' => $orderValues['lastname'],
+                'cat_id' => $orderValues['userid'],
+                'delivery_email' => $orderValues['email'],
+                'patron_types' => ''
+            ];
+            $orderData = $this->deliveryDriver->prepareOrder($user);
+            foreach ($this->dataFields as $fieldSpecs) {
+                $key = $fieldSpecs['form_name'];
+                if (!empty($fieldSpecs['orderfield']) && !empty($key)) {
+                    $prefix = $fieldSpecs['orderfieldprefix'] ?? '';
+                    if (!empty($orderValues[$key])) {
+                        $value = $prefix . $orderValues[$key];
+                    } else {
+                        $fieldTypes = explode(',', $fieldSpecs['type']);
+                        foreach ($fieldTypes as $fieldType) {
+                            if (!empty($this->formData[$fieldType][$key])) {
+                                $value = $prefix . $this->formData[$fieldType][$key];
+                                break;
+                            }
+                        }
+                    }
+                    if (empty($orderData[$fieldSpecs['orderfield']])) {
+                        $orderData[$fieldSpecs['orderfield']] = $value;
+                    } elseif ($value != $orderData[$fieldSpecs['orderfield']]) {
+                        $orderData[$fieldSpecs['orderfield']] .= ', ' . $value;
+                    }
+                }
+            }
+            if ($this->order_id = $this->deliveryDriver->sendOrder($orderData)) {
+                $table->updateOrder($orderValues['delivery'], $this->order_id);
+                return true;
+            } else {
+                $this->errors = $this->deliveryDriver->getErrors();
+            }
+        }
+        return false;
     }
 
     public function getOrderStatus()

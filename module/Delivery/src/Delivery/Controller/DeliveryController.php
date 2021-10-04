@@ -97,14 +97,33 @@ class DeliveryController extends AbstractBase
         if ($message != 'authorized') {
             return $this->forwardTo('MyResearch', 'Profile');
         }
-
+        $isAdmin = ($this->user->is_admin == 'y');
         $deliveryTable = $this->getTable('delivery');
+        if ($isAdmin) {
+            if ($this->params()->fromQuery('reorder') == 'y') {
+                $orderDataConfig = $this->configurationManager->getOrderDataConfig();
+                $pluginConfig =  $this->configurationManager->getPluginConfig();
+                $mainConfig = $this->configurationManager->getMainConfig();
+
+                $dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'),
+                                               $this->params(), $orderDataConfig, 
+                                               $pluginConfig, $deliveryDomain);
+                $dataHandler->reOrderAll($this->getRecordLoader(), 
+                                         $mainConfig['delivery_marc_yaml'], 
+                                         $deliveryTable);
+            }
+            $count = $deliveryTable->getCount($deliveryDomain, true);
+            $notDelivered = $count[0]['id'];
+        }
+
         $listData = $deliveryTable->getDeliveryList($this->user->user_delivery_id);
         $templateParams = $this->deliveryAuthenticator->getTemplateParams($deliveryDomain);
 
         $error = $this->updateDeliveryMail();
 
         $view = $this->createViewModel();
+        $view->is_admin = $isAdmin;
+        $view->not_delivered = $notDelivered;
         $view->title = $templateParams['title'];
         $view->domain = $deliveryDomain;
 	$view->message = $message;
@@ -145,7 +164,7 @@ class DeliveryController extends AbstractBase
             $pluginConfig =  $this->configurationManager->getPluginConfig();
             $mainConfig = $this->configurationManager->getMainConfig();
             $dataHandler = new DataHandler($this->serviceLocator->get('Delivery\Driver\PluginManager'), 
-                                           $this->params(), $orderDataConfig, $pluginConfig);
+                                           $this->params(), $orderDataConfig, $pluginConfig, $deliveryDomain);
             if (!empty($id)) {
                 $driver = $this->getRecordLoader()->load($id, $searchClassId);
                 $dataHandler->setSolrDriver($driver, $mainConfig['delivery_marc_yaml']);
