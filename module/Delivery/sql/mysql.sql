@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `delivery` (
   `user_delivery_id` int(11) NOT NULL DEFAULT '0',
   `resource_id` int(11) NOT NULL DEFAULT 0,
   `order_id` varchar(31),
+  `delivery_domian` varchar(63);
   `comment` text,
   `ordered` datetime,
   `delivered` datetime,

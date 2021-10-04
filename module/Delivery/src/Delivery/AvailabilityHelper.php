@@ -85,7 +85,8 @@ class AvailabilityHelper {
     {
         $availabilityConfig = $this->availabilityConfig;
         $formatData = $this->getMarcData('Format');
-        $format = array_shift(array_shift($formatData));
+        $formatList = array_shift($formatData);
+        $format = array_shift($formatList);
         $signatureData = $this->getMarcData('Signature');
         $licenceData = $this->getMarcData('Licence');
 

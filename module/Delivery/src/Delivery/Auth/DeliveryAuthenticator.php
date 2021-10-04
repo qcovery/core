@@ -181,11 +181,11 @@ class DeliveryAuthenticator extends ILSAuthenticator
         $this->configurationManager->setConfigurations($deliveryDomain);
         $config = $this->configurationManager->getMainConfig();
         $templateParams = [];
-        $templateParams['show_home'] = $config['template_show_home'] ?: '';
-        $templateParams['title'] = $config['template_title'] ?: '';
-        $templateParams['text'] = $config['template_text'] ?: '';
-        $templateParams['icon'] = $config['template_icon'] ?: '';
-        $templateParams['belugino'] = $config['template_belugino'] ?: '';
+        $templateParams['show_home'] = $config['template_show_home'] ?? '';
+        $templateParams['title'] = $config['template_title'] ?? '';
+        $templateParams['text'] = $config['template_text'] ?? '';
+        $templateParams['icon'] = $config['template_icon'] ?? '';
+        $templateParams['belugino'] = $config['template_belugino'] ?? '';
         return $templateParams;
     }
 }
