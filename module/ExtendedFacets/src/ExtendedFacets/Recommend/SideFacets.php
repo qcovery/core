@@ -40,6 +40,11 @@ namespace ExtendedFacets\Recommend;
  */
 class SideFacets extends \VuFind\Recommend\SideFacets
 {
+
+    protected $indentedFacets = [];
+
+    protected $numberDrillFacets = [];
+
     /**
      * getYearFacets
      *
