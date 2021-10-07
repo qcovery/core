@@ -83,9 +83,11 @@ class SolrDetails extends \Laminas\View\Helper\AbstractHelper
                 }
                 $originalLetters = '';
                 foreach ($solrMarcData[$solrMarcKey] as $data) {
-                    foreach ($data as $date) {
-                        if (isset($date['originalLetters'])) {
-                            $originalLetters .= ' ' . $date['originalLetters'];
+                    if (is_array($data)) {
+                        foreach ($data as $date) {
+                            if (isset($date['originalLetters'])) {
+                                $originalLetters .= ' ' . $date['originalLetters'];
+                            }
                         }
                     }
                 }

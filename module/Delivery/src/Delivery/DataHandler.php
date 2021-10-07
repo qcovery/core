@@ -82,7 +82,7 @@ class DataHandler {
                     $value = $prefix . $this->params->fromPost($fieldSpecs['form_name']);
                     if (empty($orderData[$fieldSpecs['orderfield']])) {
                         $orderData[$fieldSpecs['orderfield']] = $value;
-                    } elseif ($value != $orderData[$fieldSpecs['orderfield']]) {
+                    } elseif (!empty($value) && $value != $orderData[$fieldSpecs['orderfield']]) {
                         $orderData[$fieldSpecs['orderfield']] .= ', ' . $value;
                     }
                 }

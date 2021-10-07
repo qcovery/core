@@ -194,7 +194,7 @@ class SolrMarc extends SolrDefault
             }
             $conditions = $subfields = $parentMethods = $description = [];
 	    foreach ($solrMarcSpec as $marcField => $fieldSpec) {
-                if (!empty($fieldSpec)) {
+                if (!empty($fieldSpec) && is_array($fieldSpec)) {
                     $conditions = $subfields = $parentMethods = $description = [];
                     foreach ($fieldSpec as $subField => $subFieldSpec) {
                         if (is_array($subFieldSpec)) {

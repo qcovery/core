@@ -190,18 +190,18 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
                         $this->scores['all']['all'] += $tie * $value;
                         $this->scores['all']['br'] += $tie * $value;
                         $this->scores['br']['all'] += $tie * $value;
-                        $this->scores['br'][$suffix] += $tie * $value;
+                        $this->scores['br'][$suffix] = ($this->scores['br'][$suffix] ?? 0) + $tie * $value;
                         $this->scores['fields-all']['all'] += $tie * $value;
-                        $this->scores['fields-all'][$item] += $tie * $value;
-                        $this->scores[$area][$item] += $tie * $value;
+                        $this->scores['fields-all'][$item] = ($this->scores['fields-all'][$item] ?? 0) + $tie * $value;
+                        $this->scores[$area][$item] = ($this->scores[$area][$item] ?? 0) + $tie * $value;
                         $this->scores[$area]['all'] += $tie * $value;
-                        if ( $value > $maxValue[$area] ) {
+                        if ( $value > ($maxValue[$area] ?? 0)) {
                             $maxItem[$area] = $item;
                             $maxValue[$area] = $value;
                         }
                     } else {
                         $this->scores['all']['all'] += $value;
-                        $this->scores[$area]['all'] += $value;
+                        $this->scores[$area]['all'] = ($this->scores[$area]['all'] ?? 0) + $value;
                         if ( !isset( $this->scores[$area][$item])) {
                             $this->scores[$area][$item] = 0;
                         }
@@ -225,7 +225,7 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
                     }
 		}
             }
-            if (strpos($area, 'fields-') === 0 && $maxValue[$area] > 0) {
+            if (strpos($area, 'fields-') === 0 && ($maxValue[$area] ?? 0) > 0) {
                 $term = $this->searchTerm[$maxItem[$area].$maxValue[$area]];
                 $this->results[$area][$term] = ['field' => $maxItem[$area] , 'term' => $term , 'value' => $maxValue[$area]];
                 $suffix = (strpos($area, 'terms') !== false) ? 'terms' : 'phrase';
