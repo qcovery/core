@@ -461,4 +461,13 @@ class PAIA extends PAIAbase
 
         return $result;
     }
+
+    public function getCancelStorageRetrievalRequestDetails($details)
+    {
+        return $details['item_id'];
+    }
+
+    public function cancelStorageRetrievalRequests($cancelDetails) {
+        return $this->cancelHolds($cancelDetails);
+    }
 }
