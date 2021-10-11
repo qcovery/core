@@ -89,8 +89,27 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             foreach ($ids as $id) {
                 $driver = $this->recordLoader->load($id, $source);
                 $urlAccess = '';
+		$response = [];
                 $daiaplus_check_bool = true;
-                
+
+                if (isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
+                    $urlAccess = $this->checkParentId($driver);
+                    if (!empty($urlAccess)) {
+                        $response = ['list' => ['url_access' => $urlAccess,
+                                                'url_access_level' => 'print_access_level',
+                                                'url_access_label' => 'Journal',
+                                                'link_status' => 1],
+                                     'items' => ['journal_check' =>
+                                                    ['url_access' => $urlAccess,
+                                                     'url_access_level' => 'print_access_level',
+                                                     'url_access_label' => 'Journal',
+                                                     'link_status' => 1]
+                                                 ]
+                                    ];
+                    $daiaplus_check_bool = false;
+                    }
+                }
+
                 $urlAccessUncertain = $this->checkDirectLink($driver);
                 if (!empty($urlAccessUncertain)) {
                     $urlAccessLevel = 'uncertain_article_access_level';
@@ -101,43 +120,22 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                 if (!empty($urlAccess)) {
                     $urlAccessLevel = 'fa_article_access_level';
                     $urlAccessLabel = 'full_text_fa_article_access_level';
+                         $response['list'] = ['url_access' => $urlAccess,
+                                            'url_access_level' => $urlAccessLevel,
+                                            'url_access_label' => $urlAccessLabel,
+                                            'link_status' => 1];
+                         $response['items']['fa_check'] = ['url_access' => $urlAccess,
+                                            'url_access_level' => $urlAccessLevel,
+                                            'url_access_label' => $urlAccessLabel,
+                                            'link_status' => 1];
+
                     $daiaplus_check_bool = false;
                 }
 
-                if ($daiaplus_check_bool == false) {
-                    $response = ['list' => ['url_access' => $urlAccess,
-                                            'url_access_level' => $urlAccessLevel,
-                                            'url_access_label' => $urlAccessLabel,
-                                            'link_status' => 1],
-                                'items' => ['lr_check' =>
-                                            ['url_access' => $urlAccess,
-                                            'url_access_level' => $urlAccessLevel,
-                                            'url_access_label' => $urlAccessLabel,
-                                            'link_status' => 1]
-                                ]
-                    ];
-                } else {
+                if ($daiaplus_check_bool == true) {
                     $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
                     error_log($url);
                     $response = json_decode($this->makeRequest($url), true);
-                }
-
-                if ((empty($response) || $response['list']['url_access_level'] == 'check_ill_access_level')
-                  && isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
-                    $urlAccess = $this->checkParentId($driver);
-                    if (!empty($urlAccess)) {
-                        $response = ['list' => ['url_access' => $urlAccess,
-                                                'url_access_level' => 'print_access_level',
-                                                'url_access_label' => 'Journal',
-                                                'link_status' => 1],
-                                     'items' => ['lr_check' =>
-                                                    ['url_access' => $urlAccess,
-                                                     'url_access_level' => 'print_access_level',
-                                                     'url_access_label' => 'Journal',
-                                                     'link_status' => 1]
-                                                 ]
-                                    ];
-                    }
                 }
 
                 $response = $this->prepareData($response, $listView);
