@@ -204,7 +204,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                             if (null !== $doc) {
                                 // a document with the corresponding id exists, which
                                 // means we got status information for that record
-                                $data = $this->parseDaiaDoc($id, $doc, $isCurrentIsil);
+                                $data = $this->parseDaiaDoc($id, $doc, $paiaIsil, $isCurrentIsil);
                                 // cache the status information
                                 if ($this->daiaCacheEnabled) {
                                     $this->putCachedData($this->generateURI($id), $data);
@@ -224,7 +224,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                             if (null !== $doc) {
                                 // parse the extracted DAIA document and save the status
                                 // info
-                                $data = $this->parseDaiaDoc($id, $doc, $isCurrentIsil);
+                                $data = $this->parseDaiaDoc($id, $doc, $paiaIsil, $isCurrentIsil);
                                 // cache the status information
                                 if ($this->daiaCacheEnabled) {
                                     $this->putCachedData($this->generateURI($id), $data);
@@ -324,7 +324,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
      *
      * @return array            Array with VuFind compatible status information.
      */
-    protected function parseDaiaArray($id, $daiaArray, $isCurrentIsil)
+    protected function parseDaiaArray($id, $daiaArray, $paiaIsil, $isCurrentIsil)
     {
         $doc_id = null;
         $doc_href = null;
@@ -385,6 +385,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
                     $result_item['chronology'] = $item['chronology'];
                 }
 
+                $result_item['paiaIsil'] = $paiaIsil;
                 $result_item['isCurrentIsil'] = $isCurrentIsil;
 
                 $result[] = $result_item;
@@ -394,6 +395,7 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
         // keep DAIA+ data
         if (isset($daiaArray['daiaplus_best_result'])) {
             $result['daiaplus_best_result'] = $daiaArray['daiaplus_best_result'];
+            $result['daiaplus_best_result']['paiaIsil'] = $paiaIsil;
             $result['daiaplus_best_result']['isCurrentIsil'] = $isCurrentIsil;
         }
 
@@ -414,10 +416,10 @@ class DAIA extends \VuFind\ILS\Driver\PAIA
      * @return array An array with status information for the record
      * @throws ILSException
      */
-    protected function parseDaiaDoc($id, $daiaDoc, $isCurrentIsil)
+    protected function parseDaiaDoc($id, $daiaDoc, $paiaIsil, $isCurrentIsil)
     {
         if (is_array($daiaDoc)) {
-            return $this->parseDaiaArray($id, $daiaDoc, $isCurrentIsil);
+            return $this->parseDaiaArray($id, $daiaDoc, $paiaIsil, $isCurrentIsil);
         } else {
             throw new ILSException(
                 'Unsupported document type (did not match Array or DOMNode).'
