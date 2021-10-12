@@ -23,25 +23,6 @@
  */
 jQuery(document).ready(function() {
 
-    function formatNumber(number) {
-        number = number.toString();
-        var len = number.length;
-        var thousands = number.substring(len-3,len);
-        var millions = number.substring(len-6,len-3);
-        var billions = number.substring(len-9,len-6);
-        var formattedNumber = '';
-        if (billions != '') {
-            formattedNumber += billions + '.';
-        }
-        if (millions != '') {
-            formattedNumber += millions + '.';
-        }
-        if (thousands != '') {
-            formattedNumber += thousands;
-        }
-        return formattedNumber;
-    }
-
     function getLibraryList() {
         var queryString = jQuery('div#library-list').attr('data-query');
         var searchLink = jQuery('div#library-list').attr('data-searchlink');
@@ -68,7 +49,7 @@ jQuery(document).ready(function() {
                             newQueryString = newQueryString.replace(/&library=.+$/, '');
                             jQuery('div#library-list').append(libraryTemplate);
                             jQuery('div#library-list .library-item-text').last().html(libraryData.fullname);
-                            jQuery('div#library-list .library-item-count').last().html(formatNumber(libraryData.count));
+                            jQuery('div#library-list .library-item-count').last().html(libraryData.count.toLocaleString());
                             if (searchClass == "Primo" && libraryData.primo == undefined) {
                                 jQuery('div#library-list .library-item').last().attr('href', '#');
                             } else {
@@ -97,7 +78,7 @@ jQuery(document).ready(function() {
                             jQuery.each(data.data.locationFacets, function(locationName, locationData) {
                                 var filter = encodeURI(locationData.filter);
                                 jQuery('div#location-list').append(locationTemplate);
-                                jQuery('div#location-list .location-item-count').last().html(formatNumber(locationData.count));
+                                jQuery('div#location-list .location-item-count').last().html(locationData.count.toLocaleString());
                                 jQuery('div#location-list .location-item-text').last().html(locationName);
                                 jQuery('div#location-list .location-item').last().attr('href', searchLink + queryString + '&filter[]=' + filter);
                             });
