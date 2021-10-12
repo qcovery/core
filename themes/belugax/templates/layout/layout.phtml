@@ -168,24 +168,6 @@ JS;
     </nav>
     <div role="main" class="main">
       <div id="content" class="container">
-<? $notificationConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/notification.ini'), true); ?>
-
-<? if(!empty($notificationConfig['Global'])): ?>
-        <? if (!empty($notificationConfig['Global']['error_notification'])): ?>
-            <div id="belugax-notification"><?=$this->transEsc($notificationConfig['Global']['error_notification']);?></div>
-        <? elseif (!empty($notificationConfig['Global']['ip_notification'])): ?>
-        <?
-            $ip = '';
-            if(isset($_SERVER['REMOTE_ADDR'])) {
-                $ip = $_SERVER['REMOTE_ADDR'];
-            }
-        ?>
-        <? if (strpos($ip, $notificationConfig['Global']['ip_notification']) === false) { ?>
-            <div id="belugax-notification"><?=$this->transEsc($notificationConfig['Global']['ip_notification_message'])?></div>
-        <? } ?>
-        <? endif; ?>
-<? endif; ?>
-
         <?=$this->layout()->content ?>
       </div>
     </div>
