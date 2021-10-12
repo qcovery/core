@@ -73,22 +73,19 @@ class GetResultCount extends AbstractBase
         $queryString = $params->fromQuery('querystring');
         $queryString = urldecode(
             str_replace('&amp;', '&',
-                substr_replace(
-                    trim($queryString), '', 0, 1
-                )
+                trim($queryString)
             )
         );
 
         $queryArray = explode('&', $queryString);
         $searchParams = [];
         foreach ($queryArray as $queryItem) {
-            $arrayKey = false;
             list($key, $value) = explode('=', $queryItem, 2);
-            if (preg_match('/(\[\])$/', $key, $matches)) {
-                $key = str_replace($matches[1], '', $key);
-                $arrayKey = true;
-            }
-            if ($arrayKey) {
+            if (strpos($key, '[]') > 0) {
+                $key = str_replace('[]', '', $key);
+                if (!isset($searchParams[$key])) {
+                    $searchParams[$key] = [];
+                }
                 $searchParams[$key][] = $value;
             } else {
                 $searchParams[$key] = $value;
@@ -100,14 +97,10 @@ class GetResultCount extends AbstractBase
         $paramsObj = $results->getParams();
         $paramsObj->getOptions()->disableHighlighting();
         $paramsObj->getOptions()->spellcheckEnabled(false);
+        $paramsObj->getOptions()->setLimitOptions([0]);
         $paramsObj->initFromRequest(new Parameters($searchParams));
 
-        $total = $results->getResultTotal();
-
-        $data = [
-            'total' => $total,
-        ];
-        return $this->formatResponse($data);
+        return $this->formatResponse(['total' => $results->getResultTotal()]);
     }
 
 }
