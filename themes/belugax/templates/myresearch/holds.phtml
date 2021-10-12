@@ -1,7 +1,4 @@
 <?
-
-  $paiaConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/PAIA.ini'), true);
-  
   // Set up page title:
   $this->headTitle($this->translate('Holds and Interlibrary Loans'));
 
@@ -25,7 +22,7 @@
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
     
   <?
-  if ($this->cancelForm && $paiaConfig['Global']['cancel_holds_permitted']) {
+  if ($this->cancelForm) {
 	  $cancel_permitted = true;
   } else {
 	  $cancel_permitted = false;
