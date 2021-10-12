@@ -1,14 +1,14 @@
 <?php
-  $domain = (empty($this->domain)) ? '' : '_' . $this->domain;
+  $domain = $this->domain ?? '';
 // Set up page title:
-  $this->headTitle($this->translate('delivery_title' . $domain));
+  $this->headTitle($this->translate('delivery_title_' . $domain));
 
   // Set up breadcrumbs:
-  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('delivery_title' . $domain) . '</li>';
+  $this->layout()->breadcrumbs = '<li class="active">' . $this->transEsc('delivery_title_' . $domain) . '</li>';
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-    <h2 class="lightbox-header"><?=$this->transEsc('delivery_title' . $domain)?></h2>
+    <h2 class="lightbox-header"><?=$this->transEsc('delivery_title_' . $domain)?></h2>
 
 <?php if (!empty($this->error)): ?>
     <?=$this->transEsc($this->error) ?>
@@ -16,10 +16,10 @@
 
 <?php if (!empty($this->message) && $this->message == 'authorized'): ?>
     <p>
-	<?=$this->translate('delivery_text' . $domain) ?>
-        <?=$this->translate('delivery_further_infos' . $domain) ?><br />
-        <?=$this->translate('delivery_contact' . $domain) ?><br /><br />
-        <?=$this->translate('delivery_final_infos' . $domain) ?>
+	<?=$this->translate('delivery_text_' . $domain) ?>
+        <?=$this->translate('delivery_further_infos_' . $domain) ?><br />
+        <?=$this->translate('delivery_contact_' . $domain) ?><br /><br />
+        <?=$this->translate('delivery_final_infos_' . $domain) ?>
     </p>
 
   <form method="post" action="<?=$this->url('delivery-home')?>" name="deliveryEmailForm" class="form-order">
@@ -39,6 +39,21 @@
       </p>
     </div>
   </form>
+
+<?php
+if ($this->is_admin):
+?>
+  <h3><?=$this->transEsc('Administrationsbereich')?></h3>
+<?php
+    if ($this->not_delivered > 0):
+?>
+    <p>
+      <?=$this->not_delivered ?> nicht ausgelieferte Bestellungen: 
+      <a href="<?=$this->url('delivery-home')?>?domain=<?=$domain?>&reorder=y">nachsenden</a>
+    </p>
+<?php
+    endif;
+?>
 
 <?php if (false): ?>
     <?php if (count($this->listData) > 0): ?>
@@ -69,6 +84,7 @@
     <?php else: ?>
     <p><?=$this->transEsc('Your delivery list is empty.') ?></p>
     <?php endif; ?>
+  <?php endif; ?>
 <?php endif; ?>
 
 <?php else: ?>
@@ -77,7 +93,7 @@
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
-    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery' . $this->domain])?>
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'delivery' . $domain])?>
 </div>
 
 
