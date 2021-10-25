@@ -66,6 +66,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'getSaveStatuses' => 'VuFind\AjaxHandler\GetSaveStatuses',
         'getRVKStatus' => 'RVK\AjaxHandler\GetRVKStatus',
         'getRVKTree' => 'RVK\AjaxHandler\GetRVKTree',
+        'getBKLStatus' => 'RVK\AjaxHandler\GetBKLStatus',
         'getVisData' => 'VuFind\AjaxHandler\GetVisData',
         'keepAlive' => 'VuFind\AjaxHandler\KeepAlive',
         'recommend' => 'VuFind\AjaxHandler\Recommend',
@@ -98,6 +99,8 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
             'RVK\AjaxHandler\GetRVKStatusFactory',
         'RVK\AjaxHandler\GetRVKTree' =>
             'RVK\AjaxHandler\GetRVKTreeFactory',
+        'RVK\AjaxHandler\GetBKLStatus' =>
+            'RVK\AjaxHandler\GetBKLStatusFactory',
         'VuFind\AjaxHandler\CheckRequestIsValid' =>
             'VuFind\AjaxHandler\AbstractIlsAndUserActionFactory',
         'VuFind\AjaxHandler\CommentRecord' =>

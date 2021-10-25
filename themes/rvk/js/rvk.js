@@ -39,6 +39,46 @@ $(document).ready(function() {
         });
     });
 
+    jQuery('.bkl-wrapper').each(function(event){
+        var bkl = $(this);
+        var bklStatus = bkl.find('.bkl-status');
+        var bklDetails = bkl.find('.bkl-details');
+        var bklLink = bkl.find('.bkl-link');
+
+        bklStatus.addClass('spinner');
+        bklStatus.addClass('bel-laden01');
+        jQuery.ajax({
+            url:'/vufind/AJAX/JSON?method=getBKLStatus&bkl='+bkl.find('.bkl-details').attr('data-bkl'),
+            dataType:'json',
+            success:function(data, textStatus, jqXHR){
+                bklStatus.removeClass('spinner');
+                bklStatus.removeClass('bel-laden01');
+                if (typeof bklDetails.data('bkl-hover') === 'undefined') {
+                    bklDetails.addClass('bkl-details-show');
+                    bklDetails.html(data.data.join('<i class="bel-pfeil-l01"></i>'));
+                } else {
+                    bklDetails.addClass('bkl-details-hide');
+                    bklDetails.html(data.data.join('<i class="bel-pfeil-l01"></i>'));
+                    //bklLink.attr('data-uk-tooltip', 'true');
+                    //bklLink.attr('title', data.data.join('<i class="bel-pfeil-l01"></i>'));
+
+                    bklLink.qtip({
+                        content: {
+                            text: data.data.join('<i class="bel-pfeil-l01"></i>'),
+                        },
+                        position: {
+                            my: 'middle left',
+                            at: 'middle right',
+                        },
+                        style: {
+                            classes: 'qtip-light'
+                        }
+                    });
+                }
+            }
+        });
+    });
+
     (function ($, undefined) {
         "use strict";
 
