@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory for GetItemStatus AJAX handler.
+ * ILS connection factory
  *
  * PHP version 7
  *
@@ -20,25 +20,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  AJAX
+ * @package  ILS_Drivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace DAIAplus\AjaxHandler;
+namespace AvailabilityPlus\ILS;
 
 use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * Factory for GetItemStatus AJAX handler.
+ * ILS connection factory
  *
  * @category VuFind
- * @package  AJAX
+ * @package  ILS_Drivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetArticleStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInterface
+class ConnectionFactory extends \VuFind\ILS\ConnectionFactory
 {
     /**
      * Create an object
@@ -53,18 +54,18 @@ class GetArticleStatusesFactory implements \Zend\ServiceManager\Factory\FactoryI
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
      * @throws ContainerException if any other error occurs
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
-            throw new \Exception('Unexpected options passed to factory.');
+            throw new \Exception('Unexpected options sent to factory.');
         }
-        return new $requestedName(
-            $container->get('VuFind\Record\Loader'),
-            $container->get('VuFind\Config\PluginManager')->get('PAIA')
+        $catalog = new $requestedName(
+            $container->get('VuFind\Config\PluginManager')->get('config')->Catalog,
+            $container->get('AvailabilityPlus\ILS\Driver\PluginManager'),
+            $container->get('VuFind\Config\PluginManager')
         );
+        return $catalog->setHoldConfig($container->get('VuFind\ILS\HoldSettings'));
     }
 }

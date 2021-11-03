@@ -2,7 +2,7 @@
 /**
  *
  */
-namespace DAIAplus\View\Helper\DAIAplus;
+namespace AvailabilityPlus\View\Helper\DAIAplus;
 
 class DAIAplusProcessor extends \Zend\View\Helper\AbstractHelper
 {

@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-namespace DAIAplus\ILS\Driver;
+namespace AvailabilityPlus\ILS\Driver;
 
 /**
  * ILS driver plugin manager
@@ -47,7 +47,7 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
         'aleph' => 'VuFind\ILS\Driver\Aleph',
         'alma' => 'VuFind\ILS\Driver\Alma',
         'amicus' => 'VuFind\ILS\Driver\Amicus',
-        'daia' => 'DAIAplus\ILS\Driver\DAIA',
+        'daia' => 'AvailabilityPlus\ILS\Driver\DAIA',
         'demo' => 'VuFind\ILS\Driver\Demo',
         'evergreen' => 'VuFind\ILS\Driver\Evergreen',
         'horizon' => 'VuFind\ILS\Driver\Horizon',
@@ -59,7 +59,7 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
         'multibackend' => 'VuFind\ILS\Driver\MultiBackend',
         'newgenlib' => 'VuFind\ILS\Driver\NewGenLib',
         'noils' => 'VuFind\ILS\Driver\NoILS',
-        'paia' => 'DAIAplus\ILS\Driver\PAIA',
+        'paia' => 'AvailabilityPlus\ILS\Driver\PAIA',
         'polaris' => 'VuFind\ILS\Driver\Polaris',
         'sample' => 'VuFind\ILS\Driver\Sample',
         'sierra' => 'VuFind\ILS\Driver\Sierra',
@@ -78,9 +78,9 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
      * @var array
      */
     protected $factories = [
-        'DAIAplus\ILS\Driver\DAIA' =>
-            'DAIAplus\ILS\Driver\DriverWithDateConverterFactory',
-        'DAIAplus\ILS\Driver\PAIA' => 'DAIAplus\ILS\Driver\PAIAFactory',
+        'AvailabilityPlus\ILS\Driver\DAIA' =>
+            'AvailabilityPlus\ILS\Driver\DriverWithDateConverterFactory',
+        'AvailabilityPlus\ILS\Driver\PAIA' => 'AvailabilityPlus\ILS\Driver\PAIAFactory',
         'VuFind\ILS\Driver\Aleph' => 'VuFind\ILS\Driver\AlephFactory',
         'VuFind\ILS\Driver\Alma' => 'VuFind\ILS\Driver\AlmaFactory',
         'VuFind\ILS\Driver\Amicus' => 'Zend\ServiceManager\Factory\InvokableFactory',
@@ -132,7 +132,7 @@ class PluginManager extends \VuFind\ILS\Driver\PluginManager
     public function __construct($configOrContainerInstance = null,
                                 array $v3config = []
     ) {
-        $this->addAbstractFactory('DAIAplus\ILS\Driver\PluginFactory');
+        $this->addAbstractFactory('AvailabilityPlus\ILS\Driver\PluginFactory');
         parent::__construct($configOrContainerInstance, $v3config);
     }
 }

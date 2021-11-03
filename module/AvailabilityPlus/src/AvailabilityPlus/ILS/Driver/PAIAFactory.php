@@ -1,6 +1,6 @@
 <?php
 /**
- * ILS connection factory
+ * Factory for PAIA ILS driver.
  *
  * PHP version 7
  *
@@ -25,13 +25,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace DAIAplus\ILS;
+namespace AvailabilityPlus\ILS\Driver;
 
+use VuFind\ILS\Driver\DriverWithDateConverterFactory;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * ILS connection factory
+ * Factory for PAIA ILS driver.
  *
  * @category VuFind
  * @package  ILS_Drivers
@@ -39,7 +39,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ConnectionFactory extends \VuFind\ILS\ConnectionFactory
+class PAIAFactory extends DriverWithDateConverterFactory
 {
     /**
      * Create an object
@@ -59,13 +59,11 @@ class ConnectionFactory extends \VuFind\ILS\ConnectionFactory
         array $options = null
     ) {
         if (!empty($options)) {
-            throw new \Exception('Unexpected options sent to factory.');
+            throw new \Exception('Unexpected options passed to factory.');
         }
-        $catalog = new $requestedName(
-            $container->get('VuFind\Config\PluginManager')->get('config')->Catalog,
-            $container->get('DAIAplus\ILS\Driver\PluginManager'),
-            $container->get('VuFind\Config\PluginManager')
+        return parent::__invoke(
+            $container, $requestedName,
+            [$container->get('Zend\Session\SessionManager')]
         );
-        return $catalog->setHoldConfig($container->get('VuFind\ILS\HoldSettings'));
     }
 }

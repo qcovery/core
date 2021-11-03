@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory for PAIA ILS driver.
+ * Factory for GetItemStatus AJAX handler.
  *
  * PHP version 7
  *
@@ -20,26 +20,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  ILS_Drivers
+ * @package  AJAX
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace DAIAplus\ILS\Driver;
+namespace AvailabilityPlus\AjaxHandler;
 
-use VuFind\ILS\Driver\DriverWithDateConverterFactory;
 use Interop\Container\ContainerInterface;
 
 /**
- * Factory for PAIA ILS driver.
+ * Factory for GetItemStatus AJAX handler.
  *
  * @category VuFind
- * @package  ILS_Drivers
+ * @package  AJAX
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class PAIAFactory extends DriverWithDateConverterFactory
+class GetItemStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
@@ -54,6 +53,8 @@ class PAIAFactory extends DriverWithDateConverterFactory
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
      * @throws ContainerException if any other error occurs
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
@@ -61,9 +62,13 @@ class PAIAFactory extends DriverWithDateConverterFactory
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
-        return parent::__invoke(
-            $container, $requestedName,
-            [$container->get('Zend\Session\SessionManager')]
+        return new $requestedName(
+            $container->get('VuFind\Session\Settings'),
+            $container->get('VuFind\Config\PluginManager')->get('PAIA'),
+            $container->get('AvailabilityPlus\ILS\Connection'),
+            $container->get('ViewRenderer'),
+            $container->get('VuFind\ILS\Logic\Holds'),
+            $container->get('VuFind\Crypt\HMAC')
         );
     }
 }

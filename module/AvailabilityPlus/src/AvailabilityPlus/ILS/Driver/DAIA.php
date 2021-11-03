@@ -30,7 +30,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-namespace DAIAplus\ILS\Driver;
+namespace AvailabilityPlus\ILS\Driver;
 
 use DOMDocument;
 use VuFind\Exception\ILS as ILSException;

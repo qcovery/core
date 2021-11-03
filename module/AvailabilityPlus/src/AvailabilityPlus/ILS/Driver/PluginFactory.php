@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
-namespace DAIAplus\ILS\Driver;
+namespace AvailabilityPlus\ILS\Driver;
 
 /**
  * ILS driver plugin factory
@@ -43,6 +43,6 @@ class PluginFactory extends \VuFind\ServiceManager\AbstractPluginFactory
      */
     public function __construct()
     {
-        $this->defaultNamespace = 'DAIAplus\ILS\Driver';
+        $this->defaultNamespace = 'AvailabilityPlus\ILS\Driver';
     }
 }
