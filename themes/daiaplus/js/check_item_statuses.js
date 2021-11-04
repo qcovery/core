@@ -30,81 +30,25 @@ function displayArticleStatus(results, $item) {
     });
 }
 
-function displayItemStatus(result, $item) {
-    if (typeof(result.daiaBackend) != 'undefined') {
-        $item.find('.status').append('<h3>'+result.daiaBackend+'</h3>');
-    }
-
+function displayItemStatus(results, $item) {
     $item.removeClass('js-item-pending');
-    $item.find('.status').find('.label').remove();
-    $item.find('.status').append(result.availability_message);
     $item.find('.ajax-availability').removeClass('ajax-availability hidden');
-    if (typeof(result.error) != 'undefined'
-        && result.error.length > 0
-    ) {
-        // Only show error message if we also have a status indicator active:
-        if ($item.find('.status').length > 0) {
-            $item.find('.callnumAndLocation').empty().addClass('text-danger').append(result.error);
+    $item.find('.status').empty();
+    $.each(results, function(index, result){
+        if (typeof(result.error) != 'undefined'
+            && result.error.length > 0
+        ) {
+            $item.find('.status').append('error');
         } else {
-            $item.find('.callnumAndLocation').addClass('hidden');
-        }
-        $item.find('.callnumber,.hideIfDetailed,.location').addClass('hidden');
-    } else if (typeof(result.full_status) != 'undefined'
-        && result.full_status.length > 0
-        && $item.find('.callnumAndLocation').length > 0
-    ) {
-        // Full status mode is on -- display the HTML and hide extraneous junk:
-        $item.find('.callnumAndLocation').empty().append(result.full_status);
-        $item.find('.callnumber,.hideIfDetailed,.location,.status').addClass('hidden');
-    } else if (typeof(result.missing_data) != 'undefined'
-        && result.missing_data
-    ) {
-        // No data is available -- hide the entire status area:
-        $item.find('.callnumAndLocation,.status').addClass('hidden');
-    } else if (result.locationList) {
-        // We have multiple locations -- build appropriate HTML and hide unwanted labels:
-        $item.find('.callnumber,.hideIfDetailed,.location').addClass('hidden');
-        var locationListHTML = "";
-        for (var x = 0; x < result.locationList.length; x++) {
-            locationListHTML += '<div class="groupLocation">';
-            if (result.locationList[x].availability) {
-                locationListHTML += '<span class="text-success"><i class="fa fa-ok" aria-hidden="true"></i> '
-                    + result.locationList[x].location + '</span> ';
-            } else if (typeof(result.locationList[x].status_unknown) !== 'undefined'
-                && result.locationList[x].status_unknown
-            ) {
-                if (result.locationList[x].location) {
-                    locationListHTML += '<span class="text-warning"><i class="fa fa-status-unknown" aria-hidden="true"></i> '
-                        + result.locationList[x].location + '</span> ';
-                }
-            } else {
-                locationListHTML += '<span class="text-danger"><i class="fa fa-remove" aria-hidden="true"></i> '
-                    + result.locationList[x].location + '</span> ';
+            if (typeof(result.href) != 'undefined') {
+				
+                var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a><br/>';
+                $item.find('.status').append(html);
             }
-            locationListHTML += '</div>';
-            locationListHTML += '<div class="groupCallnumber">';
-            locationListHTML += (result.locationList[x].callnumbers)
-                ? linkCallnumbers(result.locationList[x].callnumbers, result.locationList[x].callnumber_handler) : '';
-            locationListHTML += '</div>';
         }
-        $item.find('.locationDetails').removeClass('hidden');
-        $item.find('.locationDetails').html(locationListHTML);
-    } else {
-        // Default case -- load call number and location into appropriate containers:
-        $item.find('.callnumber').empty().append(linkCallnumbers(result.callnumber, result.callnumber_handler) + '<br/>');
-        $item.find('.location').empty().append(
-            result.reserve === 'true'
-                ? result.reserve_message
-                : result.location
-        );
-    }
-    if (typeof(result.daiaplus) != 'undefined' && result.daiaplus.length > 0) {
-        $item.find('.callnumAndLocation').addClass('hidden');
-        $item.find('.status').find('.label').remove();
-        $item.find('.status').append(result.daiaplus);
-        $item.find('.status').removeClass('hidden');
-    }
+    });
 }
+
 function itemStatusFail(response, textStatus) {
     if (textStatus === 'abort' || typeof response.responseJSON === 'undefined') {
         return;
@@ -132,11 +76,11 @@ function runItemAjaxForQueue() {
         return;
     }
     itemStatusRunning = true;
-    if (itemStatusSource == 'Search2' || itemStatusType == 'electronic') {
-        var method = 'getArticleStatuses';
-    } else {
+   // if (itemStatusSource == 'Search2' || itemStatusType == 'electronic') {
         var method = 'getItemStatuses';
-    }
+    //} else {
+    //    var method = 'getItemStatuses';
+    //}
 
     for (var i=0; i<itemStatusIds.length; i++) {
         $.ajax({
