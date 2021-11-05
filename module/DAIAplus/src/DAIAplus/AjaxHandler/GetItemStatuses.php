@@ -84,12 +84,10 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
         $ids = $params->fromPost('id', $params->fromQuery('id', ''));
         $source = $params->fromPost('source', $params->fromQuery('source', ''));
         if (!empty($ids) && !empty($source)) {
-            $listView = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
             foreach ($ids as $id) {
                 $driver = $this->recordLoader->load($id, $source);
                 $urlAccess = '';
-		$response = [];
-                $daiaplus_check_bool = true;
+		        $response = [];
 
 				$urlAccess = $this->checkParentId($driver);
 				if (!empty($urlAccess)) {
@@ -98,7 +96,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 					$response[] = [ 
 					                'href' => $urlAccess,
                                     'level' => $urlAccessLevel,
-									'label' => $this->translate($urlAccessLabel),
+									'label' => $urlAccessLabel,
 									'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
 								];
 				}
@@ -117,7 +115,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 					$response[] = [ 
 					                'href' => $urlAccess,
                                     'level' => $urlAccessLevel,
-									'label' => $this->translate($urlAccessLabel),
+									'label' => $urlAccessLabel,
 									'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
 								];
                 }
