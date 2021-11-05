@@ -62,6 +62,7 @@ function runItemAjaxForQueue() {
             url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
             method: 'get',
+			//TODO: list, hideLink, mediatype entfernen?
             data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink, mediatype:itemStatusMediatype[itemStatusIds[i]]}
         })
             .done(function checkItemStatusDone(response) {
@@ -98,10 +99,10 @@ function checkItemStatus(el) {
     var item = $(el);
     var id = item.attr('data-id');
     itemStatusSource = item.attr('data-src');
-    itemStatusList = (item.attr('data-list') == 1);
-    itemStatusHideLink = item.attr('data-hide-link');
-    itemStatusType = item.attr('data-type');
-    itemStatusMediatype[id] = item.attr('data-mediatype');
+    itemStatusList = (item.attr('data-list') == 1); //TODO: entfernen?
+    itemStatusHideLink = item.attr('data-hide-link'); //TODO: entfernen?
+    itemStatusType = item.attr('data-type'); //TODO: entfernen?
+    itemStatusMediatype[id] = item.attr('data-mediatype');//TODO: entfernen?
     itemQueueAjax(id + '', item);
 }
 
@@ -116,10 +117,10 @@ function checkItemStatuses(_container) {
     for (var i = 0; i < availabilityItems.length; i++) {
         var id = $(availabilityItems[i]).attr('data-id');
         itemStatusSource = $(availabilityItems[i]).attr('data-src');
-        itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
-        itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
-        itemStatusType = $(availabilityItems[i]).attr('data-type');
-        itemStatusMediatype[id] = $(availabilityItems[i]).attr('data-mediatype');
+        itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1); //TODO: entfernen?
+        itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link'); //TODO: entfernen?
+        itemStatusType = $(availabilityItems[i]).attr('data-type'); //TODO: entfernen?
+        itemStatusMediatype[id] = $(availabilityItems[i]).attr('data-mediatype'); //TODO: entfernen?
         itemQueueAjax(id, $(availabilityItems[i]));
     }
     // Stop looking for a scroll loader
