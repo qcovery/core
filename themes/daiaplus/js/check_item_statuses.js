@@ -12,38 +12,18 @@ function linkCallnumbers(callnumber, callnumber_handler) {
     return callnumber;
 }
 
-function displayArticleStatus(results, $item) {
-    $item.removeClass('js-item-pending');
-    $item.find('.ajax-availability').removeClass('ajax-availability hidden');
-    $item.find('.status').empty();
+function displayItemStatus(results, item) {
+    item.removeClass('js-item-pending');
+    item.find('.ajax-availability').removeClass('ajax-availability hidden');
+    item.find('.status').empty();
     $.each(results, function(index, result){
         if (typeof(result.error) != 'undefined'
             && result.error.length > 0
         ) {
-            $item.find('.status').append('error');
+            item.find('.status').append('error');
         } else {
             if (typeof(result.href) != 'undefined') {
-                var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a><br/>';
-                $item.find('.status').append(html);
-            }
-        }
-    });
-}
-
-function displayItemStatus(results, $item) {
-    $item.removeClass('js-item-pending');
-    $item.find('.ajax-availability').removeClass('ajax-availability hidden');
-    $item.find('.status').empty();
-    $.each(results, function(index, result){
-        if (typeof(result.error) != 'undefined'
-            && result.error.length > 0
-        ) {
-            $item.find('.status').append('error');
-        } else {
-            if (typeof(result.href) != 'undefined') {
-				
-                var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a><br/>';
-                $item.find('.status').append(html);
+                item.find('.status').append(result.html);
             }
         }
     });
@@ -76,15 +56,10 @@ function runItemAjaxForQueue() {
         return;
     }
     itemStatusRunning = true;
-   // if (itemStatusSource == 'Search2' || itemStatusType == 'electronic') {
-        var method = 'getItemStatuses';
-    //} else {
-    //    var method = 'getItemStatuses';
-    //}
 
     for (var i=0; i<itemStatusIds.length; i++) {
         $.ajax({
-            url: VuFind.path + '/AJAX/JSON?method=' + method,
+            url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
             method: 'get',
             data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink, mediatype:itemStatusMediatype[itemStatusIds[i]]}
@@ -92,11 +67,7 @@ function runItemAjaxForQueue() {
             .done(function checkItemStatusDone(response) {
                 for (var j = 0; j < response.data.statuses.length; j++) {
                     var status = response.data.statuses[j];
-                    if (method == 'getItemStatuses') {
-                        displayItemStatus(status, itemStatusEls[status.id]);
-                    } else {
-                        displayArticleStatus(status, itemStatusEls[status.id]);
-                    }
+                    displayItemStatus(status, itemStatusEls[status.id]);
                     itemStatusIds.splice(itemStatusIds.indexOf(status.id), 1);
                 }
                 itemStatusRunning = false;
@@ -124,14 +95,14 @@ function itemQueueAjax(id, el) {
 
 //Listenansicht
 function checkItemStatus(el) {
-    var $item = $(el);
-    var id = $item.attr('data-id');
-    itemStatusSource = $item.attr('data-src');
-    itemStatusList = ($item.attr('data-list') == 1);
-    itemStatusHideLink = $item.attr('data-hide-link');
-    itemStatusType = $item.attr('data-type');
-    itemStatusMediatype[id] = $item.attr('data-mediatype');
-    itemQueueAjax(id + '', $item);
+    var item = $(el);
+    var id = item.attr('data-id');
+    itemStatusSource = item.attr('data-src');
+    itemStatusList = (item.attr('data-list') == 1);
+    itemStatusHideLink = item.attr('data-hide-link');
+    itemStatusType = item.attr('data-type');
+    itemStatusMediatype[id] = item.attr('data-mediatype');
+    itemQueueAjax(id + '', item);
 }
 
 var itemStatusObserver = null;

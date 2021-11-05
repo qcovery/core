@@ -93,18 +93,14 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 
 				$urlAccess = $this->checkParentId($driver);
 				if (!empty($urlAccess)) {
-					$response = ['list' => ['url_access' => $urlAccess,
-											'url_access_level' => 'print_access_level',
-											'url_access_label' => 'Journal',
-											'link_status' => 1],
-								 'items' => ['journal_check' =>
-												['url_access' => $urlAccess,
-												 'url_access_level' => 'print_access_level',
-												 'url_access_label' => 'Journal',
-												 'link_status' => 1]
-											 ]
+					$urlAccessLevel = 'print_access_level';
+                    $urlAccessLabel = 'Journal';
+					$response[] = [ 
+					                'href' => $urlAccess,
+                                    'level' => $urlAccessLevel,
+									'label' => $this->translate($urlAccessLabel),
+									'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
 								];
-				$daiaplus_check_bool = false;
 				}
 
 
@@ -118,25 +114,14 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                 if (!empty($urlAccess)) {
                     $urlAccessLevel = 'fa_article_access_level';
                     $urlAccessLabel = 'full_text_fa_article_access_level';
-                         $response['list'] = ['url_access' => $urlAccess,
-                                            'url_access_level' => $urlAccessLevel,
-                                            'url_access_label' => $urlAccessLabel,
-                                            'link_status' => 1];
-                         $response['items']['fa_check'] = ['url_access' => $urlAccess,
-                                            'url_access_level' => $urlAccessLevel,
-                                            'url_access_label' => $urlAccessLabel,
-                                            'link_status' => 1];
-
-                    $daiaplus_check_bool = false;
+					$response[] = [ 
+					                'href' => $urlAccess,
+                                    'level' => $urlAccessLevel,
+									'label' => $this->translate($urlAccessLabel),
+									'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
+								];
                 }
 
-               /* if ($daiaplus_check_bool == true) {
-                    $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
-                    error_log($url);
-                    $response = json_decode($this->makeRequest($url), true);
-                }*/
-
-                $response = $this->prepareData($response, $listView);
                 $response['id'] = $id;
                 $responses[] = $response;
             }
@@ -199,131 +184,5 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             }
         }
         return $urlAccess;
-    }
-
-    private function prepareUrl($driver, $id, $listView, $urlAccess = '', $urlAccessLevel = '') {
-        $openUrl = $driver->getOpenUrl();
-        $formats = $driver->getFormats();
-        $format = strtolower(str_ireplace('electronic ','',$formats[0]));
-        $doi = $driver->getMarcData('Doi');
-
-        $sfxLink = $openUrl;
-        $sfxData = $driver->getMarcData('SFX');
-
-        if (is_array($sfxData)) {
-            foreach ($sfxData as $sfxDate) {
-                if (is_array($sfxDate)) {
-                    foreach ($sfxDate as $key => $value) {
-                        $sfxLink .= '&' . $key . '=' . urlencode($value['data'][0]);
-                        if(strpos($openUrl, 'rft.' . $key . '=') === false) {
-                            $openUrl .= '&rft.' . $key . '=' . urlencode($value['data'][0]);
-                        }
-                    }
-                }
-            }
-        }
-
-        if(strpos($openUrl, 'rft.genre=') === false) {
-            $openUrl .= '&rft.genre=' . $format;
-        }
-
-        if (isset($this->config['DAIA']['sfxUrl']) && isset($this->config['DAIA']['sfxDomain'])) {
-            $sfxUrl = $this->config['DAIA']['sfxUrl'] ?? '';
-            $sfxDomain = $this->config['DAIA']['sfxDomain'] ?? '';
-            if (!empty($sfxUrl) && !empty($sfxDomain)) {
-                $sfxLink = urlencode($sfxUrl . '/sfx_' . $sfxDomain . '?' . $sfxLink);
-            }
-        }
-
-        $url = $this->config['DAIA']['baseUrl'];
-        $url = str_ireplace('/availability/', '/electronicavailability/', $url);
-        $url .= $id . '?';
-        $url .= 'apikey=' . $this->config['DAIA']['daiaplus_api_key'];
-        $url .= '&openurl=' . urlencode($openUrl);
-        $url .= '&list=' . $listView;
-        $url .= '&mediatype=' . urlencode($format);
-
-        if ($doi[0]['doi']['data'][0]) {
-            $url .= '&doi=' . $doi[0]['doi']['data'][0];
-        }
-        
-        if($urlAccess) {
-            $url .= '&url-access=' . $urlAccess;
-        }
-        
-        if($urlAccessLevel) {
-            $url .= '&url-access-level=' . $urlAccessLevel;
-        }
-
-        if (!empty($sfxUrl) && !empty($sfxDomain)) {
-            $url .= '&sfx=' . $sfxLink;
-        }
-
-        $url .= '&language=de';
-        $url .= '&format=json';
-        return $url;
-    }
-
-    private function makeRequest($url) {
-        $req = curl_init();
-        curl_setopt($req, CURLOPT_URL, $url);
-        curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($req, CURLOPT_CONNECTTIMEOUT, 0);
-        curl_setopt($req, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($req, CURLOPT_SSL_VERIFYHOST, false);
-        $result = curl_exec($req);
-        curl_close($req);
-        return $result;
-    }
-
-    private function prepareData($rawData, $list) {
-        $resolverLabels = $this->config['ResolverLabels'];
-        $data = [];
-        if (!empty($rawData['items']['sfx'])) {
-            $label = $resolverLabels['article'] ?: 'SFX';
-            $data[] = [
-                'href' => $rawData['items']['sfx'],
-                'level' => 'article_access_level',
-                'label' => $this->translate($label)
-            ];
-        } elseif (!empty($rawData)) {
-            if ($list == 1 && !empty($rawData['list']['url_access'])) {
-                $urlAccess = (is_array($rawData['list']['url_access'])) ? $rawData['list']['url_access'][0] : $rawData['list']['url_access'];
-                $level = str_replace('_access_level', '', $rawData['list']['url_access_level']);
-                $label = $resolverLabels[$level] ?: $rawData['list']['url_access_label'];
-                $data[] = [
-                    'href' => $urlAccess,
-                    'level' => $rawData['list']['url_access_level'],
-                    'label' => $this->translate($label),
-                    'doi' => $rawData['list']['doi'],
-                    'holdings' => $rawData['list']['holdings']
-                ];
-            } else {
-                if (empty($rawData['list']['url_access'])) {
-                    $level = str_replace('_access_level', '', $rawData['list']['url_access_level']);
-                    $label = $resolverLabels[$level] ?: $rawData['list']['url_access_label'];
-                    $data[] = [
-                        'label' => $this->translate($label)
-                    ];
-                } else {
-                    foreach ($rawData['items'] as $item) {
-                        if (!empty($item) && !empty($item['url_access'])) {
-                            $urlAccess = (is_array($item['url_access'])) ? $item['url_access'][0] : $item['url_access'];
-                            $level = str_replace('_access_level', '', $item['url_access_level']);
-                            $label = $resolverLabels[$level] ?: $item['url_access_label'];
-                            $data[] = [
-                                'href' => $urlAccess,
-                                'level' => $item['url_access_level'],
-                                'label' => $this->translate($label, [], $label),
-                                'notification' => $item['access_notification'],
-                                'doi' => $item['doi'],
-                                'holdings' => $item['holdings']
-                            ];
-                        }
-                    }
-                }
-            }
-        }
-        return $data;
     }
 }
