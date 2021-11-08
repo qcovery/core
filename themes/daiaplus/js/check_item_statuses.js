@@ -62,8 +62,7 @@ function runItemAjaxForQueue() {
             url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
             method: 'get',
-			//TODO: list, hideLink, mediatype entfernen?
-            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink, mediatype:itemStatusMediatype[itemStatusIds[i]]}
+            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource}
         })
             .done(function checkItemStatusDone(response) {
                 for (var j = 0; j < response.data.statuses.length; j++) {
@@ -99,10 +98,7 @@ function checkItemStatus(el) {
     var item = $(el);
     var id = item.attr('data-id');
     itemStatusSource = item.attr('data-src');
-    itemStatusList = (item.attr('data-list') == 1); //TODO: entfernen?
-    itemStatusHideLink = item.attr('data-hide-link'); //TODO: entfernen?
-    itemStatusType = item.attr('data-type'); //TODO: entfernen?
-    itemStatusMediatype[id] = item.attr('data-mediatype');//TODO: entfernen?
+    itemStatusList = (item.attr('data-list') == 1);
     itemQueueAjax(id + '', item);
 }
 
@@ -117,10 +113,6 @@ function checkItemStatuses(_container) {
     for (var i = 0; i < availabilityItems.length; i++) {
         var id = $(availabilityItems[i]).attr('data-id');
         itemStatusSource = $(availabilityItems[i]).attr('data-src');
-        itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1); //TODO: entfernen?
-        itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link'); //TODO: entfernen?
-        itemStatusType = $(availabilityItems[i]).attr('data-type'); //TODO: entfernen?
-        itemStatusMediatype[id] = $(availabilityItems[i]).attr('data-mediatype'); //TODO: entfernen?
         itemQueueAjax(id, $(availabilityItems[i]));
     }
     // Stop looking for a scroll loader
