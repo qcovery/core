@@ -64,7 +64,7 @@ class GetItemStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInte
         }
         return new $requestedName(
             $container->get('VuFind\Record\Loader'),
-            $container->get('VuFind\Config\PluginManager')->get('PAIA'),
+            $container->get('VuFind\Config\PluginManager')->get('availabilityplus'),
             $container->get('VuFind\Session\Settings'),
 			$container->get('DAIAplus\ILS\Connection'),
             $container->get('ViewRenderer'),
