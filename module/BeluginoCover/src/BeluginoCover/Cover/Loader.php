@@ -98,6 +98,15 @@ class Loader extends \VuFind\Cover\Loader
         // Store sanitized versions of some parameters for future reference:
         $this->storeSanitizedSettings($settings);
 
+        $imageWidth = 64;
+        $imageX = -10;
+        $imageY = 72;
+        if ($settings['size'] == 'medium') {
+            $imageWidth = $imageWidth * 4;
+            $imageX = $imageX * 4;
+            $imageY = $imageY * 4;
+        }
+
         // Display a fail image unless our parameters pass inspection and we
         // are able to display an ISBN or content-type-based image.
         if (!in_array($this->size, $this->validSizes)) {
@@ -109,7 +118,7 @@ class Loader extends \VuFind\Cover\Loader
                 if (isset($settings['format'])) {
                     $format = str_ireplace(' ', '', $settings['format']);
                     $format = strtolower($format);
-                    if ($im = imagecreate(64, 64)) {
+                    if ($im = imagecreate($imageWidth, $imageWidth)) {
                         $beluginoFile = APPLICATION_PATH . '/themes/belugax/css/belugino.css';
                         $beluginoParser = new \Sabberworm\CSS\Parser(file_get_contents($beluginoFile));
                         $beluginoCss = $beluginoParser->parse();
@@ -143,7 +152,7 @@ class Loader extends \VuFind\Cover\Loader
                         $bg = imagecolorallocate($im, 255, 255, 255);
                         $textcolor = imagecolorallocate($im, 0, 0, 0);
 
-                        imagettftext($im, 64,0,-10,72, $textcolor, APPLICATION_PATH . '/themes/belugax/css/fonts/belugino.ttf', $formatString);
+                        imagettftext($im, $imageWidth,0,$imageX, $imageY, $textcolor, APPLICATION_PATH . '/themes/belugax/css/fonts/belugino.ttf', $formatString);
 
                         imageAlphaBlending($im, true);
                         imageSaveAlpha($im, true);
