@@ -1,5 +1,5 @@
 ArticleFulltextFree:
-  category: marcFulltextCheckDirect
+  category: FreeAccess
   view-method: title-link
   856:
     conditions:
@@ -10,7 +10,7 @@ ArticleFulltextFree:
     u:
       - [name, url]
 ArticleFulltextFreeUrlParts:
-  category: marcFulltextCheckDirect
+  category: FreeAccess
   view-method: title-link
   856:
     conditions:
@@ -20,7 +20,7 @@ ArticleFulltextFreeUrlParts:
     u:
       - [name, url]
 ArticleFulltextFreeUrlParts2:
-  category: marcFulltextCheckDirect
+  category: FreeAccess
   view-method: title-link
   856:
     conditions:
@@ -30,14 +30,17 @@ ArticleFulltextFreeUrlParts2:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
+#TODO Später anpassen?
 ArticleFulltextFreeCollection:
-  category: marcFulltextCheckIndirect
+  category: FreeAccessIndirect
   view-method: title-link
   912:
     conditions:
       - [field, a, 'OPENACCESS|GBV_DOAJ|Gutenberg|ZDB-94-OAB|ZDB-23-GOA|GBV_XBI|GBV_XAR|GBV_XCH|GBV_CTG']
     a:
       - [name, collection]
+      
+#TODO Später anpassen?
 ArticleDirectLink:
   category: marcFulltextCheckPrep
   view-method: title-link
@@ -48,6 +51,8 @@ ArticleDirectLink:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
+      
+#TODO Später anpassen?
 ArticleDirectLinkUrlParts:
   category: marcFulltextCheckPrep
   view-method: title-link

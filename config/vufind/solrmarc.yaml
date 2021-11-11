@@ -26,8 +26,6 @@
 #
 #-----------------------------------------------------------------------------------
 #
-"@parent_yaml": "freeaccesscheck.yaml"
-
 
 # --------------------------------------------------------------------------------
 # eWW - Dummy configuration to prevent warnings for foreach and index access.

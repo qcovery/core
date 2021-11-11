@@ -57,6 +57,12 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
     
     protected $config;
 
+    protected $checks;
+
+    protected $source;
+
+    protected $driver;
+
     /**
      * Constructor
      *
@@ -69,6 +75,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
     public function __construct(Loader $loader, Config $config) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
+        $this->checks = $this->config['RecordView'];
     }
 
     /**
@@ -82,14 +89,23 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
     {
         $responses = [];
         $ids = $params->fromPost('id', $params->fromQuery('id', ''));
-        $source = $params->fromPost('source', $params->fromQuery('source', ''));
-        if (!empty($ids) && !empty($source)) {
+        $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
+
+        $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
+        if($list) $this->checks = $this->config['ResultList'];
+
+        if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
-                $driver = $this->recordLoader->load($id, $source);
+                $check_mode = 'continue';
+                $driver = $this->recordLoader->load($id, $this->source);
+                $this->driver = $driver;
+				$this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
+
                 $urlAccess = '';
 		        $response = [];
 
-				$urlAccess = $this->checkParentId($driver);
+//TODO Remove Start
+				$urlAccess = $this->checkParentId();
 				if (!empty($urlAccess)) {
 					$urlAccessLevel = 'print_access_level';
                     $urlAccessLabel = 'Journal';
@@ -108,7 +124,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                     $urlAccessLabel = 'Go to Publication';
                 }
 
-                $urlAccess = $this->checkFreeAccess($driver, $urlAccessUncertain);
+                $urlAccess = $this->checkFreeAccess2($driver, $urlAccessUncertain);
                 if (!empty($urlAccess)) {
                     $urlAccessLevel = 'fa_article_access_level';
                     $urlAccessLabel = 'full_text_fa_article_access_level';
@@ -122,12 +138,75 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 
                 $response['id'] = $id;
                 $responses[] = $response;
+//TODO Remove End
+				$responses2 = [];
+				$response2 = [];
+                foreach($this->checks as $check => $mode) {
+                    if(in_array($check_mode,array('continue','always'))) {
+                        $result = $this->performAvailabilityCheck($check, $id);
+                        if(!empty($result)) {
+                            $response2[] = $result;
+                        }
+                    }
+					
+                }
+                $response2['id'] = $id;
+                $responses2[] = $response2;
             }
         }
-        return $this->formatResponse(['statuses' => $responses]);
+        return $this->formatResponse(['statuses' => $responses2]);
     }
 
-    private function checkFreeAccess($driver, $urlAccessUncertain = '') {
+    private function performAvailabilityCheck($check, $id) {
+		
+		if(method_exists($this,'check'.$check)){
+			$response = $this->{'check'.$check}();
+			$response['check'] = 'check'.$check;
+			$response['message'] = 'method in class exists';			
+		} elseif (!empty($this->driver->getMarcData($check))) {
+			$response['check'] = $check;
+			$response['message'] = 'MARC key exists';
+		} elseif (!empty($this->driver->getSolrMarcKeys($check))) {
+			$response = $this->checkSolrMarcCategory($check);
+			$response['check'] = $check;
+			$response['message'] = 'MARC category exists';
+		} else {
+			$response['check'] = $check;
+			$response['message'] = 'no configuration or function for check exists';
+		}
+		
+        return $response;
+    }
+	
+    private function checkSolrMarcCategory($category) {
+        $urlAccess = '';      
+		$response = [];
+		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
+			$data = $this->driver->getMarcData($solrMarcKey);
+			foreach ($data as $date) {
+				$urlAccessLevel = $category." ".$solrMarcKey;
+				$urlAccessLabel = $category;
+				if (!empty($date['url']['data'][0])) {
+					$urlAccess = $date['url']['data'][0];
+					if(!empty($date['class']['data'][0])) $urlAccessLevel.=" ".$date['class']['data'][0];
+					break;
+				}
+			}
+		}
+
+		if (!empty($urlAccess)) {
+			$response = [ 
+							'href' => $urlAccess,
+							'level' => $urlAccessLevel,
+							'label' => $urlAccessLabel,
+							'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
+						];
+		}
+       
+        return $response;
+    }      
+//TODO Remove
+    private function checkFreeAccess2($driver, $urlAccessUncertain = '') {
         $urlAccess = '';      
         $categories = array("marcFulltextCheckDirect", "marcFulltextCheckIndirect");
         
@@ -152,7 +231,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
        
         return $urlAccess;
     }                
-
+//TODO Remove
     private function checkDirectLink($driver) {
         $urlAccess = '';
         $fulltextData = $driver->getMarcData('ArticleDirectLink');
@@ -165,7 +244,9 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
         return $urlAccess;
     }
 
-    private function checkParentId($driver) {
+//TODO Remove
+    private function checkParentId() {
+		$driver = $this->driver;
         $urlAccess = '';
         $parentData = $driver->getMarcData('ArticleParentId');
         foreach ($parentData as $parentDate) {
@@ -182,5 +263,38 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             }
         }
         return $urlAccess;
+    }
+	
+	private function checkParentWork() {
+		$driver = $this->driver;
+        $urlAccess = '';
+		$response = [];
+        $parentData = $driver->getMarcData('ArticleParentId');
+        foreach ($parentData as $parentDate) {
+            if (!empty(($parentDate['id']['data'][0]))) {
+                $parentId = $parentDate['id']['data'][0];
+                break;
+            }
+        }
+        if (!empty($parentId)) {
+            $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+            $ilnMatch = $parentDriver->getMarcData('ILN');
+            if (!empty($ilnMatch[0]['iln']['data'][0])) {
+                $urlAccess = '/vufind/Record/' . $parentId;
+            }
+        }
+		
+		if (!empty($urlAccess)) {
+			$urlAccessLevel = 'print_access_level';
+			$urlAccessLabel = 'Journal';
+			$response = [ 
+							'href' => $urlAccess,
+							'level' => $urlAccessLevel,
+							'label' => $urlAccessLabel,
+							'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
+						];
+		}
+		
+        return $response;
     }
 }
