@@ -1,10 +1,10 @@
-ArticleFulltextFree:
+ArticleFulltextFreeUrlParts2:
   category: FreeAccess
   view-method: title-link
   856:
     conditions:
-      - [field, 3, Volltext]
-      - [field, z, 'kostenfrei|Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
+      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
+      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
       - [indicator, 1, 4]
       - [indicator, 2, 0|1]
     u:
@@ -19,13 +19,13 @@ ArticleFulltextFreeUrlParts:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
-ArticleFulltextFreeUrlParts2:
+ArticleFulltextFree:
   category: FreeAccess
   view-method: title-link
   856:
     conditions:
-      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
-      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
+      - [field, 3, Volltext]
+      - [field, z, 'kostenfrei|Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
       - [indicator, 1, 4]
       - [indicator, 2, 0|1]
     u:

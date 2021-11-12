@@ -62,6 +62,8 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
     protected $source;
 
     protected $driver;
+	
+	protected $current_mode;
 
     /**
      * Constructor
@@ -97,73 +99,36 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $check_mode = 'continue';
-                $driver = $this->recordLoader->load($id, $this->source);
-                $this->driver = $driver;
+                $this->driver = $this->recordLoader->load($id, $this->source);
 				$this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
-
-                $urlAccess = '';
-		        $response = [];
-
-//TODO Remove Start
-				$urlAccess = $this->checkParentId();
-				if (!empty($urlAccess)) {
-					$urlAccessLevel = 'print_access_level';
-                    $urlAccessLabel = 'Journal';
-					$response[] = [ 
-					                'href' => $urlAccess,
-                                    'level' => $urlAccessLevel,
-									'label' => $urlAccessLabel,
-									'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
-								];
-				}
-
-
-                $urlAccessUncertain = $this->checkDirectLink($driver);
-                if (!empty($urlAccessUncertain)) {
-                    $urlAccessLevel = 'uncertain_article_access_level';
-                    $urlAccessLabel = 'Go to Publication';
-                }
-
-                $urlAccess = $this->checkFreeAccess2($driver, $urlAccessUncertain);
-                if (!empty($urlAccess)) {
-                    $urlAccessLevel = 'fa_article_access_level';
-                    $urlAccessLabel = 'full_text_fa_article_access_level';
-					$response[] = [ 
-					                'href' => $urlAccess,
-                                    'level' => $urlAccessLevel,
-									'label' => $urlAccessLabel,
-									'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
-								];
-                }
-
-                $response['id'] = $id;
-                $responses[] = $response;
-//TODO Remove End
-				$responses2 = [];
-				$response2 = [];
-                foreach($this->checks as $check => $mode) {
+				$responses = [];
+				$response = [];
+                foreach($this->checks as $check => $this->current_mode) {
                     if(in_array($check_mode,array('continue','always'))) {
-                        $result = $this->performAvailabilityCheck($check, $id);
+                        $result = $this->performAvailabilityCheck($check);
                         if(!empty($result)) {
-                            $response2[] = $result;
+                            $response[] = $result;
+							$check_mode = $this->current_mode;
                         }
                     }
 					
                 }
-                $response2['id'] = $id;
-                $responses2[] = $response2;
+                $response['id'] = $id;
+                $responses[] = $response;
             }
         }
-        return $this->formatResponse(['statuses' => $responses2]);
+        return $this->formatResponse(['statuses' => $responses]);
     }
 
-    private function performAvailabilityCheck($check, $id) {
+	//TODO: Add checks for resolver and DAIA
+    private function performAvailabilityCheck($check) {
 		
 		if(method_exists($this,'check'.$check)){
 			$response = $this->{'check'.$check}();
 			$response['check'] = 'check'.$check;
 			$response['message'] = 'method in class exists';			
 		} elseif (!empty($this->driver->getMarcData($check))) {
+			$response = $this->checkSolrMarcKey($check);
 			$response['check'] = $check;
 			$response['message'] = 'MARC key exists';
 		} elseif (!empty($this->driver->getSolrMarcKeys($check))) {
@@ -172,104 +137,83 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 			$response['message'] = 'MARC category exists';
 		} else {
 			$response['check'] = $check;
-			$response['message'] = 'no configuration or function for check exists';
+			$response['message'] = 'no MARC configuration or function for check exists';
 		}
 		
         return $response;
     }
 	
-    private function checkSolrMarcCategory($category) {
-        $urlAccess = '';      
+	// TODO: 
+	// - add rendering of template defined in marcyaml to generate html
+	// - support for multiple responses = not break on first match
+    private function checkSolrMarcKey($solrMarcKey) {      
 		$response = [];
+		$url = '';
+		$data = $this->driver->getMarcData($solrMarcKey);
+		foreach ($data as $date) {
+			if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
+			$level = $solrMarcKey;
+			$label = $solrMarcKey;
+			if(!empty($date['level']['data'][0])) $level.=" ".$date['level']['data'][0];
+			if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
+
+			//TODO: replace with template rendering
+			if($url) {
+				$html = '<a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+			} else {
+				$html = '<span class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</span><br/>';
+			}
+			
+			$response = [ 
+							'url' => $url,
+							'level' => $level,
+							'label' => $label,
+							'html' => $html
+						];
+			break;
+		}
+       
+        return $response;
+    }   
+	
+	// TODO: 
+	// - add rendering of template defined in marcyaml to generate html
+	// - support for multiple responses = not break on first match
+    private function checkSolrMarcCategory($category) {      
+		$response = [];
+		$url = '';
 		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
 			foreach ($data as $date) {
-				$urlAccessLevel = $category." ".$solrMarcKey;
-				$urlAccessLabel = $category;
-				if (!empty($date['url']['data'][0])) {
-					$urlAccess = $date['url']['data'][0];
-					if(!empty($date['class']['data'][0])) $urlAccessLevel.=" ".$date['class']['data'][0];
-					break;
-				}
-			}
-		}
+				if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
+				$level = $category." ".$solrMarcKey;
+				$label = $category;
+				if(!empty($date['level']['data'][0])) $level.=" ".$date['level']['data'][0];
+				if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
 
-		if (!empty($urlAccess)) {
-			$response = [ 
-							'href' => $urlAccess,
-							'level' => $urlAccessLevel,
-							'label' => $urlAccessLabel,
-							'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
-						];
+				//TODO: replace with template rendering
+				if($url) {
+					$html = '<a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+				} else {
+					$html = '<span class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</span><br/>';
+				}
+				
+				$response = [ 
+								'url' => $url,
+								'level' => $level,
+								'label' => $label,
+								'html' => $html
+							];
+				break;
+			}
 		}
        
         return $response;
-    }      
-//TODO Remove
-    private function checkFreeAccess2($driver, $urlAccessUncertain = '') {
-        $urlAccess = '';      
-        $categories = array("marcFulltextCheckDirect", "marcFulltextCheckIndirect");
-        
-        foreach ($categories as $category) {
-            foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
-                $data = $driver->getMarcData($solrMarcKey);
-                foreach ($data as $date) {
-                    if ($category == "marcFulltextCheckDirect") {
-                        if (!empty(($date['url']['data'][0]))) {
-                            $urlAccess = $date['url']['data'][0];
-                            break;
-                        }
-                    } else if ($urlAccessUncertain && $category == "marcFulltextCheckIndirect") {
-                        if (!empty(($date))) {
-                            $urlAccess = $urlAccessUncertain;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-       
-        return $urlAccess;
-    }                
-//TODO Remove
-    private function checkDirectLink($driver) {
-        $urlAccess = '';
-        $fulltextData = $driver->getMarcData('ArticleDirectLink');
-        foreach ($fulltextData as $fulltextDate) {
-            if (!empty(($fulltextDate['url']['data'][0]))) {
-                $urlAccess = $fulltextDate['url']['data'][0];
-                break;
-            }
-        }
-        return $urlAccess;
-    }
-
-//TODO Remove
-    private function checkParentId() {
-		$driver = $this->driver;
-        $urlAccess = '';
-        $parentData = $driver->getMarcData('ArticleParentId');
-        foreach ($parentData as $parentDate) {
-            if (!empty(($parentDate['id']['data'][0]))) {
-                $parentId = $parentDate['id']['data'][0];
-                break;
-            }
-        }
-        if (!empty($parentId)) {
-            $parentDriver = $this->recordLoader->load($parentId, 'Solr');
-            $ilnMatch = $parentDriver->getMarcData('ILN');
-            if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                $urlAccess = '/vufind/Record/' . $parentId;
-            }
-        }
-        return $urlAccess;
-    }
+    }  
 	
 	private function checkParentWork() {
-		$driver = $this->driver;
-        $urlAccess = '';
 		$response = [];
-        $parentData = $driver->getMarcData('ArticleParentId');
+        $parentData = $this->driver->getMarcData('ArticleParentId');
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
                 $parentId = $parentDate['id']['data'][0];
@@ -280,18 +224,18 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             $parentDriver = $this->recordLoader->load($parentId, 'Solr');
             $ilnMatch = $parentDriver->getMarcData('ILN');
             if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                $urlAccess = '/vufind/Record/' . $parentId;
+                $url = '/vufind/Record/' . $parentId;
             }
         }
 		
-		if (!empty($urlAccess)) {
-			$urlAccessLevel = 'print_access_level';
-			$urlAccessLabel = 'Journal';
+		if (!empty($url)) {
+			$level = 'ParentWork';
+			$label = 'Go to parent work';
 			$response = [ 
-							'href' => $urlAccess,
-							'level' => $urlAccessLevel,
-							'label' => $urlAccessLabel,
-							'html' => '<a href="'.$urlAccess.'" class="'.$urlAccessLevel.'" title="'.$urlAccessLabel.'" target="_blank">'.$this->translate($urlAccessLabel).'</a><br/>'
+							'href' => $url,
+							'level' => $level,
+							'label' => $label,
+							'html' => '<a href="'.$url.'" class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</a><br/>'
 						];
 		}
 		

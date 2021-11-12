@@ -22,7 +22,7 @@ function displayItemStatus(results, item) {
         ) {
             item.find('.status').append('error');
         } else {
-            if (typeof(result.href) != 'undefined') {
+            if (typeof(result.html) != 'undefined') {
                 item.find('.status').append(result.html);
             }
         }
