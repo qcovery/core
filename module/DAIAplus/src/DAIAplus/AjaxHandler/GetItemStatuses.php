@@ -123,9 +123,9 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 	//TODO: Add checks for resolver and DAIA
     private function performAvailabilityCheck($check) {
 		
-		if(method_exists($this,'check'.$check)){
-			$response = $this->{'check'.$check}();
-			$response['check'] = 'check'.$check;
+		if(method_exists($this, $check)){
+			$response = $this->{$check}();
+			$response['check'] = $check;
 			$response['message'] = 'method in class exists';			
 		} elseif (!empty($this->driver->getMarcData($check))) {
 			$response = $this->checkSolrMarcKey($check);
