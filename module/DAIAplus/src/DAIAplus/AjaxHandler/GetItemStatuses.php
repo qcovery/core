@@ -110,16 +110,18 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 				$response = [];
                 foreach($this->checks as $check => $this->current_mode) {
                     if(in_array($check_mode,array('continue','always'))) {
-                        $result = $this->performAvailabilityCheck($check);
-                        if(!empty($result)) {
-                            $response[] = $result;
-							$check_mode = $this->current_mode;
-                        }
+                        $results = $this->performAvailabilityCheck($check);
+                        foreach($results as $result) {
+							if(!empty($result)) {
+								$response[] = $result;
+								$check_mode = $this->current_mode;
+							}
+						}
                     }
 					
                 }
-                $response['id'] = $id;
-                $responses[] = $response;
+				$response['id'] = $id;
+				$responses[] = $response;
             }
         }
         return $this->formatResponse(['statuses' => $responses]);
@@ -165,10 +167,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      *
      * @solrMarcKey name of MarcKey in availabilityplus_yaml
      *
-     * @return array [response data]
+     * @return array [response data (arrays)]
      */
 	// TODO: support for multiple responses = not break on first match
-    private function checkSolrMarcKey($solrMarcKey) {      
+    private function checkSolrMarcKey($solrMarcKey) {
+		$responses = [];
 		$data = $this->driver->getMarcData($solrMarcKey);
 		$view_method = $this->getViewMethod($data);
 		foreach ($data as $date) {
@@ -183,10 +186,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 							'label' => $label,
 						];
 			$response['html'] = $this->applyTemplate($view_method, $response);
+			$responses[] = $response;
 			break;
 		}
        
-        return $response;
+        return $responses;
     }   
 	
      /**
@@ -194,10 +198,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      *
      * @category name of MarcCategory in availabilityplus_yaml
      *
-     * @return array [response data]
+     * @return array [response data (arrays)]
      */
 	// TODO: support for multiple responses = not break on first match
     private function checkSolrMarcCategory($category) {
+		$responses = [];
 		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
 			$view_method = $this->getViewMethod($data);
@@ -215,11 +220,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 								'view-method' => $view_method
 							];
 				$response['html'] = $this->applyTemplate($view_method, $response);
+				$responses[] = $response;
 				break;
 			}
 		}
        
-        return $response;
+        return $responses;
     }
 
      /**
@@ -250,9 +256,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      /**
      * Custom method to check for a parent work that is a holding of the library
      *
-     * @return array [response data]
+     * @return array [response data (arrays)]
      */		
 	private function checkParentWork() {
+		$responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
@@ -276,6 +283,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 						];
 			$response['html'] = $this->renderer->render($this->default_template, $response);
 		}
-        return $response;
+		
+		$responses[] = $response;
+        return $responses;
     }
 }
