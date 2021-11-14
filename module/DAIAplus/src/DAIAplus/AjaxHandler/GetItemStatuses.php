@@ -34,6 +34,7 @@ use VuFind\AjaxHandler\AbstractBase;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
+use Zend\View\Renderer\RendererInterface;
 
 /**
  * "Get Item Status" AJAX handler
@@ -49,7 +50,7 @@ use Zend\Mvc\Controller\Plugin\Params;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
+class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
@@ -64,6 +65,10 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
     protected $driver;
 	
 	protected $current_mode;
+	
+	protected $renderer;
+	
+	protected $default_template;
 
     /**
      * Constructor
@@ -74,10 +79,12 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
      * @param RendererInterface $renderer  View renderer
      * @param Holds             $holdLogic Holds logic
      */
-    public function __construct(Loader $loader, Config $config) {
+    public function __construct(Loader $loader, Config $config, RendererInterface $renderer) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
         $this->checks = $this->config['RecordView'];
+		$this->renderer = $renderer;
+		$this->default_template = 'ajax/default.phtml';
     }
 
     /**
@@ -147,29 +154,20 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 	// - add rendering of template defined in marcyaml to generate html
 	// - support for multiple responses = not break on first match
     private function checkSolrMarcKey($solrMarcKey) {      
-		$response = [];
-		$url = '';
 		$data = $this->driver->getMarcData($solrMarcKey);
+		$view_method = $this->getViewMethod($data);
 		foreach ($data as $date) {
 			if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
 			$level = $solrMarcKey;
 			$label = $solrMarcKey;
 			if(!empty($date['level']['data'][0])) $level.=" ".$date['level']['data'][0];
 			if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
-
-			//TODO: replace with template rendering
-			if($url) {
-				$html = '<a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-			} else {
-				$html = '<span class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</span><br/>';
-			}
-			
 			$response = [ 
 							'url' => $url,
 							'level' => $level,
 							'label' => $label,
-							'html' => $html
 						];
+			$response['html'] = $this->applyTemplate($view_method, $response);
 			break;
 		}
        
@@ -179,40 +177,43 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
 	// TODO: 
 	// - add rendering of template defined in marcyaml to generate html
 	// - support for multiple responses = not break on first match
-    private function checkSolrMarcCategory($category) {      
-		$response = [];
-		$url = '';
+    private function checkSolrMarcCategory($category) {
 		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
+			$view_method = $this->getViewMethod($data);
 			foreach ($data as $date) {
 				if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
 				$level = $category." ".$solrMarcKey;
 				$label = $category;
 				if(!empty($date['level']['data'][0])) $level.=" ".$date['level']['data'][0];
 				if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
-
-				//TODO: replace with template rendering
-				if($url) {
-					$html = '<a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-				} else {
-					$html = '<span class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</span><br/>';
-				}
 				
 				$response = [ 
 								'url' => $url,
 								'level' => $level,
 								'label' => $label,
-								'html' => $html
+								'view-method' => $view_method
 							];
+				//$response['html'] = $this->renderer->render($view_method, $response);
+				$response['html'] = $this->applyTemplate($view_method, $response);
 				break;
 			}
 		}
        
         return $response;
-    }  
+    }
+	
+	private function getViewMethod($data) {
+		$view_method = $this->default_template;
+		if(!empty($data['view-method'])) $view_method = 'ajax/'.$data['view-method'].'.phtml';
+		return $view_method;
+	}
+	
+	private function applyTemplate($view_method, $response) {
+		return $this->renderer->render($view_method, $response);
+	}
 	
 	private function checkParentWork() {
-		$response = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
@@ -229,16 +230,13 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
         }
 		
 		if (!empty($url)) {
-			$level = 'ParentWork';
-			$label = 'Go to parent work';
 			$response = [ 
-							'href' => $url,
-							'level' => $level,
-							'label' => $label,
-							'html' => '<a href="'.$url.'" class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</a><br/>'
+							'url' => $url,
+							'level' => 'ParentWork',
+							'label' => 'Go to parent work',
 						];
+			$response['html'] = $this->renderer->render($this->default_template, $response);
 		}
-		
         return $response;
     }
 }
