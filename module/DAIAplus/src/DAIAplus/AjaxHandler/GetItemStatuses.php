@@ -151,7 +151,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 	
 	// TODO: 
-	// - add rendering of template defined in marcyaml to generate html
 	// - support for multiple responses = not break on first match
     private function checkSolrMarcKey($solrMarcKey) {      
 		$data = $this->driver->getMarcData($solrMarcKey);
@@ -175,7 +174,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }   
 	
 	// TODO: 
-	// - add rendering of template defined in marcyaml to generate html
 	// - support for multiple responses = not break on first match
     private function checkSolrMarcCategory($category) {
 		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
@@ -194,7 +192,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 								'label' => $label,
 								'view-method' => $view_method
 							];
-				//$response['html'] = $this->renderer->render($view_method, $response);
 				$response['html'] = $this->applyTemplate($view_method, $response);
 				break;
 			}
