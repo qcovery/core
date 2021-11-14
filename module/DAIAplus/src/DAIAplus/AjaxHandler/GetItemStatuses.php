@@ -180,7 +180,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 			$label = $solrMarcKey;
 			if(!empty($date['level']['data'][0])) $level.=" ".$date['level']['data'][0];
 			if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
-			$response = [ 
+			$response = [
+						    'check' => 'MARC Key: '.$solrMarcKey,
 							'url' => $url,
 							'level' => $level,
 							'label' => $label,
@@ -215,6 +216,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 				if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
 				
 				$response = [ 
+								'check' => 'MARC Category -> MARC Key: '.$category.' -> '.$solrMarcKey,
 								'url' => $url,
 								'level' => $level,
 								'label' => $label,
@@ -279,7 +281,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
 		
 		if (!empty($url)) {
-			$response = [ 
+			$response = [
+							'check' => 'function checkParentWork',
 							'url' => $url,
 							'level' => 'ParentWork',
 							'label' => 'Go to parent work',
