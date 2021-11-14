@@ -203,6 +203,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 	// TODO: support for multiple responses = not break on first match
     private function checkSolrMarcCategory($category) {
 		$responses = [];
+		$break = false;
 		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
 			$view_method = $this->getViewMethod($data);
@@ -221,8 +222,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 							];
 				$response['html'] = $this->applyTemplate($view_method, $response);
 				$responses[] = $response;
+				$break = true;
 				break;
 			}
+			if($break) break;
 		}
        
         return $responses;
