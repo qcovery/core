@@ -73,11 +73,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     /**
      * Constructor
      *
-     * @param SessionSettings   $ss        Session settings
+     * @param Loader            $loader    For loading record data via driver
      * @param Config            $config    Top-level configuration
-     * @param Connection        $ils       ILS connection
      * @param RendererInterface $renderer  View renderer
-     * @param Holds             $holdLogic Holds logic
      */
     public function __construct(Loader $loader, Config $config, RendererInterface $renderer) {
         $this->recordLoader = $loader;
@@ -127,31 +125,49 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $this->formatResponse(['statuses' => $responses]);
     }
 
+    /**
+     * Determines which check to run, based on keyword in configuration. Determination in this order depending on match between name and logic: 
+	 * 1) function available with name in this class
+    `* 2) MarcKey defined in availabilityplus_yaml
+     * 3) MarcCategory defined in availabilityplus_yaml
+     * TODO: Add checks for resolver and DAIA
+	 *
+     * @check name of check to run
+     *
+     * @return array [response data for check]
+     */
 	//TODO: Add checks for resolver and DAIA
     private function performAvailabilityCheck($check) {
 		
 		if(method_exists($this, $check)){
-			$response = $this->{$check}();
-			$response['check'] = $check;
-			$response['message'] = 'method in class exists';			
+			$responses = $this->{$check}();
+			/*$response['check'] = $check;
+			$response['message'] = 'method in class exists';*/	
 		} elseif (!empty($this->driver->getMarcData($check))) {
-			$response = $this->checkSolrMarcKey($check);
-			$response['check'] = $check;
-			$response['message'] = 'MARC key exists';
+			$responses = $this->checkSolrMarcKey($check);
+			/*$response['check'] = $check;
+			$response['message'] = 'MARC key exists';*/
 		} elseif (!empty($this->driver->getSolrMarcKeys($check))) {
-			$response = $this->checkSolrMarcCategory($check);
-			$response['check'] = $check;
-			$response['message'] = 'MARC category exists';
+			$responses = $this->checkSolrMarcCategory($check);
+			/*$response['check'] = $check;
+			$response['message'] = 'MARC category exists';*/
 		} else {
 			$response['check'] = $check;
 			$response['message'] = 'no MARC configuration or function for check exists';
+			$responses[] = $response;
 		}
 		
-        return $response;
+        return $responses;
     }
 	
-	// TODO: 
-	// - support for multiple responses = not break on first match
+	 /**
+     * Perform check based on MarcKey
+     *
+     * @solrMarcKey name of MarcKey in availabilityplus_yaml
+     *
+     * @return array [response data]
+     */
+	// TODO: support for multiple responses = not break on first match
     private function checkSolrMarcKey($solrMarcKey) {      
 		$data = $this->driver->getMarcData($solrMarcKey);
 		$view_method = $this->getViewMethod($data);
@@ -173,8 +189,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $response;
     }   
 	
-	// TODO: 
-	// - support for multiple responses = not break on first match
+     /**
+     * Perform check based on MarcCategory
+     *
+     * @category name of MarcCategory in availabilityplus_yaml
+     *
+     * @return array [response data]
+     */
+	// TODO: support for multiple responses = not break on first match
     private function checkSolrMarcCategory($category) {
 		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
@@ -199,17 +221,37 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
        
         return $response;
     }
-	
+
+     /**
+     * Support method to determine if a view-method, i.e. a name of template file has been defined, if not then the default_template is used
+     *
+     * @data data provided via parsing of availabilityplus_yaml
+     *
+     * @return string
+     */	
 	private function getViewMethod($data) {
 		$view_method = $this->default_template;
 		if(!empty($data['view-method'])) $view_method = 'ajax/'.$data['view-method'].'.phtml';
 		return $view_method;
 	}
 	
+     /**
+     * Support method to apply template
+     *
+     * @view_method name of template file
+	 * @response response data
+     *
+     * @return string (html code)
+     */	
 	private function applyTemplate($view_method, $response) {
 		return $this->renderer->render($view_method, $response);
 	}
-	
+
+     /**
+     * Custom method to check for a parent work that is a holding of the library
+     *
+     * @return array [response data]
+     */		
 	private function checkParentWork() {
         $parentData = $this->driver->getMarcData('ArticleParentId');
         foreach ($parentData as $parentDate) {
