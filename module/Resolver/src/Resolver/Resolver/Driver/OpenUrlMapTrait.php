@@ -91,16 +91,18 @@ trait OpenUrlMapTrait
     public function mapOpenUrl($openUrl)
     {
         parse_str($openUrl, $openUrlArray);
-        $format = strtolower($openUrlArray['rft_format']) ?? 'unknown';
-        $openUrlMap = array_flip($this->openUrlMap[$format]);
         $mapped = [];
-        foreach ($this->map as $key => $value) {
-            if (isset($openUrlMap[$value])) {
-                $mapped[$key] = $openUrlArray[$openUrlMap[$value]] ?? '';
+        $format = isset($openUrlArray['rft_format']) ? strtolower($openUrlArray['rft_format']) : 'unknown';
+        if (isset($this->openUrlMap[$format])) {
+            $openUrlMap = array_flip($this->openUrlMap[$format]);
+            foreach ($this->map as $key => $value) {
+                if (isset($openUrlMap[$value])) {
+                    $mapped[$key] = $openUrlArray[$openUrlMap[$value]] ?? '';
+                }
             }
-        }
-        if (empty($openUrlMap['format'])) {
-            $mapped['format'] = $format;
+            if (empty($openUrlMap['format'])) {
+                $mapped['format'] = $format;
+            }
         }
         return $mapped;
     }

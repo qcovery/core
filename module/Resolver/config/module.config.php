@@ -15,17 +15,22 @@ $config = [
             ],
             'resolver_driver' => [
                 'factories' => [
-                    \Resolver\Resolver\Driver\KVK::class =>
-                        \VuFind\Resolver\Driver\AbstractBaseFactory::class,
-                    \Resolver\Resolver\Driver\JOP::class =>
-                        \Resolver\Resolver\Driver\JOPFactory::class,
-                    \Resolver\Resolver\Driver\HBZ::class =>
-                        \VuFind\Resolver\Driver\AbstractBaseFactory::class,
+                    'Resolver\Resolver\Driver\KVK' =>
+                        'VuFind\Resolver\Driver\AbstractBaseFactory',
+                    'Resolver\Resolver\Driver\Ezb' =>
+                        \VuFind\Resolver\Driver\EzbFactory::class,
+                    'Resolver\Resolver\Driver\JOP' =>
+                        'Resolver\Resolver\Driver\JOPFactory',
+                    'Resolver\Resolver\Driver\HBZ' =>
+                        'VuFind\Resolver\Driver\AbstractBaseFactory',
                 ],
                 'aliases' => [
-                    'kvk' => \Resolver\Resolver\Driver\KVK::class,
-                    'jop' => \Resolver\Resolver\Driver\JOP::class,
-                    'hbz' => \Resolver\Resolver\Driver\HBZ::class,
+                    'kvk' => 'Resolver\Resolver\Driver\KVK',
+                    'ezb' => 'Resolver\Resolver\Driver\Ezb',
+                    'VuFind\Resolver\Driver\Ezb' => 
+                        'Resolver\Resolver\Driver\Ezb',
+                    'jop' => 'Resolver\Resolver\Driver\JOP',
+                    'hbz' => 'Resolver\Resolver\Driver\HBZ',
                 ]
             ],
         ],

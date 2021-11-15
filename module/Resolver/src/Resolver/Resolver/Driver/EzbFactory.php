@@ -31,7 +31,7 @@ use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
-use VuFind\Resolver\Driver\DriverWithHttpClientFactory;
+//use VuFind\Resolver\Driver\DriverWithHttpClientFactory;
 
 /**
  * Factory for EZB resolver driver.
@@ -42,7 +42,7 @@ use VuFind\Resolver\Driver\DriverWithHttpClientFactory;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class JOPFactory extends DriverWithHttpClientFactory
+class EzbFactory extends DriverWithHttpClientFactory
 {
     /**
      * Create an object
@@ -58,7 +58,9 @@ class JOPFactory extends DriverWithHttpClientFactory
      * creating a service.
      * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         $options = [$container->get(\VuFind\Net\UserIpReader::class)];

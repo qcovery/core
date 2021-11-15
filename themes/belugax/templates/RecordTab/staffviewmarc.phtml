@@ -7,6 +7,6 @@
         </a>
     </div>
     <div id="belugax-staff-view-content" class="belugax-staff-view-toggle" hidden>
-        <?=\VuFind\XSLT\Processor::process('record-marc.xsl', $xml)?>
+<?=\VuFind\XSLT\Processor::process('record-marc.xsl', $this->driver->getXML('marc21'))?>
     </div>
 </div>

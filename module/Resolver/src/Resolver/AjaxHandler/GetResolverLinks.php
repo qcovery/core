@@ -83,8 +83,11 @@ class GetResolverLinks extends AbstractBase implements TranslatorAwareInterface
      * @param RendererInterface $renderer View renderer
      * @param Config            $config   Top-level VuFind configuration (config.ini)
      */
-    public function __construct(SessionSettings $ss, ResolverManager $pm,
-        RendererInterface $renderer, Config $resolverConfig
+    public function __construct(
+        SessionSettings $ss,
+        ResolverManager $pm,
+        RendererInterface $renderer,
+        Config $resolverConfig
     ) {
         $this->sessionSettings = $ss;
         $this->pluginManager = $pm;
@@ -105,72 +108,71 @@ class GetResolverLinks extends AbstractBase implements TranslatorAwareInterface
         $openUrl = $params->fromQuery('openurl', '');
         $resolverService = $params->fromQuery('resolverservice', ''); 
         $searchClassId = $params->fromQuery('searchClassId', '');
+        $resolverConfig = $this->resolverConfig[$resolverService] ?? [];
+        if (empty($resolverConfig['resolver'])) {
+            return $this->formatResponse(
+                $this->translate("Could not find $resolverService in configuration"),
+                self::STATUS_HTTP_ERROR
+            );
+        }
+        $resolverType = $resolverConfig['resolver'];
+        if (!$this->pluginManager->has($resolverType)) {
+            return $this->formatResponse(
+                $this->translate("Could not load driver for $resolverType"),
+                self::STATUS_HTTP_ERROR
+            );
+        }
 
-        $snippets = [];
-        foreach($this->resolverConfig as $service => $params) {
-            if (!empty($resolverService) && $resolverService != $service) {
-                continue;
-            }
-            if (!empty($params['resolver'])) {
-                $resolverType = $params['resolver'];
-                if (!$this->pluginManager->has($resolverType)) {
-                    return $this->formatResponse(
-                        $this->translate("Could not load driver for $resolverType"),
-                        self::STATUS_HTTP_ERROR
-                    );
-                }
-                $resolver = new Connection($this->pluginManager->get($resolverType));
-                if (false && isset($params['resolver_cache'])) {
-                    $resolver->enableCache($params['resolver_cache']);
-                }
-                $resolver->setBaseUrl($params['url']);
-                $resolver->setParameters($params['params']);
-                $result = $resolver->fetchLinks($openUrl);
-                // Sort the returned links into categories based on service type:
-                $electronic = $print = $services = [];
-                foreach ($result as $link) {
-                    switch ($link['service_type'] ?? '') {
-                        case 'getHolding':
-                            $print[] = $link;
-                            break;
-                        case 'getWebService':
-                            $services[] = $link;
-                            break;
-                        case 'getDOI':
-                        // Special case -- modify DOI text for special display:
-                            $link['title'] = $this->translate('Get full text');
-                            $link['coverage'] = '';
-                        case 'getFullTxt':
-                        default:
-                            $electronic[] = $link;
-                            break;
-                    }
-                }
-
-                // Get the OpenURL base:
-                if (isset($params['url'])) {
-                    // Trim off any parameters (for legacy compatibility -- default config
-                    // used to include extraneous parameters):
-                    [$base] = explode('?', $params['url']);
-                } else {
-                    $base = false;
-                }
-
-                $moreOptionsLink = (false && $resolver->supportsMoreOptionsLink())
-                    ? $resolver->getResolverUrl($openUrl) : '';
-
-                // Render the links using the view:
-                $view = [
-                    'openUrlBase' => $base, 'openUrl' => $openUrl, 'print' => $print,
-                    'electronic' => $electronic, 'services' => $services,
-                    'searchClassId' => $searchClassId,
-                    'moreOptionsLink' => $moreOptionsLink
-                ];
-                $snippets[] = $this->renderer->render('ajax/resolverLinks.phtml', $view);
+        $resolver = new Connection($this->pluginManager->get($resolverType));
+        if (false && isset($this->config->OpenURL->resolver_cache)) {
+            $resolver->enableCache($this->config->OpenURL->resolver_cache);
+        }
+        $resolver->setBaseUrl($resolverConfig['url']);
+        $resolver->setParameters($resolverConfig['params']);
+        $result = $resolver->fetchLinks($openUrl);
+        // Sort the returned links into categories based on service type:
+        $electronic = $print = $services = [];
+        foreach ($result as $link) {
+            switch ($link['service_type'] ?? '') {
+            case 'getHolding':
+                $print[] = $link;
+                break;
+            case 'getWebService':
+                $services[] = $link;
+                break;
+            case 'getDOI':
+                // Special case -- modify DOI text for special display:
+                $link['title'] = $this->translate('Get full text');
+                $link['coverage'] = '';
+            case 'getFullTxt':
+            default:
+                $electronic[] = $link;
+                break;
             }
         }
+
+        // Get the OpenURL base:
+        if (isset($resolverConfig['url'])) {
+            // Trim off any parameters (for legacy compatibility -- default config
+            // used to include extraneous parameters):
+            [$base] = explode('?', $resolverConfig['url']);
+        } else {
+            $base = false;
+        }
+
+        $moreOptionsLink = $resolver->supportsMoreOptionsLink()
+            ? $resolver->getResolverUrl($openUrl) : '';
+
+        // Render the links using the view:
+        $view = [
+            'openUrlBase' => $base, 'openUrl' => $openUrl, 'print' => $print,
+            'electronic' => $electronic, 'services' => $services,
+            'searchClassId' => $searchClassId,
+            'moreOptionsLink' => $moreOptionsLink
+        ];
         // output HTML encoded in JSON object
-        $html = implode("<br/>\n", $snippets);
+        $html = $this->renderer->render('ajax/resolverLinks.phtml', $view);
+
         return $this->formatResponse(compact('html'));
     }
 }

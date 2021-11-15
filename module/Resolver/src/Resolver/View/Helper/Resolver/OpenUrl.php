@@ -192,7 +192,9 @@ class OpenUrl extends \VuFind\View\Helper\Root\OpenUrl
             'openUrlEmbed' => $embed,
             'openUrlEmbedAutoLoad' => $embedAutoLoad
         ];
-        $this->addImageBasedParams($imagebased, $params);
+        if (!empty($imagebased)) {
+            $this->addImageBasedParams($imagebased, $params);
+        }
 
         // Render the subtemplate:
         return $this->context->__invoke($this->getView())->renderInContext(
