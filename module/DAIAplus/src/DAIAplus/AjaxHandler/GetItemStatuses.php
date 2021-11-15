@@ -224,7 +224,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      *
      * @return array [response data (arrays)]
      */		
-	private function checkParentWork() {
+	private function checkParentWorkILNSolr() {
 		$responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
         foreach ($parentData as $parentDate) {
