@@ -170,20 +170,20 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		$break = false;
 		foreach ($solrMarcKeys as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
-			$view_method = $this->getTemplate($data);
+			$template = $this->getTemplate($data);
 			foreach ($data as $date) {
 				if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
 				$level = $check;
 				$label = $check;
 				
 				$response = [ 
-								'check' => 'MARC Category -> MARC Key: '.$category.' -> '.$solrMarcKey,
+								'check' => $check,
 								'url' => $url,
 								'level' => $level,
 								'label' => $label,
-								'view-method' => $view_method
+								'template' => $template
 							];
-				$response['html'] = $this->applyTemplate($view_method, $response);
+				$response['html'] = $this->applyTemplate($template, $response);
 				$responses[] = $response;
 				$break = true;
 				break;
@@ -202,21 +202,21 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @return string
      */	
 	private function getTemplate($data) {
-		$view_method = $this->default_template;
-		if(!empty($data['view-method'])) $view_method = 'ajax/'.$data['view-method'].'.phtml';
-		return $view_method;
+		$template = $this->default_template;
+		if(!empty($data['view-method'])) $template = $data['view-method'];
+		return $template;
 	}
 	
      /**
      * Support method to apply template
      *
-     * @view_method name of template file
+     * @template name of template file
 	 * @response response data
      *
      * @return string (html code)
      */	
-	private function applyTemplate($view_method, $response) {
-		return $this->renderer->render($view_method, $response);
+	private function applyTemplate($template, $response) {
+		return $this->renderer->render($template, $response);
 	}
 
      /**
