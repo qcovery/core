@@ -143,16 +143,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		
 		if(method_exists($this, $check)){
 			$responses = $this->{$check}();
-			/*$response['check'] = $check;
-			$response['message'] = 'method in class exists';*/	
 		} elseif (!empty($this->driver->getMarcData($check))) {
-			$responses = $this->checkSolrMarcKey($check);
-			/*$response['check'] = $check;
-			$response['message'] = 'MARC key exists';*/
+			$responses = $this->checkSolrMarcData(array($check), $check);
 		} elseif (!empty($this->driver->getSolrMarcKeys($check))) {
-			$responses = $this->checkSolrMarcCategory($check);
-			/*$response['check'] = $check;
-			$response['message'] = 'MARC category exists';*/
+			$responses = $this->checkSolrMarcData($this->driver->getSolrMarcKeys($check), $check);
 		} else {
 			$response['check'] = $check;
 			$response['message'] = 'no MARC configuration or function for check exists';
@@ -162,58 +156,25 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $responses;
     }
 	
-	 /**
-     * Perform check based on MarcKey
-     *
-     * @solrMarcKey name of MarcKey in availabilityplus_yaml
-     *
-     * @return array [response data (arrays)]
-     */
-	// TODO: support for multiple responses = not break on first match
-    private function checkSolrMarcKey($solrMarcKey) {
-		$responses = [];
-		$data = $this->driver->getMarcData($solrMarcKey);
-		$view_method = $this->getViewMethod($data);
-		foreach ($data as $date) {
-			if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
-			$level = $solrMarcKey;
-			$label = $solrMarcKey;
-			if(!empty($date['level']['data'][0])) $level.=" ".$date['level']['data'][0];
-			if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
-			$response = [
-						    'check' => 'MARC Key: '.$solrMarcKey,
-							'url' => $url,
-							'level' => $level,
-							'label' => $label,
-						];
-			$response['html'] = $this->applyTemplate($view_method, $response);
-			$responses[] = $response;
-			break;
-		}
-       
-        return $responses;
-    }   
-	
      /**
-     * Perform check based on MarcCategory
+     * Perform check based on provided MarcKeys
      *
-     * @category name of MarcCategory in availabilityplus_yaml
+	 * @solrMarcKeys array of MarcKeys to check
+     * @check name of check in availabilityplus_yaml
      *
      * @return array [response data (arrays)]
      */
 	// TODO: support for multiple responses = not break on first match
-    private function checkSolrMarcCategory($category) {
+    private function checkSolrMarcData($solrMarcKeys, $check) {
 		$responses = [];
 		$break = false;
-		foreach ($this->driver->getSolrMarcKeys($category) as $solrMarcKey) {
+		foreach ($solrMarcKeys as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
 			$view_method = $this->getViewMethod($data);
 			foreach ($data as $date) {
 				if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
-				$level = $category." ".$solrMarcKey;
-				$label = $category;
-				if(!empty($date['level']['data'][0])) $level.=" ".$date['level']['data'][0];
-				if(!empty($date['label']['data'][0])) $label.=" ".$date['label']['data'][0];
+				$level = $check;
+				$label = $check;
 				
 				$response = [ 
 								'check' => 'MARC Category -> MARC Key: '.$category.' -> '.$solrMarcKey,
