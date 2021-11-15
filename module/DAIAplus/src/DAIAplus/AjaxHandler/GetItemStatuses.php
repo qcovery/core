@@ -170,7 +170,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		$break = false;
 		foreach ($solrMarcKeys as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
-			$view_method = $this->getViewMethod($data);
+			$view_method = $this->getTemplate($data);
 			foreach ($data as $date) {
 				if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
 				$level = $check;
@@ -201,7 +201,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      *
      * @return string
      */	
-	private function getViewMethod($data) {
+	private function getTemplate($data) {
 		$view_method = $this->default_template;
 		if(!empty($data['view-method'])) $view_method = 'ajax/'.$data['view-method'].'.phtml';
 		return $view_method;
