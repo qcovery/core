@@ -99,7 +99,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
 
         $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
-        if($list) $this->checks = $this->config['ResultList'];
+		$this->setChecks($list);
 
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
@@ -126,6 +126,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
         return $this->formatResponse(['statuses' => $responses]);
     }
+	
+	private function setChecks($list) {
+		$checks = 'RecordView';
+		if($list) $checks = 'ResultList';
+		if(!empty($this->config[$this->source.$checks])) $this->checks = $this->config[$this->source.$checks];
+	}
 
     /**
      * Determines which check to run, based on keyword in configuration. Determination in this order depending on match between name and logic: 
