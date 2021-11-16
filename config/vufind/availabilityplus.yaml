@@ -30,6 +30,17 @@ ArticleFulltextFree:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
+GBVILNTitle:
+  category: GBVILN
+  view-method: ajax/link-external.phtml
+  245:
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr%20%22($0)%22&ACT=SRCH']
+  490:
+    a:
+      - [name, url]
+
 #TODO Später anpassen?
 ArticleFulltextFreeCollection:
   category: FreeAccessIndirect
@@ -39,6 +50,7 @@ ArticleFulltextFreeCollection:
       - [field, a, 'OPENACCESS|GBV_DOAJ|Gutenberg|ZDB-94-OAB|ZDB-23-GOA|GBV_XBI|GBV_XAR|GBV_XCH|GBV_CTG']
     a:
       - [name, collection]
+
       
 #TODO Später anpassen?
 ArticleDirectLink:
