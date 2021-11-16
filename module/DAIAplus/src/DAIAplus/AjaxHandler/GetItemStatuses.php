@@ -81,8 +81,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
         $this->checks = $this->config['RecordView'];
-		$this->renderer = $renderer;
-		$this->default_template = 'ajax/default.phtml';
+	$this->renderer = $renderer;
+	$this->default_template = 'ajax/default.phtml';
     }
 
     /**
@@ -99,29 +99,28 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
 
         $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
-		$this->setChecks($list);
+	$this->setChecks($list);
 
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $check_mode = 'continue';
                 $this->driver = $this->recordLoader->load($id, $this->source);
-				$this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
-				$responses = [];
-				$response = [];
+		$this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
+		$responses = [];
+		$response = [];
                 foreach($this->checks as $check => $this->current_mode) {
                     if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
                         $results = $this->performAvailabilityCheck($check);
                         foreach($results as $result) {
-							if(!empty($result)) {
-								$response[] = $result;
-								$check_mode = $this->current_mode;
-							}
-						}
-                    }
-					
+				if(!empty($result)) {
+					$response[] = $result;
+					$check_mode = $this->current_mode;
+				}
+			}
+                    }			
                 }
-				$response['id'] = $id;
-				$responses[] = $response;
+		$response['id'] = $id;
+		$responses[] = $response;
             }
         }
         return $this->formatResponse(['statuses' => $responses]);
@@ -185,7 +184,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 				if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
 				$level = $check;
 				$label = $check;
-				
 				$response = [ 
 								'check' => $check,
 								'url' => $url,
@@ -202,7 +200,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 			}
 			if($break) break;
 		}
-       
         return array_unique($responses, SORT_REGULAR);
     }
 
@@ -238,32 +235,31 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      */		
 	private function checkParentWorkILNSolr() {
 		$responses = [];
-        $parentData = $this->driver->getMarcData('ArticleParentId');
-        foreach ($parentData as $parentDate) {
-            if (!empty(($parentDate['id']['data'][0]))) {
-                $parentId = $parentDate['id']['data'][0];
-                break;
-            }
-        }
-        if (!empty($parentId)) {
-            $parentDriver = $this->recordLoader->load($parentId, 'Solr');
-            $ilnMatch = $parentDriver->getMarcData('ILN');
-            if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                $url = '/vufind/Record/' . $parentId;
-            }
-        }
-		
+       		$parentData = $this->driver->getMarcData('ArticleParentId');
+       		foreach ($parentData as $parentDate) {
+			if (!empty(($parentDate['id']['data'][0]))) {
+				$parentId = $parentDate['id']['data'][0];
+				break;
+		    	}
+        	}
+		if (!empty($parentId)) {
+		    $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+		    $ilnMatch = $parentDriver->getMarcData('ILN');
+		    if (!empty($ilnMatch[0]['iln']['data'][0])) {
+			$url = '/vufind/Record/' . $parentId;
+		    }
+		}
 		if (!empty($url)) {
 			$response = [
-							'check' => 'function checkParentWork',
-							'url' => $url,
-							'level' => 'ParentWorkILNSolr',
-							'label' => 'Go to parent work (local holding)',
-						];
+				'check' => 'function checkParentWork',
+				'url' => $url,
+				'level' => 'ParentWorkILNSolr',
+				'label' => 'Go to parent work (local holding)',
+				];
 			$response['html'] = $this->renderer->render('ajax/link.phtml', $response);
 		}
 		
 		$responses[] = $response;
-        return $responses;
-    }
+        	return $responses;
+	}
 }
