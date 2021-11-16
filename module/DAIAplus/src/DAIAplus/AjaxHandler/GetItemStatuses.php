@@ -130,14 +130,19 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 	private function setChecks($list) {
 		$checks = 'RecordView';
 		if($list) $checks = 'ResultList';
-		if(!empty($this->config[$this->source.$checks])) $this->checks = $this->config[$this->source.$checks];
+		if(!empty($this->config[$this->source.$checks])) {
+			$this->checks = $this->config[$this->source.$checks];
+		} else {
+			$this->checks = $this->config[$checks];
+		}
 	}
 
     /**
      * Determines which check to run, based on keyword in configuration. Determination in this order depending on match between name and logic: 
 	 * 1) function available with name in this class
-    `* 2) MarcKey defined in availabilityplus_yaml
-     * 3) MarcCategory defined in availabilityplus_yaml
+     * 2) DAIA and other resolver
+	 * 3) MarcKey defined in availabilityplus_yaml
+     * 4) MarcCategory defined in availabilityplus_yaml
      * TODO: Add checks for resolver and DAIA
 	 *
      * @check name of check to run
@@ -170,7 +175,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      *
      * @return array [response data (arrays)]
      */
-	// TODO: support for multiple responses = not break on first match
     private function checkSolrMarcData($solrMarcKeys, $check) {
 		$responses = [];
 		$break = false;
@@ -191,13 +195,15 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 							];
 				$response['html'] = $this->applyTemplate($template, $response);
 				$responses[] = $response;
-				$break = true;
-				break;
+				if($this->current_mode == 'break_on_first') {
+					$break = true;
+					break;
+				}
 			}
 			if($break) break;
 		}
        
-        return $responses;
+        return array_unique($responses, SORT_REGULAR);
     }
 
      /**
