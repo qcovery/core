@@ -180,28 +180,43 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		foreach ($solrMarcKeys as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
 			$template = $this->getTemplate($data);
-			foreach ($data as $date) {
-				if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
-				$level = $check;
-				$label = $check;
-				$response = [ 
-								'check' => $check,
-								'url' => $url,
-								'level' => $level,
-								'label' => $label,
-								'template' => $template
-							];
-				$response['html'] = $this->applyTemplate($template, $response);
-				$responses[] = $response;
-				if($this->current_mode == 'break_on_first') {
-					$break = true;
-					break;
+			if($this->checkConditions($data)) {
+				foreach ($data as $date) {
+					if(!isset($date['condition'])) {
+						if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
+						$level = $check;
+						$label = $check;
+						$response = [ 
+										'check' => $check,
+										'url' => $url,
+										'level' => $level,
+										'label' => $label,
+										'template' => $template,
+										'data' => $data
+									];
+						$response['html'] = $this->applyTemplate($template, $response);
+						$responses[] = $response;
+						if($this->current_mode == 'break_on_first') {
+							$break = true;
+							break;
+						}						
+					}
 				}
 			}
 			if($break) break;
 		}
         return array_unique($responses, SORT_REGULAR);
     }
+	
+	private function checkConditions($data){
+		$check = true;
+		foreach($data as $date) {
+			if(!empty($date['condition']['data'][0])) {
+				if($date['condition']['data'][0] != 'true') $check = false;
+			}
+		}
+		return $check;
+	}
 
      /**
      * Support method to determine if a view-method, i.e. a name of template file has been defined, if not then the default_template is used
