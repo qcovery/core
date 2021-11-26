@@ -99,28 +99,28 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
 
         $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
-	$this->setChecks($list);
+	    $this->setChecks($list);
 
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $check_mode = 'continue';
                 $this->driver = $this->recordLoader->load($id, $this->source);
-		$this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
-		$responses = [];
-		$response = [];
+		        $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
+		        $responses = [];
+		        $response = [];
                 foreach($this->checks as $check => $this->current_mode) {
                     if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
                         $results = $this->performAvailabilityCheck($check);
                         foreach($results as $result) {
-				if(!empty($result)) {
-					$response[] = $result;
-					$check_mode = $this->current_mode;
-				}
-			}
+				            if(!empty($result)) {
+					            $response[] = $result;
+					            $check_mode = $this->current_mode;
+				            }
+			            }
                     }			
                 }
-		$response['id'] = $id;
-		$responses[] = $response;
+		        $response['id'] = $id;
+		        $responses[] = $response;
             }
         }
         return $this->formatResponse(['statuses' => $responses]);
@@ -175,37 +175,47 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @return array [response data (arrays)]
      */
     private function checkSolrMarcData($solrMarcKeys, $check) {
+		sort($solrMarcKeys);
 		$responses = [];
+		$urls = [];
 		$break = false;
 		foreach ($solrMarcKeys as $solrMarcKey) {
 			$data = $this->driver->getMarcData($solrMarcKey);
-			$template = $this->getTemplate($data);
-			if($this->checkConditions($data)) {
+			if(!empty($data) && $this->checkConditions($data)) {
+				$template = $this->getTemplate($data);
+				$level = $this->getLevel($data, $check, $solrMarcKey);
+				$label = $this->getLabel($data, $check);
 				foreach ($data as $date) {
-					if(!isset($date['condition'])) {
-						if (!empty($date['url']['data'][0])) $url = $date['url']['data'][0];
-						$level = $check;
-						$label = $check;
-						$response = [ 
-										'check' => $check,
-										'url' => $url,
-										'level' => $level,
-										'label' => $label,
-										'template' => $template,
-										'data' => $data
-									];
-						$response['html'] = $this->applyTemplate($template, $response);
-						$responses[] = $response;
-						if($this->current_mode == 'break_on_first') {
-							$break = true;
-							break;
-						}						
+					if (!empty($date['url']['data'][0])) {
+						foreach ($date['url']['data'] as $url) {
+							if(!in_array($url, $urls)) {
+								$urls[] = $url;
+								$response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url);
+								$response['html'] = $this->applyTemplate($template, $response);
+								$responses[] = $response;
+								if($this->current_mode == 'break_on_first') {
+									$break = true;
+									break;
+								}
+							}
+						}
 					}
+					if($break) break;					
 				}
+				
+				if(empty($urls)) {
+					$response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data);
+					$response['html'] = $this->applyTemplate($template, $response);
+					$responses[] = $response;
+					if($this->current_mode == 'break_on_first') {
+						$break = true;
+						break;
+					}							
+				}	
 			}
 			if($break) break;
 		}
-        return array_unique($responses, SORT_REGULAR);
+        return $responses;
     }
 	
 	private function checkConditions($data){
@@ -216,6 +226,35 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 			}
 		}
 		return $check;
+	}
+	
+	private function getLevel($data, $level, $solrMarcKey) {
+		if($level != $solrMarcKey) $level = $level.' '.$solrMarcKey;
+		foreach ($data as $date) {
+			if(!empty($date['level']['data'][0])) $level = $date['level']['data'][0];
+		}
+		return $level;
+	}
+	
+	private function getLabel($data, $label) {
+		foreach ($data as $date) {
+			if(!empty($date['label']['data'][0])) $label = $date['label']['data'][0];
+		}
+		return $label;
+	}
+	
+	private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = ''){
+		$response = [ 
+				'mode' => $this->current_mode,
+				'check' => $check,
+				'SolrMarcKey' => $solrMarcKey,
+				'url' => $url,
+				'level' => $level,
+				'label' => $label,
+				'template' => $template,
+				'data' => $data
+			];
+		return $response;
 	}
 
      /**

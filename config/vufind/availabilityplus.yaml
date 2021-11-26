@@ -21,7 +21,7 @@ TestCondition:
       - [name, url]
       - [replace, '(^((?!Dubbel).)*$)', 'false'] 
       - [replace, '(^Dubbel$)', 'true']
-ArticleFulltextFreeUrlParts2:
+3ArticleFulltextFreeUrlParts2:
   category: FreeAccess
   view-method: ajax/link-external.phtml
   856:
@@ -32,7 +32,7 @@ ArticleFulltextFreeUrlParts2:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
-ArticleFulltextFreeUrlParts:
+2ArticleFulltextFreeUrlParts:
   category: FreeAccess
   view-method: ajax/link-external.phtml
   856:
@@ -42,7 +42,7 @@ ArticleFulltextFreeUrlParts:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
-ArticleFulltextFree:
+1ArticleFulltextFree:
   category: FreeAccess
   view-method: ajax/link-external.phtml
   856:
