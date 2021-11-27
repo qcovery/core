@@ -1,49 +1,6 @@
-PubPharmDrugsOfTheFuture:
-  category: PubPharmProxy
-  mandatory-field: url
-  view-method: ajax/link-external.phtml
-  773:
-    x: 
-      - [name, condition]
-      - [replace, '(^0377-8282$)', 'true']      
-  952:
-    j:
-      - [name, condition]
-      - [replace, '(^2021$|^2020$|^2019$|^2018$|^2017$|^2016$|^2015$|^2014$|^2013$|^2012$|^2011$|^2010$)', 'true']
-  856:
-    u:
-      - [name, url]
-      - [replace, '(^.*$)', 'http://pharmazie.proxy.fid-lizenzen.de/fid/thomson-reuters-ejournals-pharmazie/$0']
-TestCondition:
-  view-method: ajax/default.phtml
-  245:
-    a: 
-      - [name, url]
-      - [replace, '(^((?!Dubbel).)*$)', 'false'] 
-      - [replace, '(^Dubbel$)', 'true']
-3ArticleFulltextFreeUrlParts2:
-  category: FreeAccess
-  view-method: ajax/link-external.phtml
-  856:
-    conditions:
-      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
-      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
-      - [indicator, 1, 4]
-      - [indicator, 2, 0|1]
-    u:
-      - [name, url]
-2ArticleFulltextFreeUrlParts:
-  category: FreeAccess
-  view-method: ajax/link-external.phtml
-  856:
-    conditions:
-      - [field, u, 'doaj.org\/article|edocs.tib.eu\/files|tib.uni-hannover.de\/edoks\/|digibib.tu-bs.de|resolver.sub.uni-goettingen.de|resolver.staatsbibliothek-berlin.de|hdl.handle.net|lib.dr.iastate.edu|www.dzhw.eu\/pdf|www.his.de\/pdf|arxiv.org|publikationsserver.tu-braunschweig.de\/get|bib-pubdb1.desy.de\/record|inef.uni-due.de\/index.php?article_id=|kluedo.ub.uni-kl.de\/frontdoor\/index\/index\/docId\/|wiiw.ac.at|library.fes.de\/pdf-files|www.bis.org\/publ\/bppdf|www.bsu-bund.de\/SharedDocs\/pdf|www.bamf.de\/SharedDocs\/Anlagen\/DE\/Publikationen|bib-pubdb1.desy.de\/record|www.doabooks.org\/doab?func=fulltext|www.pharmazeutische-zeitung.de|clinicaltrials.gov\/show|www.jfe-steel.co.jp\/en\/research\/report\/|www.ressource-deutschland.de\/fileadmin\/|juser.fz-juelich.de\/record\/|www.qip-journal.eu\/index.php\/ams\/article\/download\/|www.ita.rwth-aachen.de\/global\/show_document.asp|opus.bibliothek.uni-wuerzburg.de\/files\/|kth.diva-portal.org\/smash\/record|www.teses.usp.br\/teses\/disponiveis\/|edoc.difu.de\/edoc.php|haab-digital.klassik-stiftung.de\/viewer|darwin-online.org.uk|www.doabooks.org|revistas.unam.mx|produccioncientificaluz.org']
-      - [indicator, 1, 4]
-      - [indicator, 2, 0|1]
-    u:
-      - [name, url]
 1ArticleFulltextFree:
   category: FreeAccess
+  mandatory-field: url
   view-method: ajax/link-external.phtml
   856:
     conditions:
@@ -53,8 +10,62 @@ TestCondition:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
+2ArticleFulltextFreeUrlParts:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, u, 'doaj.org\/article|edocs.tib.eu\/files|tib.uni-hannover.de\/edoks\/|digibib.tu-bs.de|resolver.sub.uni-goettingen.de|resolver.staatsbibliothek-berlin.de|hdl.handle.net|lib.dr.iastate.edu|www.dzhw.eu\/pdf|www.his.de\/pdf|arxiv.org|publikationsserver.tu-braunschweig.de\/get|bib-pubdb1.desy.de\/record|inef.uni-due.de\/index.php?article_id=|kluedo.ub.uni-kl.de\/frontdoor\/index\/index\/docId\/|wiiw.ac.at|library.fes.de\/pdf-files|www.bis.org\/publ\/bppdf|www.bsu-bund.de\/SharedDocs\/pdf|www.bamf.de\/SharedDocs\/Anlagen\/DE\/Publikationen|bib-pubdb1.desy.de\/record|www.doabooks.org\/doab?func=fulltext|www.pharmazeutische-zeitung.de|clinicaltrials.gov\/show|www.jfe-steel.co.jp\/en\/research\/report\/|www.ressource-deutschland.de\/fileadmin\/|juser.fz-juelich.de\/record\/|www.qip-journal.eu\/index.php\/ams\/article\/download\/|www.ita.rwth-aachen.de\/global\/show_document.asp|opus.bibliothek.uni-wuerzburg.de\/files\/|kth.diva-portal.org\/smash\/record|www.teses.usp.br\/teses\/disponiveis\/|edoc.difu.de\/edoc.php|haab-digital.klassik-stiftung.de\/viewer|darwin-online.org.uk|www.doabooks.org|revistas.unam.mx|produccioncientificaluz.org']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+3ArticleFulltextFreeUrlParts2:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
+      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+PubPharmDrugsOfTheFuture:
+  category: PubPharmProxy
+  mandatory-field: url
+  view-method: ajax/default.phtml
+  '035':
+    a:
+      - [name, requirednumberofconditions]
+      - [replace, '(^.*$)', 2]
+  773:
+    x: 
+      - [name, condition]
+      - [replace, '(^1699-3993$)', 'true']
+  952:
+    j:
+      - [name, condition]
+      - [replace, '(^2021$|^2020$|^2019$|^2018$|^2017$|^2016$|^2015$|^2014$|^2013$|^2012$|^2011$|^2010$)', 'true']
+  856:
+    u:
+      - [name, url]
+      - [replace, '(^.*$)', 'http://pharmazie.proxy.fid-lizenzen.de/fid/thomson-reuters-ejournals-pharmazie/$0']
+TestLabel:
+  view-method: ajax/default.phtml
+  245:
+    a: 
+      - [name, label]
+TestLevel:
+  view-method: ajax/default.phtml
+  245:
+    a: 
+      - [name, level]
 GBVILNTitle:
   category: GBVILN
+  mandatory-field: url
   view-method: ajax/link-external.phtml
   245:
     a:

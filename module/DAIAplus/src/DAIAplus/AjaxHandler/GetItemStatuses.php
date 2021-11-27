@@ -220,11 +220,24 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 	
 	private function checkConditions($data){
 		$check = true;
+		$requirednumberofconditions = 0;
+		$numberofconditions = 0;
+		
+		foreach($data as $date) {
+			if(!empty($date['requirednumberofconditions']['data'][0])) {
+				$requirednumberofconditions = $date['requirednumberofconditions']['data'][0];
+			}
+		}
+		
 		foreach($data as $date) {
 			if(!empty($date['condition']['data'][0])) {
 				if($date['condition']['data'][0] != 'true') $check = false;
+				$numberofconditions += 1;
 			}
 		}
+		
+		if($requirednumberofconditions != $numberofconditions) $check = false;
+		
 		return $check;
 	}
 	
