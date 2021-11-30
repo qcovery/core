@@ -89,26 +89,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             foreach ($ids as $id) {
                 $driver = $this->recordLoader->load($id, $source);
                 $urlAccess = '';
-		$response = [];
+				$response = [];
                 $daiaplus_check_bool = true;
-
-                if (isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
-                    $urlAccess = $this->checkParentId($driver);
-                    if (!empty($urlAccess)) {
-                        $response = ['list' => ['url_access' => $urlAccess,
-                                                'url_access_level' => 'print_access_level',
-                                                'url_access_label' => 'Journal',
-                                                'link_status' => 1],
-                                     'items' => ['journal_check' =>
-                                                    ['url_access' => $urlAccess,
-                                                     'url_access_level' => 'print_access_level',
-                                                     'url_access_label' => 'Journal',
-                                                     'link_status' => 1]
-                                                 ]
-                                    ];
-                    $daiaplus_check_bool = false;
-                    }
-                }
 
                 $urlAccessUncertain = $this->checkDirectLink($driver);
                 if (!empty($urlAccessUncertain)) {
@@ -136,6 +118,17 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
                     error_log($url);
                     $response = json_decode($this->makeRequest($url), true);
+                }
+				
+				if(empty($response) && isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
+                    $urlAccess = $this->checkParentId($driver);
+                    if (!empty($urlAccess)) {
+						$response['items']['journal_check'] = ['url_access' => $urlAccess,
+                                                     'url_access_level' => 'print_access_level',
+                                                     'url_access_label' => 'Journal',
+                                                          'link_status' => 1];
+                    //$daiaplus_check_bool = false;
+                    }
                 }
 
                 $response = $this->prepareData($response, $listView);
@@ -311,6 +304,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     foreach ($rawData['items'] as $item) {
                         if (!empty($item) && !empty($item['url_access'])) {
                             $urlAccess = (is_array($item['url_access'])) ? $item['url_access'][0] : $item['url_access'];
+							$urlAccess = str_replace('&filter[]=format_facet%3A(%22Zeitschriften%22%20OR%20%22Bücher%22)','',$urlAccess);
+							$urlAccess = str_replace('lookfor=SGN ','type=Signature&lookfor=', $urlAccess);
                             $level = str_replace('_access_level', '', $item['url_access_level']);
                             $label = $resolverLabels[$level] ?: $item['url_access_label'];
                             $data[] = [
