@@ -99,7 +99,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
 
         $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
-	    $this->setChecks($list);
+		$mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
+	    $this->setChecks($list, $mediatype);
 
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
@@ -126,10 +127,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $this->formatResponse(['statuses' => $responses]);
     }
 	
-	private function setChecks($list) {
+	private function setChecks($list, $mediatype = '') {
+		$mediatype = str_replace(array(' ', '+'),array('',''), $mediatype);
 		$checks = 'RecordView';
 		if($list) $checks = 'ResultList';
-		if(!empty($this->config[$this->source.$checks])) {
+	    if(!empty($this->config[$this->source.$checks.'-'.$mediatype])) {
+			$this->checks = $this->config[$this->source.$checks.'-'.$mediatype];
+		} else if(!empty($this->config[$this->source.$checks])) {
 			$this->checks = $this->config[$this->source.$checks];
 		} else {
 			$this->checks = $this->config[$checks];
