@@ -33,26 +33,6 @@
       - [indicator, 2, 0|1]
     u:
       - [name, url]
-PubPharmDrugsOfTheFuture:
-  category: PubPharmProxy
-  mandatory-field: url
-  view-method: ajax/default.phtml
-  '035':
-    a:
-      - [name, requirednumberofconditions]
-      - [replace, '(^.*$)', 2]
-  773:
-    x: 
-      - [name, condition]
-      - [replace, '(^1699-3993$)', 'true']
-  952:
-    j:
-      - [name, condition]
-      - [replace, '(^2021$|^2020$|^2019$|^2018$|^2017$|^2016$|^2015$|^2014$|^2013$|^2012$|^2011$|^2010$)', 'true']
-  856:
-    u:
-      - [name, url]
-      - [replace, '(^.*$)', 'http://pharmazie.proxy.fid-lizenzen.de/fid/thomson-reuters-ejournals-pharmazie/$0']
 TestLabel:
   view-method: ajax/default.phtml
   245:
