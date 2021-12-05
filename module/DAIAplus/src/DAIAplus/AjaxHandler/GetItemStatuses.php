@@ -329,7 +329,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 				'level' => 'ParentWorkILNSolr',
 				'label' => 'Go to parent work (local holding)',
 				];
-			$response['html'] = $this->renderer->render('ajax/link.phtml', $response);
+			$response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
 		}
 		
 		$responses[] = $response;
