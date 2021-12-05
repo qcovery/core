@@ -1,7 +1,9 @@
 <?php
 	if($url) {
+		echo '<div class="delimiter"></div>';
 		echo '<a href="'.$url.'" class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</a><br/>';
 	} else {
+		echo '<div class="delimiter"></div>';
 		echo '<span class="'.$level.'" title="'.$label.'">'.$this->translate($label).'</span><br/>';
 	}
 ?>
