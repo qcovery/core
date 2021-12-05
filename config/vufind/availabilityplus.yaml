@@ -43,8 +43,8 @@ TestLevel:
   245:
     a: 
       - [name, level]
-GBVILNTitle:
-  category: GBVILN
+GBVILLTitle:
+  category: GBVILL
   mandatory-field: url
   view-method: ajax/link-external.phtml
   245:
