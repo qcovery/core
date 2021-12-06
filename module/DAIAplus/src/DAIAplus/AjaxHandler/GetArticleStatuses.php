@@ -106,7 +106,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                                                      'link_status' => 1]
                                                  ]
                                     ];
-                    $daiaplus_check_bool = false;
+                    //$daiaplus_check_bool = false;
                     }
                 }
 
@@ -135,7 +135,9 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                 if ($daiaplus_check_bool == true) {
                     $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
                     error_log($url);
-                    $response = json_decode($this->makeRequest($url), true);
+                    $request_result = json_decode($this->makeRequest($url), true);
+					if(!empty($response['items']['journal_check'])) $request_result['items']['journal_check'] = $response['items']['journal_check'];
+					$response = $request_result;
                 }
 
                 $response = $this->prepareData($response, $listView);
@@ -291,6 +293,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         } elseif (!empty($rawData)) {
             if ($list == 1 && !empty($rawData['list']['url_access'])) {
                 $urlAccess = (is_array($rawData['list']['url_access'])) ? $rawData['list']['url_access'][0] : $rawData['list']['url_access'];
+				$urlAccess = str_replace('&filter[]=format_facet%3A(%22Zeitschriften%22%20OR%20%22Bücher%22)','',$urlAccess);
+				$urlAccess = str_replace('lookfor=SGN ','type=Signature&lookfor=', $urlAccess);
                 $level = str_replace('_access_level', '', $rawData['list']['url_access_level']);
                 $label = $resolverLabels[$level] ?: $rawData['list']['url_access_label'];
                 $data[] = [
@@ -311,6 +315,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     foreach ($rawData['items'] as $item) {
                         if (!empty($item) && !empty($item['url_access'])) {
                             $urlAccess = (is_array($item['url_access'])) ? $item['url_access'][0] : $item['url_access'];
+							$urlAccess = str_replace('&filter[]=format_facet%3A(%22Zeitschriften%22%20OR%20%22Bücher%22)','',$urlAccess);
+							$urlAccess = str_replace('lookfor=SGN ','type=Signature&lookfor=', $urlAccess);
                             $level = str_replace('_access_level', '', $item['url_access_level']);
                             $label = $resolverLabels[$level] ?: $item['url_access_label'];
                             $data[] = [
