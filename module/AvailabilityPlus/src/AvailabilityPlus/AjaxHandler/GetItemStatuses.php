@@ -27,14 +27,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace AvailabilityPlus\AjaxHandler;
+namespace DAIAplus\AjaxHandler;
 
-use VuFind\Exception\ILS as ILSException;
+use VuFind\Record\Loader;
+use VuFind\AjaxHandler\AbstractBase;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
-use VuFind\ILS\Connection;
-use VuFind\ILS\Logic\Holds;
-use VuFind\Session\Settings as SessionSettings;
-use VuFind\Crypt\HMAC;
 use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\View\Renderer\RendererInterface;
@@ -53,25 +50,39 @@ use Zend\View\Renderer\RendererInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
+class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements TranslatorAwareInterface
 {
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
-    protected $hmac;
+    protected $recordLoader;
+    
+    protected $config;
+
+    protected $checks;
+
+    protected $source;
+
+    protected $driver;
+	
+	protected $current_mode;
+	
+	protected $renderer;
+	
+	protected $default_template;
 
     /**
      * Constructor
      *
-     * @param SessionSettings   $ss        Session settings
+     * @param Loader            $loader    For loading record data via driver
      * @param Config            $config    Top-level configuration
-     * @param Connection        $ils       ILS connection
      * @param RendererInterface $renderer  View renderer
-     * @param Holds             $holdLogic Holds logic
      */
-    public function __construct(SessionSettings $ss, Config $config, Connection $ils,
-                                RendererInterface $renderer, Holds $holdLogic, HMAC $hmac
-    ) {
-        $this->hmac = $hmac;
-        parent::__construct($ss, $config, $ils, $renderer, $holdLogic);
+    public function __construct(Loader $loader, Config $config, RendererInterface $renderer) {
+        $this->recordLoader = $loader;
+        $this->config = $config->toArray();
+        $this->checks = $this->config['RecordView'];
+	$this->renderer = $renderer;
+	$this->default_template = 'ajax/default.phtml';
     }
 
     /**
@@ -83,198 +94,245 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
      */
     public function handleRequest(Params $params)
     {
-        $this->disableSessionWrites();  // avoid session write timing bug
-        $ids = $params->fromPost('id', $params->fromQuery('id', []));
-//neu V
-        $list = $params->fromPost('list', $params->fromQuery('list', []));
-        $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', []));
-        $hideLink = $params->fromPost('hideLink', $params->fromQuery('hideLink', []));
-        $hmacKeys = explode(':', $this->config['StorageRetrievalRequests']['HMACKeys']);
-//neu A
-        try {
-            if (method_exists($this->ils, 'getDriver')) {
-                $ilsDriver = $this->ils->getDriver();
-                if (method_exists($ilsDriver, 'setLanguage')) {
-                    $ilsDriver->setLanguage(
-                        $this->translator->getLocale()
-                    );
-                }
-            }
-//neu V
-            $this->ils->setList($list);
-//neu A
-            $results = $this->ils->getStatuses($ids);
-        } catch (ILSException $e) {
-            // If the ILS fails, send an error response instead of a fatal
-            // error; we don't want to confuse the end user unnecessarily.
-            error_log($e->getMessage());
+        $responses = [];
+        $ids = $params->fromPost('id', $params->fromQuery('id', ''));
+        $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
+
+        $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
+		$mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
+	    $this->setChecks($list, $mediatype);
+
+        if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
-                $results[] = [
-                    [
-                        'id' => $id,
-                        'error' => 'An error has occurred'
-                    ]
-                ];
+                $check_mode = 'continue';
+                $this->driver = $this->recordLoader->load($id, $this->source);
+		        $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
+		        $responses = [];
+		        $response = [];
+                foreach($this->checks as $check => $this->current_mode) {
+                    if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
+                        $results = $this->performAvailabilityCheck($check);
+                        foreach($results as $result) {
+				            if(!empty($result)) {
+					            $response[] = $result;
+					            $check_mode = $this->current_mode;
+				            }
+			            }
+                    }			
+                }
+		        $response['id'] = $id;
+		        $responses[] = $response;
             }
         }
-
-        if (!is_array($results)) {
-            // If getStatuses returned garbage, let's turn it into an empty array
-            // to avoid triggering a notice in the foreach loop below.
-            $results = [];
-        }
-
-        // In order to detect IDs missing from the status response, create an
-        // array with a key for every requested ID.  We will clear keys as we
-        // encounter IDs in the response -- anything left will be problems that
-        // need special handling.
-        $missingIds = array_flip($ids);
-
-        // Load messages for response:
-        $messages = [
-            'available' => $this->renderer->render('ajax/status-available.phtml'),
-            'unavailable' =>
-                $this->renderer->render('ajax/status-unavailable.phtml'),
-            'unknown' => $this->renderer->render('ajax/status-unknown.phtml')
-        ];
-
-        // Load callnumber and location settings:
-        $callnumberSetting = isset($this->config->Item_Status->multiple_call_nos)
-            ? $this->config->Item_Status->multiple_call_nos : 'msg';
-        $locationSetting = isset($this->config->Item_Status->multiple_locations)
-            ? $this->config->Item_Status->multiple_locations : 'msg';
-        $showFullStatus = isset($this->config->Item_Status->show_full_status)
-            ? $this->config->Item_Status->show_full_status : false;
-
-        // Loop through all the status information that came back
-        $statuses = [];
-        foreach ($results as $recordNumber => $record) {
-            // Filter out suppressed locations:
-            $record = $this->filterSuppressedLocations($record);
-
-            // Skip empty records:
-            if (count($record)) {
-                // Check for errors
-                if (!empty($record[0]['error'])) {
-                    $current = $this
-                        ->getItemStatusError($record, $messages['unknown']);
-                } elseif ($locationSetting === 'group') {
-                    $current = $this->getItemStatusGroup(
-                        $record, $messages, $callnumberSetting
-                    );
-                } else {
-                    $current = $this->getItemStatus(
-                        $record, $messages, $locationSetting, $callnumberSetting
-                    );
-                }
-                // If a full status display has been requested, append the HTML:
-                if ($showFullStatus) {
-                    $current['full_status'] = $this->renderer->render(
-                        'ajax/status-full.phtml', [
-                            'statusItems' => $record,
-                            'callnumberHandler' => $this->getCallnumberHandler()
-                        ]
-                    );
-                }
-//neu V
-                foreach ($record as $index1 => $recordItem) {
-                    foreach ($recordItem['daiaplus']['actionArray'] as $index2 => $action) {
-                        if (!empty($action['beluga_core']['href'])) {
-                            $id = $current['id'];
-                            $docId = $action['documentId'];
-                            $itemId = $action['itemId'];
-                            $type = $action['type'];
-                            $storageId = null;
-                            if (isset($action['storageId'])) {
-                                $storageId = $action['storageId'];
-                            }
-                            $hmacPairs = [
-                                'id' => $id,
-                                'doc_id' => $docId,
-                                'item_id' => $itemId
-                            ];
-                            $hashKey = $this->hmac->generate($hmacKeys, $hmacPairs);
-                            $orderLink = '/vufind/Record/' . $id . '/Hold?';
-                            $orderLink .= 'doc_id=' . urlencode($docId);
-                            $orderLink .= '&item_id=' . urlencode($itemId);
-                            $orderLink .= '&type=' . $type;
-                            if ($storageId) {
-                                $orderLink .= '&storage_id=' . urlencode($storageId);
-                            }
-                            $orderLink .= '&hashKey=' . $hashKey;
-                            $record[$index1]['daiaplus']['actionArray'][$index2]['beluga_core']['href'] = $orderLink;
-                        }
-                    }
-                }
-
-                // Add display for DAIA+ data
-                $current['daiaplus'] = $this->renderer->render(
-                    'ajax/daiaplus.phtml', [
-                        'daiaResults_org' => $record,
-                        'callnumberHandler' => $this->getCallnumberHandler(),
-                        'list' => $list === 'true'? true: false,
-                        'ppn' => $current['id'],
-                        'mediatype' => $mediatype,
-                        'hideLink' => $hideLink,
-                        'mediatype' => $mediatype,
-                    ]
-                );
-//neu A
-                $current['record_number'] = array_search($current['id'], $ids);
-
-                $current['daiaBackend'] = $recordNumber;
-
-                $statuses[] = $current;
-
-                // The current ID is not missing -- remove it from the missing list.
-                unset($missingIds[$current['id']]);
-            }
-        }
-
-        // If any IDs were missing, send back appropriate dummy data
-        foreach ($missingIds as $missingId => $recordNumber) {
-            $statuses[] = [
-                'id'                   => $missingId,
-                'availability'         => 'false',
-                'availability_message' => $messages['unavailable'],
-                'location'             => $this->translate('Unknown'),
-                'locationList'         => false,
-                'reserve'              => 'false',
-                'reserve_message'      => $this->translate('Not On Reserve'),
-                'callnumber'           => '',
-                'missing_data'         => true,
-                'record_number'        => $recordNumber,
-                'daiaBackend'          => ''
-            ];
-        }
-
-        // Done
-        return $this->formatResponse(compact('statuses'));
+        return $this->formatResponse(['statuses' => $responses]);
     }
+	
+	private function setChecks($list, $mediatype = '') {
+		$mediatype = str_replace(array(' ', '+'),array('',''), $mediatype);
+		$checks = 'RecordView';
+		if($list) $checks = 'ResultList';
+	    if(!empty($this->config[$this->source.$checks.'-'.$mediatype])) {
+			$this->checks = $this->config[$this->source.$checks.'-'.$mediatype];
+		} else if(!empty($this->config[$checks.'-'.$mediatype])) {
+			$this->checks = $this->config[$checks.'-'.$mediatype];
+		} else if(!empty($this->config[$this->source.$checks])) {
+			$this->checks = $this->config[$this->source.$checks];
+		} else {
+			$this->checks = $this->config[$checks];
+		}
+	}
 
     /**
-     * Support method for getItemStatuses() -- filter suppressed locations from the
-     * array of item information for a particular bib record.
+     * Determines which check to run, based on keyword in configuration. Determination in this order depending on match between name and logic: 
+	 * 1) function available with name in this class
+     * 2) DAIA and other resolver
+	 * 3) MarcKey defined in availabilityplus_yaml
+     * 4) MarcCategory defined in availabilityplus_yaml
+     * TODO: Add checks for resolver and DAIA
+	 *
+     * @check name of check to run
      *
-     * @param array $record Information on items linked to a single bib record
-     *
-     * @return array        Filtered version of $record
+     * @return array [response data for check]
      */
-    protected function filterSuppressedLocations($record)
-    {
-        static $hideHoldings = false;
-        if ($hideHoldings === false) {
-//          $hideHoldings = $this->holdLogic->getSuppressedLocations();
-//in der VuFind-Methode gehen die "best results" verloren
-            $hideHoldings = [];
-        }
-
-        $filtered = [];
-        foreach ($record as $key => $current) {
-            if (!in_array($current['location'] ?? null, $hideHoldings)) {
-                $filtered[$key] = $current;
-            }
-        }
-        return $filtered;
+	//TODO: Add checks for resolver and DAIA
+    private function performAvailabilityCheck($check) {
+		
+		if(method_exists($this, $check)){
+			$responses = $this->{$check}();
+		} elseif (!empty($this->driver->getMarcData($check))) {
+			$responses = $this->checkSolrMarcData(array($check), $check);
+		} elseif (!empty($this->driver->getSolrMarcKeys($check))) {
+			$responses = $this->checkSolrMarcData($this->driver->getSolrMarcKeys($check), $check);
+		} else {
+			$response['check'] = $check;
+			$response['message'] = 'no MARC configuration or function for check exists';
+			$responses[] = $response;
+		}
+		
+        return $responses;
     }
+	
+     /**
+     * Perform check based on provided MarcKeys
+     *
+	 * @solrMarcKeys array of MarcKeys to check
+     * @check name of check in availabilityplus_yaml
+     *
+     * @return array [response data (arrays)]
+     */
+    private function checkSolrMarcData($solrMarcKeys, $check) {
+		sort($solrMarcKeys);
+		$responses = [];
+		$urls = [];
+		$break = false;
+		foreach ($solrMarcKeys as $solrMarcKey) {
+			$data = $this->driver->getMarcData($solrMarcKey);
+			if(!empty($data) && $this->checkConditions($data)) {
+				$template = $this->getTemplate($data);
+				$level = $this->getLevel($data, $check, $solrMarcKey);
+				$label = $this->getLabel($data, $check);
+				foreach ($data as $date) {
+					if (!empty($date['url']['data'][0])) {
+						foreach ($date['url']['data'] as $url) {
+							if(!in_array($url, $urls)) {
+								$urls[] = $url;
+								$response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url);
+								$response['html'] = $this->applyTemplate($template, $response);
+								$responses[] = $response;
+								if($this->current_mode == 'break_on_first') {
+									$break = true;
+									break;
+								}
+							}
+						}
+					}
+					if($break) break;					
+				}
+				
+				if(empty($urls)) {
+					$response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data);
+					$response['html'] = $this->applyTemplate($template, $response);
+					$responses[] = $response;
+					if($this->current_mode == 'break_on_first') {
+						$break = true;
+						break;
+					}							
+				}	
+			}
+			if($break) break;
+		}
+        return $responses;
+    }
+	
+	private function checkConditions($data){
+		$check = true;
+		$requirednumberofconditions = 0;
+		$numberofconditions = 0;
+		
+		foreach($data as $date) {
+			if(!empty($date['requirednumberofconditions']['data'][0])) {
+				$requirednumberofconditions = $date['requirednumberofconditions']['data'][0];
+			}
+		}
+		
+		foreach($data as $date) {
+			if(!empty($date['condition']['data'][0])) {
+				if($date['condition']['data'][0] != 'true') $check = false;
+				$numberofconditions += 1;
+			}
+		}
+		
+		if($requirednumberofconditions != $numberofconditions) $check = false;
+		
+		return $check;
+	}
+	
+	private function getLevel($data, $level, $solrMarcKey) {
+		if($level != $solrMarcKey) $level = $level.' '.$solrMarcKey;
+		foreach ($data as $date) {
+			if(!empty($date['level']['data'][0])) $level = $date['level']['data'][0];
+		}
+		return $level;
+	}
+	
+	private function getLabel($data, $label) {
+		foreach ($data as $date) {
+			if(!empty($date['label']['data'][0])) $label = $date['label']['data'][0];
+		}
+		return $label;
+	}
+	
+	private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = ''){
+		$response = [ 
+				'mode' => $this->current_mode,
+				'check' => $check,
+				'SolrMarcKey' => $solrMarcKey,
+				'url' => $url,
+				'level' => $level,
+				'label' => $label,
+				'template' => $template,
+				'data' => $data
+			];
+		return $response;
+	}
+
+     /**
+     * Support method to determine if a view-method, i.e. a name of template file has been defined, if not then the default_template is used
+     *
+     * @data data provided via parsing of availabilityplus_yaml
+     *
+     * @return string
+     */	
+	private function getTemplate($data) {
+		$template = $this->default_template;
+		if(!empty($data['view-method'])) $template = $data['view-method'];
+		return $template;
+	}
+	
+     /**
+     * Support method to apply template
+     *
+     * @template name of template file
+	 * @response response data
+     *
+     * @return string (html code)
+     */	
+	private function applyTemplate($template, $response) {
+		return $this->renderer->render($template, $response);
+	}
+
+     /**
+     * Custom method to check for a parent work that is a holding of the library
+     *
+     * @return array [response data (arrays)]
+     */		
+	private function checkParentWorkILNSolr() {
+		$responses = [];
+       		$parentData = $this->driver->getMarcData('ArticleParentId');
+       		foreach ($parentData as $parentDate) {
+			if (!empty(($parentDate['id']['data'][0]))) {
+				$parentId = $parentDate['id']['data'][0];
+				break;
+		    	}
+        	}
+		if (!empty($parentId)) {
+		    $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+		    $ilnMatch = $parentDriver->getMarcData('ILN');
+		    if (!empty($ilnMatch[0]['iln']['data'][0])) {
+			$url = '/vufind/Record/' . $parentId;
+		    }
+		}
+		if (!empty($url)) {
+			$response = [
+				'check' => 'function checkParentWork',
+				'url' => $url,
+				'level' => 'ParentWorkILNSolr',
+				'label' => 'Go to parent work (local holding)',
+				];
+			$response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
+		}
+		
+		$responses[] = $response;
+        	return $responses;
+	}
 }
