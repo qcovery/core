@@ -12,99 +12,23 @@ function linkCallnumbers(callnumber, callnumber_handler) {
     return callnumber;
 }
 
-function displayArticleStatus(results, $item) {
-    $item.removeClass('js-item-pending');
-    $item.find('.ajax-availability').removeClass('ajax-availability hidden');
-    $item.find('.status').empty();
+function displayItemStatus(results, item) {
+    item.removeClass('js-item-pending');
+    item.find('.ajax-availability').removeClass('ajax-availability hidden');
+    item.find('.status').empty();
     $.each(results, function(index, result){
         if (typeof(result.error) != 'undefined'
             && result.error.length > 0
         ) {
-            $item.find('.status').append('error');
+            item.find('.status').append('error');
         } else {
-            if (typeof(result.href) != 'undefined') {
-                var html = '<a href="' + result.href + '" class="' + result.level + '" title="' + result.label + '" target="_blank">' + VuFind.translate(result.label) + '</a><br/>';
-                $item.find('.status').append(html);
+            if (typeof(result.html) != 'undefined') {
+                item.find('.status').append(result.html);
             }
         }
     });
 }
 
-function displayItemStatus(result, $item) {
-    if (typeof(result.daiaBackend) != 'undefined') {
-        $item.find('.status').append('<h3>'+result.daiaBackend+'</h3>');
-    }
-
-    $item.removeClass('js-item-pending');
-    $item.find('.status').find('.label').remove();
-    $item.find('.status').append(result.availability_message);
-    $item.find('.ajax-availability').removeClass('ajax-availability hidden');
-    if (typeof(result.error) != 'undefined'
-        && result.error.length > 0
-    ) {
-        // Only show error message if we also have a status indicator active:
-        if ($item.find('.status').length > 0) {
-            $item.find('.callnumAndLocation').empty().addClass('text-danger').append(result.error);
-        } else {
-            $item.find('.callnumAndLocation').addClass('hidden');
-        }
-        $item.find('.callnumber,.hideIfDetailed,.location').addClass('hidden');
-    } else if (typeof(result.full_status) != 'undefined'
-        && result.full_status.length > 0
-        && $item.find('.callnumAndLocation').length > 0
-    ) {
-        // Full status mode is on -- display the HTML and hide extraneous junk:
-        $item.find('.callnumAndLocation').empty().append(result.full_status);
-        $item.find('.callnumber,.hideIfDetailed,.location,.status').addClass('hidden');
-    } else if (typeof(result.missing_data) != 'undefined'
-        && result.missing_data
-    ) {
-        // No data is available -- hide the entire status area:
-        $item.find('.callnumAndLocation,.status').addClass('hidden');
-    } else if (result.locationList) {
-        // We have multiple locations -- build appropriate HTML and hide unwanted labels:
-        $item.find('.callnumber,.hideIfDetailed,.location').addClass('hidden');
-        var locationListHTML = "";
-        for (var x = 0; x < result.locationList.length; x++) {
-            locationListHTML += '<div class="groupLocation">';
-            if (result.locationList[x].availability) {
-                locationListHTML += '<span class="text-success"><i class="fa fa-ok" aria-hidden="true"></i> '
-                    + result.locationList[x].location + '</span> ';
-            } else if (typeof(result.locationList[x].status_unknown) !== 'undefined'
-                && result.locationList[x].status_unknown
-            ) {
-                if (result.locationList[x].location) {
-                    locationListHTML += '<span class="text-warning"><i class="fa fa-status-unknown" aria-hidden="true"></i> '
-                        + result.locationList[x].location + '</span> ';
-                }
-            } else {
-                locationListHTML += '<span class="text-danger"><i class="fa fa-remove" aria-hidden="true"></i> '
-                    + result.locationList[x].location + '</span> ';
-            }
-            locationListHTML += '</div>';
-            locationListHTML += '<div class="groupCallnumber">';
-            locationListHTML += (result.locationList[x].callnumbers)
-                ? linkCallnumbers(result.locationList[x].callnumbers, result.locationList[x].callnumber_handler) : '';
-            locationListHTML += '</div>';
-        }
-        $item.find('.locationDetails').removeClass('hidden');
-        $item.find('.locationDetails').html(locationListHTML);
-    } else {
-        // Default case -- load call number and location into appropriate containers:
-        $item.find('.callnumber').empty().append(linkCallnumbers(result.callnumber, result.callnumber_handler) + '<br/>');
-        $item.find('.location').empty().append(
-            result.reserve === 'true'
-                ? result.reserve_message
-                : result.location
-        );
-    }
-    if (typeof(result.daiaplus) != 'undefined' && result.daiaplus.length > 0) {
-        $item.find('.callnumAndLocation').addClass('hidden');
-        $item.find('.status').find('.label').remove();
-        $item.find('.status').append(result.daiaplus);
-        $item.find('.status').removeClass('hidden');
-    }
-}
 function itemStatusFail(response, textStatus) {
     if (textStatus === 'abort' || typeof response.responseJSON === 'undefined') {
         return;
@@ -123,7 +47,7 @@ var itemStatusList = false;
 var itemStatusSource = '';
 var itemStatusHideLink = '';
 var itemStatusType = '';
-var itemStatusMediatype = {};
+var itemStatusMediatype = '';
 
 function runItemAjaxForQueue() {
     // Only run one item status AJAX request at a time:
@@ -132,27 +56,18 @@ function runItemAjaxForQueue() {
         return;
     }
     itemStatusRunning = true;
-    if (itemStatusSource == 'Search2' || itemStatusType == 'electronic') {
-        var method = 'getArticleStatuses';
-    } else {
-        var method = 'getItemStatuses';
-    }
 
     for (var i=0; i<itemStatusIds.length; i++) {
         $.ajax({
-            url: VuFind.path + '/AJAX/JSON?method=' + method,
+            url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
             method: 'get',
-            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, hideLink:itemStatusHideLink, mediatype:itemStatusMediatype[itemStatusIds[i]]}
+            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype}
         })
             .done(function checkItemStatusDone(response) {
                 for (var j = 0; j < response.data.statuses.length; j++) {
                     var status = response.data.statuses[j];
-                    if (method == 'getItemStatuses') {
-                        displayItemStatus(status, itemStatusEls[status.id]);
-                    } else {
-                        displayArticleStatus(status, itemStatusEls[status.id]);
-                    }
+                    displayItemStatus(status, itemStatusEls[status.id]);
                     itemStatusIds.splice(itemStatusIds.indexOf(status.id), 1);
                 }
                 itemStatusRunning = false;
@@ -180,14 +95,12 @@ function itemQueueAjax(id, el) {
 
 //Listenansicht
 function checkItemStatus(el) {
-    var $item = $(el);
-    var id = $item.attr('data-id');
-    itemStatusSource = $item.attr('data-src');
-    itemStatusList = ($item.attr('data-list') == 1);
-    itemStatusHideLink = $item.attr('data-hide-link');
-    itemStatusType = $item.attr('data-type');
-    itemStatusMediatype[id] = $item.attr('data-mediatype');
-    itemQueueAjax(id + '', $item);
+    var item = $(el);
+    var id = item.attr('data-id');
+    itemStatusSource = item.attr('data-src');
+    itemStatusList = (item.attr('data-list') == 1);
+	itemStatusMediatype = item.attr('data-mediatype');
+    itemQueueAjax(id + '', item);
 }
 
 var itemStatusObserver = null;
@@ -201,10 +114,7 @@ function checkItemStatuses(_container) {
     for (var i = 0; i < availabilityItems.length; i++) {
         var id = $(availabilityItems[i]).attr('data-id');
         itemStatusSource = $(availabilityItems[i]).attr('data-src');
-        itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
-        itemStatusHideLink = $(availabilityItems[i]).attr('data-hide-link');
-        itemStatusType = $(availabilityItems[i]).attr('data-type');
-        itemStatusMediatype[id] = $(availabilityItems[i]).attr('data-mediatype');
+        itemStatusMediatype = $(availabilityItems[i]).attr('data-mediatype');
         itemQueueAjax(id, $(availabilityItems[i]));
     }
     // Stop looking for a scroll loader

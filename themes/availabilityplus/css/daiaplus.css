@@ -49,72 +49,32 @@
   font-weight: bold;
 }
 
-.article_access_level,
-.fid_article_access_level,
-.fid_homepage_access_level,
-.fid_issue_access_level,
-.fid_volume_access_level,
-.homepage_access_level,
-.ill_access_level,
-.issue_access_level,
-.check_ill_access_level,
-.oa_article_access_level,
-.fa_article_access_level,
-.print_access_level,
-.uncertain_article_access_level,
-.uncertain_homepage_access_level,
-.uncertain_issue_access_level,
-.uncertain_volume_access_level,
-.uncertain_abstract_access_level,
-.unknown_access_level,
-.volume_access_level {
+.link_internal,
+.link_external {
   font-weight: bold;
 }
 
-
-
-.oa_article_access_level::after,
-.oa_homepage_access_level::after,
-.fa_article_access_level::after,
-.fa_homepage_access_level::after {
+.FreeAccess::after {
     content: url("../images/checkmark_green.png") " " url("../images/OpenAccess_Logo.png");
     margin-left: 5px;
 }
 
-.article_access_level:after,
-.homepage_access_level:after,
-.issue_access_level:after,
-.print_access_level:after,
-.volume_access_level:after {
+.Access:after {
   content: url("../images/checkmark_green.png");
   margin-left: 5px;
 }
 
-.proxy_article_access_level:after,
-.proxy_homepage_access_level:after,
-.proxy_issue_access_level:after,
-.proxy_volume_access_level:after {
+.PubPharmProxy:after {
   content: url("../images/checkmark_green.png");
   margin-left: 5px;
 }
 
-.ill_access_level:after,
-.check_ill_access_level:after,
-.uncertain_article_access_level:after,
-.uncertain_homepage_access_level:after,
-.uncertain_issue_access_level:after,
-.uncertain_volume_access_level:after {
+.UncertainAccess:after {
   content: url("../images/checkmark_orange.png");
   margin-left: 5px;
 }
 
-.unknown_access_level:after {
+.UnknownAccess:after {
   content: url("../images/questionmark_orange.png");
   margin-left: 5px;
-}
-
-.daia_backend_not_matching {
-    font-weight: bold;
-    display: block;
-    font-style: italic;
 }
