@@ -146,9 +146,9 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                             }
                         }
                     }
-					if(!empty($response['items']['journal_check'])) array_unshift($request_result['items'], $response['items']['journal_check']);
+					//if(!empty($response['items']['journal_check'])) array_unshift($request_result['items'], $response['items']['journal_check']);
                         //$request_result['items']['journal_check'] = $response['items']['journal_check'];
-					$response = $request_result;
+					//$response = $request_result;
                 }
 
                 $response = $this->prepareData($response, $listView);
