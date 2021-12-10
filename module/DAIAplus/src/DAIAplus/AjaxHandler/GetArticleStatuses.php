@@ -146,7 +146,6 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                             }
                         }
                     }
-                    $response = $request_result;
                 }
 
                 $response = $this->prepareData($response, $listView);
