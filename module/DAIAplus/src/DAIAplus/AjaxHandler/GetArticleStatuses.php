@@ -96,12 +96,12 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     $urlAccess = $this->checkParentId($driver);
                     if (!empty($urlAccess)) {
                         $response = ['list' => ['url_access' => $urlAccess,
-                                                'url_access_level' => 'Journal',
+                                                'url_access_level' => 'print_access_level',
                                                 'url_access_label' => 'Journal',
                                                 'link_status' => 1],
                                      'items' => ['journal_check' =>
                                                     ['url_access' => $urlAccess,
-                                                     'url_access_level' => 'Journal',
+                                                     'url_access_level' => 'print_access_level',
                                                      'url_access_label' => 'Journal',
                                                      'link_status' => 1]
                                                  ]
