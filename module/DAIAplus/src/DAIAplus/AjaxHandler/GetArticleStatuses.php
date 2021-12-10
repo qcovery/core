@@ -139,6 +139,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     if(empty($response)) {
                         $response = $request_result;
                     } else {
+                        $response['item']['journal_check']['test'] = $request_result;
                         foreach($request_result['items'] as $key => $item) {
                             $response['item'][$key] = array();
                             if(in_array($item['url_access_level'],array('oa_article_access_level', 'oa_homepage_access_level', 'fa_article_access_level', 'fa_homepage_access_level', 'article_access_level', 'homepage_access_level', 'issue_access_level', 'print_access_level', 'volume_access_level', 'proxy_article_access_level', 'proxy_homepage_access_level', 'proxy_issue_access_level', 'proxy_volume_access_level'))) {
