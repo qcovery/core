@@ -136,7 +136,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
                     error_log($url);
                     $request_result = json_decode($this->makeRequest($url), true);
-					if(!empty($response['items']['journal_check'])) $request_result['items']['journal_check'] = $response['items']['journal_check'];
+					if(!empty($response['items']['journal_check'])) array_unshift($request_result['items'], $response['items']['journal_check']);
+                        //$request_result['items']['journal_check'] = $response['items']['journal_check'];
 					$response = $request_result;
                 }
 
