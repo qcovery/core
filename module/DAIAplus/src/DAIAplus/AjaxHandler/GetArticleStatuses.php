@@ -133,7 +133,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                 }
 
                 if ($daiaplus_check_bool == true) {
-                    $url = $this->prepareUrl($driver, $id, '1', $urlAccessUncertain, $urlAccessLevel);
+                    $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
                     error_log($url);
                     $request_result = json_decode($this->makeRequest($url), true);
                     if(empty($response)) {
@@ -146,6 +146,7 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                             }
                         }
                     }
+                    $response = $request_result;
                 }
 
                 $response = $this->prepareData($response, $listView);
