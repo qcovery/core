@@ -57,7 +57,7 @@ GBVILLTitle:
       - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
 JournalsOnlinePrint:
   category: resolver
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-jop.phtml
   mandatory-field: issn
   773:
     t:
