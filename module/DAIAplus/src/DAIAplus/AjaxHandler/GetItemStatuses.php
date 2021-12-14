@@ -341,12 +341,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 	}
 	
 	private function getResolverResponse($resolver) {
+		$resolver_url = $this->prepareUrl($resolver);
 		$response = [
 			'check' => $resolver,
-			'url' => $this->prepareUrl($resolver),
+			'url' => $resolver_url,
 			'level' => $resolver,
 			'label' => $resolver,
-			'resolver_url' => $this->prepareUrl($resolver),
+			'resolver_url' => $resolver_url,
+			'data' => $this->makeRequest($resolver_url),
 			];
 		$response['html'] = $this->renderer->render('ajax/link-jop.phtml', $response);
 			
