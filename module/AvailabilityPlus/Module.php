@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://github.com/dmj/vf2-proxy
  */
-namespace AvailabilityPlus;
+namespace DAIAplus;
 use Zend\ModuleManager\ModuleManager,
     Zend\Mvc\MvcEvent;
 

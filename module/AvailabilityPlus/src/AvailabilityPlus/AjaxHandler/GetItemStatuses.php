@@ -27,7 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace DAIAplus\AjaxHandler;
+namespace AvailabilityPlus\AjaxHandler;
 
 use VuFind\Record\Loader;
 use VuFind\AjaxHandler\AbstractBase;
@@ -308,18 +308,18 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      */		
 	private function checkParentWorkILNSolr() {
 		$responses = [];
-       		$parentData = $this->driver->getMarcData('ArticleParentId');
-       		foreach ($parentData as $parentDate) {
-			if (!empty(($parentDate['id']['data'][0]))) {
-				$parentId = $parentDate['id']['data'][0];
-				break;
-		    	}
-        	}
+		$parentData = $this->driver->getMarcData('ArticleParentId');
+		foreach ($parentData as $parentDate) {
+		if (!empty(($parentDate['id']['data'][0]))) {
+			$parentId = $parentDate['id']['data'][0];
+			break;
+			}
+		}
 		if (!empty($parentId)) {
 		    $parentDriver = $this->recordLoader->load($parentId, 'Solr');
 		    $ilnMatch = $parentDriver->getMarcData('ILN');
 		    if (!empty($ilnMatch[0]['iln']['data'][0])) {
-			$url = '/vufind/Record/' . $parentId;
+				$url = '/vufind/Record/' . $parentId;
 		    }
 		}
 		if (!empty($url)) {
@@ -335,4 +335,71 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		$responses[] = $response;
         	return $responses;
 	}
+	
+	private function JournalsOnlinePrint () {
+		return $this->getResolverResponse('JournalsOnlinePrint');
+	}
+	
+	private function getResolverResponse($resolver) {
+        $data = $this->driver->getMarcData($resolver);
+		$resolver_url = $this->prepareUrl($resolver);
+        $template = $this->getTemplate($data);
+		$response = [
+			'check' => $resolver,
+			'url' => $resolver_url,
+			'level' => $resolver,
+			'label' => $resolver,
+			'resolver_url' => $resolver_url,
+            'marc_data' => $data,
+			'data' => $this->makeRequest($resolver_url),
+			];
+		$response['html'] = $this->applyTemplate($template, $response);
+			
+		$responses[] = $response;
+		
+        return $responses;
+	}
+	
+	private function prepareUrl($resolver) {
+		$resolverData = $this->driver->getMarcData($resolver);
+		if(!empty($resolverData) && !empty($this->config['ResolverBaseURL'][$resolver])) {
+			$baseUrl = $this->config['ResolverBaseURL'][$resolver];
+			$used_params = [];
+			$params = '';
+
+			if (is_array($resolverData)) {
+				foreach ($resolverData as $resolverDate) {
+					if (is_array($resolverDate)) {
+						foreach ($resolverDate as $key => $value) {
+							if(!in_array($key, $used_params)) {
+								if(empty($params)) {
+									$params .= '?' . $key . '=' . urlencode($value['data'][0]);
+								} else {
+									$params .= '&' . $key . '=' . urlencode($value['data'][0]);
+								}
+								$used_params[] = $key;
+							}
+						}
+					}
+				}
+			}
+			
+			if(!empty($this->config['ResolverExtraParams'][$resolver])) $params .= $this->config['ResolverExtraParams'][$resolver];
+			
+			return $baseUrl.$params;
+		}
+		return '';
+    }
+
+    private function makeRequest($url) {
+        $req = curl_init();
+        curl_setopt($req, CURLOPT_URL, $url);
+        curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($req, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($req, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($req, CURLOPT_SSL_VERIFYHOST, false);
+        $result = curl_exec($req);
+        curl_close($req);
+        return $result;
+    }
 }
