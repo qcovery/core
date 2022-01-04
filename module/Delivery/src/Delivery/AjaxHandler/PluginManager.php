@@ -53,7 +53,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-        'getItemStatuses' => 'AvailabilityPlus\AjaxHandler\GetItemStatuses',
+        'getItemStatuses' => 'DAIAplus\AjaxHandler\GetItemStatuses',
         'getItemStatusesNew' => 'AvailabilityPlus\AjaxHandler\GetItemStatuses',
         'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
