@@ -15,9 +15,10 @@ return [
         'belugax.js',
     ],
     'mixins' => [
+        'availabilityplus',
         'belugaconfig',
 	    'delivery',
-	    'daiaplus',
+	    #'daiaplus',
         'extendedfacets',
         'libraries',
         'searchkeys',
