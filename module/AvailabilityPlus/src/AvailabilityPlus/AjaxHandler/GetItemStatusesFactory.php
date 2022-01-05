@@ -1,6 +1,6 @@
 <?php
 /**
- * SearchBox helper factory.
+ * Factory for GetItemStatus AJAX handler.
  *
  * PHP version 7
  *
@@ -20,26 +20,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category VuFind
- * @package  View_Helpers
+ * @package  AJAX
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace DAIAplus\View\Helper\DAIAplus;
+namespace AvailabilityPlus\AjaxHandler;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
- * SearchBox helper factory.
+ * Factory for GetItemStatus AJAX handler.
  *
  * @category VuFind
- * @package  View_Helpers
+ * @package  AJAX
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class DAIAplusProcessorFactory implements FactoryInterface
+class GetItemStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
@@ -54,16 +53,23 @@ class DAIAplusProcessorFactory implements FactoryInterface
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
      * @throws ContainerException if any other error occurs
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
-            throw new \Exception('Unexpected options sent to factory.');
+            throw new \Exception('Unexpected options passed to factory.');
         }
-        $config = $container->get('VuFind\Config\PluginManager')->get('PAIA');
         return new $requestedName(
-            $config
+            $container->get('VuFind\Record\Loader'),
+            $container->get('VuFind\Config\PluginManager')->get('availabilityplus'),
+            $container->get('ViewRenderer'),
+			$container->get('VuFind\Session\Settings'),
+			$container->get('AvailabilityPlus\ILS\Connection'),
+            $container->get('VuFind\ILS\Logic\Holds'),
+            $container->get('VuFind\Crypt\HMAC')
         );
     }
 }

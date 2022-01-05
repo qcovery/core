@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-namespace DAIAplus\AjaxHandler;
+namespace AvailabilityPlus\AjaxHandler;
 
 /**
  * AJAX handler plugin manager
@@ -49,11 +49,11 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'commentRecord' => 'VuFind\AjaxHandler\CommentRecord',
         'deleteRecordComment' => 'VuFind\AjaxHandler\DeleteRecordComment',
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
-        'getArticleStatuses' => 'DAIAplus\AjaxHandler\GetArticleStatuses',
+        'getArticleStatuses' => 'AvailabilityPlus\AjaxHandler\GetArticleStatuses',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-        'getItemStatuses' => 'DAIAplus\AjaxHandler\GetItemStatuses',
+        'getItemStatuses' => 'AvailabilityPlus\AjaxHandler\GetItemStatuses',
         'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
@@ -80,10 +80,10 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
      * @var array
      */
     protected $factories = [
-        'DAIAplus\AjaxHandler\GetArticleStatuses' =>
-            'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
-        'DAIAplus\AjaxHandler\GetItemStatuses' =>
-            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
+        'AvailabilityPlus\AjaxHandler\GetArticleStatuses' =>
+            'AvailabilityPlus\AjaxHandler\GetArticleStatusesFactory',
+        'AvailabilityPlus\AjaxHandler\GetItemStatuses' =>
+            'AvailabilityPlus\AjaxHandler\GetItemStatusesFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>
             'Delivery\AjaxHandler\CheckAvailabilityFactory',
         'DependentWorks\AjaxHandler\GetDependentWorks' =>
