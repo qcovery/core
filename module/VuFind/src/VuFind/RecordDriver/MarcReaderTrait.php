@@ -58,8 +58,8 @@ trait MarcReaderTrait
     public function getMarcRecord()
     {
         if (null === $this->lazyMarcRecord) {
-            $marc = trim($this->fields['fullrecord']);
-
+//            $marc = trim($this->fields['fullrecord']);
+$marc = trim($this->fields['fullrecord_marcxml']);
             // check if we are dealing with MARCXML
             if (substr($marc, 0, 1) == '<') {
                 $marc = new \File_MARCXML($marc, \File_MARCXML::SOURCE_STRING);
