@@ -60,6 +60,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     
     protected $config;
 
+    protected $configResolver;
+
     protected $checks;
 
     protected $source;
@@ -73,18 +75,27 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 	protected $default_template;
 
     /**
+     * Resolver driver plugin manager
+     *
+     * @var ResolverManager
+     */
+    protected $pluginManager;
+
+    /**
      * Constructor
      *
      * @param Loader            $loader    For loading record data via driver
      * @param Config            $config    Top-level configuration
      * @param RendererInterface $renderer  View renderer
      */
-    public function __construct(Loader $loader, Config $config, RendererInterface $renderer) {
+    public function __construct(Loader $loader, Config $config, Config $configResolver, RendererInterface $renderer, ResolverManager $pm) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
+        $this->configResolver = $configResolver->toArray();
         $this->checks = $this->config['RecordView'];
-	$this->renderer = $renderer;
-	$this->default_template = 'ajax/default.phtml';
+        $this->renderer = $renderer;
+        $this->default_template = 'ajax/default.phtml';
+        $this->pluginManager = $pm;
     }
 
     /**
