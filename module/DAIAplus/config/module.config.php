@@ -16,22 +16,5 @@ return array (
       'VuFind\\ILSConnection' => 'DAIAplus\\ILS\\Connection',
       'VuFind\\ILSDriverPluginManager' => 'DAIAplus\\ILS\\Driver\\PluginManager',
     ),
-  ),
-  'vufind' => 
-  array (
-    'plugin_managers' => 
-    array (
-      'ajaxhandler' => 
-      array (
-        'factories' => 
-        array (
-          'DAIAplus\\AjaxHandler\\GetResolverLinks' => 'DAIAplus\\AjaxHandler\\GetResolverLinksFactory',
-        ),
-        'aliases' => 
-        array (
-          'VuFind\\AjaxHandler\\GetResolverLinks' => 'DAIAplus\\AjaxHandler\\GetResolverLinks',
-        ),
-      ),
-    ),
-  ),
+  );
 );

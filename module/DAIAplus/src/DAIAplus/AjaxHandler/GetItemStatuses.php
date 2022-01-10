@@ -35,6 +35,8 @@ use VuFind\I18n\Translator\TranslatorAwareInterface;
 use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\View\Renderer\RendererInterface;
+use VuFind\Resolver\Connection;
+use VuFind\Resolver\Driver\PluginManager as ResolverManager;
 
 /**
  * "Get Item Status" AJAX handler
