@@ -173,9 +173,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		if(method_exists($this, $check)){
 			$responses = $this->{$check}();
 		} elseif(in_array($check,$this->driver->getSolrMarcKeys('resolver'))) {
-            $response['check'] = $check;
-            $response['message'] = 'is resolver';
-            $responses[] = $response;
+            $responses = $this->getResolverResponse($check);
 		} elseif (!empty($this->driver->getMarcData($check))) {
              $responses = $this->checkSolrMarcData(array($check), $check);
 		} elseif (!empty($this->driver->getSolrMarcKeys($check))) {
@@ -352,11 +350,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		$responses[] = $response;
         	return $responses;
 	}
-	
-	private function JournalsOnlinePrint () {
-		return $this->getResolverResponse('JournalsOnlinePrint');
-	}
-	
+
 	private function getResolverResponse($resolver) {
         $data = $this->driver->getMarcData($resolver);
 		$resolver_url = $this->prepareUrl($resolver);
