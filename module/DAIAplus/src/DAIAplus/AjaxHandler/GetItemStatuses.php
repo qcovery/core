@@ -173,7 +173,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		if(method_exists($this, $check)){
 			$responses = $this->{$check}();
 		} elseif (!empty($this->driver->getMarcData($check))) {
-			$responses = $this->checkSolrMarcData(array($check), $check);
+            if(in_array($check,$this->driver->getSolrMarcKeys('resolver'))) {
+                $response['check'] = $check;
+                $response['message'] = 'is resolver';
+                $responses[] = $response;
+            } else {
+                $responses = $this->checkSolrMarcData(array($check), $check);
+            }
 		} elseif (!empty($this->driver->getSolrMarcKeys($check))) {
 			$responses = $this->checkSolrMarcData($this->driver->getSolrMarcKeys($check), $check);
 		} else {
