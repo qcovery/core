@@ -362,10 +362,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 			'label' => $resolver,
 			'resolver_url' => $resolver_url,
             'marc_data' => $data,
-			'data' => $this->makeRequest($resolver_url),
 			];
-		$response['html'] = $this->applyTemplate($template, $response);
-			
+        $response['data'] = '';
+        If(!empty($data)) {
+            $response['data'] = $this->makeRequest($resolver_url);
+            $response['html'] = $this->applyTemplate($template, $response);
+        }
+
 		$responses[] = $response;
 		
         return $responses;
