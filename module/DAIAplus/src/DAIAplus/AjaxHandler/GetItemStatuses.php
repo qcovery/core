@@ -285,6 +285,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 				'url' => $url,
 				'level' => $level,
 				'label' => $label,
+				'label_translated' => $this->translate($label),
 				'template' => $template,
 				'data' => $data
 			];
@@ -338,11 +339,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 		    }
 		}
 		if (!empty($url)) {
+            $level = 'ParentWorkILNSolr';
+            $label = 'Go to parent work (local holding)';
 			$response = [
 				'check' => 'function checkParentWork',
 				'url' => $url,
-				'level' => 'ParentWorkILNSolr',
-				'label' => 'Go to parent work (local holding)',
+				'level' => $level,
+				'label' => $label,
+				'label_translated' => $this->translate($label),
 				];
 			$response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
 		}
@@ -360,6 +364,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 			'url' => $resolver_url,
 			'level' => $resolver,
 			'label' => $resolver,
+			'label_translated' => $this->translate($resolver),
 			'resolver_url' => $resolver_url,
             'marc_data' => $data,
 			];
