@@ -49,12 +49,12 @@ use Zend\Mvc\Controller\Plugin\Params;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterface
+class GetArticleStatusesUW extends AbstractBase implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
     protected $recordLoader;
-
+    
     protected $config;
 
     /**
@@ -89,7 +89,26 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             foreach ($ids as $id) {
                 $driver = $this->recordLoader->load($id, $source);
                 $urlAccess = '';
+		$response = [];
                 $daiaplus_check_bool = true;
+
+                if (isset($resolverChecks['journal']) && $resolverChecks['journal'] == 'y') {
+                    $urlAccess = $this->checkParentId($driver);
+                    if (!empty($urlAccess)) {
+                        $response = ['list' => ['url_access' => $urlAccess,
+                                                'url_access_level' => 'print_access_level',
+                                                'url_access_label' => 'Journal',
+                                                'link_status' => 1],
+                                     'items' => ['journal_check' =>
+                                                    ['url_access' => $urlAccess,
+                                                     'url_access_level' => 'print_access_level',
+                                                     'url_access_label' => 'Journal',
+                                                     'link_status' => 1]
+                                                 ]
+                                    ];
+                    //$daiaplus_check_bool = false;
+                    }
+                }
 
                 $urlAccessUncertain = $this->checkDirectLink($driver);
                 if (!empty($urlAccessUncertain)) {
@@ -101,25 +120,32 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                 if (!empty($urlAccess)) {
                     $urlAccessLevel = 'fa_article_access_level';
                     $urlAccessLabel = 'full_text_fa_article_access_level';
+                         $response['list'] = ['url_access' => $urlAccess,
+                                            'url_access_level' => $urlAccessLevel,
+                                            'url_access_label' => $urlAccessLabel,
+                                            'link_status' => 1];
+                         $response['items']['fa_check'] = ['url_access' => $urlAccess,
+                                            'url_access_level' => $urlAccessLevel,
+                                            'url_access_label' => $urlAccessLabel,
+                                            'link_status' => 1];
+
                     $daiaplus_check_bool = false;
                 }
 
-                if ($daiaplus_check_bool == false) {
-                    $response = ['list' => ['url_access' => $urlAccess,
-                        'url_access_level' => $urlAccessLevel,
-                        'url_access_label' => $urlAccessLabel,
-                        'link_status' => 1],
-                        'items' => ['lr_check' =>
-                            ['url_access' => $urlAccess,
-                                'url_access_level' => $urlAccessLevel,
-                                'url_access_label' => $urlAccessLabel,
-                                'link_status' => 1]
-                        ]
-                    ];
-                } else {
+                if ($daiaplus_check_bool == true) {
                     $url = $this->prepareUrl($driver, $id, $listView, $urlAccessUncertain, $urlAccessLevel);
                     error_log($url);
-                    $response = json_decode($this->makeRequest($url), true);
+                    $request_result = json_decode($this->makeRequest($url), true);
+                    if(empty($response)) {
+                        $response = $request_result;
+                    } else {
+                        foreach($request_result['items'] as $key => $item) {
+                            if(in_array($item['url_access_level'],array('oa_article_access_level', 'oa_homepage_access_level', 'fa_article_access_level', 'fa_homepage_access_level', 'article_access_level', 'homepage_access_level', 'issue_access_level', 'print_access_level', 'volume_access_level', 'proxy_article_access_level', 'proxy_homepage_access_level', 'proxy_issue_access_level', 'proxy_volume_access_level'))) {
+                                $response['list'] = $item;
+                                $response['items'][$key] = $item;
+                            }
+                        }
+                    }
                 }
 
                 $response = $this->prepareData($response, $listView);
@@ -131,9 +157,9 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
     }
 
     private function checkFreeAccess($driver, $urlAccessUncertain = '') {
-        $urlAccess = '';
+        $urlAccess = '';      
         $categories = array("marcFulltextCheckDirect", "marcFulltextCheckIndirect");
-
+        
         foreach ($categories as $category) {
             foreach ($driver->getSolrMarcKeys($category) as $solrMarcKey) {
                 $data = $driver->getMarcData($solrMarcKey);
@@ -152,9 +178,9 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                 }
             }
         }
-
+       
         return $urlAccess;
-    }
+    }                
 
     private function checkDirectLink($driver) {
         $urlAccess = '';
@@ -163,6 +189,25 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
             if (!empty(($fulltextDate['url']['data'][0]))) {
                 $urlAccess = $fulltextDate['url']['data'][0];
                 break;
+            }
+        }
+        return $urlAccess;
+    }
+
+    private function checkParentId($driver) {
+        $urlAccess = '';
+        $parentData = $driver->getMarcData('ArticleParentId');
+        foreach ($parentData as $parentDate) {
+            if (!empty(($parentDate['id']['data'][0]))) {
+                $parentId = $parentDate['id']['data'][0];
+                break;
+            }
+        }
+        if (!empty($parentId)) {
+            $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+            $ilnMatch = $parentDriver->getMarcData('ILN');
+            if (!empty($ilnMatch[0]['iln']['data'][0])) {
+                $urlAccess = '/vufind/Record/' . $parentId;
             }
         }
         return $urlAccess;
@@ -213,11 +258,11 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         if ($doi[0]['doi']['data'][0]) {
             $url .= '&doi=' . $doi[0]['doi']['data'][0];
         }
-
+        
         if($urlAccess) {
             $url .= '&url-access=' . $urlAccess;
         }
-
+        
         if($urlAccessLevel) {
             $url .= '&url-access-level=' . $urlAccessLevel;
         }
@@ -256,6 +301,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
         } elseif (!empty($rawData)) {
             if ($list == 1 && !empty($rawData['list']['url_access'])) {
                 $urlAccess = (is_array($rawData['list']['url_access'])) ? $rawData['list']['url_access'][0] : $rawData['list']['url_access'];
+				$urlAccess = str_replace('&filter[]=format_facet%3A(%22Zeitschriften%22%20OR%20%22Bücher%22)','',$urlAccess);
+				$urlAccess = str_replace('lookfor=SGN ','type=Signature&lookfor=', $urlAccess);
                 $level = str_replace('_access_level', '', $rawData['list']['url_access_level']);
                 $label = $resolverLabels[$level] ?: $rawData['list']['url_access_label'];
                 $data[] = [
@@ -276,6 +323,8 @@ class GetArticleStatuses extends AbstractBase implements TranslatorAwareInterfac
                     foreach ($rawData['items'] as $item) {
                         if (!empty($item) && !empty($item['url_access'])) {
                             $urlAccess = (is_array($item['url_access'])) ? $item['url_access'][0] : $item['url_access'];
+							$urlAccess = str_replace('&filter[]=format_facet%3A(%22Zeitschriften%22%20OR%20%22Bücher%22)','',$urlAccess);
+							$urlAccess = str_replace('lookfor=SGN ','type=Signature&lookfor=', $urlAccess);
                             $level = str_replace('_access_level', '', $item['url_access_level']);
                             $label = $resolverLabels[$level] ?: $item['url_access_label'];
                             $data[] = [

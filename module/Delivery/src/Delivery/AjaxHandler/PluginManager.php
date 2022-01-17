@@ -50,6 +50,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'deleteRecordComment' => 'VuFind\AjaxHandler\DeleteRecordComment',
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
         'getArticleStatuses' => 'DAIAplus\AjaxHandler\GetArticleStatuses',
+        'getArticleStatusesUW' => 'DAIAplus\AjaxHandler\GetArticleStatusesUW',
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
@@ -82,6 +83,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
     protected $factories = [
         'DAIAplus\AjaxHandler\GetArticleStatuses' =>
             'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
+        'DAIAplus\AjaxHandler\GetArticleStatusesUW' =>
+            'DAIAplus\AjaxHandler\GetArticleStatusesFactoryUW',
         'DAIAplus\AjaxHandler\GetItemStatuses' =>
             'DAIAplus\AjaxHandler\GetItemStatusesFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>

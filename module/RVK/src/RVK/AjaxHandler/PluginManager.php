@@ -49,6 +49,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'deleteRecordComment' => 'VuFind\AjaxHandler\DeleteRecordComment',
         'getACSuggestions' => 'VuFind\AjaxHandler\GetACSuggestions',
         'getArticleStatuses' => 'DAIAplus\AjaxHandler\GetArticleStatuses',
+        'getArticleStatusesUW' => 'DAIAplus\AjaxHandler\GetArticleStatusesUW',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
@@ -86,6 +87,8 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
             'BelugaConfig\AjaxHandler\GetResultCountFactory',
         'DAIAplus\AjaxHandler\GetArticleStatuses' =>
             'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
+        'DAIAplus\AjaxHandler\GetArticleStatusesUW' =>
+            'DAIAplus\AjaxHandler\GetArticleStatusesFactoryUW',
         'DAIAplus\AjaxHandler\GetItemStatuses' =>
             'DAIAplus\AjaxHandler\GetItemStatusesFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>
