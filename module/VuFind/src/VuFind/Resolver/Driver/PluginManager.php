@@ -68,6 +68,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\Redi' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
+        'VuFind\Resolver\Driver\AvailabilityPlusBase' =>
+            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
     ];
 
     /**
