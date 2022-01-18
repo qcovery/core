@@ -361,7 +361,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         //$result = $resolverHandler->fetchLinks($openUrl);
 
         $data = $this->driver->getMarcData($resolver);
-		$resolver_url = $resolverHandler->prepareUrl($resolver, $data, $this->config);
+		// = $resolverHandler->prepareUrl($resolver, $data, $this->config);
+		$resolver_url = this->prepareUrl($resolver);
         $template = $this->getTemplate($data);
 		$response = [
 			'check' => $resolver,
@@ -374,8 +375,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 			];
         $response['data'] = '';
         If(!empty($data)) {
-            //$response['data'] = $this->makeRequest($resolver_url);
-            $response['data'] = $resolverHandler->fetchLinks($resolver_url);
+            $response['data'] = $this->makeRequest($resolver_url);
+            //$response['data'] = $resolverHandler->fetchLinks($resolver_url);
             $response['html'] = $this->applyTemplate($template, $response);
         }
 
