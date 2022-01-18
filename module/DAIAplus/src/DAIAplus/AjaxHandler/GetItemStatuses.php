@@ -356,9 +356,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 	}
 
 	private function getResolverResponse($resolver) {
-        $resolverType = 'AvailabilityPlusBase';
         $data = $this->driver->getMarcData($resolver);
-		$resolver_url = $this->prepareUrl($resolver);
+		$resolver_url = this->prepareUrl($resolver);
         $template = $this->getTemplate($data);
 		$response = [
 			'check' => $resolver,
