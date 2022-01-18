@@ -407,7 +407,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
                 // Specific for Journals Online & Print
                 if (str_starts_with('resolver', 'OpenJournalsPrint')) {
-                    if(strpos($this->config['ResolverExtraParams'][$resolver], "&pid=client_ip=dynamic" !== false)) {
+                    if(strpos($this->config['ResolverExtraParams'][$resolver], "&pid=client_ip=dynamic") !== false) {
                         $ip = "192.1.1.1";
                         $params .= str_replace("&pid=client_ip=dynamic","&pid=client_ip=".$ip,$this->config['ResolverExtraParams'][$resolver]);
                     } else {
