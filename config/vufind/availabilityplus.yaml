@@ -80,7 +80,8 @@ DAIA:
   '035':
     a:
       - [name, id]
-      - [replace, '(^.*$)', 'ppn:'$1]
+      - [match, '\(DE-627\)([0-9xX]+)', 1]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
 #TODO Später anpassen?
 ArticleFulltextFreeCollection:
   category: FreeAccessIndirect
