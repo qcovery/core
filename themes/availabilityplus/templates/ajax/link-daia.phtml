@@ -12,6 +12,7 @@ foreach($data->document[0]->item as $item) {
     $services['loan'] = [];
     $services['presentation'] = [];
     $services['interloan'] = [];
+    //TODO: default services not available
 
     foreach($item->available as $service) {
         $services[$service->service] = $service;
@@ -27,10 +28,13 @@ foreach($data->document[0]->item as $item) {
 
     foreach($services as $service) {
         if(!empty($service)) {
+            //TODO: switch case for service templates
             print_r($service);
             break;
         }
     }
+
+
 }
 
 
