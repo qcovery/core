@@ -5,6 +5,9 @@ $label_org = $label;
 echo $url;
 
 $data = json_decode($data);
-print_r($data);
+
+foreach($data->document[0]->item as $item) {
+    print_r($item);
+}
 
 ?>
