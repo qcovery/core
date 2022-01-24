@@ -78,9 +78,10 @@ DAIA:
   view-method: ajax/link-daia.phtml
   mandatory-field: id
   '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
     a:
       - [name, id]
-      - [match, '\(DE-627\)([0-9xX]+)', 1]
       - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
 #TODO Später anpassen?
 ArticleFulltextFreeCollection:
