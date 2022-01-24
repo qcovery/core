@@ -7,7 +7,11 @@ echo $url;
 $data = json_decode($data);
 
 foreach($data->document[0]->item as $item) {
-    $services = [];
+    $services['openaccess'] = [];
+    $services['remote'] = [];
+    $services['loan'] = [];
+    $services['presentation'] = [];
+    $services['interloan'] = [];
 
     foreach($item->available as $service) {
         $services[$service->service] = $service;
@@ -22,7 +26,10 @@ foreach($data->document[0]->item as $item) {
     }
 
     foreach($services as $service) {
-        print_r($service);
+        if(!empty($service)) {
+            print_r($service);
+            break;
+        }
     }
 }
 
