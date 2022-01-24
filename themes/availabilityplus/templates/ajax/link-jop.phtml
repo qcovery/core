@@ -1,26 +1,9 @@
 <?php
 	$level_org = $level;
 	$label_org = $label;
-	
-	$data = @simplexml_load_string($data, "SimpleXMLElement", LIBXML_COMPACT);
-	foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
-		if(!empty($result->AccessURL)) {
-			$level = $level_org;
-			$label = $label_org;
-			$url = $result->AccessURL;
-			switch ($result['state']) {
-				case 0:
-					$level .= " FreeAccess";
-				case 2:
-					$level .= " ".$result->AccessLevel;
-				    $label .= "_".$result->AccessLevel;
-					echo '<div class="delimiter test"></div>';
-					echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-					break;
-				default:
-					echo "Zur Info: kein freier oder lizenzierter elektronischer Zugriff";
-					break;
-			}
-		}
-	}
+
+    echo $url;
+    print_r($data);
+
+	//$data = @simplexml_load_string($data, "SimpleXMLElement", LIBXML_COMPACT);
 ?>
