@@ -1,6 +1,6 @@
 <?php
 return [
-    'css' => ['daiaplus.css'],
+    'css' => ['availabilityplus.css'],
     'js' => [
         'check_item_statuses.js',
     ],
