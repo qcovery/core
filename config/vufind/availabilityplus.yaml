@@ -73,6 +73,14 @@ JournalsOnlinePrint:
       - [name, issue]
     h:
       - [name, pages]
+DAIA:
+  category: resolver
+  view-method: ajax/link-daia.phtml
+  mandatory-field: id
+  '035':
+    a:
+      - [name, id]
+      - [replace, '(^.*$)', 'ppn:'$1]
 #TODO Später anpassen?
 ArticleFulltextFreeCollection:
   category: FreeAccessIndirect
