@@ -7,9 +7,24 @@ echo $url;
 $data = json_decode($data);
 
 foreach($data->document[0]->item as $item) {
-    foreach($item->service->available as $service) {
+    $services = [];
+
+    foreach($item->available as $service) {
+        $services[$service->service] = $service;
+    }
+
+    if(empty($services)){
+        foreach($item->unavailable as $service) {
+            if(count(get_object_vars($service)) > 1) {
+                $services[$service->service] = $service;
+            }
+        }
+    }
+
+    foreach($services as $service) {
         print_r($service);
     }
 }
+
 
 ?>
