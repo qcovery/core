@@ -18,12 +18,10 @@ foreach($data->document[0]->item as $item) {
         $services[$service->service] = $service;
     }
 
-    if(empty($services)){
-        foreach($item->unavailable as $service) {
-            if(count(get_object_vars($service)) > 1) {
-                $services[$service->service] = $service;
-            }
-        }
+    foreach($item->unavailable as $service) {
+       if(count(get_object_vars($service)) > 1) {
+           $services[$service->service] = $service;
+       }
     }
 
     foreach($services as $service) {
