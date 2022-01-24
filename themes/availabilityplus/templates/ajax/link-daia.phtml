@@ -7,7 +7,9 @@ echo $url;
 $data = json_decode($data);
 
 foreach($data->document[0]->item as $item) {
-    print_r($item);
+    foreach($item->service->available) {
+        print_r($item);
+    }
 }
 
 ?>
