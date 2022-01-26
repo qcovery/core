@@ -55,9 +55,9 @@ foreach($data->document[0]->item as $item) {
                     if(!empty($item->label)) echo ' <b>'.$item->label.'</b>';
                     echo '<br>';
                     if(!empty($service_content->limitation[0]->id)) {
-                        $limitation = $service_content->limitation[0]->id;
-                        $level = substr($limitation, strpos($limitation, "#") + 1);
-                        $label = $service_content->service.'_'.substr($limitation, strpos($limitation, "#") + 1);
+                        $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
+                        $level = $limitation;
+                        $label = $service_content->service.$limitation;
                     } elseif(!empty($service_content->expected)) {
                         $level = "daia_orange";
                         $date = date_create($service_content->expected);
