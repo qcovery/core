@@ -76,7 +76,7 @@ foreach($data->document[0]->item as $item) {
                         $label = $params['action'];
                         echo '<span class="daia_action"><a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a></span>';
                     } else {
-                        echo $this->translate($service_content->service.'_default_action'.$limitation);
+                        echo '<span class="daia_action">'.$this->translate($service_content->service.'_default_action'.$limitation).'</span>';
                     }
                     break;
                 /*case 'interloan':
