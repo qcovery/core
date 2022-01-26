@@ -20,6 +20,10 @@ foreach($data->document[0]->item as $item) {
 
     $service_available = false;
     foreach($item_services['available'] as $service_key=>$service_content) {
+        $level='';
+        $label='';
+        $url='';
+        $limitation='';
         if(!empty($service_content)) {
             //TODO: switch case for service
             switch($service_key) {
@@ -72,7 +76,7 @@ foreach($data->document[0]->item as $item) {
                         $label = $params['action'];
                         echo '<span class="daia_action"><a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a></span>';
                     } else {
-                        echo $this->translate($service_content->service.'_default_action');
+                        echo $this->translate($service_content->service.'_default_action'.$limitation);
                     }
                     break;
                 /*case 'interloan':
