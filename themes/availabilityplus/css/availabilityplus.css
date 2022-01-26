@@ -55,15 +55,12 @@
 }
 
 .FreeAccess::after {
-    content: url("../images/checkmark_green.png") " " url("../images/OpenAccess_Logo.png");
-    margin-left: 5px;
-}
-
-.Access:after {
-  content: url("../images/checkmark_green.png");
+  content: url("../images/checkmark_green.png") " " url("../images/OpenAccess_Logo.png");
   margin-left: 5px;
 }
 
+.Access:after,
+.LicensedAccess:after,
 .PubPharmProxy:after {
   content: url("../images/checkmark_green.png");
   margin-left: 5px;

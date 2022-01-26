@@ -1,39 +1,88 @@
 <?php
-$level_org = $level;
-$label_org = $label;
-
-echo $url;
-
 $data = json_decode($data);
 
 foreach($data->document[0]->item as $item) {
-    $services['openaccess'] = [];
-    $services['remote'] = [];
-    $services['loan'] = [];
-    $services['presentation'] = [];
-    $services['interloan'] = [];
-    //TODO: default services not available
+    $item_services['available']['openaccess'] = [];
+    $item_services['available']['remote'] = [];
+    $item_services['available']['loan'] = [];
+    $item_services['available']['presentation'] = [];
+    $item_services['available']['interloan'] = [];
 
     foreach($item->available as $service) {
-        $services[$service->service] = $service;
+        $item_services['available'][$service->service] = $service;
     }
 
     foreach($item->unavailable as $service) {
-       if(count(get_object_vars($service)) > 1) {
-           $services[$service->service] = $service;
-       }
-    }
-
-    foreach($services as $service) {
-        if(!empty($service)) {
-            //TODO: switch case for service templates
-            print_r($service);
-            break;
+        if(count(get_object_vars($service)) > 1) {
+            $item_services['available'][$service->service] = $service;
         }
     }
 
+    $service_available = false;
+    foreach($item_services['available'] as $service_key=>$service_content) {
+        if(!empty($service_content)) {
+            //TODO: switch case for service
+            switch($service_key) {
+                case 'openaccess':
+                    $level = 'FreeAccess link_external';
+                    $label = 'FreeAccess';
+                    $url = $service_content->href;
+                    echo '<div class="delimiter"></div>';
+                    echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+                    break;
+                case 'remote':
+                    $level = 'LicensedAccess link_external';
+                    $label = 'LicensedAccess';
+                    $url = $service_content->href;
+                    echo '<div class="delimiter"></div>';
+                    echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+                    break;
+                case 'loan':
+                case 'presentation':
+                    echo '<div class="delimiter"></div>';
+                    if(!empty($item->storage->id)){
+                        $level = 'external_link';
+                        $label = $item->storage->content;
+                        $url = $item->storage->id;
+                        echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a>';
+                    } else {
+                        echo $this->translate('unknown_location');
+                    }
+                    if(!empty($item->label)) echo ' <b>'.$item->label.'</b>';
+                    echo '<br>';
+                    if(!empty($service_content->limitation[0]->id)) {
+                        $limitation = $service_content->limitation[0]->id;
+                        $level = substr($limitation, strpos($limitation, "#") + 1);
+                        $label = $service_content->service.'_'.substr($limitation, strpos($limitation, "#") + 1);
+                    } elseif(!empty($service_content->expected)) {
+                        $level = "daia_orange";
+                        $date = date_create($service_content->expected);
+                        $label = $this->translate('on_loan_until').' '.date_format($date,"d.m.Y");
+                    } else {
+                        $level = "daia_green";
+                        $label = $service_content->service;
+                    }
+                    echo '<span class="'.$level.'">'.$this->translate($label).'</span>';
+                    echo '<span class="daia_arrow"> ➝ </span>';
+                    if(!empty($service_content->href)) {
+                        $url = $service_content->href;
+                        $level = 'internal_link';
+                        $url_components = parse_url($url);
+                        parse_str($url_components['query'], $params);
+                        $label = $params['action'];
+                        echo '<span class="daia_action"><a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a></span>';
+                    } else {
+                        echo $this->translate($service_content->service.'_default_action');
+                    }
+                    break;
+                /*case 'interloan':
+                  echo 'interloan';
+                  break;*/
+            }
 
+            break;
+        }
+    }
 }
-
 
 ?>
