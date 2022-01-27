@@ -73,6 +73,24 @@ JournalsOnlinePrint:
       - [name, issue]
     h:
       - [name, pages]
+JournalsOnlinePrintPrint:
+  category: resolver
+  view-method: ajax/link-jop-print.phtml
+  mandatory-field: issn
+  773:
+    t:
+      - [name, title]
+    x:
+      - [name, issn]
+  952:
+    d:
+      - [name, volume]
+    j:
+      - [name, date]
+    e:
+      - [name, issue]
+    h:
+      - [name, pages]
 DAIA:
   category: resolver
   view-method: ajax/link-daia.phtml
