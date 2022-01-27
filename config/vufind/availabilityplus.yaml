@@ -73,7 +73,7 @@ JournalsOnlinePrint:
       - [name, issue]
     h:
       - [name, pages]
-JournalsOnlinePrintPrint:
+JournalsOnlinePrint-Print:
   category: resolver
   view-method: ajax/link-jop-print.phtml
   mandatory-field: issn
