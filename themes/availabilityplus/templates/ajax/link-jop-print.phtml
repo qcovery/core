@@ -19,7 +19,7 @@ foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
                     $label .= "_".$result->AccessLevel;
                     echo '<div class="delimiter"></div>';
                     echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-                    //$urls[] = $url;
+                    $urls[] = $url;
                     if($mode == 'break_on_first') $break = true;
                     break;
             }
