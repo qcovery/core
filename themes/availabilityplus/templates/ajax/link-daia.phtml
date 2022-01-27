@@ -2,6 +2,7 @@
 $data = json_decode($data);
 
 foreach($data->document[0]->item as $item) {
+
     $item_services['available']['openaccess'] = [];
     $item_services['available']['remote'] = [];
     $item_services['available']['loan'] = [];
@@ -18,14 +19,16 @@ foreach($data->document[0]->item as $item) {
         }
     }
 
-    $service_available = false;
+    $break = false;
     foreach($item_services['available'] as $service_key=>$service_content) {
         $level='';
         $label='';
         $url='';
         $limitation='';
         if(!empty($service_content)) {
-            //TODO: switch case for service
+            if($mode == 'break_on_first') {
+                $break = true;
+            }
             switch($service_key) {
                 case 'openaccess':
                     $level = 'FreeAccess link_external';
@@ -87,6 +90,7 @@ foreach($data->document[0]->item as $item) {
             break;
         }
     }
+    if($break == true) break;
 }
 
 ?>
