@@ -45,6 +45,7 @@ trait HoldsTrait
      */
     public function holdAction()
     {
+
         $type = $this->request->getQuery('type');
 
         $driver = $this->loadRecord();
@@ -63,6 +64,8 @@ trait HoldsTrait
                 'patron' => $patron
             ]
         );
+
+
         if (!$checkHolds) {
             return $this->redirectToRecord();
         }
@@ -78,6 +81,7 @@ trait HoldsTrait
         $validRequest = $catalog->checkRequestIsValid(
             $driver->getUniqueID(), $gatheredDetails, $patron
         );
+
         if ((is_array($validRequest) && !$validRequest['valid']) || !$validRequest) {
             $this->flashMessenger()->addErrorMessage(
                 is_array($validRequest)
@@ -94,6 +98,7 @@ trait HoldsTrait
         ) : [];
         $extraHoldFields = isset($checkHolds['extraHoldFields'])
             ? explode(":", $checkHolds['extraHoldFields']) : [];
+
 
         $requestGroupNeeded = in_array('requestGroup', $extraHoldFields)
             && !empty($requestGroups)
@@ -113,10 +118,18 @@ trait HoldsTrait
         $pickupDetails['type'] = $type;
         $pickupDetails['storage_id'] = $this->request->getQuery('storage_id');
 
-        $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
+        
+	$pickup_res = $catalog->getPickUpLocations($patron, $pickupDetails);
+	//var_dump( $pickup_res);
 
+	$pickup = $pickup_res['location'];
+	$PAIA_STATUS_CODE = $pickup_res['status'];
+	//var_dump( $this->PAIA_STATUS_CODE);
+
+	//$this->type='failed';
         // Process form submissions if necessary:
         if (null !== $this->params()->fromPost('placeHold')) {
+
             // If the form contained a pickup location or request group, make sure
             // they are valid:
             $validGroup = $this->holds()->validateRequestGroupInput(
@@ -125,7 +138,7 @@ trait HoldsTrait
             $validPickup = $validGroup && $this->holds()->validatePickUpInput(
                 $gatheredDetails['pickUpLocation'], $extraHoldFields, $pickup
             );
-
+		//$this->flashMessenger()->addMessage('hold_invalid_pickup', 'error');
             if (!$validGroup) {
                 $this->flashMessenger()
                     ->addMessage('hold_invalid_request_group', 'error');
@@ -137,6 +150,7 @@ trait HoldsTrait
 
                 // Add Patron Data to Submitted Data
                 $holdDetails = $gatheredDetails + ['patron' => $patron];
+
 
                 // Attempt to place the hold:
                 $function = (string)$checkHolds['function'];
@@ -201,8 +215,10 @@ trait HoldsTrait
                 'requestGroupNeeded' => $requestGroupNeeded,
                 'helpText' => $checkHolds['helpText'] ?? null,
                 'type' => $type,
+		'PAIA_STATUS_CODE' => $PAIA_STATUS_CODE,
             ]
         );
+
         $view->setTemplate('record/hold');
         return $view;
     }

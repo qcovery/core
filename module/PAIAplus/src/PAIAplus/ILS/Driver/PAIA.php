@@ -372,16 +372,25 @@ class PAIA extends PAIAbase
      * @return array        An array of associative arrays with locationID and
      * locationDisplay keys
      */
+
+	/**
+	* BS COVID19 change return to pickuplocation
+	*/
+
     public function getPickUpLocations($patron = null, $holdDetails = null)
     {
         $pickupLocation = [];
-
         $item = $holdDetails['item_id'];
 
         $doc = [];
+	//autoconfirm fees
+	//$doc = '{"doc":[{"edition":"'.$documentId.'","item":"'.$itemId.'","confirm":{ "http://purl.org/ontology/paia#FeeCondition": ["http://purl.org/ontology/dso#Reservation"] }}]}';
+  	$confirm = [];
+        $confirm['http://purl.org/ontology/paia#FeeCondition'][] = 'http://purl.org/ontology/dso#Reservation';
+	$doc['confirm'] = $confirm;
+
         $doc['item'] = stripslashes($item);
         $post_data['doc'][] = $doc;
-
         try {
             $array_response = $this->paiaPostAsArray(
                 'core/' . $patron['cat_username'] . '/request', $post_data
@@ -393,6 +402,13 @@ class PAIA extends PAIAbase
                 'sysMessage' => $e->getMessage(),
             ];
         }
+ //error_log ("JAOH PUP". var_dump($array_response));
+ $PAIA_STATUS_CODE = $array_response['doc'][0]['status'];
+// error_log ("JAOH PUP". var_dump($this->PAIA_STATUS_CODE));
+
+	if($PAIA_STATUS_CODE == 5) {
+	        //$this->flashMessenger() ->addMessage('hold_invalid_request_group', 'error');
+	}
 
         if ($holdDetails['type'] == 'order') {
             if (isset($array_response['doc'][0]['condition']['http://purl.org/ontology/paia#StorageCondition']['option'])) {
@@ -414,7 +430,8 @@ class PAIA extends PAIAbase
                 }
             }
         }
-
-        return $pickupLocation;
+	//error_log ("JAOH PUP". var_dump($pickupLocation));
+	return ['status' => $PAIA_STATUS_CODE, 'location' => $pickupLocation,];
+        //return $pickupLocation;
     }
 }
