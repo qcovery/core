@@ -81,10 +81,15 @@ foreach($data->document[0]->item as $item) {
                     } else {
                         echo '<span class="daia_action">'.$this->translate($service_content->service.'_default_action'.$limitation).'</span>';
                     }
+                    if(isset($service_content->queue)) {
+                        $label = 'Recalls';
+                        if($service_queue == 1) $label = 'Recall';
+                        echo '<div class="service_queue">'.$service_content->queue.' '.$this->translate($label).'</div>';
+                    }
+                    if(!empty($item->about)) {
+                        echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$item->about.'</div>';
+                    }
                     break;
-                /*case 'interloan':
-                  echo 'interloan';
-                  break;*/
             }
 
             break;
