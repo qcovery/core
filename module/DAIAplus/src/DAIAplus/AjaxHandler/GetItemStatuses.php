@@ -325,6 +325,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     private function checkParentWorkILNSolr() {
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
+        $response = [
+            'check' => 'function checkParentWork',
+            'parentData' => $parentData
+        ];
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
                 $parentId = $parentDate['id']['data'][0];
@@ -347,6 +351,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 'level' => $level,
                 'label' => $label,
                 'label_translated' => $this->translate($label),
+                'parentData' => $parentData
             ];
             $response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
         }
