@@ -101,6 +101,12 @@ DAIA:
     a:
       - [name, id]
       - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+ArticleParentId:
+  category: resolver
+  773:
+    w:
+      - [name, id]
+      - [match, '(^\(DE-601\)|^\(DE-627\))(.*)', 2]
 #TODO Später anpassen?
 ArticleFulltextFreeCollection:
   category: FreeAccessIndirect
