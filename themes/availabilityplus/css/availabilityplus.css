@@ -34,12 +34,14 @@
   display: block;
 }
 
-.daia_green {
+.daia_green,
+.ApprovalRequired {
   color: #3DA22D;
   font-weight: bold;
 }
 
-.daia_orange {
+.daia_orange,
+.ShortLoan {
   color: #EB8E12;
   font-weight: bold;
 }
