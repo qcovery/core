@@ -78,10 +78,9 @@
   margin-left: 5px;
 }
 
-.item_label {
-  font-weight: bold;
-}
-
+.storage_prefix,
+.item_label,
 .item_about_prefix {
   font-weight: bold;
 }
+

@@ -51,7 +51,7 @@ foreach($data->document[0]->item as $item) {
                         $level = 'link_external';
                         $label = $item->storage->content;
                         $url = $item->storage->id;
-                        echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span><a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a></span>';
+                        echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a></span>';
                     } else {
                         echo $this->translate('unknown_location');
                     }
