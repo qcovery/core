@@ -136,7 +136,7 @@ ArticleParentId:
   773:
     w:
       - [name, id]
-      - [match, '(^\(DE-601\)|^\(DE-627\))(.*)', 2]
+      - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
 #TODO Später anpassen?
 ArticleFulltextFreeCollection:
   category: FreeAccessIndirect
