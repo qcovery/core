@@ -77,3 +77,7 @@
   content: url("../images/questionmark_orange.png");
   margin-left: 5px;
 }
+
+.item_about_prefix {
+  font-weight: bold;
+}
