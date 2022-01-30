@@ -35,7 +35,7 @@ use VuFind\I18n\Translator\TranslatorAwareInterface;
 use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\View\Renderer\RendererInterface;
-use VuFind\Resolver\Connection;
+use VuFind\Crypt\HMAC;
 use VuFind\Resolver\Driver\PluginManager as ResolverManager;
 
 /**
@@ -74,6 +74,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $default_template;
 
+    protected $hmac;
+
     /**
      * Resolver driver plugin manager
      *
@@ -88,14 +90,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @param Config            $config    Top-level configuration
      * @param RendererInterface $renderer  View renderer
      */
-    public function __construct(Loader $loader, Config $config, Config $configResolver, RendererInterface $renderer, ResolverManager $pm) {
+    public function __construct(Loader $loader, Config $config, Config $configResolver, RendererInterface $renderer, HMAC $hmac) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
         $this->configResolver = $configResolver->toArray();
         $this->checks = $this->config['RecordView'];
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
-        $this->pluginManager = $pm;
+        $this->hmac = $hmac;
     }
 
     /**
@@ -375,7 +377,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'marc_data' => $data,
         ];
         $response['data'] = '';
-        If(!empty($data)) {
+        if(!empty($data)) {
+            $response['itemStatusesHandler'] = $this;
             $response['data'] = $this->makeRequest($resolver_url);
             $response['html'] = $this->applyTemplate($template, $response);
         }
@@ -440,4 +443,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         curl_close($req);
         return $result;
     }
+
+    public function getHMAC() {
+        return $this->hmac;
+    }
 }
+
