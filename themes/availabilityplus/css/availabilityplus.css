@@ -47,7 +47,7 @@
 }
 
 .daia_red {
-  color: #FF0000;
+  color: #.FF0000;
   font-weight: bold;
 }
 
@@ -76,6 +76,10 @@
 .UnknownAccess:after {
   content: url("../images/questionmark_orange.png");
   margin-left: 5px;
+}
+
+.item_label {
+  font-weight: bold;
 }
 
 .item_about_prefix {

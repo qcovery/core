@@ -48,14 +48,14 @@ foreach($data->document[0]->item as $item) {
                 case 'presentation':
                     echo '<div class="delimiter"></div>';
                     if(!empty($item->storage->id)){
-                        $level = 'external_link';
+                        $level = 'link_external daia_link';
                         $label = $item->storage->content;
                         $url = $item->storage->id;
-                        echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a>';
+                        echo '<a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a>';
                     } else {
                         echo $this->translate('unknown_location');
                     }
-                    if(!empty($item->label)) echo ' <b>'.$item->label.'</b>';
+                    if(!empty($item->label)) echo ' <span class="item_label"></span>'.$item->label.'</span>';
                     echo '<br>';
                     if(!empty($service_content->limitation[0]->id)) {
                         $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
