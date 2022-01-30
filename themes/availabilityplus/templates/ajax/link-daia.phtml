@@ -69,7 +69,7 @@ foreach($data->document[0]->item as $item) {
                         $level = "daia_green";
                         $label = $service_content->service;
                     }
-                    echo '<span class="'.$level.'">'.$this->translate($label).'</span>';
+                    echo '<span class="daia_hint"><span class="'.$level.'">'.$this->translate($label).'</span></span>';
                     echo '<span class="daia_arrow"> ➝ </span>';
                     if(!empty($service_content->href)) {
                         $url = $service_content->href;
