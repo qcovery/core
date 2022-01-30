@@ -119,8 +119,8 @@ ArticleFulltextFreeCollection:
 
       
 #TODO Später anpassen?
-ArticleDirectLink:
-  category: marcFulltextCheckPrep
+1ArticleDirectLink:
+  category: FullTextFallbackUrls
   view-method: ajax/link-external.phtml
   856:
     conditions:
@@ -131,8 +131,8 @@ ArticleDirectLink:
       - [name, url]
       
 #TODO Später anpassen?
-ArticleDirectLinkUrlParts:
-  category: marcFulltextCheckPrep
+2ArticleDirectLinkUrlParts:
+  category: FullTextFallbackUrls
   view-method: ajax/link-external.phtml
   856:
     conditions:
