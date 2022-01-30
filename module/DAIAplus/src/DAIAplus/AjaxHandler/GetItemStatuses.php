@@ -444,8 +444,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $result;
     }
 
-    public function getHMAC() {
-        return $this->hmac;
+    public function generateDAIAOrderLink() {
+        //TODO: see here https://github.com/qcovery/core/blob/develop-5/module/DAIAplus/src/DAIAplus/AjaxHandler/GetItemStatuses.php#L180
+        $HMACKeys = "id:item_id:doc_id";
+        return 'test';
     }
 }
 
