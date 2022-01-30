@@ -16,7 +16,7 @@
   view-method: ajax/link-external.phtml
   856:
     conditions:
-      - [field, u, 'doaj.org\/article|edocs.tib.eu\/files|tib.uni-hannover.de\/edoks\/|digibib.tu-bs.de|resolver.sub.uni-goettingen.de|resolver.staatsbibliothek-berlin.de|hdl.handle.net|lib.dr.iastate.edu|www.dzhw.eu\/pdf|www.his.de\/pdf|arxiv.org|publikationsserver.tu-braunschweig.de\/get|bib-pubdb1.desy.de\/record|inef.uni-due.de\/index.php?article_id=|kluedo.ub.uni-kl.de\/frontdoor\/index\/index\/docId\/|wiiw.ac.at|library.fes.de\/pdf-files|www.bis.org\/publ\/bppdf|www.bsu-bund.de\/SharedDocs\/pdf|www.bamf.de\/SharedDocs\/Anlagen\/DE\/Publikationen|bib-pubdb1.desy.de\/record|www.doabooks.org\/doab?func=fulltext|www.pharmazeutische-zeitung.de|clinicaltrials.gov\/show|www.jfe-steel.co.jp\/en\/research\/report\/|www.ressource-deutschland.de\/fileadmin\/|juser.fz-juelich.de\/record\/|www.qip-journal.eu\/index.php\/ams\/article\/download\/|www.ita.rwth-aachen.de\/global\/show_document.asp|opus.bibliothek.uni-wuerzburg.de\/files\/|kth.diva-portal.org\/smash\/record|www.teses.usp.br\/teses\/disponiveis\/|edoc.difu.de\/edoc.php|haab-digital.klassik-stiftung.de\/viewer|darwin-online.org.uk|www.doabooks.org|revistas.unam.mx|produccioncientificaluz.org']
+      - [field, u, 'doaj.org\/article|edocs.tib.eu\/files|tib.uni-hannover.de\/edoks\/|digibib.tu-bs.de|resolver.sub.uni-goettingen.de|resolver.staatsbibliothek-berlin.de|hdl.handle.net|lib.dr.iastate.edu|www.dzhw.eu\/pdf|www.his.de\/pdf|arxiv.org|publikationsserver.tu-braunschweig.de\/get|bib-pubdb1.desy.de\/record|inef.uni-due.de\/index.php?article_id=|kluedo.ub.uni-kl.de\/frontdoor\/index\/index\/docId\/|wiiw.ac.at|library.fes.de\/pdf-files|www.bis.org\/publ\/bppdf|www.bsu-bund.de\/SharedDocs\/pdf|www.bamf.de\/SharedDocs\/Anlagen\/DE\/Publikationen|bib-pubdb1.desy.de\/record|www.doabooks.org\/doab?func=fulltext|www.pharmazeutische-zeitung.de|clinicaltrials.gov\/show|www.jfe-steel.co.jp\/en\/research\/report\/|www.ressource-deutschland.de\/fileadmin\/|juser.fz-juelich.de\/record\/|www.qip-journal.eu\/index.php\/ams\/article\/download\/|www.ita.rwth-aachen.de\/global\/show_document.asp|opus.bibliothek.uni-wuerzburg.de\/files\/|kth.diva-portal.org\/smash\/record|www.teses.usp.br\/teses\/disponiveis\/|edoc.difu.de\/edoc.php|haab-digital.klassik-stiftung.de\/viewer|darwin-online.org.uk|www.doabooks.org|revistas.unam.mx|produccioncientificaluz.org|www.gbv.de\/dms\/']
       - [indicator, 1, 4]
       - [indicator, 2, 0|1]
     u:
@@ -43,6 +43,24 @@ TestLevel:
   245:
     a: 
       - [name, level]
+1ArticleDirectLink:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, 3, Volltext]
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+2ArticleDirectLinkUrlParts:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, u, 'doi.org']
+    u:
+      - [name, url]
 GBVILLTitle:
   category: GBVILL
   mandatory-field: url
@@ -116,27 +134,3 @@ ArticleFulltextFreeCollection:
       - [field, a, 'OPENACCESS|GBV_DOAJ|Gutenberg|ZDB-94-OAB|ZDB-23-GOA|GBV_XBI|GBV_XAR|GBV_XCH|GBV_CTG']
     a:
       - [name, collection]
-
-      
-#TODO Später anpassen?
-1ArticleDirectLink:
-  category: FullTextFallbackUrls
-  view-method: ajax/link-external.phtml
-  856:
-    conditions:
-      - [field, 3, Volltext]
-      - [indicator, 1, 4]
-      - [indicator, 2, 0|1]
-    u:
-      - [name, url]
-      
-#TODO Später anpassen?
-2ArticleDirectLinkUrlParts:
-  category: FullTextFallbackUrls
-  view-method: ajax/link-external.phtml
-  856:
-    conditions:
-      - [field, u, 'doi.org']
-    u:
-      - [name, url]
-
