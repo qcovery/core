@@ -55,7 +55,7 @@ foreach($data->document[0]->item as $item) {
                     } else {
                         echo $this->translate('unknown_location');
                     }
-                    if(!empty($item->label)) echo ' <span class="item_label"></span>'.$item->label.'</span>';
+                    if(!empty($item->label)) echo ' <span class="item_label">'.$item->label.'</span>';
                     echo '<br>';
                     if(!empty($service_content->limitation[0]->id)) {
                         $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
