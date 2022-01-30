@@ -61,7 +61,13 @@ foreach($data->document[0]->item as $item) {
                         $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
                         $level = $limitation;
                         $label = $service_content->service.$limitation;
-                    } elseif(!empty($service_content->expected)) {
+                    } elseif(!empty($service_content->limitation[0]->content)) {
+                        $limitation = $service_content->limitation[0]->content;
+                        $level = $limitation;
+                        $label = $service_content->service.$limitation;
+                    }
+
+                    if(!empty($service_content->expected)) {
                         $level = "daia_orange";
                         $date = date_create($service_content->expected);
                         $label = $this->translate('on_loan_until').' '.date_format($date,"d.m.Y");
