@@ -122,12 +122,12 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
 
             $replyTo = $view->email;
             if (isset($resultFeedbackConfig['resultFeedback']['set_user_email_as_reply_to']) && !$resultFeedbackConfig['resultFeedback']['set_user_email_as_reply_to']) {
-                $replyTo = null;
+                $replyTo = new Address($view->email, $view->name);
             }
 
             $cc = null;
             if (isset($resultFeedbackConfig['resultFeedback']['set_user_email_as_cc']) && $resultFeedbackConfig['resultFeedback']['set_user_email_as_cc']) {
-                $cc = $view->email;
+                $cc = new Address($view->email, $view->name);
             }
 
             try {
