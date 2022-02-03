@@ -78,10 +78,18 @@ trait HoldsTrait
         $validRequest = $catalog->checkRequestIsValid(
             $driver->getUniqueID(), $gatheredDetails, $patron
         );
+
+        $errorMessage = 'hold_error_blocked';
+        if (isset($this->config['Holds']['usePatronStatusForErrorMessage']) && $this->config['Holds']['usePatronStatusForErrorMessage']) {
+            if (isset($patron['status'])) {
+                $errorMessage = 'hold_error_blocked_status_'.$patron['status'];
+            }
+        }
+
         if ((is_array($validRequest) && !$validRequest['valid']) || !$validRequest) {
             $this->flashMessenger()->addErrorMessage(
                 is_array($validRequest)
-                    ? $validRequest['status'] : 'hold_error_blocked'
+                    ? $validRequest['status'] : $errorMessage
             );
             return $this->redirectToRecord('#top');
         }

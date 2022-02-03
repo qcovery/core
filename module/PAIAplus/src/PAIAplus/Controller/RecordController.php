@@ -27,6 +27,9 @@
  */
 namespace PAIAplus\Controller;
 
+use Zend\Config\Config;
+use Zend\ServiceManager\ServiceLocatorInterface;
+
 /**
  * Record Controller
  *
@@ -39,4 +42,13 @@ namespace PAIAplus\Controller;
 class RecordController extends \VuFind\Controller\RecordController
 {
     use HoldsTrait;
+
+    private $config;
+
+    public function __construct(ServiceLocatorInterface $sm, Config $config)
+    {
+        parent::__construct($sm, $config);
+
+        $this->config = $config;
+    }
 }
