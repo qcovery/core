@@ -2,6 +2,14 @@
   category: FreeAccess
   mandatory-field: url
   view-method: ajax/link-external.phtml
+  '035':
+    a:
+      - [ name, requirednumberofconditions ]
+      - [ replace, '(^.*$)', 1 ]
+  912:
+    a:
+      - [ name, condition_false ]
+      - [ replace, '(^GBV_DOAJ $)', 'false' ]
   856:
     conditions:
       - [field, z, 'kostenfrei|Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
