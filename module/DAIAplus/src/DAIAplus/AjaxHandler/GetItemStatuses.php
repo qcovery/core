@@ -253,8 +253,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
 
         foreach($data as $date) {
-            if(!empty($date['condition']['data'][0])) {
-                if($date['condition']['data'][0] != 'true') $check = false;
+            if(!empty($date['condition_true']['data'][0])) {
+                if($date['condition_true']['data'][0] != 'true') $check = false;
+                $numberofconditions += 1;
+            } elseif(!empty($date['condition_false']['data'][0])) {
+                if($date['condition_false']['data'][0] != 'false') $check = false;
                 $numberofconditions += 1;
             }
         }
