@@ -91,7 +91,17 @@ TestLevel:
       - [field, u, 'doi.org']
     u:
       - [name, url]
-GBVILLTitle:
+1GBVILLPPN:
+  category: GBVILL
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9xX]+)' ]
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($0)&ACT=SRCH']
+2GBVILLTitle:
   category: GBVILL
   mandatory-field: url
   view-method: ajax/link-external.phtml
