@@ -16,5 +16,5 @@ return array (
       'VuFind\\ILSConnection' => 'DAIAplus\\ILS\\Connection',
       'VuFind\\ILSDriverPluginManager' => 'DAIAplus\\ILS\\Driver\\PluginManager',
     ),
-  );
+  )
 );
