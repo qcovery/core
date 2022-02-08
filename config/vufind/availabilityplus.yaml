@@ -1,4 +1,15 @@
-1ArticleFulltextFree:
+1ArticleFulltextFreeIndicator2:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, z, 'kostenfrei|Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+1ArticleFulltextFreeSubfield3:
   category: FreeAccess
   mandatory-field: url
   view-method: ajax/link-external.phtml
@@ -7,7 +18,6 @@
       - [field, 3, Volltext]
       - [field, z, 'kostenfrei|Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
       - [indicator, 1, 4]
-      - [indicator, 2, 0|1]
     u:
       - [name, url]
 2ArticleDirectLinkUrlParts:
