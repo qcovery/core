@@ -100,7 +100,7 @@ TestLevel:
       - [ field, a, '\(DE-627\)([0-9xX]+)' ]
     a:
       - [name, url]
-      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($0)&ACT=SRCH']
+      - [replace, '\(DE-627\)([0-9xX]+)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($1)&ACT=SRCH']
 2GBVILLTitle:
   category: GBVILL
   mandatory-field: url
