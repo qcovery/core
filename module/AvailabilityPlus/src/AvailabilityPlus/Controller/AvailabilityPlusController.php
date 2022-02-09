@@ -39,4 +39,8 @@ class AvailabilityPlusController extends \VuFind\Controller\AbstractBase
         return $this->createViewModel();
     }
 
+    public function debugAction() {
+        $id = $this->params()->fromRoute('id', 'no id specified');
+        return $this->createViewModel(['id' => $id]);
+    }
 }
