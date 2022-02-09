@@ -32,8 +32,12 @@ class AvailabilityPlusController extends \VuFind\Controller\AbstractBase
      */
     public function homeAction()
     {
-        $this->layout()->setTemplate('availabilityplus/testcases');
-        return $this->createViewModel();
+        return $this->forwardTo('AvailabilityPlus', 'TestCases');
+    }
+
+    public function testcasesAction() {
+        $view = $this->createViewModel();
+        return $view;
     }
 
 }

@@ -14,7 +14,7 @@ $config = [
 ];
 
 $staticRoutes = [
-    'AvailabilityPlus/TestCases'
+    'AvailabilityPlus/Home', 'AvailabilityPlus/TestCases'
 ];
 
 $routeGenerator = new \VuFind\Route\RouteGenerator();
