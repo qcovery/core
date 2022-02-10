@@ -72,11 +72,11 @@ return array (
       array (
         'factories' => 
         array (
-          'AvailabilityPlus\\AjaxHandler\\GetItemStatuses' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatusesFactory',
+          'AvailabilityPlus\\AjaxHandler\\GetItemStatusesAP' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatusesAPFactory',
         ),
         'aliases' => 
         array (
-          'VuFind\\AjaxHandler\\GetItemStatuses' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatuses',
+          'VuFind\\AjaxHandler\\GetItemStatusesAP' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatusesAP',
         ),
       ),
     ),
