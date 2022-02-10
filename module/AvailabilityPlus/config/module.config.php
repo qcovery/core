@@ -64,4 +64,21 @@ return array (
       ),
     ),
   ),
+  'vufind' => 
+  array (
+    'plugin_managers' => 
+    array (
+      'ajaxhandler' => 
+      array (
+        'factories' => 
+        array (
+          'AvailabilityPlus\\AjaxHandler\\GetItemStatuses' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatusesFactory',
+        ),
+        'aliases' => 
+        array (
+          'VuFind\\AjaxHandler\\GetItemStatuses' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatuses',
+        ),
+      ),
+    ),
+  ),
 );
