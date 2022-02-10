@@ -25,7 +25,7 @@ use VuFind\Resolver\Driver\PluginManager as ResolverManager;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetItemStatusesAP extends \VuFind\AjaxHandler\GetItemStatuses implements TranslatorAwareInterface
+class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 

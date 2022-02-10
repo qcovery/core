@@ -13,7 +13,7 @@ use Interop\Container\ContainerInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetItemStatusesAPFactory implements \Zend\ServiceManager\Factory\FactoryInterface
+class GetItemStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
