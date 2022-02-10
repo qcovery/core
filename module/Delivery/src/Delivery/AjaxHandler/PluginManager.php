@@ -53,7 +53,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-        'getItemStatuses' => 'DAIAplus\AjaxHandler\GetItemStatuses',
+        'getItemStatuses' => 'AvailabilityPlus\AjaxHandler\GetItemStatuses',
         'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
@@ -82,8 +82,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
     protected $factories = [
         'DAIAplus\AjaxHandler\GetArticleStatuses' =>
             'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
-        'DAIAplus\AjaxHandler\GetItemStatuses' =>
-            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
+        'AvailabilityPlus\AjaxHandler\GetItemStatuses' =>
+            'AvailabilityPlus\AjaxHandler\GetItemStatusesFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>
             'Delivery\AjaxHandler\CheckAvailabilityFactory',
         'DependentWorks\AjaxHandler\GetDependentWorks' =>
