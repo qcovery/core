@@ -87,7 +87,7 @@ foreach($data->document[0]->item as $item) {
                     }
                     if(isset($service_content->queue)) {
                         $label = 'Recalls';
-                        if($service_queue == 1) $label = 'Recall';
+                        if($service_content->queue == 1) $label = 'Recall';
                         echo '<div class="service_queue">'.$service_content->queue.' '.$this->translate($label).'</div>';
                     }
                     if(!empty($item->about)) {
