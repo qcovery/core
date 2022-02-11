@@ -106,6 +106,7 @@ foreach($data->document[0]->item as $item) {
                     }
                     if(!empty($item->label)) echo ' <span class="item_label">'.$item->label.'</span>';
                     echo '<br>';
+                    echo '<span class="daia_hint"><span class="daia_red">'.$this->translate('not_available').'</span></span>';
                     break;
             }
 
