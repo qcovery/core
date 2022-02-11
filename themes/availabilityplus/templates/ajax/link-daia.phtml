@@ -93,7 +93,7 @@ foreach($data->document[0]->item as $item) {
                         echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$item->about.'</div>';
                     }
                     break;
-                caese 'fallback':
+                case 'fallback':
                     echo '<div class="delimiter"></div>';
                     if(!empty($item->storage->id)){
                         $level = 'link_external';
