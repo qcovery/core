@@ -7,7 +7,7 @@ foreach($data->document[0]->item as $item) {
     $item_services['available']['remote'] = [];
     $item_services['available']['loan'] = [];
     $item_services['available']['presentation'] = [];
-    $item_services['available']['interloan'] = [];
+    $item_services['available']['fallback'] = 'fallback';
 
     foreach($item->available as $service) {
         $item_services['available'][$service->service] = $service;
@@ -16,7 +16,6 @@ foreach($data->document[0]->item as $item) {
     foreach($item->unavailable as $service) {
         if(count(get_object_vars($service)) > 1) {
             $item_services['available'][$service->service] = $service;
-        }
     }
 
     $break = false;
@@ -93,6 +92,19 @@ foreach($data->document[0]->item as $item) {
                     if(!empty($item->about)) {
                         echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$item->about.'</div>';
                     }
+                    break;
+                'fallback':
+                    echo '<div class="delimiter"></div>';
+                    if(!empty($item->storage->id)){
+                        $level = 'link_external';
+                        $label = $item->storage->content;
+                        $url = $item->storage->id;
+                        echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$url.'" class="'.$level.'" title="'.$label.'" target="_blank">'.$this->translate($label).'</a></span>';
+                    } else {
+                        echo $this->translate('unknown_location');
+                    }
+                    if(!empty($item->label)) echo ' <span class="item_label">'.$item->label.'</span>';
+                    echo '<br>';
                     break;
             }
 
