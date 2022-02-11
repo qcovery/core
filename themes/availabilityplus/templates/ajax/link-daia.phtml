@@ -16,6 +16,7 @@ foreach($data->document[0]->item as $item) {
     foreach($item->unavailable as $service) {
         if(count(get_object_vars($service)) > 1) {
             $item_services['available'][$service->service] = $service;
+        }
     }
 
     $break = false;
