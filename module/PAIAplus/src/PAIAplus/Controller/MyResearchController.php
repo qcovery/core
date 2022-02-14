@@ -116,15 +116,23 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         $patron = $this->catalogLogin();
         $profileExpires = "not set";
+        $profileNote = null;
+        $patronStatus = null;
         if (is_array($patron)) {
             $profile = $catalog->getMyProfile($patron);
             $profileExpires = $profile['expires'];
+            if ($this->showProfileNoteOnAllPages()) {
+                $profileNote = $profile['note'];
+            }
+            if ($this->showPatronStatusOnAllPages()) {
+                $patronStatus = $patron['status'];
+            }
         }
 
         return $this->createViewModel(
             compact(
                 'transactions', 'renewForm', 'renewResult', 'paginator',
-                'hiddenTransactions', 'displayItemBarcode', 'profileExpires'
+                'hiddenTransactions', 'displayItemBarcode', 'profileExpires', 'profileNote', 'patronStatus'
             )
         );
     }
@@ -233,5 +241,73 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         }
         $view->recordList = $recordList;
         return $view;
+    }
+
+    public function holdsAction()
+    {
+        $view = parent::holdsAction();
+        if ($this->showProfileNoteOnAllPages()) {
+            $this->addProfileNoteToView($view);
+        }
+        if ($this->showPatronStatusOnAllPages()) {
+            $this->addPatronStatusToView($view);
+        }
+        return $view;
+    }
+
+    public function finesAction()
+    {
+        $view = parent::finesAction();
+        if ($this->showProfileNoteOnAllPages()) {
+            $this->addProfileNoteToView($view);
+        }
+        if ($this->showPatronStatusOnAllPages()) {
+            $this->addPatronStatusToView($view);
+        }
+        return $view;
+    }
+
+    public function changePasswordAction()
+    {
+        $view = parent::changePasswordAction();
+        if ($this->showProfileNoteOnAllPages()) {
+            $this->addProfileNoteToView($view);
+        }
+        if ($this->showPatronStatusOnAllPages()) {
+            $this->addPatronStatusToView($view);
+        }
+        return $view;
+    }
+
+    private function showProfileNoteOnAllPages () {
+        $paiaConfig = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('PAIA');
+        if (isset($paiaConfig['PAIA']['show_note_on_all_pages']) && $paiaConfig['PAIA']['show_note_on_all_pages']) {
+            return true;
+        }
+        return false;
+    }
+
+    private function addProfileNoteToView (&$view) {
+        $catalog = $this->getILS();
+        $patron = $this->catalogLogin();
+        if (is_array($patron)) {
+            $profile = $catalog->getMyProfile($patron);
+            $view->profileNote = $profile['note'];
+        }
+    }
+
+    private function showPatronStatusOnAllPages () {
+        $paiaConfig = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('PAIA');
+        if (isset($paiaConfig['PAIA']['show_patron_status_on_all_pages']) && $paiaConfig['PAIA']['show_patron_status_on_all_pages']) {
+            return true;
+        }
+        return false;
+    }
+
+    private function addPatronStatusToView (&$view) {
+        $patron = $this->catalogLogin();
+        if (is_array($patron)) {
+            $view->patronStatus = $patron['status'];
+        }
     }
 }
