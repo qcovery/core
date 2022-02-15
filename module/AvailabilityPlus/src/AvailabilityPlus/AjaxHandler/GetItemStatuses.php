@@ -10,6 +10,7 @@ use Zend\Mvc\Controller\Plugin\Params;
 use Zend\View\Renderer\RendererInterface;
 use VuFind\Crypt\HMAC;
 use VuFind\Resolver\Driver\PluginManager as ResolverManager;
+use VuFind\Resolver\Connection;
 
 /**
  * "Get Item Status" AJAX handler
@@ -54,7 +55,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      *
      * @var ResolverManager
      */
-    protected $pluginManager;
+    protected $resolverManager;
 
     /**
      * Constructor
@@ -63,7 +64,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @param Config            $config    Top-level configuration
      * @param RendererInterface $renderer  View renderer
      */
-    public function __construct(Loader $loader, Config $config, Config $configResolver, RendererInterface $renderer, HMAC $hmac) {
+    public function __construct(Loader $loader, Config $config, Config $configResolver, RendererInterface $renderer, HMAC $hmac, ResolverManager $rm) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
         $this->configResolver = $configResolver->toArray();
@@ -71,6 +72,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
         $this->hmac = $hmac;
+	$this->resolverManager = $rm;
     }
 
     /**
@@ -340,6 +342,16 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     private function getResolverResponse($resolver) {
+        $resolverType = 'availabilityplusresolver';
+        if (!$this->resolverManager->has($resolverType)) {
+            return $this->formatResponse(
+                $this->translate("Could not load driver for $resolverType"),
+                self::STATUS_HTTP_ERROR
+            );
+        }
+        $resolverHandler = new Connection($this->resolverManager->get($resolverType));
+        $test = $resolverHandler->getResolverUrl('OpenURL=Dummy');
+
         $data = $this->driver->getMarcData($resolver);
         $resolver_url = $this->prepareUrl($resolver);
         $template = $this->getTemplate($data);
@@ -352,6 +364,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label_translated' => $this->translate($resolver),
             'resolver_url' => $resolver_url,
             'marc_data' => $data,
+            'test' => $test,
         ];
         $response['data'] = '';
         if(!empty($data)) {

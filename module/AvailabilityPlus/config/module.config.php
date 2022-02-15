@@ -79,6 +79,28 @@ return array (
           'VuFind\\AjaxHandler\\GetItemStatuses' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatuses',
         ),
       ),
+      'resolver_driver' => 
+      array (
+        'factories' => 
+        array (
+          'AvailabilityPlus\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+        ),
+        'aliases' => 
+        array (
+          'VuFind\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\AbstractBase',
+        ),
+      ),
+    ),
+  ),
+  'service_manager' => 
+  array (
+    'factories' => 
+    array (
+      'AvailabilityPlus\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\ServiceManager\\AbstractPluginManagerFactory',
+    ),
+    'aliases' => 
+    array (
+      'VuFind\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\Resolver\\Driver\\PluginManager',
     ),
   ),
 );
