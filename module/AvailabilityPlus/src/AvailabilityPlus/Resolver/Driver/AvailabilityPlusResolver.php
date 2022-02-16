@@ -62,10 +62,10 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      *
      * @return array         Array of values
      */
-    public function parseLinks($xmlstr)
+    public function parseLinks($data)
     {
-        $records = []; // array to return
-        return $records;
+	$links = $data;
+        return $links;
     }
 
 }
