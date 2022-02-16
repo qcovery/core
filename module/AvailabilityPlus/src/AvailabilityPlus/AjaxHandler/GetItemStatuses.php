@@ -72,7 +72,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
         $this->hmac = $hmac;
-	$this->resolverManager = $rm;
+	    $this->resolverManager = $rm;
     }
 
     /**
@@ -352,7 +352,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $resolverHandler = new Connection($this->resolverManager->get($resolverType));
 
         $data = $this->driver->getMarcData($resolver);
-	$test = $resolverHandler->getResolverUrl($data);
+	    $test = $resolverHandler->getResolverUrl($data);
 
         $resolver_url = $this->prepareUrl($resolver);
         $template = $this->getTemplate($data);
@@ -370,7 +370,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $response['data'] = '';
         if(!empty($data)) {
             $response['itemStatusesHandler'] = $this;
-            $response['data'] = $this->makeRequest($resolver_url);
+            //$response['data'] = $this->makeRequest($resolver_url);
+            $response['data'] = $resolverHandler->fetchLinks($resolver_url);
             $response['html'] = $this->applyTemplate($template, $response);
         }
 

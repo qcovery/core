@@ -5,6 +5,25 @@ namespace AvailabilityPlus\Resolver\Driver;
 class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 {
     /**
+     * HTTP client
+     *
+     * @var \Zend\Http\Client
+     */
+    protected $httpClient;
+
+    /**
+     * Constructor
+     *
+     * @param string            $baseUrl    Base URL for link resolver
+     * @param \Zend\Http\Client $httpClient HTTP client
+     */
+    public function __construct($baseUrl, \Zend\Http\Client $httpClient)
+    {
+        parent::__construct($baseUrl);
+        $this->httpClient = $httpClient;
+    }
+
+    /**
      * Get Resolver Url
      *
      * Transform the OpenURL as needed to get a working link to the resolver.
@@ -27,11 +46,8 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      *
      * @return string         raw XML returned by resolver
      */
-    public function fetchLinks($openURL)
+    public function fetchLinks($url)
     {
-        // Make the call to SFX and load results
-        $url = $this->baseUrl .
-            '?sfx.response_type=multi_obj_detailed_xml&svc.fulltext=yes&' . $openURL;
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
     }
