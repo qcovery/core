@@ -16,7 +16,7 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'sfx' => 'VuFind\Resolver\Driver\Sfx',
         'redi' => 'VuFind\Resolver\Driver\Redi',
         'threesixtylink' => 'VuFind\Resolver\Driver\Threesixtylink',
-        'availabilityplusresolver' => 'AvailabilityPlus\Resolver\Driver\AvailabilityPlusResolver',
+        'AvailabilityPlusResolver' => 'AvailabilityPlus\Resolver\Driver\AvailabilityPlusResolver',
     ];
 
     /**

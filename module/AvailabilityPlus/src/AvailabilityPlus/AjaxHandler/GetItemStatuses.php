@@ -342,7 +342,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     private function getResolverResponse($resolver) {
-        $resolverType = 'availabilityplusresolver';
+        $resolverType = 'AvailabilityPlusResolver';
         if (!$this->resolverManager->has($resolverType)) {
             return $this->formatResponse(
                 $this->translate("Could not load driver for $resolverType"),
@@ -351,6 +351,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
         $resolverHandler = new Connection($this->resolverManager->get($resolverType));
 	$resolver_url = $this->prepareUrl($resolver);
+	$resolver_url2 = $resolverHandler->getResolverUrl($data);
         $data = $this->driver->getMarcData($resolver);
         $template = $this->getTemplate($data);
         $response = [
@@ -361,11 +362,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label' => $resolver,
             'label_translated' => $this->translate($resolver),
             'resolver_url' => $resolver_url,
+	    'resolver_url2' => $resolver_url2,
             'marc_data' => $data,
         ];
         $response['data'] = '';
         if(!empty($data)) {
             $response['data'] = $resolverHandler->fetchLinks($resolver_url);
+            $response['test'] = $resolverHandler->test();
             $response['html'] = $this->applyTemplate($template, $response);
         }
 
