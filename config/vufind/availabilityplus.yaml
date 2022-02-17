@@ -131,7 +131,7 @@ JournalsOnlinePrintElectronic:
       - [name, issue]
     h:
       - [name, pages]
-JournalsOnlinePrint-Print:
+JournalsOnlinePrintPrint:
   category: resolver
   view-method: ajax/link-jop-print.phtml
   mandatory-field: issn
