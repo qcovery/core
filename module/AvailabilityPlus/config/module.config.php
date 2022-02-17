@@ -84,6 +84,8 @@ return array (
         'factories' => 
         array (
           'AvailabilityPlus\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\DAIA' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
         ),
         'aliases' => 
         array (

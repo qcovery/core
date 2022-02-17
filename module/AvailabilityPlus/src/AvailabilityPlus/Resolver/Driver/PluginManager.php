@@ -17,6 +17,8 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'redi' => 'VuFind\Resolver\Driver\Redi',
         'threesixtylink' => 'VuFind\Resolver\Driver\Threesixtylink',
         'AvailabilityPlusResolver' => 'AvailabilityPlus\Resolver\Driver\AvailabilityPlusResolver',
+        'DAIA' => 'AvailabilityPlus\Resolver\Driver\DAIA',
+        'JournalsOnlinePrintElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
     ];
 
     /**
@@ -36,6 +38,10 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'VuFind\Resolver\Driver\Redi' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\AvailabilityPlusResolver' =>
+            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
+        'VuFind\Resolver\Driver\DAIA' =>
+            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
+        'VuFind\Resolver\Driver\JournalsOnlinePrintElectronic' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
 
     ];

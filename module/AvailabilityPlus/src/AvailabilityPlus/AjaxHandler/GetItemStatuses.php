@@ -343,6 +343,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     private function getResolverResponse($resolver) {
         $resolverType = 'AvailabilityPlusResolver';
+	$resolverType = $resolver;
         if (!$this->resolverManager->has($resolverType)) {
             return $this->formatResponse(
                 $this->translate("Could not load driver for $resolverType"),
