@@ -15,7 +15,7 @@ class JournalsOnlinePrint extends AvailabilityPlusResolver
      */
     public function getResolverUrl($openUrl)
     {
-        $url = $this->baseUrl.'?='.$openUrl.$this->addtionalParams;
+        $url = $this->baseUrl.$openUrl.$this->addtionalParams;
         if(strpos($url, "&pid=client_ip=dynamic") !== false) {
             $ip = $_SERVER['REMOTE_ADDR'];
             $url = str_replace("&pid=client_ip=dynamic","&pid=client_ip=".$ip, $url);

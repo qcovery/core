@@ -37,7 +37,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      */
     public function getResolverUrl($openUrl)
     {
-        return $this->baseUrl.'?='.$openUrl.$this->addtionalParams;
+        return $this->baseUrl.$openUrl.$this->addtionalParams;
     }
 
     /**
