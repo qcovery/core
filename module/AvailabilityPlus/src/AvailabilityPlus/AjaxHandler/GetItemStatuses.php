@@ -378,16 +378,15 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     private function prepareResolverParams($resolverData) {
+        $used_params = [];
+        $params = '';
         if(!empty($resolverData)) {
-            $used_params = [];
-            $params = '';
-
-            if (is_array($resolverData)) {
+            if(is_array($resolverData)) {
                 foreach ($resolverData as $resolverDate) {
                     if (is_array($resolverDate)) {
                         foreach ($resolverDate as $key => $value) {
-                            if(!in_array($key, $used_params)) {
-                                if(empty($params)) {
+                            if (!in_array($key, $used_params)) {
+                                if (empty($params)) {
                                     $params .= '?' . $key . '=' . urlencode($value['data'][0]);
                                 } else {
                                     $params .= '&' . $key . '=' . urlencode($value['data'][0]);
@@ -398,6 +397,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                 }
             }
+        }
         return $params;
     }
     private function prepareUrl($resolverData) {
