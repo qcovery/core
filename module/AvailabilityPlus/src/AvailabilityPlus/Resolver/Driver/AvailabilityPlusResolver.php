@@ -51,6 +51,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      */
     public function fetchLinks($openUrl)
     {
+        $url = $this->getResolverUrl($openUrl);
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
     }
