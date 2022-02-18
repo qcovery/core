@@ -352,7 +352,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $resolverHandler = new Connection($this->resolverManager->get($resolverType));
         $data = $this->driver->getMarcData($resolver);
 	    $resolver_url = $this->prepareUrl($data);
-	    $resolver_url2 = $resolverHandler->getResolverUrl($this->prepareResolverParams($data));
+	    $resolver_url2 = $resolverHandler->getResolverUrl($data);
         $template = $this->getTemplate($data);
         $response = [
             'mode' => $this->current_mode,
