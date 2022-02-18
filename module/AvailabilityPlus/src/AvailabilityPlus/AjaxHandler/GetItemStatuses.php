@@ -398,61 +398,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
         return $params;
     }
-    private function prepareUrl($resolver) {
-        $resolverData = $this->driver->getMarcData($resolver);
-        if(!empty($resolverData) && !empty($this->config['ResolverBaseURL'][$resolver])) {
-            $baseUrl = $this->config['ResolverBaseURL'][$resolver];
-            $used_params = [];
-            $params = '';
-
-            if (is_array($resolverData)) {
-                foreach ($resolverData as $resolverDate) {
-                    if (is_array($resolverDate)) {
-                        foreach ($resolverDate as $key => $value) {
-                            if(!in_array($key, $used_params)) {
-                                if(empty($params)) {
-                                    $params .= '?' . $key . '=' . urlencode($value['data'][0]);
-                                } else {
-                                    $params .= '&' . $key . '=' . urlencode($value['data'][0]);
-                                }
-                                $used_params[] = $key;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(!empty($this->config['ResolverExtraParams'][$resolver])) {
-
-                // Specific for Journals Online & Print
-                if (strpos($resolver, 'JournalsOnlinePrint') !== false) {
-                    if(strpos($this->config['ResolverExtraParams'][$resolver], "&pid=client_ip=dynamic") !== false) {
-                        $ip = $_SERVER['REMOTE_ADDR'];
-                        $params .= str_replace("&pid=client_ip=dynamic","&pid=client_ip=".$ip,$this->config['ResolverExtraParams'][$resolver]);
-                    } else {
-                        $params .= $this->config['ResolverExtraParams'][$resolver];
-                    }
-                } else {
-                    $params .= $this->config['ResolverExtraParams'][$resolver];
-                }
-            }
-
-            return $baseUrl.$params;
-        }
-        return '';
-    }
-
-    private function makeRequest($url) {
-        $req = curl_init();
-        curl_setopt($req, CURLOPT_URL, $url);
-        curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($req, CURLOPT_CONNECTTIMEOUT, 0);
-        curl_setopt($req, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($req, CURLOPT_SSL_VERIFYHOST, false);
-        $result = curl_exec($req);
-        curl_close($req);
-        return $result;
-    }
 
     public function generateDAIAOrderLink() {
         //TODO: see here https://github.com/qcovery/core/blob/develop-5/module/DAIAplus/src/DAIAplus/AjaxHandler/GetItemStatuses.php#L180
