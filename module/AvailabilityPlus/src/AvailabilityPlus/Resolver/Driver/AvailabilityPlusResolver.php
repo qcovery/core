@@ -49,7 +49,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      *
      * @return string         raw XML returned by resolver
      */
-    public function fetchLinks($url)
+    public function fetchLinks($openUrl)
     {
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
