@@ -18,7 +18,9 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'threesixtylink' => 'VuFind\Resolver\Driver\Threesixtylink',
         'AvailabilityPlusResolver' => 'AvailabilityPlus\Resolver\Driver\AvailabilityPlusResolver',
         'DAIA' => 'AvailabilityPlus\Resolver\Driver\DAIA',
+        'JournalsOnlinePrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrint',
         'JournalsOnlinePrintElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
+        'JournalsOnlinePrintPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintPrint',
     ];
 
     /**
