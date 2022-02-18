@@ -350,9 +350,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             );
         }
         $resolverHandler = new Connection($this->resolverManager->get($resolverType));
-	$resolver_url = $this->prepareUrl($resolver);
-	$resolver_url2 = $resolverHandler->getResolverUrl($data);
         $data = $this->driver->getMarcData($resolver);
+	    $resolver_url = $this->prepareUrl($data);
+	    $resolver_url2 = $resolverHandler->getResolverUrl($this->prepareResolverParams($data));
         $template = $this->getTemplate($data);
         $response = [
             'mode' => $this->current_mode,
@@ -362,7 +362,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label' => $resolver,
             'label_translated' => $this->translate($resolver),
             'resolver_url' => $resolver_url,
-	    'resolver_url2' => $resolver_url2,
+	        'resolver_url2' => $resolver_url2,
             'marc_data' => $data,
         ];
         $response['data'] = '';
@@ -377,8 +377,30 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $responses;
     }
 
-    private function prepareUrl($resolver) {
-        $resolverData = $this->driver->getMarcData($resolver);
+    private function prepareResolverParams($resolverData) {
+        if(!empty($resolverData)) {
+            $used_params = [];
+            $params = '';
+
+            if (is_array($resolverData)) {
+                foreach ($resolverData as $resolverDate) {
+                    if (is_array($resolverDate)) {
+                        foreach ($resolverDate as $key => $value) {
+                            if(!in_array($key, $used_params)) {
+                                if(empty($params)) {
+                                    $params .= '?' . $key . '=' . urlencode($value['data'][0]);
+                                } else {
+                                    $params .= '&' . $key . '=' . urlencode($value['data'][0]);
+                                }
+                                $used_params[] = $key;
+                            }
+                        }
+                    }
+                }
+            }
+        return $params;
+    }
+    private function prepareUrl($resolverData) {
         if(!empty($resolverData) && !empty($this->config['ResolverBaseURL'][$resolver])) {
             $baseUrl = $this->config['ResolverBaseURL'][$resolver];
             $used_params = [];
