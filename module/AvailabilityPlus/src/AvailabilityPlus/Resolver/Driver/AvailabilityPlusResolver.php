@@ -42,7 +42,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     {
         $url = '';
         if(!empty($this->baseUrl)) {
-            $url = $this->baseUrl.$openUrl.$this->addtionalParams
+            $url = $this->baseUrl.$openUrl.$this->addtionalParams;
         }
         return $url;
     }
