@@ -13,17 +13,20 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $addtionalParams;
 
+    protected $options;
+
     /**
      * Constructor
      *
      * @param string            $baseUrl    Base URL for link resolver
      * @param \Zend\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $addtionalParams)
+    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $options)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
-	    $this->addtionalParams = $addtionalParams;
+        $this->addtionalParams = $additionalParams;
+        $this->options = $options;
     }
 
     /**
@@ -68,12 +71,12 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      */
     public function parseLinks($data)
     {
-	$links = $data;
+        $links = $data;
         return $links;
     }
-    
+
     public function test(){
-       return $this->options; 
-   }
+        return $this->options;
+    }
 }
 
