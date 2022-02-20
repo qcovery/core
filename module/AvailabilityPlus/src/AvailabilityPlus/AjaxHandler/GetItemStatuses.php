@@ -360,6 +360,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $response['data'] = '';
         if(!empty($data)) {
             $response['data'] = $resolverHandler->fetchLinks($params);
+            $response['test'] = $resolverHandler->test();
             $response['html'] = $this->applyTemplate($template, $response);
         }
 
