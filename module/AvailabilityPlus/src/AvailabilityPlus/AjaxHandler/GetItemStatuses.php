@@ -8,7 +8,6 @@ use VuFind\I18n\Translator\TranslatorAwareInterface;
 use Zend\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\View\Renderer\RendererInterface;
-use VuFind\Crypt\HMAC;
 use VuFind\Resolver\Driver\PluginManager as ResolverManager;
 use VuFind\Resolver\Connection;
 
@@ -34,8 +33,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $config;
 
-    protected $configResolver;
-
     protected $checks;
 
     protected $source;
@@ -47,8 +44,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     protected $renderer;
 
     protected $default_template;
-
-    protected $hmac;
 
     /**
      * Resolver driver plugin manager
@@ -64,14 +59,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @param Config            $config    Top-level configuration
      * @param RendererInterface $renderer  View renderer
      */
-    public function __construct(Loader $loader, Config $config, Config $configResolver, RendererInterface $renderer, HMAC $hmac, ResolverManager $rm) {
+    public function __construct(Loader $loader, Config $config, RendererInterface $renderer, ResolverManager $rm) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
-        $this->configResolver = $configResolver->toArray();
         $this->checks = $this->config['RecordView'];
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
-        $this->hmac = $hmac;
 	    $this->resolverManager = $rm;
     }
 
@@ -397,12 +390,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             }
         }
         return $params;
-    }
-
-    public function generateDAIAOrderLink() {
-        //TODO: see here https://github.com/qcovery/core/blob/develop-5/module/DAIAplus/src/DAIAplus/AjaxHandler/GetItemStatuses.php#L180
-        $HMACKeys = "id:item_id:doc_id";
-        return 'test';
     }
 }
 
