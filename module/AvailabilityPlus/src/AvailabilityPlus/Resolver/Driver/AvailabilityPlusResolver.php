@@ -11,7 +11,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      */
     protected $httpClient;
 
-    protected $addtionalParams;
+    protected $additionalParams;
 
     protected $options;
 
@@ -25,7 +25,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
-        $this->addtionalParams = $additionalParams;
+        $this->additionalParams = $additionalParams;
         $this->options = $options;
     }
 
@@ -42,7 +42,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     {
         $url = '';
         if(!empty($this->baseUrl)) {
-            $url = $this->baseUrl.$openUrl.$this->addtionalParams;
+            $url = $this->baseUrl.$openUrl.$this->additionalParams;
         }
         return $url;
     }
