@@ -14,7 +14,7 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
      *
      * @return array         Array of values
      */
-  /*  public function parseLinks($data)
+    public function parseLinks($data)
     {
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
@@ -54,6 +54,6 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
         $response['data'] = $records;
         $response['parsed_data'] = $data;
         return $response;
-    }*/
+    }
 }
 
