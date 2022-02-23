@@ -14,13 +14,13 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
      *
      * @return array         Array of values
      */
-    public function parseLinks($data)
+    public function parseLinks($data_org)
     {
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
         $level_org = $level;
 
-        $data = @simplexml_load_string($data, "SimpleXMLElement", LIBXML_COMPACT);
+        $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
         foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
             if(!empty($result->AccessURL)) {
                 $level = '';
@@ -52,7 +52,7 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
         }
 
         $response['data'] = $records;
-        $response['parsed_data'] = $data;
+        $response['parsed_data'] = $data_org;
         return $response;
     }
 }
