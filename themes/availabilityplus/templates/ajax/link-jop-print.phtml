@@ -1,27 +1,10 @@
 <?php
-$level_org = $level;
-$label_org = $label;
-
-$break = false;
-$data = @simplexml_load_string($data, "SimpleXMLElement", LIBXML_COMPACT);
-foreach($data->Full->PrintData->ResultList->Result AS $result) {
-    $level = $level_org;
-    $label = $label_org;
-    switch ($result['state']) {
-        case 2:
-        case 3:
-            $level .= " PrintAccess";
-            $label = "PrintAccess";
-            if(!empty($result->Signature)) {
-                $url = '/vufind/Search/Results?lookfor='.$result->Signature.'&type=Signature';
-            } else {
-                $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';;
-            }
-            echo '<div class="delimiter"></div>';
-            echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).' '.$result->Location.'</a><br/>';
-            if($mode == 'break_on_first') $break = true;
-            break;
-    }
-    if($break == true) break;
+foreach($data as $result) {
+    $level = $result['level'];
+    $label = $result['label'];
+    $url = $result['url'];
+    echo '<div class="delimiter"></div>';
+    echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+    if($mode == 'break_on_first') break;
 }
 ?>
