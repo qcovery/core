@@ -1,35 +1,10 @@
 <?php
-$level_org = $level;
-$label_org = $label;
-
-$urls = [];
-$break = false;
-$data = @simplexml_load_string($data, "SimpleXMLElement", LIBXML_COMPACT);
-foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
-    if(!empty($result->AccessURL)) {
-        $level = '';
-        $label = '';
-        $url = $result->AccessURL->__toString();
-        if(!in_array($url, $urls)) {
-            switch ($result['state']) {
-                case 0:
-                    $level = $level_org." FreeAccess link_external";
-                    $label = "FreeAccess";
-                case 2:
-                    if($result['state'] != 0) {
-                        $level = $level_org." LicensedAccess link_external";
-                        $label = "LicensedAccess";
-                    }
-                    $level .= " ".$result->AccessLevel;
-                    $label .= "_".$result->AccessLevel;
-                    echo '<div class="delimiter"></div>';
-                    echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-                    $urls[] = $url;
-                    if($mode == 'break_on_first') $break = true;
-                    break;
-            }
-        }
-    }
-    if($break == true) break;
+foreach($resolver_data as $result) {
+   $level = $result['level'];
+   $label = $result['label'];
+   $url = $result['url'];
+   echo '<div class="delimiter"></div>';
+   echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+   if($mode == 'break_on_first') break;
 }
 ?>
