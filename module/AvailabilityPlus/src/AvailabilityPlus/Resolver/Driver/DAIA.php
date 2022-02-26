@@ -73,7 +73,8 @@ class DAIA extends AvailabilityPlusResolver
                             } elseif(!empty($service_content->expected)) {
                                 $record['daia_hint']['level'] = "daia_orange";
                                 $date = date_create($service_content->expected);
-                                $record['daia_hint']['label'] = $this->translate('on_loan_until').' '.date_format($date,"d.m.Y");
+                                $record['daia_hint']['label'] = $this->translate('on_loan_until');
+                                $record['daia_hint']['label_date'] = date_format($date,"d.m.Y");
                             } else {
                                 $record['daia_hint']['level'] = "daia_green";
                                 $record['daia_hint']['label'] = $this->translate($service_content->service);
