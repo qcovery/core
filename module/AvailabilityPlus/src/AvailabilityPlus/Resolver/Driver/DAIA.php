@@ -84,6 +84,8 @@ class DAIA extends AvailabilityPlusResolver
                                 $url_components = parse_url($record['daia_action']['url']);
                                 parse_str($url_components['query'], $params);
                                 $record['daia_action']['label'] = $params['action'];
+                            } else {
+                                $record['daia_action']['label'] = $this->translate($service_content->service.'_default_action'.$limitation);
                             }
                             if(isset($service_content->queue)) {
                                 $record['queue'] = $service_content->queue;
