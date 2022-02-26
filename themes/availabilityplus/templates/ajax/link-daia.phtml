@@ -121,13 +121,14 @@ foreach($data->document[0]->item as $item) {
 
 foreach($resolver_data as $result) {
     echo '<div class="delimiter"></div>';
+    echo '<div class="daia_storage_callnumber">';
     if(!empty($result['storage'])) {
         echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result['storage']['url'].'" class="'.$result['storage']['level'].'" title="'.$result['storage']['label'].'" target="_blank">'.$this->translate($result['storage']['label']).'</a></span>';
     }
     if(!empty($result['callnumber'])) {
         echo ' <span class="item_label">' . $result['callnumber'] . '</span>';
     }
-    echo '<br>';
+    echo '</div>';
     if(!empty($result['daia_hint'])) {
         echo '<span class="daia_hint"><span class="'.$result['daia_hint']['level'].'">'.$this->translate($result['daia_hint']['label']);
         if(!empty($result['daia_hint']['label_date'])) echo ' '.$result['daia_hint']['label_date'];
