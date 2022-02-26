@@ -139,7 +139,7 @@ foreach($resolver_data as $result) {
             echo '<span class="daia_action">'.$this->translate($result['daia_action']['label']).'</span>';
         }
     }
-    if(!empty($result['queue']) {
+    if(!empty($result['queue'])) {
         echo '<div class="service_queue">'.$result['queue']['length'].' '.$this->translate($result['queue']['label']).'</div>';
     }
     if(!empty(!empty($result['about'])) {
