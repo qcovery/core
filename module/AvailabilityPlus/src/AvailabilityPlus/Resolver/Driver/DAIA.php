@@ -106,6 +106,8 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['storage']['label'] = 'unknown_location';
                             }
                             if(!empty($item->label)) $record['callnumber'] = $item->label;
+                            $record['daia_hint']['level'] = 'daia_red';
+                            $record['daia_hint']['label'] = $this->translate('not_available');
                             if(!empty($item->about)) {
                                 $record['about'] = $item->about;
                             }
