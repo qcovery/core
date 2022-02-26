@@ -124,6 +124,22 @@ foreach($resolver_data as $result) {
     if(!empty($result['storage'])) {
         echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result['storage']['url'].'" class="'.$result['storage']['level'].'" title="'.$result['storage']['label'].'" target="_blank">'.$this->translate($result['storage']['label']).'</a></span>';
     }
+    if(!empty($result['callnumber'])) {
+        echo ' <span class="item_label">' . $result['callnumber'] . '</span>';
+    }
+    echo '<br>';
+    if(!empty($result['daia_hint'])) {
+        echo '<span class="daia_hint"><span class="'.$result['daia_hint']['level'].'">'.$this->translate($result['daia_hint']['label']).'</span></span>';
+        echo '<span class="daia_arrow"> ➝ </span>';
+    }
+    if(!empty($result['daia_hint'])) {
+        if(!empty($result['daia_hint']['url'])) {
+            echo '<span class="daia_action"><a href="'.$result['daia_hint']['url'].'" class="'.$result['daia_hint']['level'].' link_external" title="'.$result['daia_hint']['label'].'" target="_blank">'.$this->translate($result['daia_hint']['label']).'</a></span>';
+        } else {
+            echo '<span class="daia_action">'.$this->translate($result['daia_hint']['label']).'</span>';
+        }
+    }
+
     if($mode == 'break_on_first') break;
 }
 
