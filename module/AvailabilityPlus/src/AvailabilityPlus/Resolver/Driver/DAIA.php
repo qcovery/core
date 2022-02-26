@@ -86,8 +86,8 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['label'] = $params['action'];
                             }
                             if(isset($service_content->queue)) {
-                                $record['label'] = 'Recalls';
-                                if($service_content->queue == 1) $record['label'] = 'Recall';
+                                $record['label'] =  $this->translate('Recalls');
+                                if($service_content->queue == 1) $record['label'] =  $this->translate('Recall');
                             }
                             if(!empty($item->about)) {
                                 $record['about'] = $item->about;
