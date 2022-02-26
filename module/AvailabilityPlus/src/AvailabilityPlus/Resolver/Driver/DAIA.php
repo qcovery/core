@@ -43,14 +43,14 @@ class DAIA extends AvailabilityPlusResolver
                  if(!empty($service_content)) {
                     switch($service_key) {
                         case 'openaccess':
-                            $record['level'] = 'FreeAccess link_external';
-                            $record['label'] = 'FreeAccess';
-                            $record['url'] = $service_content->href;
+                            $record['daia_action']['level'] = 'FreeAccess link_external';
+                            $record['daia_action']['label'] = 'FreeAccess';
+                            $record['daia_action']['url'] = $service_content->href;
                             break;
                         case 'remote':
-                            $record['level'] = 'LicensedAccess link_external';
-                            $record['label'] = 'LicensedAccess';
-                            $record['url'] = $service_content->href;
+                            $record['daia_action']['level'] = 'LicensedAccess link_external';
+                            $record['daia_action']['label'] = 'LicensedAccess';
+                            $record['daia_action']['url'] = $service_content->href;
                             break;
                         case 'loan':
                         case 'presentation':
