@@ -310,10 +310,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             }
         }
         if (!empty($parentId)) {
-            $parentDriver = $this->recordLoader->load($parentId, 'Solr');
-            $ilnMatch = $parentDriver->getMarcData('ILN');
-            if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                $url = '/vufind/Record/' . $parentId;
+            try {
+                $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+                $ilnMatch = $parentDriver->getMarcData('ILN');
+                if (!empty($ilnMatch[0]['iln']['data'][0])) {
+                    $url = '/vufind/Record/' . $parentId;
+                }
+            } catch (Exception $e) {
+                $url = '';
             }
         }
         if (!empty($url)) {
