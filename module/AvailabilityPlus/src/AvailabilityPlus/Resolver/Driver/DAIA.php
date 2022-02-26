@@ -122,8 +122,8 @@ class DAIA extends AvailabilityPlusResolver
             }
         }
 
-        $response['data'] = $records;
-        $response['parsed_data'] = $data_org;
+        $response['data'] = $data_org;
+        $response['parsed_data'] = $records;
         return $response;
     }
 }
