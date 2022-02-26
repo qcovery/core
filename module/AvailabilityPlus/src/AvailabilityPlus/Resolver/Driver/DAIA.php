@@ -81,7 +81,7 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($service_content->href)) {
                                 $record['daia_action']['url'] = $service_content->href;
                                 $record['daia_action']['level'] = 'internal_link';
-                                $url_components = parse_url($url);
+                                $url_components = parse_url($record['daia_action']['url']);
                                 parse_str($url_components['query'], $params);
                                 $record['daia_action']['label'] = $params['action'];
                             }
