@@ -64,26 +64,26 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($item->label)) $record['callnumber'] = $item->label;
                             if(!empty($service_content->limitation[0]->id)) {
                                 $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
-                                $record['level'] = $limitation;
-                                $record['label'] = $this->translate($service_content->service.$limitation);
+                                $record['daia_hint']['level'] = $limitation;
+                                $record['daia_hint']['label'] = $this->translate($service_content->service.$limitation);
                             } elseif(!empty($service_content->limitation[0]->content)) {
                                 $limitation = $service_content->limitation[0]->content;
-                                $record['level'] = $limitation;
-                                $record['label'] = $this->translate($service_content->service.$limitation);
+                                $record['daia_hint']['level'] = $limitation;
+                                $record['daia_hint']['label'] = $this->translate($service_content->service.$limitation);
                             } elseif(!empty($service_content->expected)) {
-                                $record['level'] = "daia_orange";
+                                $record['daia_hint']['level'] = "daia_orange";
                                 $date = date_create($service_content->expected);
-                                $record['label'] = $this->translate('on_loan_until').' '.date_format($date,"d.m.Y");
+                                $record['daia_hint']['label'] = $this->translate('on_loan_until').' '.date_format($date,"d.m.Y");
                             } else {
-                                $record['level'] = "daia_green";
-                                $record['label'] = $this->translate($service_content->service);
+                                $record['daia_hint']['level'] = "daia_green";
+                                $record['daia_hint']['label'] = $this->translate($service_content->service);
                             }
                             if(!empty($service_content->href)) {
-                                $record['url'] = $service_content->href;
-                                $record['level'] = 'internal_link';
+                                $record['daia_action']['url'] = $service_content->href;
+                                $record['daia_action']['level'] = 'internal_link';
                                 $url_components = parse_url($url);
                                 parse_str($url_components['query'], $params);
-                                $record['label'] = $params['action'];
+                                $record['daia_action']['label'] = $params['action'];
                             }
                             if(isset($service_content->queue)) {
                                 $record['queue'] = $service_content->queue;
