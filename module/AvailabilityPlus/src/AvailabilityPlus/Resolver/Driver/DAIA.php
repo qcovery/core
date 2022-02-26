@@ -16,6 +16,7 @@ class DAIA extends AvailabilityPlusResolver
      */
     public function parseLinks($data_org)
     {
+        $urls = []; // to check for duplicate urls
         $records = []; // array to return
 
         $data = json_decode($data_org);
@@ -43,14 +44,20 @@ class DAIA extends AvailabilityPlusResolver
                  if(!empty($service_content)) {
                     switch($service_key) {
                         case 'openaccess':
-                            $record['daia_action']['level'] = 'FreeAccess link_external';
-                            $record['daia_action']['label'] = 'FreeAccess';
-                            $record['daia_action']['url'] = $service_content->href;
+                            if(!in_array($service_content->href, $urls)) {
+                                $record['daia_action']['level'] = 'FreeAccess link_external';
+                                $record['daia_action']['label'] = 'FreeAccess';
+                                $record['daia_action']['url'] = $service_content->href;
+                                $urls[] = $record['daia_action']['url'];
+                            }
                             break;
                         case 'remote':
-                            $record['daia_action']['level'] = 'LicensedAccess link_external';
-                            $record['daia_action']['label'] = 'LicensedAccess';
-                            $record['daia_action']['url'] = $service_content->href;
+                            if(!in_array($service_content->href, $urls)) {
+                                $record['daia_action']['level'] = 'LicensedAccess link_external';
+                                $record['daia_action']['label'] = 'LicensedAccess';
+                                $record['daia_action']['url'] = $service_content->href;
+                                $urls[] = $record['daia_action']['url'];
+                            }
                             break;
                         case 'loan':
                         case 'presentation':
