@@ -56,7 +56,7 @@ class DAIA extends AvailabilityPlusResolver
                         case 'loan':
                         case 'presentation':
                             if(!empty($item->storage->id)){
-                                $record['storage']['$level'] = 'link_external';
+                                $record['storage']['level'] = 'link_external';
                                 $record['storage']['label'] = $this->translate($item->storage->content);
                                 $record['storage']['url'] = $item->storage->id;
                             } else {
@@ -96,7 +96,7 @@ class DAIA extends AvailabilityPlusResolver
                             break;
                         case 'fallback':
                             if(!empty($item->storage->id)){
-                                $record['storage']['$level'] = 'link_external';
+                                $record['storage']['level'] = 'link_external';
                                 $record['storage']['label'] = $item->storage->content;
                                 $record['storage']['url'] = $item->storage->id;
                             } else {
