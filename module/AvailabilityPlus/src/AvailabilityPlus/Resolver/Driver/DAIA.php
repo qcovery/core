@@ -123,7 +123,7 @@ class DAIA extends AvailabilityPlusResolver
                             }
                             break;
                     }
-                    $records[] = $record;
+                    if(!empty($record)) $records[] = $record;
                     break;
                 }
             }
