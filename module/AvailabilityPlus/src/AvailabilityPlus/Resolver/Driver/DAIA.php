@@ -91,9 +91,9 @@ class DAIA extends AvailabilityPlusResolver
                             if(isset($service_content->queue)) {
                                 $record['queue'] = $service_content->queue;
                                 if($service_content->queue == 1) {
-                                    $record['queue'] .=  ' '.'Recall';
+                                    $record['queue_label'] .=  'Recall';
                                 } else {
-                                    $record['queue'] .=  ' '.'Recalls';
+                                    $record['queue_label'] .=  'Recalls';
                                 }
                             }
                             if(!empty($item->about)) {
