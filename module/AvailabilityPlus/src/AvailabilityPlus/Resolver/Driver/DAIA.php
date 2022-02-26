@@ -44,19 +44,19 @@ class DAIA extends AvailabilityPlusResolver
                     switch($service_key) {
                         case 'openaccess':
                             $record['level'] = 'FreeAccess link_external';
-                            $record['label'] = $this->translate('FreeAccess');
+                            $record['label'] = 'FreeAccess';
                             $record['url'] = $service_content->href;
                             break;
                         case 'remote':
                             $record['level'] = 'LicensedAccess link_external';
-                            $record['label'] = $this->translate('LicensedAccess');
+                            $record['label'] = 'LicensedAccess';
                             $record['url'] = $service_content->href;
                             break;
                         case 'loan':
                         case 'presentation':
                             if(!empty($item->storage->id)){
                                 $record['storage']['level'] = 'link_external';
-                                $record['storage']['label'] = $this->translate($item->storage->content);
+                                $record['storage']['label'] = $item->storage->content;
                                 $record['storage']['url'] = $item->storage->id;
                             } else {
                                 $record['storage']['label'] = 'unknown_location';
@@ -65,19 +65,19 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($service_content->limitation[0]->id)) {
                                 $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
                                 $record['daia_hint']['level'] = $limitation;
-                                $record['daia_hint']['label'] = $this->translate($service_content->service.$limitation);
+                                $record['daia_hint']['label'] = $service_content->service.$limitation;
                             } elseif(!empty($service_content->limitation[0]->content)) {
                                 $limitation = $service_content->limitation[0]->content;
                                 $record['daia_hint']['level'] = $limitation;
-                                $record['daia_hint']['label'] = $this->translate($service_content->service.$limitation);
+                                $record['daia_hint']['label'] = $service_content->service.$limitation;
                             } elseif(!empty($service_content->expected)) {
                                 $record['daia_hint']['level'] = "daia_orange";
                                 $date = date_create($service_content->expected);
-                                $record['daia_hint']['label'] = $this->translate('on_loan_until');
+                                $record['daia_hint']['label'] = 'on_loan_until';
                                 $record['daia_hint']['label_date'] = date_format($date,"d.m.Y");
                             } else {
                                 $record['daia_hint']['level'] = "daia_green";
-                                $record['daia_hint']['label'] = $this->translate($service_content->service);
+                                $record['daia_hint']['label'] = $service_content->service;
                             }
                             if(!empty($service_content->href)) {
                                 $record['daia_action']['url'] = $service_content->href;
@@ -86,14 +86,14 @@ class DAIA extends AvailabilityPlusResolver
                                 parse_str($url_components['query'], $params);
                                 $record['daia_action']['label'] = $params['action'];
                             } else {
-                                $record['daia_action']['label'] = $this->translate($service_content->service.'_default_action'.$limitation);
+                                $record['daia_action']['label'] = $service_content->service.'_default_action'.$limitation;
                             }
                             if(isset($service_content->queue)) {
                                 $record['queue'] = $service_content->queue;
                                 if($service_content->queue == 1) {
-                                    $record['queue'] .=  ' '.$this->translate('Recall');
+                                    $record['queue'] .=  ' '.'Recall';
                                 } else {
-                                    $record['queue'] .=  ' '.$this->translate('Recalls');
+                                    $record['queue'] .=  ' '.'Recalls';
                                 }
                             }
                             if(!empty($item->about)) {
@@ -110,7 +110,7 @@ class DAIA extends AvailabilityPlusResolver
                             }
                             if(!empty($item->label)) $record['callnumber'] = $item->label;
                             $record['daia_hint']['level'] = 'daia_red';
-                            $record['daia_hint']['label'] = $this->translate('not_available');
+                            $record['daia_hint']['label'] = 'not_available';
                             if(!empty($item->about)) {
                                 $record['about'] = $item->about;
                             }
