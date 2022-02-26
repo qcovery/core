@@ -38,7 +38,6 @@ class DAIA extends AvailabilityPlusResolver
                 }
             }
 
-            $break = false;
             foreach($item_services['available'] as $service_key=>$service_content) {
                 $level='';
                 $label='';
@@ -109,9 +108,12 @@ class DAIA extends AvailabilityPlusResolver
                                 $storage['label'] = 'unknown_location';
                             }
                             if(!empty($item->label)) $callnumber = $item->label;
+                            if(!empty($item->about)) {
+                                $about = $item->about;
+                            }
                             break;
                     }
-                    if(!empty($level)) {
+ //                   if(!empty($level)) {
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
@@ -120,7 +122,7 @@ class DAIA extends AvailabilityPlusResolver
                         $record['callnumber'] = $callnumber;
                         $record['about'] = $about;
                         $records[] = $record;
-                    }
+ //                   }
                     break;
                 }
             }
