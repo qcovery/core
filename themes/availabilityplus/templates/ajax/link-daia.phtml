@@ -142,7 +142,7 @@ foreach($resolver_data as $result) {
     if(!empty($result['queue'])) {
         echo '<div class="service_queue">'.$result['queue']['length'].' '.$this->translate($result['queue']['label']).'</div>';
     }
-    if(!empty(!empty($result['about'])) {
+    if(!empty($result['about'])) {
         echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.!empty($result['about'].'</div>';
     }
     if($mode == 'break_on_first') break;
