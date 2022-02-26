@@ -21,6 +21,7 @@ class DAIA extends AvailabilityPlusResolver
         $data = json_decode($data);
 
         foreach($data->document[0]->item as $item) {
+            $record =  [];
 
             $item_services['available']['openaccess'] = [];
             $item_services['available']['remote'] = [];
@@ -39,90 +40,74 @@ class DAIA extends AvailabilityPlusResolver
             }
 
             foreach($item_services['available'] as $service_key=>$service_content) {
-                $level='';
-                $label='';
-                $url='';
-                $limitation='';
-                $storage  = [];
-                $callnumber = '';
-                $about = '';
-                if(!empty($service_content)) {
+                 if(!empty($service_content)) {
                     switch($service_key) {
                         case 'openaccess':
-                            $level = 'FreeAccess link_external';
-                            $label = 'FreeAccess';
-                            $url = $service_content->href;
+                            $record['level'] = 'FreeAccess link_external';
+                            $record['label'] = $this->translate('FreeAccess');
+                            $record['url'] = $service_content->href;
                             break;
                         case 'remote':
-                            $level = 'LicensedAccess link_external';
-                            $label = 'LicensedAccess';
-                            $url = $service_content->href;
+                            $record['level'] = 'LicensedAccess link_external';
+                            $record['label'] = $this->translate('LicensedAccess');
+                            $record['url'] = $service_content->href;
                             break;
                         case 'loan':
                         case 'presentation':
                             if(!empty($item->storage->id)){
-                                $storage['$level'] = 'link_external';
-                                $storage['label'] = $item->storage->content;
-                                $storage['url'] = $item->storage->id;
+                                $record['storage']['$level'] = 'link_external';
+                                $record['storage']['label'] = $this->translate($item->storage->content);
+                                $record['storage']['url'] = $item->storage->id;
                             } else {
-                                $storage['label'] = 'unknown_location';
+                                $record['storage']['label'] = 'unknown_location';
                             }
-                            if(!empty($item->label)) $callnumber = $item->label;
+                            if(!empty($item->label)) $record['callnumber'] = $item->label;
                             if(!empty($service_content->limitation[0]->id)) {
                                 $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
-                                $level = $limitation;
-                                $label = $service_content->service.$limitation;
+                                $record['level'] = $limitation;
+                                $record['label'] = $this->translate($service_content->service.$limitation);
                             } elseif(!empty($service_content->limitation[0]->content)) {
                                 $limitation = $service_content->limitation[0]->content;
-                                $level = $limitation;
-                                $label = $service_content->service.$limitation;
+                                $record['level'] = $limitation;
+                                $record['label'] = $this->translate($service_content->service.$limitation);
                             } elseif(!empty($service_content->expected)) {
-                                $level = "daia_orange";
+                                $record['level'] = "daia_orange";
                                 $date = date_create($service_content->expected);
-                                $label = $this->translate('on_loan_until').' '.date_format($date,"d.m.Y");
+                                $record['label'] = $this->translate('on_loan_until').' '.date_format($date,"d.m.Y");
                             } else {
-                                $level = "daia_green";
-                                $label = $service_content->service;
+                                $record['level'] = "daia_green";
+                                $record['label'] = $this->translate($service_content->service);
                             }
                             if(!empty($service_content->href)) {
-                                $url = $service_content->href;
-                                $level = 'internal_link';
+                                $record['url'] = $service_content->href;
+                                $record['level'] = 'internal_link';
                                 $url_components = parse_url($url);
                                 parse_str($url_components['query'], $params);
-                                $label = $params['action'];
+                                $record['label'] = $params['action'];
                             }
                             if(isset($service_content->queue)) {
-                                $label = 'Recalls';
-                                if($service_content->queue == 1) $label = 'Recall';
+                                $record['label'] = 'Recalls';
+                                if($service_content->queue == 1) $record['label'] = 'Recall';
                             }
                             if(!empty($item->about)) {
-                                $about = $item->about;
+                                $record['about'] = $item->about;
                             }
                             break;
                         case 'fallback':
                             if(!empty($item->storage->id)){
-                                $storage['$level'] = 'link_external';
-                                $storage['label'] = $item->storage->content;
-                                $storage['url'] = $item->storage->id;
+                                $record['storage']['$level'] = 'link_external';
+                                $record['storage']['label'] = $item->storage->content;
+                                $record['storage']['url'] = $item->storage->id;
                             } else {
-                                $storage['label'] = 'unknown_location';
+                                $record['storage']['label'] = 'unknown_location';
                             }
-                            if(!empty($item->label)) $callnumber = $item->label;
+                            if(!empty($item->label)) $record['callnumber'] = $item->label;
                             if(!empty($item->about)) {
-                                $about = $item->about;
+                                $record['about'] = $item->about;
                             }
                             break;
                     }
- //                   if(!empty($level)) {
-                        $record['level'] = $level;
-                        $record['label'] = $label;
-                        $record['url'] = $url;
-                        $record['limitation'] = $limitation;
-                        $record['storage'] = $storage;
-                        $record['callnumber'] = $callnumber;
-                        $record['about'] = $about;
-                        $records[] = $record;
- //                   }
+                    $records[] = $record;
                     break;
                 }
             }
