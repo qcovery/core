@@ -4,7 +4,6 @@ namespace AvailabilityPlus\Resolver\Driver;
 
 class DAIA extends AvailabilityPlusResolver
 {
-    use \VuFind\I18n\Translator\TranslatorAwareTrait;
     /**
      * Parse Links
      *

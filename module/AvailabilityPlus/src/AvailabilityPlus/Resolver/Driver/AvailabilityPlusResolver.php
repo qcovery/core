@@ -6,6 +6,7 @@ use VuFind\Crypt\HMAC;
 
 class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 {
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
     /**
      * HTTP client
      *
