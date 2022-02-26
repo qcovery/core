@@ -18,7 +18,7 @@ class DAIA extends AvailabilityPlusResolver
     {
         $records = []; // array to return
 
-        $data = json_decode($data);
+        $data = json_decode($data_org);
 
         foreach($data->document[0]->item as $item) {
             $record =  [];
