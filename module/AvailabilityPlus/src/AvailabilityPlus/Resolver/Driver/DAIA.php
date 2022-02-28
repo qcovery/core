@@ -87,11 +87,11 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['daia_hint']['label'] = $service_content->service;
                             }
                             if(!empty($service_content->href)) {
-                                $record['daia_action']['url'] = $this->generateOrderLink($service_content->href);
                                 $record['daia_action']['level'] = 'internal_link';
                                 $url_components = parse_url($record['daia_action']['url']);
                                 parse_str($url_components['query'], $params);
                                 $record['daia_action']['label'] = $params['action'];
+                                $record['daia_action']['url'] = $this->generateOrderLink($service_content->href, $params['action'], $data->document[0]->id, $item->id, $item->storage->id);
                             } else {
                                 $record['daia_action']['label'] = $service_content->service.'_default_action'.$limitation;
                             }
@@ -134,8 +134,9 @@ class DAIA extends AvailabilityPlusResolver
         return $response;
     }
 
-    private function generateOrderLink ($daia_url) {
-        return $daia_url."test";
+    private function generateOrderLink ($daia_url, $action, $doc_id, $item_id, $storage_id) {
+        if ($action == 'reserve') $action = 'recall';
+        return 'Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'type='.$action.'storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate([1,2,3],[1,2,3]);
     }
 }
 
