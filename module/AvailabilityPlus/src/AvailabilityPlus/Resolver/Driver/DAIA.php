@@ -137,7 +137,13 @@ class DAIA extends AvailabilityPlusResolver
     private function generateOrderLink ($action, $doc_id, $item_id, $storage_id) {
         if ($action == 'reserve') $action = 'recall';
         $id = substr($doc_id, strrpos($doc_id, ":") + 1);
-        return $id.'/Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'&type='.$action.'&storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate([1,2,3],[1,2,3]);
+        $hmacKeys = explode(':','id:item_id:doc_id');
+        $hmacPairs = [
+            'id' => $id,
+            'doc_id' => $doc_id,
+            'item_id' => $item_id
+        ];
+        return $id.'/Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'&type='.$action.'&storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate($hmacKeys,$hmacPairs);
     }
 }
 
