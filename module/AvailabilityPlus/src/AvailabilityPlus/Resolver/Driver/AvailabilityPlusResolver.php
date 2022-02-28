@@ -84,9 +84,5 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $response['parsed_data'] = $data;
         return $response;
     }
-
-    public function test(){
-        return $this->hmac->generate([1,2,3],[1,2,3]);
-    }
 }
 
