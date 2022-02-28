@@ -20,22 +20,19 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $hmac;
 
-    protected $recordLoader;
-
     /**
      * Constructor
      *
      * @param string            $baseUrl    Base URL for link resolver
      * @param \Zend\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $options, HMAC $hmac, Loader $loader)
+    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $options, HMAC $hmac)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
         $this->additionalParams = $additionalParams;
         $this->options = $options;
         $this->hmac = $hmac;
-        $this->recordLoader = $loader;
     }
 
     /**

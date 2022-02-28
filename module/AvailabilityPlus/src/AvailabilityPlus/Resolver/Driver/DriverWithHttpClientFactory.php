@@ -34,7 +34,6 @@ class DriverWithHttpClientFactory extends \VuFind\Resolver\Driver\DriverWithHttp
             $config['ResolverExtraParams'][$resolverName],
             'test options',
             $container->get('VuFind\Crypt\HMAC'),
-            $container->get('VuFind\Record\Loader')
         );
     }
 
