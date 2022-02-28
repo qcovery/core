@@ -87,7 +87,7 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['daia_hint']['label'] = $service_content->service;
                             }
                             if(!empty($service_content->href)) {
-                                $record['daia_action']['url'] = $service_content->href;
+                                $record['daia_action']['url'] = $this->generateOrderLink($service_content->href);
                                 $record['daia_action']['level'] = 'internal_link';
                                 $url_components = parse_url($record['daia_action']['url']);
                                 parse_str($url_components['query'], $params);
@@ -132,6 +132,10 @@ class DAIA extends AvailabilityPlusResolver
         $response['data'] = $data_org;
         $response['parsed_data'] = $records;
         return $response;
+    }
+
+    private function generateOrderLink ($daia_url) {
+        return $daia_url."test";
     }
 }
 
