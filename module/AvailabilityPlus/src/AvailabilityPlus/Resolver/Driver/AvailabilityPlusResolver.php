@@ -3,6 +3,7 @@
 namespace AvailabilityPlus\Resolver\Driver;
 
 use VuFind\Crypt\HMAC;
+use VuFind\Record\Loader;
 
 class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 {
@@ -19,19 +20,22 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $hmac;
 
+    protected $recordLoader;
+
     /**
      * Constructor
      *
      * @param string            $baseUrl    Base URL for link resolver
      * @param \Zend\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $options, HMAC $hmac)
+    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $options, HMAC $hmac, Loader $loader)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
         $this->additionalParams = $additionalParams;
         $this->options = $options;
         $this->hmac = $hmac;
+        $this->recordLoader = $loader;
     }
 
     /**
