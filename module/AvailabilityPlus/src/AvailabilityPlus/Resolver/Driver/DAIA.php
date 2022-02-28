@@ -134,7 +134,7 @@ class DAIA extends AvailabilityPlusResolver
         return $response;
     }
 
-    private function generateOrderLink ($daia_url, $action, $doc_id, $item_id, $storage_id) {
+    private function generateOrderLink ($action, $doc_id, $item_id, $storage_id) {
         if ($action == 'reserve') $action = 'recall';
         return $this->recordLink()->getUrl($this->driver).'/Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'type='.$action.'storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate([1,2,3],[1,2,3]);
     }
