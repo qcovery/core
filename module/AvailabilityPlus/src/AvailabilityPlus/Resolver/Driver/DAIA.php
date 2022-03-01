@@ -165,6 +165,7 @@ class DAIA extends AvailabilityPlusResolver
                         $rule_applies = true;
                     } else {
                         $rule_applies = false;
+                        break;
                     }
                 }
                 if($rule_applies){
