@@ -83,3 +83,8 @@
 .item_about_prefix {
   font-weight: bold;
 }
+
+.AvailabilityPlusDebug,
+.AvailabilityPlusTestCases {
+  background-color: white;
+}
