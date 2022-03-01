@@ -2,6 +2,8 @@
 
 namespace AvailabilityPlus\Resolver\Driver;
 
+use VuFind\Config\SearchSpecsReader;
+
 class DAIA extends AvailabilityPlusResolver
 {
     /**
@@ -146,8 +148,17 @@ class DAIA extends AvailabilityPlusResolver
         return $id.'/Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'&type='.$action.'&storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate($hmacKeys,$hmacPairs);
     }
 
-    private function applyCustomChanges($response) {
-        return $response;
+    private function applyCustomChanges($data) {
+
+        $specsReader = new SearchSpecsReader();
+        $rules = $specsReader->get('availabilityplus-daia.yaml');
+
+        /* foreach($data->document[0]->item as $item) {
+
+        } */
+        $data['rules'] = $rules;
+
+        return $data;
     }
 }
 
