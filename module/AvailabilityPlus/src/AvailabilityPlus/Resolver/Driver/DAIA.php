@@ -154,6 +154,7 @@ class DAIA extends AvailabilityPlusResolver
 
         $specsReader = new SearchSpecsReader();
         $rules = $specsReader->get('availabilityplus-daia.yaml');
+        $rules_applied = [];
 
         foreach($this->parsed_data->document[0]->item as $key => $item) {
             foreach($rules as $rule) {
@@ -172,10 +173,11 @@ class DAIA extends AvailabilityPlusResolver
                     {
                         $this->setObjectPathValue($key, explode('->',$action['field']), $action['content']);
                     }
+                    $rules_applied[] = $rule;
                 }
             }
         }
-        $this->parsed_data->rules = $rules;
+        $this->parsed_data->document[0]->item->rules_applied = $rules_applied;
     }
 
     private function getObjectPathValue($item, $path) {
