@@ -130,8 +130,7 @@ class DAIA extends AvailabilityPlusResolver
         }
 
         $response['data'] = $data_org;
-        $response['parsed_data'] = $parsed_data;
-        $response = $this->applyCustomChanges($response);
+        $response['parsed_data'] = $this->applyCustomChanges($parsed_data);
         return $response;
     }
 
