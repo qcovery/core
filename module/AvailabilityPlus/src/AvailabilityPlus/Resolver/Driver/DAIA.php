@@ -48,18 +48,18 @@ class DAIA extends AvailabilityPlusResolver
                     switch($service_key) {
                         case 'openaccess':
                             if(!in_array($service_content->href, $urls)) {
-                                $record['daia_action']['level'] = 'FreeAccess link_external';
-                                $record['daia_action']['label'] = 'FreeAccess';
-                                $record['daia_action']['url'] = $service_content->href;
-                                $urls[] = $record['daia_action']['url'];
+                                $record['daiaaction']['level'] = 'FreeAccess link_external';
+                                $record['daiaaction']['label'] = 'FreeAccess';
+                                $record['daiaaction']['url'] = $service_content->href;
+                                $urls[] = $record['daiaaction']['url'];
                             }
                             break;
                         case 'remote':
                             if(!in_array($service_content->href, $urls)) {
-                                $record['daia_action']['level'] = 'LicensedAccess link_external';
-                                $record['daia_action']['label'] = 'LicensedAccess';
-                                $record['daia_action']['url'] = $service_content->href;
-                                $urls[] = $record['daia_action']['url'];
+                                $record['daiaaction']['level'] = 'LicensedAccess link_external';
+                                $record['daiaaction']['label'] = 'LicensedAccess';
+                                $record['daiaaction']['url'] = $service_content->href;
+                                $urls[] = $record['daiaaction']['url'];
                             }
                             break;
                         case 'loan':
@@ -90,13 +90,13 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['daiahint']['label'] = $service_content->service;
                             }
                             if(!empty($service_content->href)) {
-                                $record['daia_action']['level'] = 'internal_link';
+                                $record['daiaaction']['level'] = 'internal_link';
                                 $url_components = parse_url($service_content->href);
                                 parse_str($url_components['query'], $params);
-                                $record['daia_action']['label'] = $params['action'];
-                                $record['daia_action']['url'] = $this->generateOrderLink($params['action'], $data->document[0]->id, $item->id, $item->storage->id);
+                                $record['daiaaction']['label'] = $params['action'];
+                                $record['daiaaction']['url'] = $this->generateOrderLink($params['action'], $data->document[0]->id, $item->id, $item->storage->id);
                             } else {
-                                $record['daia_action']['label'] = $service_content->service.'_default_action'.$limitation;
+                                $record['daiaaction']['label'] = $service_content->service.'_default_action'.$limitation;
                             }
                             if(isset($service_content->queue)) {
                                 $record['queue']['length'] = $service_content->queue;
