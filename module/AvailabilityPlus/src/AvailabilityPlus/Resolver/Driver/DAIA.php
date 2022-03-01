@@ -17,7 +17,6 @@ class DAIA extends AvailabilityPlusResolver
     public function parseLinks($data_org)
     {
         $urls = []; // to check for duplicate urls
-        $records = []; // array to return
 
         $data = json_decode($data_org);
         $parsed_data = $data;
@@ -125,7 +124,6 @@ class DAIA extends AvailabilityPlusResolver
                             break;
                     }
                     $parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                    if(!empty($record)) $records[] = $record;
                     break;
                 }
             }
