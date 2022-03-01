@@ -155,6 +155,7 @@ class DAIA extends AvailabilityPlusResolver
 
         foreach($data->document[0]->item as $item) {
             foreach($rules as $rule) {
+                $rule_applies = false;
                 foreach($rule['conditions'] as $condition) {
                     $data->test = $item->department->id;
                     $data->test2 = $condition['field'];
@@ -178,6 +179,7 @@ class DAIA extends AvailabilityPlusResolver
                             break;
                     }
                     $data->test4 = $field_content;
+                    $data->test5 = $condition['content'];
                 }
             }
         }
