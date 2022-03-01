@@ -170,7 +170,15 @@ class DAIA extends AvailabilityPlusResolver
                         $rule_applies = false;
                     }
                 }
-                $data->test5 = $rule_applies;
+                $data->test6 = $rule_applies;
+                if($rule_applies){
+                    foreach($rule['actions'] as $action)
+                    {
+                        $data->test7 = explode('->',$action['field']);
+                        $data->test8 = $action['content'];
+                        $this->setObjectPathValue($item, explode('->',$action['field']), $action['content']);
+                    }
+                }
             }
         }
         $data->rules = $rules;
@@ -179,6 +187,7 @@ class DAIA extends AvailabilityPlusResolver
     }
 
     private function getObjectPathValue($item, $path) {
+        $content = '';
         switch(count($path)) {
             case 1 :
                 $content = $item->{$path[0]};
@@ -197,6 +206,26 @@ class DAIA extends AvailabilityPlusResolver
                 break;
         }
         return $content;
+    }
+
+    private function setObjectPathValue($item, $path, $value) {
+        switch(count($path)) {
+            case 1 :
+                $item->{$path[0]} = $value;
+                break;
+            case 2 :
+               $item->{$path[0]}->{$path[1]} = $value;
+                break;
+            case 3 :
+                $item->{$path[0]}->{$path[1]}->{$path[2]} = $value;
+                break;
+            case 4 :
+                $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]} = $value;
+                break;
+            case 5 :
+                $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]} = $value;
+                break;
+        }
     }
 }
 
