@@ -74,20 +74,20 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($item->label)) $record['callnumber'] = $item->label;
                             if(!empty($service_content->limitation[0]->id)) {
                                 $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
-                                $record['daia_hint']['level'] = $limitation;
-                                $record['daia_hint']['label'] = $service_content->service.$limitation;
+                                $record['daiahint']['level'] = $limitation;
+                                $record['daiahint']['label'] = $service_content->service.$limitation;
                             } elseif(!empty($service_content->limitation[0]->content)) {
                                 $limitation = $service_content->limitation[0]->content;
-                                $record['daia_hint']['level'] = $limitation;
-                                $record['daia_hint']['label'] = $service_content->service.$limitation;
+                                $record['daiahint']['level'] = $limitation;
+                                $record['daiahint']['label'] = $service_content->service.$limitation;
                             } elseif(!empty($service_content->expected)) {
-                                $record['daia_hint']['level'] = "daia_orange";
+                                $record['daiahint']['level'] = "daia_orange";
                                 $date = date_create($service_content->expected);
-                                $record['daia_hint']['label'] = 'on_loan_until';
-                                $record['daia_hint']['label_date'] = date_format($date,"d.m.Y");
+                                $record['daiahint']['label'] = 'on_loan_until';
+                                $record['daiahint']['label_date'] = date_format($date,"d.m.Y");
                             } else {
-                                $record['daia_hint']['level'] = "daia_green";
-                                $record['daia_hint']['label'] = $service_content->service;
+                                $record['daiahint']['level'] = "daia_green";
+                                $record['daiahint']['label'] = $service_content->service;
                             }
                             if(!empty($service_content->href)) {
                                 $record['daia_action']['level'] = 'internal_link';
@@ -119,8 +119,8 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['storage']['label'] = 'unknown_location';
                             }
                             if(!empty($item->label)) $record['callnumber'] = $item->label;
-                            $record['daia_hint']['level'] = 'daia_red';
-                            $record['daia_hint']['label'] = 'not_available';
+                            $record['daiahint']['level'] = 'daia_red';
+                            $record['daiahint']['label'] = 'not_available';
                             if(!empty($item->about)) {
                                 $record['about'] = $item->about;
                             }
