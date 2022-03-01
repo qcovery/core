@@ -156,7 +156,7 @@ class DAIA extends AvailabilityPlusResolver
         foreach($data->document[0]->item as $item) {
             foreach($rules as $rule) {
                 foreach($rule->conditions as $condition) {
-                    $data->test = $condition;
+                    if(!empty($condition)) $data->test = $condition;
                 }
             }
         }
