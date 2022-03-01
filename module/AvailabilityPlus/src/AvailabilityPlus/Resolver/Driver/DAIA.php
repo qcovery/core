@@ -161,23 +161,7 @@ class DAIA extends AvailabilityPlusResolver
                     $data->test2 = $condition['field'];
                     $field_array = explode('->',$condition['field']);
                     $data->test3 = $field_array;
-                    switch(count($field_array)) {
-                        case 1 :
-                            $field_content = $item->{$field_array[0]};
-                            break;
-                        case 2 :
-                            $field_content = $item->{$field_array[0]}->{$field_array[1]};
-                            break;
-                        case 3 :
-                            $field_content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]};
-                            break;
-                        case 4 :
-                            $field_content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]}->{$field_array[3]};
-                            break;
-                        case 5 :
-                            $field_content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]}->{$field_array[3]}->{$field_array[4]};
-                            break;
-                    }
+                    $field_content = $this->getObjectPathValue($item, $field_array);
                     $data->test4 = $field_content;
                     $data->test5 = $condition['content'];
                 }
@@ -186,6 +170,27 @@ class DAIA extends AvailabilityPlusResolver
         $data->rules = $rules;
 
         return $data;
+    }
+
+    private function getObjectPathValue($item, $path) {
+        switch(count($path)) {
+            case 1 :
+                $content = $item->{$field_array[0]};
+                break;
+            case 2 :
+                $content = $item->{$field_array[0]}->{$field_array[1]};
+                break;
+            case 3 :
+                $content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]};
+                break;
+            case 4 :
+                $content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]}->{$field_array[3]};
+                break;
+            case 5 :
+                $content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]}->{$field_array[3]}->{$field_array[4]};
+                break;
+        }
+        return $content;
     }
 }
 
