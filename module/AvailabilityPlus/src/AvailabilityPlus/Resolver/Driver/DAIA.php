@@ -153,7 +153,7 @@ class DAIA extends AvailabilityPlusResolver
         $specsReader = new SearchSpecsReader();
         $rules = $specsReader->get('availabilityplus-daia.yaml');
 
-        foreach($data->document[0]->item as $item) {
+        foreach($data->document[0]->item as $key => $item) {
             foreach($rules as $rule) {
                 $rule_applies = false;
                 foreach($rule['conditions'] as $condition) {
@@ -176,7 +176,7 @@ class DAIA extends AvailabilityPlusResolver
                     {
                         $data->test7 = explode('->',$action['field']);
                         $data->test8 = $action['content'];
-                        $this->setObjectPathValue($item, explode('->',$action['field']), $action['content']);
+                        $data= $this->setObjectPathValue($data, $key, explode('->',$action['field']), $action['content']);
                     }
                 }
             }
@@ -208,24 +208,26 @@ class DAIA extends AvailabilityPlusResolver
         return $content;
     }
 
-    private function setObjectPathValue($item, $path, $value) {
+    private function setObjectPathValue($data, $key, $path, $value) {
+        $data->document[0]->item[$key]->availabilityplus
         switch(count($path)) {
             case 1 :
-                $item->{$path[0]} = $value;
+                $data->document[0]->item[$key]->availabilityplus->{$path[0]} = $value;
                 break;
             case 2 :
-               $item->{$path[0]}->{$path[1]} = $value;
+                $data->document[0]->item[$key]->availabilityplus->{$path[0]}->{$path[1]} = $value;
                 break;
             case 3 :
-                $item->{$path[0]}->{$path[1]}->{$path[2]} = $value;
+                $data->document[0]->item[$key]->availabilityplus->{$path[0]}->{$path[1]}->{$path[2]} = $value;
                 break;
             case 4 :
-                $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]} = $value;
+                $data->document[0]->item[$key]->availabilityplus->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]} = $value;
                 break;
             case 5 :
-                $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]} = $value;
+                $data->document[0]->item[$key]->availabilityplus->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]} = $value;
                 break;
         }
+        return $data;
     }
 }
 
