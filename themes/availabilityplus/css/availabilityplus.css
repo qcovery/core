@@ -84,3 +84,7 @@
   font-weight: bold;
 }
 
+.AvailabilityPlusDebug,
+.AvailabilityPlusTestCases {
+  background-color: white;
+}
