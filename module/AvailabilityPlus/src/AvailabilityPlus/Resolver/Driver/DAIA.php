@@ -20,7 +20,7 @@ class DAIA extends AvailabilityPlusResolver
         $records = []; // array to return
 
         $data = json_decode($data_org);
-        $data_all = $data;
+        $parsed_data = $data;
 
         foreach($data->document[0]->item as $key => $item) {
             $record =  [];
@@ -124,7 +124,7 @@ class DAIA extends AvailabilityPlusResolver
                             }
                             break;
                     }
-                    $data_all->document[0]->item[$key]->availabilityplus = $record;
+                    $parsed_data->document[0]->item[$key]->availabilityplus = $record;
                     if(!empty($record)) $records[] = $record;
                     break;
                 }
@@ -132,8 +132,7 @@ class DAIA extends AvailabilityPlusResolver
         }
 
         $response['data'] = $data_org;
-        $response['parsed_data'] = $records;
-        $response['parsed_data_all'] = $data_all;
+        $response['parsed_data'] = $parsed_data;
         $response = $this->applyCustomChanges($response);
         return $response;
     }
