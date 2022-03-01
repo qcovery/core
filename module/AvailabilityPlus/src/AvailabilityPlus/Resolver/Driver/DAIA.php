@@ -167,7 +167,6 @@ class DAIA extends AvailabilityPlusResolver
                         $rule_applies = false;
                     }
                 }
-                $this->parsed_data->test6 = $rule_applies;
                 if($rule_applies){
                     foreach($rule['actions'] as $action)
                     {
@@ -177,7 +176,7 @@ class DAIA extends AvailabilityPlusResolver
                 }
             }
         }
-        $this->parsed_data->document[0]->item->rules_applied = $rules_applied;
+        $this->parsed_data->document[0]->item->availabilityplus['rules_applied'] = $rules_applied;
     }
 
     private function getObjectPathValue($item, $path) {
