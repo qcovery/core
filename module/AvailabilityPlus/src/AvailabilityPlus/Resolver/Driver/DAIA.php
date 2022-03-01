@@ -159,13 +159,7 @@ class DAIA extends AvailabilityPlusResolver
             foreach($rules as $rule) {
                 $rule_applies = false;
                 foreach($rule['conditions'] as $condition) {
-                    $this->parsed_data->test = $item->department->id;
-                    $this->parsed_data->test2 = $condition['field'];
-                    $field_array = explode('->',$condition['field']);
-                    $this->parsed_dataa->test3 = $field_array;
-                    $field_content = $this->getObjectPathValue($item, $field_array);
-                    $this->parsed_data->test4 = $field_content;
-                    $this->parsed_data->test5 = $condition['content'];
+                    $field_content = $this->getObjectPathValue($item, explode('->',$condition['field']));
                     if ($field_content == $condition['content']) {
                         $rule_applies = true;
                     } else {
@@ -176,8 +170,6 @@ class DAIA extends AvailabilityPlusResolver
                 if($rule_applies){
                     foreach($rule['actions'] as $action)
                     {
-                        $this->parsed_data->test7 = explode('->',$action['field']);
-                        $this->parsed_data->test8 = $action['content'];
                         $this->setObjectPathValue($key, explode('->',$action['field']), $action['content']);
                     }
                 }
@@ -212,25 +204,18 @@ class DAIA extends AvailabilityPlusResolver
         switch(count($path)) {
             case 1 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]] = $value;
-                $this->parsed_data->test9 = '1 '.$key.' '.$value;
                 break;
             case 2 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]] = $value;
-                $this->parsed_data->test9 = $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]];
-                $this->parsed_data->test10 = '2 '.$key.' '.$value;
                 break;
             case 3 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]] = $value;
-                $this->parsed_data->test9 = $this->parsed_data->document[0]->item[$key][$path[0]][$path[1]][$path[2]];
-                $this->parsed_data->test10 = '3 '.$key.' '.$value;
                 break;
             case 4 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]] = $value;
-                $this->parsed_data->test9 = '4 '.$key.' '.$value;
                 break;
             case 5 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] = $value;
-                $this->parsed_data->test9 = '5 '.$key.' '.$value;
                 break;
         }
     }
