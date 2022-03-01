@@ -151,8 +151,6 @@ class DAIA extends AvailabilityPlusResolver
     }
 
     private function applyCustomChanges($response) {
-        $count = 0;
-        foreach($response['data'] as $)
         return $response;
     }
 }
