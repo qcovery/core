@@ -155,8 +155,29 @@ class DAIA extends AvailabilityPlusResolver
 
         foreach($data->document[0]->item as $item) {
             foreach($rules as $rule) {
-                foreach($rule->conditions as $condition) {
-                    $data->test = $condition->field;
+                foreach($rule['conditions'] as $condition) {
+                    $data->test = $item->department->id;
+                    $data->test2 = $condition['field'];
+                    $field_array = explode('->',$condition['field']);
+                    $data->test3 = $field_array;
+                    switch(count($field_array)) {
+                        case 1 :
+                            $field_content = $item->{$field_array[0]};
+                            break;
+                        case 2 :
+                            $field_content = $item->{$field_array[0]}->{$field_array[1]};
+                            break;
+                        case 3 :
+                            $field_content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]};
+                            break;
+                        case 4 :
+                            $field_content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]}->{$field_array[3]};
+                            break;
+                        case 5 :
+                            $field_content = $item->{$field_array[0]}->{$field_array[1]}->{$field_array[2]}->{$field_array[3]}->{$field_array[4]};
+                            break;
+                    }
+                    $data->test4 = $field_content;
                 }
             }
         }
