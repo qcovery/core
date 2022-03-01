@@ -85,6 +85,7 @@ return array (
         array (
           'AvailabilityPlus\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\DAIA' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\DAIAplus' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintPrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
