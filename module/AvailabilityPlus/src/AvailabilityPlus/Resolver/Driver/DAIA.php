@@ -16,12 +16,13 @@ class DAIA extends AvailabilityPlusResolver
      */
     public function parseLinks($data_org)
     {
+        $data_all = $data_org;
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
 
         $data = json_decode($data_org);
 
-        foreach($data->document[0]->item as $item) {
+        foreach($data->document[0]->item as $key => $item) {
             $record =  [];
 
             $item_services['available']['openaccess'] = [];
@@ -123,6 +124,7 @@ class DAIA extends AvailabilityPlusResolver
                             }
                             break;
                     }
+                    $data_all->document[0]->item[$key]['availabilityplus-daia'] = $record;
                     if(!empty($record)) $records[] = $record;
                     break;
                 }
@@ -131,6 +133,7 @@ class DAIA extends AvailabilityPlusResolver
 
         $response['data'] = $data_org;
         $response['parsed_data'] = $records;
+        $response['parsed_all'] = $data_all;
         $response = $this->applyCustomChanges($response);
         return $response;
     }
@@ -148,6 +151,8 @@ class DAIA extends AvailabilityPlusResolver
     }
 
     private function applyCustomChanges($response) {
+        $count = 0;
+        foreach($response['data'] as $)
         return $response;
     }
 }
