@@ -216,7 +216,8 @@ class DAIA extends AvailabilityPlusResolver
                 break;
             case 2 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]] = $value;
-                $this->parsed_data->test9 = '2 '.$key.' '.$value;
+                $this->parsed_data->test9 = $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]];
+                $this->parsed_data->test10 = '2 '.$key.' '.$value;
                 break;
             case 3 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]] = $value;
