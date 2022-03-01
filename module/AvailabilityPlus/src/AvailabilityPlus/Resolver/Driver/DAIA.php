@@ -164,7 +164,13 @@ class DAIA extends AvailabilityPlusResolver
                     $field_content = $this->getObjectPathValue($item, $field_array);
                     $data->test4 = $field_content;
                     $data->test5 = $condition['content'];
+                    if ($field_content == $condition['content']) {
+                        $rule_applies = true;
+                    } else {
+                        $rule_applies = false;
+                    }
                 }
+                $data->test5 = $rule_applies;
             }
         }
         $data->rules = $rules;
