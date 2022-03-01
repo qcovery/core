@@ -211,24 +211,24 @@ class DAIA extends AvailabilityPlusResolver
     private function setObjectPathValue($key, $path, $value) {
         switch(count($path)) {
             case 1 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus->{$path[0]} = $value;
+                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]] = $value;
                 $this->parsed_data->test9 = '1 '.$key.' '.$value;
                 break;
             case 2 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus->{$path[0]}[$path[1]] = $value;
+                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]] = $value;
                 $this->parsed_data->test9 = '2 '.$key.' '.$value;
                 break;
             case 3 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus->{$path[0]}[$path[1]][$path[2]] = $value;
-                $this->parsed_data->test9 = $this->parsed_data->document[0]->item[$key]->{$path[0]}[$path[1]][$path[2]];
+                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]] = $value;
+                $this->parsed_data->test9 = $this->parsed_data->document[0]->item[$key][$path[0]][$path[1]][$path[2]];
                 $this->parsed_data->test10 = '3 '.$key.' '.$value;
                 break;
             case 4 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus->{$path[0]}[$path[1]][$path[2]][$path[3]] = $value;
+                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]] = $value;
                 $this->parsed_data->test9 = '4 '.$key.' '.$value;
                 break;
             case 5 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus->{$path[0]}[$path[1]][$path[2]][$path[3]][$path[4]] = $value;
+                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] = $value;
                 $this->parsed_data->test9 = '5 '.$key.' '.$value;
                 break;
         }
