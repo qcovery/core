@@ -1,0 +1,6 @@
+rule1:
+  conditions:
+    - { field: 'department->id', content: 'http://uri.gbv.de/organization/isil/DE-84@department-1'}
+  actions:
+    - {field: 'availabilityplus->daia_hint->label', content: 'institute'}
+    - {field: 'availabilityplus->daia_action->label', content: 'institute'}
