@@ -1,14 +1,14 @@
 rule1:
-  name: 'institutes1'
-  conditions:
+  - name: 'institutes1'
+  - conditions:
     - { field: 'department->id', content: 'http://uri.gbv.de/organization/isil/DE-84@department-2'}
-  actions:
+  - actions:
     - {field: 'availabilityplus->daia_hint->label', content: 'institute'}
     - {field: 'availabilityplus->daia_action->label', content: 'institute'}
 rule2:
-  name: 'institutes2'
-  conditions:
+  - name: 'institutes2'
+  - conditions:
     - { field: 'department->id', content: 'http://uri.gbv.de/organization/isil/DE-84@department-2'}
-  actions:
+  - actions:
     - {field: 'availabilityplus->daia_hint->label', content: 'institute'}
     - {field: 'availabilityplus->daia_action->label', content: 'institute'}
