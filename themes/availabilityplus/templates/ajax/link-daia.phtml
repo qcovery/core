@@ -1,5 +1,5 @@
 <?php
-foreach($data as $result) {
+foreach($data->document[0]->item as $result) {
     echo '<div class="delimiter"></div>';
     echo '<div class="daia_storage_callnumber">';
     if(!empty($result['storage'])) {
