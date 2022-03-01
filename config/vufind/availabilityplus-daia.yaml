@@ -3,12 +3,12 @@ rule1:
   conditions:
     - { field: 'department->id', content: 'http://uri.gbv.de/organization/isil/DE-84@department-2'}
   actions:
-    - {field: 'availabilityplus->daiahint->label', content: 'institute'}
-    - {field: 'availabilityplus->daiaaction->label', content: 'institute'}
+    - {field: 'daia-hint->label', content: 'institute'}
+    - {field: 'daia-action->label', content: 'institute'}
 rule2:
   name: 'institutes2'
   conditions:
     - { field: 'department->id', content: 'http://uri.gbv.de/organization/isil/DE-84@department-2'}
   actions:
-    - {field: 'availabilityplus->daiahint->label', content: 'institute'}
-    - {field: 'availabilityplus->daiaaction->label', content: 'institute'}
+    - {field: 'daia-hint->label', content: 'institute'}
+    - {field: 'daia-action->label', content: 'institute'}
