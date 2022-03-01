@@ -11,16 +11,16 @@ foreach($data->document[0]->item as $item) {
     }
     echo '</div>';
     if(!empty($result['daiahint'])) {
-        echo '<span class="daiahint"><span class="'.$result['daiahint']['level'].'">'.$this->translate($result['daiahint']['label']);
+        echo '<span class="daia_hint"><span class="'.$result['daiahint']['level'].'">'.$this->translate($result['daiahint']['label']);
         if(!empty($result['daiahint']['label_date'])) echo ' '.$result['daiahint']['label_date'];
         echo '</span></span>';
         echo '<span class="daia_arrow"> ➝ </span>';
     }
     if(!empty($result['daiaaction'])) {
         if(!empty($result['daiaaction']['url'])) {
-            echo '<span class="daiaaction"><a href="'.$result['daiaaction']['url'].'" class="'.$result['daiaaction']['level'].' link_external" title="'.$result['daiaaction']['label'].'" target="_blank">'.$this->translate($result['daiaaction']['label']).'</a></span>';
+            echo '<span class="daia_action"><a href="'.$result['daiaaction']['url'].'" class="'.$result['daiaaction']['level'].' link_external" title="'.$result['daiaaction']['label'].'" target="_blank">'.$this->translate($result['daiaaction']['label']).'</a></span>';
         } else {
-            echo '<span class="daiaaction">'.$this->translate($result['daiaaction']['label']).'</span>';
+            echo '<span class="daia_action">'.$this->translate($result['daiaaction']['label']).'</span>';
         }
     }
     if(!empty($result['queue'])) {
