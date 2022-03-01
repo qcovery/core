@@ -153,9 +153,12 @@ class DAIA extends AvailabilityPlusResolver
         $specsReader = new SearchSpecsReader();
         $rules = $specsReader->get('availabilityplus-daia.yaml');
 
-        /* foreach($data->document[0]->item as $item) {
-
-        } */
+        foreach($data->document[0]->item as $item) {
+            foreach($rules as $rule) {
+                foreach($rule->condition as $condition)
+                $data->test = $item->{$condition->field};
+            }
+        }
         $data->rules = $rules;
 
         return $data;
