@@ -85,10 +85,16 @@ return array (
         array (
           'AvailabilityPlus\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\DAIA' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\DAIAHsH' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\DAIAKSF' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\DAIAplus' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintHsHElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintKSFElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintPrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintHsHPrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintKSFPrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
         ),
         'aliases' => 
         array (
