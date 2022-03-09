@@ -18,15 +18,15 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'threesixtylink' => 'VuFind\Resolver\Driver\Threesixtylink',
         'AvailabilityPlusResolver' => 'AvailabilityPlus\Resolver\Driver\AvailabilityPlusResolver',
         'DAIA' => 'AvailabilityPlus\Resolver\Driver\DAIA',
-        'DAIAHsH' => 'AvailabilityPlus\Resolver\Driver\DAIA',
-        'DAIAKSF' => 'AvailabilityPlus\Resolver\Driver\DAIA',
+        'DAIAHsH' => 'AvailabilityPlus\Resolver\Driver\DAIAHsH',
+        'DAIAKSF' => 'AvailabilityPlus\Resolver\Driver\DAIAKSF',
         'JournalsOnlinePrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrint',
         'JournalsOnlinePrintElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
-        'JournalsOnlinePrintHsHElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
-        'JournalsOnlinePrintKSFElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
+        'JournalsOnlinePrintHsHElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintHsHElectronic',
+        'JournalsOnlinePrintKSFElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintKSFElectronic',
         'JournalsOnlinePrintPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintPrint',
-        'JournalsOnlinePrintHsHPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintPrint',
-        'JournalsOnlinePrintKSFPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintPrint',
+        'JournalsOnlinePrintHsHPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintHsHPrint',
+        'JournalsOnlinePrintKSFPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintKSFPrint',
     ];
 
     /**
