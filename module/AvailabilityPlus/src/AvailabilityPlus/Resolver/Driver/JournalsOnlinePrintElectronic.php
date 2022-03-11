@@ -16,7 +16,6 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
      */
     public function parseLinks($data_org)
     {
-        $data_org = $data;
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
         $level_org = $level;
