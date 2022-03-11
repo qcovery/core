@@ -19,25 +19,14 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
         $data_org = $data;
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
+        $record['level'] = "test";
+        $record['label'] = "test";
+        $record['url'] = "https://www.test.com";
+        $records[] = $record;
         foreach($data->Full->PrintData->ResultList->Result AS $result) {
             $level = $level_org;
             switch ($result['state']) {
                 case 2:
-                    $level .= " PrintAccess";
-                    $label = "PrintAccess";
-                    if(!empty($result->Signature)) {
-                        $url = '/vufind/Search/Results?lookfor='.$result->Signature.'&type=Signature';
-                    } else {
-                        $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';;
-                    }
-                    if(!in_array($url, $urls)) {
-                        $record['level'] = $level;
-                        $record['label'] = $label;
-                        $record['url'] = $url;
-                        $records[] = $record;
-                        $urls[] = $url;
-                    }
-                    break;
                 case 3:
                     $level .= " PrintAccess";
                     $label = "PrintAccess";
