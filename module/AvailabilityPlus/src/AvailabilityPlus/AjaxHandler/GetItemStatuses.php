@@ -19,9 +19,7 @@ use VuFind\Resolver\Connection;
  *
  * @category VuFind
  * @package  AJAX
- * @author   Demian Katz <demian.katz@villanova.edu>
- * @author   Chris Delis <cedelis@uillinois.edu>
- * @author   Tuan Nguyen <tuan@yorku.ca>
+ * @author   Kristof Kessler <mail@kristofkessler.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
@@ -136,16 +134,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     /**
      * Determines which check to run, based on keyword in configuration. Determination in this order depending on match between name and logic:
      * 1) function available with name in this class
-     * 2) DAIA and other resolver
+     * 2) DAIA and other resolvers
      * 3) MarcKey defined in availabilityplus_yaml
      * 4) MarcCategory defined in availabilityplus_yaml
-     * TODO: Add checks for resolver and DAIA
      *
      * @check name of check to run
      *
      * @return array [response data for check]
      */
-    //TODO: Add checks for resolver and DAIA
     private function performAvailabilityCheck($check) {
 
         if(method_exists($this, $check)){
