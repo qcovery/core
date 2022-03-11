@@ -119,7 +119,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if($list) $checks = 'ResultList';
         if(!empty($this->config[$this->source.$checks.'-'.$mediatype])) {
             $this->checks = $this->config[$this->source.$checks.'-'.$mediatype];
-            $this->checkRoute = $this->source.$checks.'-'.$mediatype;s
+            $this->checkRoute = $this->source.$checks.'-'.$mediatype;
         } else if(!empty($this->config[$checks.'-'.$mediatype])) {
             $this->checks = $this->config[$checks.'-'.$mediatype];
             $this->checkRoute = $checks.'-'.$mediatype;
