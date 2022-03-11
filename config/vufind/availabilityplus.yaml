@@ -141,12 +141,12 @@ JournalsOnlinePrintPrint:
     x:
       - [name, issn]
   952:
-    d:
-      - [name, volume]
+#    d:
+#      - [name, volume]
     j:
       - [name, date]
-    e:
-      - [name, issue]
+#    e:
+#      - [name, issue]
     h:
       - [name, pages]
 DAIA:
