@@ -91,6 +91,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $this->driver = $this->recordLoader->load($id, $this->source);
                 $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
                 $responses = [];
+                $responses['id'] = $id;
+                $responses['version'] = '0.2';
+                $responses['checks'] = $this->checks;
                 $response = [];
                 foreach($this->checks as $check => $this->current_mode) {
                     if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
