@@ -35,7 +35,8 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
-                        $records[] = $record;                        $urls[] = $url;
+                        $records[] = $record;
+                        $urls[] = $url;
                     }
                     break;
             }
