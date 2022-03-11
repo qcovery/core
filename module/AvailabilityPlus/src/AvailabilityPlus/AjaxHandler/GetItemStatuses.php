@@ -35,6 +35,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $checks;
 
+    protected $checkRoute;
+
     protected $source;
 
     protected $driver;
@@ -91,9 +93,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $this->driver = $this->recordLoader->load($id, $this->source);
                 $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
                 $responses = [];
-                $responses['id'] = $id;
-                $responses['version'] = '0.2';
-                $responses['checks'] = $this->checks;
                 $response = [];
                 foreach($this->checks as $check => $this->current_mode) {
                     if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
@@ -107,7 +106,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                 }
                 $response['id'] = $id;
-                $response['version'] = '0.2';
+                $response['checkRoute'] = $this->checkRoute;
                 $responses[] = $response;
             }
         }
@@ -120,12 +119,16 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if($list) $checks = 'ResultList';
         if(!empty($this->config[$this->source.$checks.'-'.$mediatype])) {
             $this->checks = $this->config[$this->source.$checks.'-'.$mediatype];
+            $this->checkRoute = $this->source.$checks.'-'.$mediatype;s
         } else if(!empty($this->config[$checks.'-'.$mediatype])) {
             $this->checks = $this->config[$checks.'-'.$mediatype];
+            $this->checkRoute = $checks.'-'.$mediatype;
         } else if(!empty($this->config[$this->source.$checks])) {
             $this->checks = $this->config[$this->source.$checks];
+            $this->checkRoute =$this->source.$checks;
         } else {
             $this->checks = $this->config[$checks];
+            $this->checkRoute = $checks;
         }
     }
 
