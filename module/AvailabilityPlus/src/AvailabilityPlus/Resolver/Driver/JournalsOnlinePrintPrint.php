@@ -25,6 +25,7 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
         $records[] = $record;
         foreach($data->Full->PrintData->ResultList->Result AS $result) {
             $level = $level_org;
+            $record = [];
             switch ($result['state']) {
                 case 2:
                 case 3:
@@ -35,13 +36,13 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
                     } else {
                         $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';;
                     }
-                    if(!in_array($url, $urls)) {
+                   // if(!in_array($url, $urls)) {
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
                         $records[] = $record;
                         $urls[] = $url;
-                    }
+                    //}
                     break;
             }
         }
