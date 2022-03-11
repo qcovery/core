@@ -32,9 +32,10 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
                         $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';;
                     }
                     if(!in_array($url, $urls)) {
-                        echo '<div class="delimiter"></div>';
-                        echo '<a href="' . $url . '" class="' . $level . ' link_external" title="' . $label . '" target="_blank">' . $this->translate($label) . ' ' . $result->Location . '</a><br/>';
-                        $urls[] = $url;
+                        $record['level'] = $level;
+                        $record['label'] = $label;
+                        $record['url'] = $url;
+                        $records[] = $record;                        $urls[] = $url;
                     }
                     break;
             }
