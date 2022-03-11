@@ -19,11 +19,11 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
         $data_org = $data;
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
-        $record['level'] = "test";
-        $record['label'] = "test";
-        $record['url'] = "https://www.test.com";
-        $records[] = $record;
         foreach($data->Full->PrintData->ResultList->Result AS $result) {
+            $record['level'] = "test";
+            $record['label'] = "test";
+            $record['url'] = "https://www.test.com";
+            $records[] = $record;
             $level = $level_org;
             $record = [];
             switch ($result['state']) {
