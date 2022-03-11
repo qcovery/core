@@ -16,6 +16,7 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
      */
     public function parseLinks($data)
     {
+        $data_org = $data;
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
         foreach($data->Full->PrintData->ResultList->Result AS $result) {
