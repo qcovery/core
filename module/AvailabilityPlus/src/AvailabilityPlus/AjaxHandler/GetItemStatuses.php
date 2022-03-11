@@ -107,6 +107,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 }
                 $response['id'] = $id;
                 $response['checkRoute'] = $this->checkRoute;
+                $response['checks'] = $this->checks;
                 $responses[] = $response;
             }
         }
