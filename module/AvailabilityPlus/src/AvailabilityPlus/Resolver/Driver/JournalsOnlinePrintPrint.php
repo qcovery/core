@@ -21,10 +21,6 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
         $records = []; // array to return
         $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
         foreach($data->Full->PrintData->ResultList->Result AS $result) {
-            $record['level'] = "test";
-            $record['label'] = "test";
-            $record['url'] = "https://www.test.com";
-            $records[] = $record;
             $level = $level_org;
             $record = [];
             switch ($result['state']) {
@@ -37,13 +33,13 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
                     } else {
                         $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';;
                     }
-                   // if(!in_array($url, $urls)) {
+                    if(!in_array($url, $urls)) {
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
                         $records[] = $record;
                         $urls[] = $url;
-                    //}
+                    }
                     break;
             }
         }
