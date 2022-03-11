@@ -19,6 +19,7 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
         $data_org = $data;
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
+        $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
         foreach($data->Full->PrintData->ResultList->Result AS $result) {
             $record['level'] = "test";
             $record['label'] = "test";
