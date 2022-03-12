@@ -319,7 +319,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 if (!empty($ilnMatch[0]['iln']['data'][0])) {
                     $url = '/vufind/Record/' . $parentId;
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $url = '';
             }
         }
