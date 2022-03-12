@@ -52,6 +52,12 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['daia_action']['label'] = 'FreeAccess';
                                 $record['daia_action']['url'] = $service_content->href;
                                 $urls[] = $record['daia_action']['url'];
+                                if(!empty($item->about)) {
+                                    $record['about'] = $item->about;
+                                }
+                                if(!empty($item->chronology->about)) {
+                                    $record['chronology'] = $item->chronology->about;
+                                }
                             }
                             break;
                         case 'remote':
@@ -60,6 +66,12 @@ class DAIA extends AvailabilityPlusResolver
                                 $record['daia_action']['label'] = 'LicensedAccess';
                                 $record['daia_action']['url'] = $service_content->href;
                                 $urls[] = $record['daia_action']['url'];
+                                if(!empty($item->about)) {
+                                    $record['about'] = $item->about;
+                                }
+                                if(!empty($item->chronology->about)) {
+                                    $record['chronology'] = $item->chronology->about;
+                                }
                             }
                             break;
                         case 'loan':
@@ -109,6 +121,9 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($item->about)) {
                                 $record['about'] = $item->about;
                             }
+                            if(!empty($item->chronology->about)) {
+                                $record['chronology'] = $item->chronology->about;
+                            }
                             break;
                         case 'fallback':
                             if(!empty($item->storage->id)){
@@ -123,6 +138,9 @@ class DAIA extends AvailabilityPlusResolver
                             $record['daia_hint']['label'] = 'not_available';
                             if(!empty($item->about)) {
                                 $record['about'] = $item->about;
+                            }
+                            if(!empty($item->chronology->about)) {
+                                $record['chronology'] = $item->chronology->about;
                             }
                             break;
                     }
