@@ -176,7 +176,9 @@ class DAIA extends AvailabilityPlusResolver
                     $rules_applied[] = $rule;
                 }
             }
-            $this->parsed_data->document[0]->item[$key]->availabilityplus['rules_applied'] = $rules_applied;
+            if(!empty($rules_applied)) {
+                $this->parsed_data->document[0]->item[$key]->availabilityplus['rules_applied'] = $rules_applied;
+            }
         }
     }
 
