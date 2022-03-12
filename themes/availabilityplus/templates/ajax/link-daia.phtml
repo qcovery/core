@@ -35,8 +35,9 @@ foreach($data->document[0]->item as $item) {
     if(!empty($result['about'])) {
         echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result['about'].'</div>';
     }
+    print_r($reus);
     if(!empty($result['chronology'])) {
-        echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Holdings').': </span>'.$result['chronology'].'</div>';
+        echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result['chronology'].'</div>';
     }
     if($mode == 'break_on_first') break;
 }
