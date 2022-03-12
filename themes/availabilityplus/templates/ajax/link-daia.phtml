@@ -1,6 +1,6 @@
 <?php
 foreach($data->document[0]->item as $item) {
-    if(!empty($item->availabilityplus['daia_hint']) || !empty($item->availabilityplus['daia_action'])) {
+    if(!empty($item->availabilityplus)) {
         $result = $item->availabilityplus;
     } else {
         $result = [];
