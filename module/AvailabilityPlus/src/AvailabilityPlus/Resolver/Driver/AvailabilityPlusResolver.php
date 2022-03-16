@@ -85,5 +85,9 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $response['parsed_data'] = $data;
         return $response;
     }
+
+    public function getOptions() {
+        return $this->options;
+    }
 }
 

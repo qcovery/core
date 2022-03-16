@@ -32,7 +32,7 @@ class DriverWithHttpClientFactory extends \VuFind\Resolver\Driver\DriverWithHttp
             $config['ResolverBaseURL'][$resolverName],
             $container->get('VuFindHttp\HttpService')->createClient(),
             $config['ResolverExtraParams'][$resolverName],
-            'test options',
+            'availabilityplus-resolver-'.$resolverName.'.yaml',
             $container->get('VuFind\Crypt\HMAC')
         );
     }
