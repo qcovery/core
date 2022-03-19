@@ -91,7 +91,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         return $this->rules;
     }
 
-    private function applyCustomChanges() {
+    protected function applyCustomChanges() {
 
         $specsReader = new SearchSpecsReader();
         $rules = $specsReader->get($this->rules);
