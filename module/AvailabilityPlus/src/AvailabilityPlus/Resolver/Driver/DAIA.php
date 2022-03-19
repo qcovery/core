@@ -2,8 +2,6 @@
 
 namespace AvailabilityPlus\Resolver\Driver;
 
-use VuFind\Config\SearchSpecsReader;
-
 class DAIA extends AvailabilityPlusResolver
 {
     protected $parsed_data;
@@ -168,80 +166,6 @@ class DAIA extends AvailabilityPlusResolver
             'item_id' => $item_id
         ];
         return $id.'/Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'&type='.$action.'&storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate($hmacKeys,$hmacPairs);
-    }
-
-    private function applyCustomChanges() {
-
-        $specsReader = new SearchSpecsReader();
-        $rules = $specsReader->get($this->rules);
-        $rules_applied = [];
-
-        foreach($this->parsed_data->document[0]->item as $key => $item) {
-            foreach($rules as $rule) {
-                $rule_applies = false;
-                foreach($rule['conditions'] as $condition) {
-                    $field_content = $this->getObjectPathValue($item, explode('->',$condition['field']));
-                    if ($field_content == $condition['content']) {
-                        $rule_applies = true;
-                    } else {
-                        $rule_applies = false;
-                        break;
-                    }
-                }
-                if($rule_applies){
-                    foreach($rule['actions'] as $action)
-                    {
-                        $this->setObjectPathValue($key, explode('->',$action['field']), $action['content']);
-                    }
-                    $rules_applied[] = $rule;
-                }
-            }
-            if(!empty($rules_applied)) {
-                $this->parsed_data->document[0]->item[$key]->availabilityplus['rules_applied'] = $rules_applied;
-            }
-        }
-    }
-
-    private function getObjectPathValue($item, $path) {
-        $content = '';
-        switch(count($path)) {
-            case 1 :
-                $content = $item->{$path[0]};
-                break;
-            case 2 :
-                $content = $item->{$path[0]}->{$path[1]};
-                break;
-            case 3 :
-                $content = $item->{$path[0]}->{$path[1]}->{$path[2]};
-                break;
-            case 4 :
-                $content = $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]};
-                break;
-            case 5 :
-                $content = $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]};
-                break;
-        }
-        return $content;
-    }
-
-    private function setObjectPathValue($key, $path, $value) {
-        switch(count($path)) {
-            case 1 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]] = $value;
-                break;
-            case 2 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]] = $value;
-                break;
-            case 3 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]] = $value;
-                break;
-            case 4 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]] = $value;
-                break;
-            case 5 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] = $value;
-                break;
-        }
     }
 }
 
