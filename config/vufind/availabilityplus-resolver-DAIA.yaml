@@ -1,0 +1,6 @@
+rule100:
+  name: 'Signatur'
+  conditions:
+    - { field: 'label', content: '(.*):(.*)'}
+  actions:
+    - {field: 'callnumber', content: 'test'}

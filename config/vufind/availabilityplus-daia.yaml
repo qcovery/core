@@ -1,7 +1,0 @@
-rule1:
-  name: 'Institute'
-  conditions:
-    - { field: 'department->id', content: 'http://uri.gbv.de/organization/isil/DE-84@department-2'}
-  actions:
-    - {field: 'daia_hint->label', content: 'availability_inquiry'}
-    - {field: 'daia_action->label', content: 'inquiry_at_location'}
