@@ -101,14 +101,17 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
             foreach($rules as $rule) {
                 $rule_applies = false;
                 foreach($rule['conditions'] as $condition) {
+                    $match_array = [];
                     $field_content = $this->getObjectPathValue($item, explode('->',$condition['field']));
-                    if ($field_content == $condition['content']) {
+                    preg_match('|'.$condition['content'].'|',$field_content,$match_array);
+                    if(!empty($match_array)){
                         $rule_applies = true;
                     } else {
                         $rule_applies = false;
                         break;
                     }
                 }
+
                 if($rule_applies){
                     foreach($rule['actions'] as $action)
                     {
