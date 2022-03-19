@@ -115,9 +115,17 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 if($rule_applies){
                     foreach($rule['actions'] as $action)
                     {
-                        $content_new = preg_replace('|(.*)|', '$0', $action['content']);
+                        $content_old = $this->getObjectPathValue($item, explode('->',$action['field']));
+                        $content_new = $content_old;
+                        if(!empty($action['pattern'])) {
+                            $content_preg =  $this->getObjectPathValue($item, explode('->',$action['content_field']));
+                            $content_new = preg_replace('|'.$action['pattern'].'|', $action['replacement'], $content_preg);
+                        } else if(isset($action['content'])){
+                            $content_new = preg_replace('|(.*)|', '$0', $action['content']);
+                        }
                         $this->setObjectPathValue($key, explode('->',$action['field']), $content_new);
                     }
+
                     $rules_applied[] = $rule;
                 }
             }

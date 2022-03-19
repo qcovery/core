@@ -3,4 +3,4 @@ rule100:
   conditions:
     - { field: 'label', content: '(.*):(.*)' }
   actions:
-    - { field: 'callnumber', content_field: 'callnumber', pattern: '(.*):(.*)', replacement: '$2'}
+    - { field: 'callnumber', content_field: 'label', pattern: '(.*):(.*)', replacement: '$2'}
