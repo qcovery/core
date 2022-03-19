@@ -16,7 +16,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $additionalParams;
 
-    protected $options;
+    protected $rules;
 
     protected $hmac;
 
@@ -26,12 +26,12 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      * @param string            $baseUrl    Base URL for link resolver
      * @param \Zend\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $options, HMAC $hmac)
+    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $rules, HMAC $hmac)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
         $this->additionalParams = $additionalParams;
-        $this->options = $options;
+        $this->rules = $rules;
         $this->hmac = $hmac;
     }
 
@@ -86,8 +86,8 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         return $response;
     }
 
-    public function getOptions() {
-        return $this->options;
+    public function getRulesFile() {
+        return $this->rules;
     }
 }
 

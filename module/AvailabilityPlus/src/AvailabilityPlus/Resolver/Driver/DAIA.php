@@ -173,7 +173,7 @@ class DAIA extends AvailabilityPlusResolver
     private function applyCustomChanges() {
 
         $specsReader = new SearchSpecsReader();
-        $rules = $specsReader->get('availabilityplus-daia.yaml');
+        $rules = $specsReader->get($this->rules);
         $rules_applied = [];
 
         foreach($this->parsed_data->document[0]->item as $key => $item) {
