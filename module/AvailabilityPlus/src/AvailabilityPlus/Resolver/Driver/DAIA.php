@@ -156,7 +156,7 @@ class DAIA extends AvailabilityPlusResolver
         return $response;
     }
 
-    private function setObjectPathValue($key, $path, $value) {
+    protected function setObjectPathValue($key, $path, $value) {
         switch(count($path)) {
             case 1 :
                 $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]] = $value;

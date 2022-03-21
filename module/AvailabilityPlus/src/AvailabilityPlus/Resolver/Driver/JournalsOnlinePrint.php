@@ -2,7 +2,7 @@
 
 namespace AvailabilityPlus\Resolver\Driver;
 
-class JournalsOnlinePrint extends AvailabilityPlusResolverIntermediate
+class JournalsOnlinePrint extends AvailabilityPlusResolver
 {
     /**
      * Get Resolver Url

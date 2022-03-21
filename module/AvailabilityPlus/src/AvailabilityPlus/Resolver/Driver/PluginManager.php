@@ -17,7 +17,6 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'redi' => 'VuFind\Resolver\Driver\Redi',
         'threesixtylink' => 'VuFind\Resolver\Driver\Threesixtylink',
         'AvailabilityPlusResolver' => 'AvailabilityPlus\Resolver\Driver\AvailabilityPlusResolver',
-        'AvailabilityPlusResolverIntermediate' => 'AvailabilityPlus\Resolver\Driver\AvailabilityPlusResolverIntermediate',
         'DAIA' => 'AvailabilityPlus\Resolver\Driver\DAIA',
         'DAIAHsH' => 'AvailabilityPlus\Resolver\Driver\DAIAHsH',
         'DAIAKSF' => 'AvailabilityPlus\Resolver\Driver\DAIAKSF',
