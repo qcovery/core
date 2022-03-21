@@ -14,9 +14,8 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
      *
      * @return array         Array of values
      */
-    public function parseLinks($data)
+    public function parseLinks($data_org)
     {
-        $data_org = $data;
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
         $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
