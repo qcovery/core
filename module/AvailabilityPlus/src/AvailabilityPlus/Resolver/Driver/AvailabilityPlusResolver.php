@@ -156,25 +156,5 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         }
         return $content;
     }
-
-    private function setObjectPathValue($key, $path, $value) {
-        switch(count($path)) {
-            case 1 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]] = $value;
-                break;
-            case 2 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]] = $value;
-                break;
-            case 3 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]] = $value;
-                break;
-            case 4 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]] = $value;
-                break;
-            case 5 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] = $value;
-                break;
-        }
-    }
 }
 
