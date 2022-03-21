@@ -2,6 +2,8 @@
 
 namespace AvailabilityPlus\Resolver\Driver;
 
+use VuFind\Config\SearchSpecsReader;
+
 class DAIA extends AvailabilityPlusResolver
 {
     protected $parsed_data;
@@ -154,6 +156,50 @@ class DAIA extends AvailabilityPlusResolver
         $this->applyCustomChanges();
         $response['parsed_data'] = $this->parsed_data;
         return $response;
+    }
+
+    protected function applyCustomChanges() {
+
+        $specsReader = new SearchSpecsReader();
+        $rules = $specsReader->get($this->rules);
+        $rules_applied = [];
+
+        foreach($this->parsed_data->document[0]->item as $key => $item) {
+            foreach($rules as $rule) {
+                $rule_applies = false;
+                foreach($rule['conditions'] as $condition) {
+                    $match_array = [];
+                    $field_content = $this->getObjectPathValue($item, explode('->',$condition['field']));
+                    preg_match('|'.$condition['content'].'|',$field_content,$match_array);
+                    if(!empty($match_array)){
+                        $rule_applies = true;
+                    } else {
+                        $rule_applies = false;
+                        break;
+                    }
+                }
+
+                if($rule_applies){
+                    foreach($rule['actions'] as $action)
+                    {
+                        $content_old = $this->getObjectPathValue($item, explode('->',$action['field']));
+                        $content_new = $content_old;
+                        if(!empty($action['pattern'])) {
+                            $content_preg =  $this->getObjectPathValue($item, explode('->',$action['content_field']));
+                            $content_new = preg_replace('|'.$action['pattern'].'|', $action['replacement'], $content_preg);
+                        } else if(isset($action['content'])){
+                            $content_new = preg_replace('|(.*)|', '$0', $action['content']);
+                        }
+                        $this->setObjectPathValue($key, explode('->',$action['field']), $content_new);
+                    }
+
+                    $rules_applied[] = $rule;
+                }
+            }
+            if(!empty($rules_applied)) {
+                $this->parsed_data->document[0]->item[$key]->availabilityplus['rules_applied'] = $rules_applied;
+            }
+        }
     }
 
     protected function getObjectPathValue($item, $path) {
