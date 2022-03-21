@@ -82,10 +82,12 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      *
      * @return array         Array of values
      */
-    public function parseLinks($data)
+    public function parseLinks($data_org)
     {
-        $response['data'] = $data;
-        $response['parsed_data'] = $data;
+        $this->parsed_data = $data_org;
+        $response['data'] = $data_org;
+        $this->applyCustomChanges();
+        $response['parsed_data'] = $this->parsed_data;
         return $response;
     }
 
