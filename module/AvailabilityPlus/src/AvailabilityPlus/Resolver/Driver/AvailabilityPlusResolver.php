@@ -119,6 +119,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 if($rule_applies){
                     foreach($rule['actions'] as $action)
                     {
+                        $this->parsed_data[$key]->availabilityplus['rule'] = $rule;
                         $content_old = $this->getObjectPathValue($item, explode('->',$action['field']));
                         $content_new = $content_old;
                         if(!empty($action['pattern'])) {
@@ -134,7 +135,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 }
             }
             if(!empty($rules_applied)) {
-                $this->parsed_data->document[0]->item[$key]->availabilityplus['rules_applied'] = $rules_applied;
+                $this->parsed_data[$key]->availabilityplus['rules_applied'] = $rules_applied;
             }
         }
     }
