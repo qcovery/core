@@ -49,7 +49,8 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
             }
         }
         $response['data'] = $data_org;
-        $response['parsed_data'] = $records;
+        $this->parsed_data = $records;
+        $response['parsed_data'] = $this->parsed_data;
         return $response;
     }
 }
