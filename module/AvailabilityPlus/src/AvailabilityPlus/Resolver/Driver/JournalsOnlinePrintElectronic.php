@@ -18,8 +18,6 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
     {
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
-        $level_org = $level;
-
         $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
         foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
             if(!empty($result->AccessURL)) {
@@ -29,11 +27,11 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
                 if(!in_array($url, $urls)) {
                     switch ($result['state']) {
                         case 0:
-                            $level = $level_org." FreeAccess link_external";
+                            $level = "FreeAccess link_external";
                             $label = "FreeAccess";
                         case 2:
                             if($result['state'] != 0) {
-                                $level = $level_org." LicensedAccess link_external";
+                                $level = "LicensedAccess link_external";
                                 $label = "LicensedAccess";
                             }
                             $level .= " ".$result->AccessLevel;
