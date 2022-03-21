@@ -100,7 +100,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $specsReader = new SearchSpecsReader();
         $rules = $specsReader->get($this->rules);
         $rules_applied = [];
-
+        $this->parsed_data['test'] = 'test';
         foreach($this->parsed_data as $key => $item) {
             foreach($rules as $rule) {
                 $rule_applies = false;
@@ -119,7 +119,6 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 if($rule_applies){
                     foreach($rule['actions'] as $action)
                     {
-                        $this->parsed_data[$key]->availabilityplus['rule'] = $rule;
                         $content_old = $this->getObjectPathValue($item, explode('->',$action['field']));
                         $content_new = $content_old;
                         if(!empty($action['pattern'])) {
