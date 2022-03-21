@@ -24,7 +24,7 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
             switch ($result['state']) {
                 case 2:
                 case 3:
-                    $level .= " PrintAccess";
+                    $level = "PrintAccess";
                     $label = "PrintAccess";
                     if(!empty($result->Signature)) {
                         $url = '/vufind/Search/Results?lookfor='.$result->Signature.'&type=Signature';
