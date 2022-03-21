@@ -6,7 +6,6 @@ use VuFind\Config\SearchSpecsReader;
 
 class DAIA extends AvailabilityPlusResolver
 {
-    protected $parsed_data;
     /**
      * Parse Links
      *

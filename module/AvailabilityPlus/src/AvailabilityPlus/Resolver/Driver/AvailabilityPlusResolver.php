@@ -21,6 +21,8 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $hmac;
 
+    protected $parsed_data;
+
     /**
      * Constructor
      *
