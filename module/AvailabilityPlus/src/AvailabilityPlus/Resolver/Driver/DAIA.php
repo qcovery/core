@@ -156,6 +156,28 @@ class DAIA extends AvailabilityPlusResolver
         return $response;
     }
 
+    protected function getObjectPathValue($item, $path) {
+        $content = '';
+        switch(count($path)) {
+            case 1 :
+                $content = $item->{$path[0]};
+                break;
+            case 2 :
+                $content = $item->{$path[0]}->{$path[1]};
+                break;
+            case 3 :
+                $content = $item->{$path[0]}->{$path[1]}->{$path[2]};
+                break;
+            case 4 :
+                $content = $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]};
+                break;
+            case 5 :
+                $content = $item->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]};
+                break;
+        }
+        return $content;
+    }
+
     protected function setObjectPathValue($key, $path, $value) {
         switch(count($path)) {
             case 1 :
