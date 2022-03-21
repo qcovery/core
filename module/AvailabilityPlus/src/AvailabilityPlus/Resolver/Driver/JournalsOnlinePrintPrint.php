@@ -20,7 +20,6 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
         $records = []; // array to return
         $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
         foreach($data->Full->PrintData->ResultList->Result AS $result) {
-            $level = $level_org;
             $record = [];
             switch ($result['state']) {
                 case 2:
