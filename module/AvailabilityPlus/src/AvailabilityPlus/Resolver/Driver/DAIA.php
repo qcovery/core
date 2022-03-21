@@ -165,7 +165,7 @@ class DAIA extends AvailabilityPlusResolver
             'doc_id' => $doc_id,
             'item_id' => $item_id
         ];
-        return $id.'/Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'&type='.$action.'&storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate($hmacKeys,$hmacPairs);
+        return $id.'/vufind/Record/'.$id.'/Hold?doc_id='.urlencode($doc_id).'&item_id='.urlencode($item_id).'&type='.$action.'&storage_id='.urlencode($storage_id).'&hashKey='.$this->hmac->generate($hmacKeys,$hmacPairs);
     }
 }
 
