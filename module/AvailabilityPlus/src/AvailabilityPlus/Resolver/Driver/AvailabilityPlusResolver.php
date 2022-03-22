@@ -141,7 +141,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 }
             }
             if(!empty($rules_applied)) {
-                $this->parsed_data[$key]->availabilityplus['rules_applied'] = $rules_applied;
+                $this->parsed_data[$key]['rules_applied'] = $rules_applied;
             }
         }
     }
