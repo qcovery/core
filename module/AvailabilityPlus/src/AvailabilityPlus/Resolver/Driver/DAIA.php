@@ -186,10 +186,17 @@ class DAIA extends AvailabilityPlusResolver
                         if(!empty($action['pattern'])) {
                             $content_preg =  $this->getObjectPathValue($item, explode('->',$action['content_field']));
                             $content_new = preg_replace('|'.$action['pattern'].'|', $action['replacement'], $content_preg);
+                            $this->setObjectPathValue($key, explode('->',$action['field']), $content_new);
                         } else if(isset($action['content'])){
                             $content_new = preg_replace('|(.*)|', '$0', $action['content']);
+                            $this->setObjectPathValue($key, explode('->',$action['field']), $content_new);
+                        } else if(!empty($action['function'])) {
+                            switch($action['function']) {
+                                case 'removeItem' :
+                                    unset($this->parsed_data[$key]);
+                                    break;
+                            }
                         }
-                        $this->setObjectPathValue($key, explode('->',$action['field']), $content_new);
                     }
 
                     $rules_applied[] = $rule;
