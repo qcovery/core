@@ -100,13 +100,12 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $specsReader = new SearchSpecsReader();
         $rules = $specsReader->get($this->rules);
         $rules_applied = [];
-        $this->parsed_data['test'] = 'test';
         foreach($this->parsed_data as $key => $item) {
             foreach($rules as $rule) {
                 $rule_applies = false;
                 foreach($rule['conditions'] as $condition) {
                     $match_array = [];
-                    $field_content = $this->getObjectPathValue($item, explode('->',$condition['field']));
+                    $field_content = $item[$condition['field']];
                     preg_match('|'.$condition['content'].'|',$field_content,$match_array);
                     if(!empty($match_array)){
                         $rule_applies = true;
@@ -119,15 +118,15 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 if($rule_applies){
                     foreach($rule['actions'] as $action)
                     {
-                        $content_old = $this->getObjectPathValue($item, explode('->',$action['field']));
+                        $content_old = $item[$action['field']];
                         $content_new = $content_old;
                         if(!empty($action['pattern'])) {
-                            $content_preg =  $this->getObjectPathValue($item, explode('->',$action['content_field']));
+                            $content_preg =  $item[$action['content_field']];
                             $content_new = preg_replace('|'.$action['pattern'].'|', $action['replacement'], $content_preg);
                         } else if(isset($action['content'])){
                             $content_new = preg_replace('|(.*)|', '$0', $action['content']);
                         }
-                        $this->setObjectPathValue($key, explode('->',$action['field']), $content_new);
+                        $this->parsed_data[$key][$action['field']] = $content_new;
                     }
 
                     $rules_applied[] = $rule;
