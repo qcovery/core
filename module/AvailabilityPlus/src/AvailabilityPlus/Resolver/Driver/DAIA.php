@@ -161,9 +161,9 @@ class DAIA extends AvailabilityPlusResolver
 
         $specsReader = new SearchSpecsReader();
         $rules = $specsReader->get($this->rules);
-        $rules_applied = [];
 
         foreach($this->parsed_data->document[0]->item as $key => $item) {
+            $rules_applied = [];
             foreach($rules as $rule) {
                 $rule_applies = false;
                 foreach($rule['conditions'] as $condition) {
