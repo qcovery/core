@@ -1,10 +1,12 @@
 <?php
 foreach($data as $result) {
-   $level = $result['level'];
-   $label = $result['label'];
-   $url = $result['url'];
-   echo '<div class="delimiter"></div>';
-   echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-   if($mode == 'break_on_first') break;
+   if(!empty($result['label'])){
+      $level = $result['level'];
+      $label = $result['label'];
+      $url = $result['url'];
+      echo '<div class="delimiter"></div>';
+      echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+      if($mode == 'break_on_first') break;
+   }
 }
 ?>
