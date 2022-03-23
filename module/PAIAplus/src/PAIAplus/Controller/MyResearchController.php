@@ -279,6 +279,18 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         return $view;
     }
 
+    public function profileAction()
+    {
+        $view = parent::profileAction();
+        if ($this->showProfileNoteOnAllPages()) {
+            $this->addProfileNoteToView($view);
+        }
+        if ($this->showPatronStatusOnAllPages()) {
+            $this->addPatronStatusToView($view);
+        }
+        return $view;
+    }
+
     private function showProfileNoteOnAllPages () {
         $paiaConfig = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('PAIA');
         if (isset($paiaConfig['PAIA']['show_note_on_all_pages']) && $paiaConfig['PAIA']['show_note_on_all_pages']) {
