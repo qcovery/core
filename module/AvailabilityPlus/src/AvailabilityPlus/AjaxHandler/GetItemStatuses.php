@@ -65,7 +65,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->checks = $this->config['RecordView'];
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
-	    $this->resolverManager = $rm;
+        $this->resolverManager = $rm;
     }
 
     /**
@@ -80,15 +80,19 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $responses = [];
         $ids = $params->fromPost('id', $params->fromQuery('id', ''));
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
-
         $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
-        $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
-        $this->setChecks($list, $mediatype);
-
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $check_mode = 'continue';
                 $this->driver = $this->recordLoader->load($id, $this->source);
+                $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
+                if(empty($mediatype)) {
+                    $formats = $this->driver->getFormats();
+                    if (isset($formats[0])) {
+                        $mediatype = $formats[0];
+                    }
+                }
+                $this->setChecks($list, $mediatype);
                 $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
                 $responses = [];
                 $response = [];
@@ -104,6 +108,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                 }
                 $response['id'] = $id;
+                $response['mediatype'] = $mediatype;
                 $response['checkRoute'] = $this->checkRoute;
                 $response['checks'] = $this->checks;
                 $responses[] = $response;

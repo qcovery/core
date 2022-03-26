@@ -1,12 +1,4 @@
-<?php
-$formats = $this->driver->getFormats();
-$mediatype = '';
-if (isset($formats[0])) {
-    $mediatype = $formats[0];
-}
-
-?>
-<div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->searchClassId ?>" data-mediatype="<?=$mediatype?>">
+<div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->searchClassId ?>">
     <span class="status ajax-availability hidden">
         <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
     </span>
