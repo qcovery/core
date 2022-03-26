@@ -45,6 +45,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $default_template;
 
+    protected $debug;
+
     /**
      * Resolver driver plugin manager
      *
@@ -81,6 +83,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $ids = $params->fromPost('id', $params->fromQuery('id', ''));
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
         $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
+        $this->debug = $params->fromPost('debug', $params->fromQuery('debug', ''));
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $check_mode = 'continue';
@@ -101,8 +104,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                         $results = $this->performAvailabilityCheck($check);
                         foreach($results as $result) {
                             if(!empty($result)) {
-                                $response[] = $result;
                                 if(!empty($result['html'])) $check_mode = $this->current_mode;
+                                if($this->debug) {
+                                    $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
+                                }
+                                $response[] = $result;
                             }
                         }
                     }
@@ -114,6 +120,16 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $responses[] = $response;
             }
         }
+
+        if($this->debug) {
+            $debug_info = [];
+            $debug_info['check'] = 'Debug Info';
+            $debug_info['mediatype'] = $mediatype;
+            $debug_info['checkRoute'] = $this->checkRoute;
+            $debug_info['checks'] = $this->checks;
+            $responses[0][0]['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $debug_info ]).$responses[0][0]['html'];
+        }
+
         return $this->formatResponse(['statuses' => $responses]);
     }
 
@@ -269,7 +285,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label' => $label,
             'label_translated' => $this->translate($label),
             'template' => $template,
-            'data' => $data
+            'data' => $data,
+            'debug' => $this->debug
         ];
         return $response;
     }
@@ -368,6 +385,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label_translated' => $this->translate($resolver),
             'marc_data' => $data,
             'params' => $params,
+            'debug' => $this->debug
         ];
         $response['data'] = '';
         if(!empty($resolver_url) && !empty($data)) {
@@ -407,4 +425,3 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $params;
     }
 }
-
