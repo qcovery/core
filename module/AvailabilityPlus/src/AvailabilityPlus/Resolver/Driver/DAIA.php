@@ -24,7 +24,7 @@ class DAIA extends AvailabilityPlusResolver
         $this->parsed_data = $data;
 
         foreach($data->document[0]->item as $key => $item) {
-            $record =  [];
+            $record =  (object)[];
 
             $item_services['available']['openaccess'] = [];
             $item_services['available']['remote'] = [];
@@ -43,109 +43,109 @@ class DAIA extends AvailabilityPlusResolver
             }
 
             foreach($item_services['available'] as $service_key=>$service_content) {
-                 if(!empty($service_content)) {
+                if(!empty($service_content)) {
                     switch($service_key) {
                         case 'openaccess':
                             if(!in_array($service_content->href, $urls)) {
-                                $record['daia_action']['level'] = 'FreeAccess link_external';
-                                $record['daia_action']['label'] = 'FreeAccess';
-                                $record['daia_action']['url'] = $service_content->href;
-                                $urls[] = $record['daia_action']['url'];
+                                $record->daia_action->level = 'FreeAccess link_external';
+                                $record->daia_action->label = 'FreeAccess';
+                                $record->daia_action->url = $service_content->href;
+                                $urls[] = $record->daia_action->url;
                                 if(!empty($item->about)) {
-                                    $record['about'] = $item->about;
+                                    $record->about = $item->about;
                                 }
                                 if(!empty($item->chronology->about)) {
-                                    $record['chronology'] = $item->chronology->about;
+                                    $record->chronology = $item->chronology->about;
                                 }
                             }
                             break;
                         case 'remote':
                             if(!in_array($service_content->href, $urls)) {
-                                $record['daia_action']['level'] = 'LicensedAccess link_external';
-                                $record['daia_action']['label'] = 'LicensedAccess';
-                                $record['daia_action']['url'] = $service_content->href;
-                                $urls[] = $record['daia_action']['url'];
+                                $record->daia_action->level = 'LicensedAccess link_external';
+                                $record->daia_action->label = 'LicensedAccess';
+                                $record->daia_action->url = $service_content->href;
+                                $urls[] = $record->daia_action->url;
                                 if(!empty($item->about)) {
-                                    $record['about'] = $item->about;
+                                    $record->about = $item->about;
                                 }
                                 if(!empty($item->chronology->about)) {
-                                    $record['chronology'] = $item->chronology->about;
+                                    $record->chronology = $item->chronology->about;
                                 }
                             }
                             break;
                         case 'loan':
                         case 'presentation':
                             if(!empty($item->storage->id)){
-                                $record['storage']['level'] = 'link_external';
-                                $record['storage']['label'] = $item->storage->content;
-                                $record['storage']['url'] = $item->storage->id;
+                                $record->storage->level = 'link_external';
+                                $record->storage->label = $item->storage->content;
+                                $record->storage->url = $item->storage->id;
                             } else {
-                                $record['storage']['label'] = 'unknown_location';
+                                $record->storage->label = 'unknown_location';
                             }
-                            if(!empty($item->label)) $record['callnumber'] = $item->label;
+                            if(!empty($item->label)) $record->callnumber = $item->label;
                             if(!empty($service_content->limitation[0]->id)) {
                                 $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
-                                $record['daia_hint']['level'] = $limitation;
-                                $record['daia_hint']['label'] = $service_content->service.$limitation;
+                                $record->daia_hint->level = $limitation;
+                                $record->daia_hint->label = $service_content->service.$limitation;
                             } elseif(!empty($service_content->limitation[0]->content)) {
                                 $limitation = $service_content->limitation[0]->content;
-                                $record['daia_hint']['level'] = $limitation;
-                                $record['daia_hint']['label'] = $service_content->service.$limitation;
+                                $record->daia_hint->level = $limitation;
+                                $record->daia_hint->label = $service_content->service.$limitation;
                             } elseif(!empty($service_content->expected)) {
-                                $record['daia_hint']['level'] = "daia_orange";
+                                $record->daia_hint->level = "daia_orange";
                                 $date = date_create($service_content->expected);
-                                $record['daia_hint']['label'] = 'on_loan_until';
-                                $record['daia_hint']['label_date'] = date_format($date,"d.m.Y");
+                                $record->daia_hint->label = 'on_loan_until';
+                                $record->daia_hint->label_date = date_format($date,"d.m.Y");
                             } else {
-                                $record['daia_hint']['level'] = "daia_green";
-                                $record['daia_hint']['label'] = $service_content->service;
+                                $record->daia_hint->level = "daia_green";
+                                $record->daia_hint->label = $service_content->service;
                             }
                             if(!empty($service_content->href)) {
-                                $record['daia_action']['level'] = 'internal_link';
+                                $record->daia_action->level = 'internal_link';
                                 $url_components = parse_url($service_content->href);
                                 parse_str($url_components['query'], $params);
-                                $record['daia_action']['label'] = $params['action'];
-                                $record['daia_action']['url'] = $this->generateOrderLink($params['action'], $data->document[0]->id, $item->id, $item->storage->id);
+                                $record->daia_action->label = $params['action'];
+                                $record->daia_action->url = $this->generateOrderLink($params->action, $data->document[0]->id, $item->id, $item->storage->id);
                             } else {
-                                $record['daia_action']['label'] = $service_content->service.'_default_action'.$limitation;
+                                $record->daia_action->label = $service_content->service.'_default_action'.$limitation;
                             }
                             if(isset($service_content->queue)) {
-                                $record['queue']['length'] = $service_content->queue;
+                                $record->queue->length = $service_content->queue;
                                 if($service_content->queue == 1) {
-                                    $record['queue']['label'] .=  'Recall';
+                                    $record->queue->label .=  'Recall';
                                 } else {
-                                    $record['queue']['label'] .=  'Recalls';
+                                    $record->queue->label .=  'Recalls';
                                 }
                             }
                             if(!empty($item->about)) {
-                                $record['about'] = $item->about;
+                                $record->about = $item->about;
                             }
                             if(!empty($item->chronology->about)) {
-                                $record['chronology'] = $item->chronology->about;
+                                $record->chronology = $item->chronology->about;
                             }
                             break;
                         case 'fallback':
                             if(!empty($item->storage->id)){
-                                $record['storage']['level'] = 'link_external';
-                                $record['storage']['label'] = $item->storage->content;
-                                $record['storage']['url'] = $item->storage->id;
+                                $record->storage->level = 'link_external';
+                                $record->storage->label = $item->storage->content;
+                                $record->storage->url = $item->storage->id;
                             } else {
-                                $record['storage']['label'] = 'unknown_location';
+                                $record->storage->label = 'unknown_location';
                             }
-                            if(!empty($item->label)) $record['callnumber'] = $item->label;
-                            $record['daia_hint']['level'] = 'daia_red';
-                            $record['daia_hint']['label'] = 'not_available';
+                            if(!empty($item->label)) $record->callnumber = $item->label;
+                            $record->daia_hint->level = 'daia_red';
+                            $record->daia_hint->label = 'not_available';
                             if(!empty($item->about)) {
-                                $record['about'] = $item->about;
+                                $record->about = $item->about;
                             }
                             if(!empty($item->chronology->about)) {
-                                $record['chronology'] = $item->chronology->about;
+                                $record->chronology = $item->chronology->about;
                             }
                             break;
                     }
-                    if(!empty($record)) {
-                        $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                    }
+                    //  if(!empty($record)) {
+                    $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                    // }
                     break;
                 }
             }
@@ -203,7 +203,7 @@ class DAIA extends AvailabilityPlusResolver
                 }
             }
             if(!empty($rules_applied)) {
-                $this->parsed_data->document[0]->item[$key]->availabilityplus['rules_applied'] = $rules_applied;
+                $this->parsed_data->document[0]->item[$key]->availabilityplus->rules_applied = $rules_applied;
             }
         }
     }
@@ -233,19 +233,22 @@ class DAIA extends AvailabilityPlusResolver
     protected function setObjectPathValue($key, $path, $value) {
         switch(count($path)) {
             case 1 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]] = $value;
+                $this->parsed_data->document[0]->item[$key]->{$path[0]} = $value;
                 break;
             case 2 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]] = $value;
+                $this->parsed_data->document[0]->item[$key]->{$path[0]}->{$path[1]} = $value;
                 break;
             case 3 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]] = $value;
+                $this->parsed_data->document[0]->item[$key]->{$path[0]}->{$path[1]}->{$path[2]} = $value;
                 break;
             case 4 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]] = $value;
+                $this->parsed_data->document[0]->item[$key]->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]} = $value;
                 break;
             case 5 :
-                $this->parsed_data->document[0]->item[$key]->availabilityplus[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] = $value;
+                $this->parsed_data->document[0]->item[$key]->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]} = $value;
+                break;
+            case 6 :
+                $this->parsed_data->document[0]->item[$key]->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]}->{$path[5]} = $value;
                 break;
         }
     }

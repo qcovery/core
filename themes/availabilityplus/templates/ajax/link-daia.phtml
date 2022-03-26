@@ -9,37 +9,37 @@ foreach($data->document[0]->item as $item) {
         echo '<div class="delimiter"></div>';
     }
     echo '<div class="daia_storage_callnumber">';
-    if(!empty($result['storage'])) {
-        echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result['storage']['url'].'" class="'.$result['storage']['level'].'" title="'.$result['storage']['label'].'" target="_blank">'.$this->translate($result['storage']['label']).'</a></span>';
+    if(!empty($result->storage)) {
+        echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result->storage->url.'" class="'.$result->storage->level.'" title="'.$result->storage->label.'" target="_blank">'.$this->translate($result->storage->label).'</a></span>';
     }
-    if(!empty($result['callnumber'])) {
-        echo ' <span class="item_label">' . $result['callnumber'] . '</span>';
+    if(!empty($result->callnumber)) {
+        echo ' <span class="item_label">' . $result->callnumber . '</span>';
     }
     echo '</div>';
-    if(!empty($result['daia_hint'])) {
-        echo '<span class="daia_hint"><span class="'.$result['daia_hint']['level'].'">'.$this->translate($result['daia_hint']['label']);
-        if(!empty($result['daia_hint']['label_date'])) echo ' '.$result['daia_hint']['label_date'];
+    if(!empty($result->daia_hint)) {
+        echo '<span class="daia_hint"><span class="'.$result->daia_hint->level.'">'.$this->translate($result->daia_hint->label);
+        if(!empty($result->daia_hint->label_date)) echo ' '.$result->daia_hint->label_date;
         echo '</span></span>';
     }
-    if(!empty($result['daia_hint']) && !empty($result['daia_action'])) {
+    if(!empty($result->daia_hint) && !empty($result->daia_action)) {
         echo '<span class="daia_arrow"> ➝ </span>';
     }
-    if(!empty($result['daia_action'])) {
-        if(!empty($result['daia_action']['url'])) {
-            echo '<span class="daia_action"><a href="'.$result['daia_action']['url'].'" class="'.$result['daia_action']['level'].' link_external" title="'.$result['daia_action']['label'].'" target="_blank">'.$this->translate($result['daia_action']['label']).'</a></span>';
+    if(!empty($result->daia_action)) {
+        if(!empty($result->daia_action->url)) {
+            echo '<span class="daia_action"><a href="'.$result->daia_action->url.'" class="'.$result->daia_action->level.' link_external" title="'.$result->daia_action->label.'" target="_blank">'.$this->translate($result->daia_action->label).'</a></span>';
         } else {
-            echo '<span class="daia_action">'.$this->translate($result['daia_action']['label']).'</span>';
+            echo '<span class="daia_action">'.$this->translate($result->daia_action->label).'</span>';
         }
     }
-    if(!empty($result['queue'])) {
-        echo '<div class="service_queue">'.$result['queue']['length'].' '.$this->translate($result['queue']['label']).'</div>';
+    if(!empty($result->queue)) {
+        echo '<div class="service_queue">'.$result->queue->length.' '.$this->translate($result->queue->label).'</div>';
     }
-    if(!empty($result['about'])) {
-        echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result['about'].'</div>';
+    if(!empty($result->about)) {
+        echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
     }
     print_r($reus);
-    if(!empty($result['chronology'])) {
-        echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result['chronology'].'</div>';
+    if(!empty($result->chronology)) {
+        echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
     }
     if($mode == 'break_on_first') break;
 }

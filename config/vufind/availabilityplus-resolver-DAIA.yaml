@@ -1,6 +1,6 @@
 rule100:
   name: 'Signatur'
   conditions:
-    - { field: 'label', content: '(.*):(.*)' }
+    - { field: 'availabilityplus->callnumber', content: '(.*):(.*)' }
   actions:
-    - { field: 'callnumber', content_field: 'label', pattern: '(.*):(.*)', replacement: '$2'}
+    - { field: 'availabilityplus->callnumber', content_field: 'availabilityplus->callnumber', pattern: '(.*):(.*)', replacement: '$2'}
