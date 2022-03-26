@@ -285,8 +285,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label' => $label,
             'label_translated' => $this->translate($label),
             'template' => $template,
-            'data' => $data,
-            'debug' => $this->debug
+            'data' => $data
         ];
         return $response;
     }
@@ -384,8 +383,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label' => $resolver,
             'label_translated' => $this->translate($resolver),
             'marc_data' => $data,
-            'params' => $params,
-            'debug' => $this->debug
+            'params' => $params
         ];
         $response['data'] = '';
         if(!empty($resolver_url) && !empty($data)) {
