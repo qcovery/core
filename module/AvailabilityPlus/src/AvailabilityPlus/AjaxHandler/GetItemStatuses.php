@@ -192,7 +192,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      */
     private function checkSolrMarcData($solrMarcKeys, $check) {
         sort($solrMarcKeys);
-        $responses = [];
         $urls = [];
         $break = false;
         foreach ($solrMarcKeys as $solrMarcKey) {
@@ -228,6 +227,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                         break;
                     }
                 }
+            } else {
+                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url);
+                $responses[] = $response;
             }
             if($break) break;
         }
