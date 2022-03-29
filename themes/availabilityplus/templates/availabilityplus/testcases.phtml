@@ -1,8 +1,46 @@
 <?php
     // Set up page title:
-    $this->headTitle($this->translate('Availability Plus Test Cases'));
+	$this->headTitle($this->translate('Availability Plus Test Cases'));
+	
+	//Load Cases
+    $specsReader = new \VuFind\Config\SearchSpecsReader();
+    $cases = $specsReader->get('availabilityplus-testcases.yaml');
 ?>
 <div class="AvailabilityPlusTestCases">
-TestCases
+<? if(!empty($cases)) { ?>
+	<table>
+		<tr>
+			<th>PPN</th>
+			<th>Driver</th>
+			<th>List</th>
+			<th>Description</th>
+			<th>Expected</th>
+			<th>Result</th>
+		</tr>
+		<? foreach ($cases AS $case) { ?>
+		    <?
+				$id = $case['id'];
+				$driver = $case['driver'];
+				$list = $case['list'];
+				$description = $case['description'];
+				$expected = $case['expected'];
+			?>
+			<tr>
+				<td><?=$id?></td>
+				<td><?=$driver?></td>
+				<td><?=$list?></td>
+				<td><?=$description?></td>
+				<td><?=$expected?></td>
+				<td>
+					<div class="AvailabilityPlusTestCases">
+					<?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?>
+					</div>
+				</td>
+			</tr>
+		<? } ?>
+	</table>
+<? } else { ?>
+Keine TestCases definiert
+<? } ?>
 </div>
 

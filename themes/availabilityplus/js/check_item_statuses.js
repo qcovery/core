@@ -59,6 +59,11 @@ function runItemAjaxForQueue() {
     itemStatusRunning = true;
 
     for (var i=0; i<itemStatusIds.length; i++) {
+		var item = itemStatusEls[itemStatusIds[i]];
+		itemStatusSource = item.attr('data-src');
+		itemStatusList = (item.attr('data-list') == 1);
+		itemStatusMediatype = item.attr('data-mediatype');
+		itemStatusDebug = item.attr('data-debug');
         $.ajax({
             url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
@@ -87,6 +92,11 @@ function itemQueueAjax(id, el) {
     clearTimeout(itemStatusTimer);
     itemStatusIds.push(id);
     itemStatusEls[id] = el;
+	var item = $(el);
+	itemStatusSource = item.attr('data-src');
+    itemStatusList = (item.attr('data-list') == 1);
+    itemStatusMediatype = item.attr('data-mediatype');
+    itemStatusDebug = item.attr('data-debug');
     itemStatusTimer = setTimeout(runItemAjaxForQueue, itemStatusDelay);
     el.addClass('js-item-pending').removeClass('hidden');
     el.find('.callnumAndLocation').removeClass('hidden');

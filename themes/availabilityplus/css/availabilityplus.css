@@ -88,3 +88,19 @@
 .AvailabilityPlusTestCases {
   background-color: white;
 }
+
+.AvailabilityPlusTestCases table {
+	width: 100%;
+}
+
+.AvailabilityPlusTestCases tr,
+.AvailabilityPlusTestCases th,
+.AvailabilityPlusTestCases td
+{
+	border: 1px solid black;
+}
+
+.AvailabilityPlusTestCases th,
+.AvailabilityPlusTestCases td {
+	padding: 5px;
+}
