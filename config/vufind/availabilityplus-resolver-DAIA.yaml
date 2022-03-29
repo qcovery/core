@@ -1,5 +1,11 @@
-rule100:
+Signatur:
   name: 'Signatur'
+  descripton: ''
+  reason: ''
+  date: ''
+  creator: ''
+  examples: ''
+  details: ''
   conditions:
     - { field: 'availabilityplus->callnumber', content: '(.*):(.*)' }
   actions:
