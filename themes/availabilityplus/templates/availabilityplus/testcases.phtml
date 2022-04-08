@@ -16,6 +16,7 @@
 			<th>Description</th>
 			<th>Expected</th>
 			<th>Result</th>
+			<th>Debug-Ansicht</th>
 		</tr>
 		<? foreach ($cases AS $key => $case) { ?>
 		    <?
@@ -26,7 +27,7 @@
 				$expected = $case['expected'];
 			?>
 			<tr>
-				<td><?=$id?></td>
+                <td><a href="/vufind/<?=$driver?>/<?=$id?>" target="_blank"><?=$id?></a></td>
 				<td><?=$driver?></td>
 				<td><?=$list?></td>
 				<td><?=$description?></td>
@@ -36,6 +37,8 @@
 					<?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?>
 					</div>
 				</td>
+                <td><a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank">Debug-Ansicht</a></td>
+            </tr>
 			</tr>
 		<? } ?>
 	</table>
