@@ -25,9 +25,15 @@
 				$list = $case['list'];
 				$description = $case['description'];
 				$expected = $case['expected'];
+
+                if($driver == 'Search2') {
+                    $recordRoute = 'Search2Record';
+                } else {
+                    $recordRoute = 'Record';
+                }
 			?>
 			<tr>
-                <td><a href="/vufind/<?=$driver?>/<?=$id?>" target="_blank"><?=$id?></a></td>
+                <td><a href="/vufind/<?=$recordRoute?>Record/<?=$id?>" target="_blank"><?=$id?></a></td>
 				<td><?=$driver?></td>
 				<td><?=$list?></td>
 				<td><?=$description?></td>
