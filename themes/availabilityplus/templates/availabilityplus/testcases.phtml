@@ -10,7 +10,6 @@
 <? if(!empty($cases)) { ?>
 	<table>
 		<tr>
-            <th>#</th>
 			<th>PPN</th>
 			<th>Driver</th>
 			<th>List</th>
@@ -20,14 +19,13 @@
 		</tr>
 		<? foreach ($cases AS $key => $case) { ?>
 		    <?
-				$id = $case['id'];
+				$id = $key;
 				$driver = $case['driver'];
 				$list = $case['list'];
 				$description = $case['description'];
 				$expected = $case['expected'];
 			?>
 			<tr>
-				<td><?=$key?></td>
 				<td><?=$id?></td>
 				<td><?=$driver?></td>
 				<td><?=$list?></td>
