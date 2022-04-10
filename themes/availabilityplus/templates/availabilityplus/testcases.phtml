@@ -30,6 +30,7 @@
 				$date = $case['date'];
 				$creator = $case['creator'];
 				$detailsLink = $case['detailsLink'];
+				$rules = $case['rules'];
 
                 if($driver == 'Search2') {
                     $recordRoute = 'Search2Record';
@@ -67,6 +68,9 @@
                     <? } ?>
                     <? if(!empty($detailsLink)) { ?>
                         <a href="<?=$detailsLink?>" target="_blank">Link zu weiteren Details</a><br>
+                    <? } ?>
+                    <? if(!empty($rules)) { ?>
+                        Geprüfte Regel(n): <?=$rules?><br>
                     <? } ?>
                 </td>
             </tr>
