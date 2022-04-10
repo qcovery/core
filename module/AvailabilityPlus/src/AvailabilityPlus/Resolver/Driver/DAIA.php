@@ -253,7 +253,7 @@ class DAIA extends AvailabilityPlusResolver
         }
     }
 
-    private function generateOrderLink ($action, $doc_id, $item_id, $storage_id) {
+    protected function generateOrderLink ($action, $doc_id, $item_id, $storage_id) {
         if ($action == 'reserve') $action = 'recall';
         $id = substr($doc_id, strrpos($doc_id, ":") + 1);
         $hmacKeys = explode(':','id:item_id:doc_id');
