@@ -16,7 +16,8 @@
 			<th>Description</th>
 			<th>Expected</th>
 			<th>Result</th>
-			<th>Debug-Ansicht</th>
+			<th>Links</th>
+			<th>Info</th>
 		</tr>
 		<? foreach ($cases AS $key => $case) { ?>
 		    <?
@@ -25,11 +26,17 @@
 				$list = $case['list'];
 				$description = $case['description'];
 				$expected = $case['expected'];
+				$reason = $case['reason'];
+				$date = $case['date'];
+				$creator = $case['creator'];
+				$detailsLink = $case['detailsLink'];
 
                 if($driver == 'Search2') {
                     $recordRoute = 'Search2Record';
+                    $searchRoute = 'Search2';
                 } else {
                     $recordRoute = 'Record';
+                    $searchRoute = 'Solr';
                 }
 			?>
 			<tr>
@@ -43,7 +50,25 @@
 					<?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?>
 					</div>
 				</td>
-                <td><a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank">Debug-Ansicht</a></td>
+                <td>
+                    <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank">Ergebnislisten-Ansicht</a><br>
+                    <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank">Detail-Ansicht</a><br>
+                    <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank">Debug-Ansicht</a><br>
+                </td>
+                <td>
+                    <? if(!empty($reason)) { ?>
+                        Grund: <?=$reason?><br>
+                    <? } ?>
+                    <? if(!empty($creator)) { ?>
+                        Erstellt durch: <?=$creator?><br>
+                    <? } ?>
+                    <? if(!empty($date)) { ?>
+                        Erstellt am: <?=$date?><br>
+                    <? } ?>
+                    <? if(!empty($detailsLink)) { ?>
+                        <a href="detailsLink" target="_blank">Link zu weiteren Details</a><br>
+                    <? } ?>
+                </td>
             </tr>
 			</tr>
 		<? } ?>
