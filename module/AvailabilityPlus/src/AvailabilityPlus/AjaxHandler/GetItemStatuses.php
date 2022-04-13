@@ -294,9 +294,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = ''){
         $response = [
-            'mode' => $this->current_mode,
             'check' => $check,
             'SolrMarcKey' => $solrMarcKey,
+            'mode' => $this->current_mode,
             'url' => $url,
             'level' => $level,
             'label' => $label,
