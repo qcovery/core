@@ -87,37 +87,51 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $check_mode = 'continue';
-                $this->driver = $this->recordLoader->load($id, $this->source);
-                $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
-                if(empty($mediatype)) {
-                    $formats = $this->driver->getFormats();
-                    if (isset($formats[0])) {
-                        $mediatype = $formats[0];
+                try {
+                    $this->driver = $this->recordLoader->load($id, $this->source);
+                    $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
+                    if(empty($mediatype)) {
+                        $formats = $this->driver->getFormats();
+                        if (isset($formats[0])) {
+                            $mediatype = $formats[0];
+                        }
                     }
-                }
-                $this->setChecks($list, $mediatype);
-                $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
-                $responses = [];
-                $response = [];
-                foreach($this->checks as $check => $this->current_mode) {
-                    if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
-                        $results = $this->performAvailabilityCheck($check);
-                        foreach($results as $result) {
-                            if(!empty($result)) {
-                                if(!empty($result['html'])) $check_mode = $this->current_mode;
-                                if($this->debug) {
-                                    $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
+                    $this->setChecks($list, $mediatype);
+                    $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
+                    $responses = [];
+                    $response = [];
+                    foreach($this->checks as $check => $this->current_mode) {
+                        if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
+                            $results = $this->performAvailabilityCheck($check);
+                            foreach($results as $result) {
+                                if(!empty($result)) {
+                                    if(!empty($result['html'])) $check_mode = $this->current_mode;
+                                    if($this->debug) {
+                                        $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
+                                    }
+                                    $response[] = $result;
                                 }
-                                $response[] = $result;
                             }
                         }
                     }
+                    $response['id'] = $id;
+                    $response['mediatype'] = $mediatype;
+                    $response['checkRoute'] = $this->checkRoute;
+                    $response['checks'] = $this->checks;
+                    $responses[] = $response;
+                } catch (\Exception $e) {
+                    $result['check'] = 'Exception';
+                    $result['error'] = $e;
+                    if($this->debug) {
+                        $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
+                    }
+                    $response[] = $result;
+                    $response['id'] = $id;
+                    $response['checkRoute'] = $this->checkRoute;
+                    $response['checks'] = $this->checks;
+                    $responses[] = $response;
                 }
-                $response['id'] = $id;
-                $response['mediatype'] = $mediatype;
-                $response['checkRoute'] = $this->checkRoute;
-                $response['checks'] = $this->checks;
-                $responses[] = $response;
+
             }
         }
 
