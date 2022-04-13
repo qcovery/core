@@ -300,8 +300,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
         $response = [
             'check' => $check,
-            'status' => $status,
             'SolrMarcKey' => $solrMarcKey,
+            'status' => $status,
             'mode' => $this->current_mode,
             'url' => $url,
             'level' => $level,
