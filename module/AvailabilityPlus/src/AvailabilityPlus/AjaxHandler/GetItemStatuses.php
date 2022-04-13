@@ -220,7 +220,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                         foreach ($date['url']['data'] as $url) {
                             if(!in_array($url, $urls)) {
                                 $urls[] = $url;
-                                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url);
+                                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, true);
                                 $response['html'] = $this->applyTemplate($template, $response);
                                 $responses[] = $response;
                                 if($this->current_mode == 'break_on_first') {
@@ -234,7 +234,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 }
 
                 if(empty($urls)) {
-                    $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data);
+                    $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, '', true);
                     $response['html'] = $this->applyTemplate($template, $response);
                     $responses[] = $response;
                     if($this->current_mode == 'break_on_first') {
@@ -292,9 +292,15 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $label;
     }
 
-    private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = ''){
+    private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = '', $status = false){
+        if($status) {
+            $status = 'Successful - Check found a match!';
+        } else {
+            'NOT successful - Check did not find a match!'
+        }
         $response = [
             'check' => $check,
+            'status' => $status,
             'SolrMarcKey' => $solrMarcKey,
             'mode' => $this->current_mode,
             'url' => $url,
@@ -304,11 +310,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'template' => $template,
             'data' => $data
         ];
-        if(empty($label)) {
+/*        if(empty($label)) {
             $response['status'] = 'NOT successful - Check did not find a match!';
         } else {
             $response['status'] = 'Successful - Check found a match!';
-        }
+        }*/
         return array_filter($response);
     }
 
