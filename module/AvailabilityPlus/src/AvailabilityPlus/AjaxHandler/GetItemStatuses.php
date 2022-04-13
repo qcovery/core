@@ -304,6 +304,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'template' => $template,
             'data' => $data
         ];
+        if(empty($label)) {
+            $response['status'] = 'NOT successful - Check did not find a match!';
+        } else {
+            $response['status'] = 'Successful - Check found a match!';
+        }
         return array_filter($response);
     }
 
