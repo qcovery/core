@@ -128,9 +128,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                     $response[] = $result;
                     $response['id'] = $id;
-                    $response['mediatype'] = 'unknown';
-                    $response['checkRoute'] = 'unknown';
-                    $response['checks'] = $this->checks;
+                    $mediatype = 'cannot be determined due to exception';
+                    $this->checkRoute = 'cannot be determined due to exception';
                     $responses[] = $response;
                 }
 
