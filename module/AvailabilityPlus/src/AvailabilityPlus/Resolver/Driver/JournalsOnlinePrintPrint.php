@@ -29,12 +29,18 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
                     if(!empty($result->Signature)) {
                         $url = '/vufind/Search/Results?lookfor='.$result->Signature.'&type=Signature';
                     } else {
-                        $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';;
+                        $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';
                     }
+
                     if(!in_array($url, $urls)) {
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
+                        if(!empty($result->Signature)) $record['signature'] = $result->Signature;
+                        if(!empty($result->Title)) $record['title'] = $result->Title;
+                        if(!empty($result->Location)) $record['location'] = $result->Location;
+                        if(!empty($result->Period)) $record['period'] = $result->Period;
+                        if(!empty($result->Holding_comment)) $record['Holding_comment'] = $result->Holding_comment;
                         $records[] = $record;
                         $urls[] = $url;
                     }
