@@ -304,7 +304,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'template' => $template,
             'data' => $data
         ];
-        return $response;
+        return array_filter($response);
     }
 
     /**
