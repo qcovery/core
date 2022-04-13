@@ -86,6 +86,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->debug = $params->fromPost('debug', $params->fromQuery('debug', ''));
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
+                $this->checks = [];
                 $check_mode = 'continue';
                 try {
                     $this->driver = $this->recordLoader->load($id, $this->source);
@@ -127,6 +128,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                     $response[] = $result;
                     $response['id'] = $id;
+                    $response['mediatype'] = 'unknown';
+                    $response['checkRoute'] = 'unknown';
+                    $response['checks'] = $this->checks;
                     $responses[] = $response;
                 }
 
