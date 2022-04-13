@@ -28,6 +28,6 @@ Example:
   reason: 'to give an example for test cases'
   date: '2022-04-09'
   creator: 'Jon Doe'
-  rules: 'keine Regel zutreffend'
+  rules: 'no rule applicable'
   detailsLink: 'http://www.test.com'
 ```
