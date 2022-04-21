@@ -75,7 +75,11 @@ class DAIA extends AvailabilityPlusResolver
                             break;
                         case 'loan':
                         case 'presentation':
-                            if(!empty($item->storage->id)){
+                            if(!empty($item->storage->href)){
+                                $record->storage->level = 'link_external';
+                                $record->storage->label = $item->storage->content;
+                                $record->storage->url = $item->storage->href;
+                            } elseif(!empty($item->storage->id)){
                                 $record->storage->level = 'link_external';
                                 $record->storage->label = $item->storage->content;
                                 $record->storage->url = $item->storage->id;
