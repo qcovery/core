@@ -9,12 +9,15 @@
     // Variables:
     $list = 1;
     if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
+    $list_name = 'ResultList';
+    if($list == 0) $list_name = 'DetailView';
 
 ?>
 <div class="AvailabilityPlusTestCases">
 <? if(!empty($cases)) { ?>
     Links To TestCase Views: <a href="/vufind/AvailabilityPlus/TestCases?list=1">TestCases ResultsList</a> | <a href="/vufind/AvailabilityPlus/TestCases?list=0">TestCases DetailView</a>
-	<table>
+    <h3>TestCases <?=$list_name?></h3>
+    <table>
 		<tr>
 			<th>PPN</th>
 			<th>Driver</th>
