@@ -89,6 +89,12 @@
   background-color: white;
 }
 
+.AvailabilityPlusTestCases {
+  width: 100vw;
+  position: relative;
+  left: calc(-50vw + 50%);
+}
+
 .AvailabilityPlusTestCases table {
 	width: 100%;
 }
