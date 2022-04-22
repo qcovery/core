@@ -90,9 +90,9 @@
 }
 
 .AvailabilityPlusTestCases {
-  width: 100vw;
+  width: 98vw;
   position: relative;
-  left: calc(-50vw + 50%);
+  left: calc(-49vw + 49%);
   margin: 0px 20px 0px 20px;
 }
 
