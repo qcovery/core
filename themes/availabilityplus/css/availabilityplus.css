@@ -93,6 +93,7 @@
   width: 100vw;
   position: relative;
   left: calc(-50vw + 50%);
+  margin: 0px 20px 0px 20px;
 }
 
 .AvailabilityPlusTestCases table {
