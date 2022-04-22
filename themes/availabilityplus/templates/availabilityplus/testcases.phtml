@@ -20,6 +20,7 @@
     <table>
 		<tr>
 			<th><?=$this->transEsc('PPN')?></th>
+			<th><?=$this->transEsc('Status')?></th>
 			<th><?=$this->transEsc('Driver')?></th>
 			<th><?=$this->transEsc('Description')?></th>
 			<th><?=$this->transEsc('ExpectedResult')?></th>
@@ -49,6 +50,7 @@
 			?>
 			<tr>
                 <td><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
+				<td><span class="testcase_status"></span></td>
 				<td><?=$driver?></td>
 				<td><?=$description?></td>
 				<td><?=$expected?></td>
@@ -69,7 +71,7 @@
                         Erstellt am: <?=$date?><br>
                     <? } ?>
                     <? if(!empty($detailsLink)) { ?>
-                        <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('more details')?></a><br>
+                        <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('link to more details')?></a><br>
                     <? } ?>
                     <? if(!empty($rules)) { ?>
                         <?=$this->transEsc('Checked rule(s)')?>: <?=$rules?><br>
