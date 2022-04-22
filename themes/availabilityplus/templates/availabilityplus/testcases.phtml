@@ -10,22 +10,22 @@
     $list = 1;
     if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
     $list_name = 'ResultList';
-    if($list == 0) $list_name = 'DetailView';
+    if($list == 0) $list_name = 'RecordView';
 
 ?>
 <div class="AvailabilityPlusTestCases">
 <? if(!empty($cases)) { ?>
-    Links To TestCase Views: <a href="/vufind/AvailabilityPlus/TestCases?list=1">TestCases ResultsList</a> | <a href="/vufind/AvailabilityPlus/TestCases?list=0">TestCases DetailView</a>
-    <h3>TestCases <?=$list_name?></h3>
+    <?=$this->transEsc('Links To TestCase Views')?>: <a href="/vufind/AvailabilityPlus/TestCases?list=1"><?=$this->transEsc('TestCases ResultList')?></a> | <a href="/vufind/AvailabilityPlus/TestCases?list=0"><?=$this->transEsc('TestCases RecordView')?></a>
+    <h3><?=$this->transEsc('TestCases'.$list_name)?></h3>
     <table>
 		<tr>
-			<th>PPN</th>
-			<th>Driver</th>
-			<th>Description</th>
-			<th>Expected</th>
-			<th>Result</th>
-			<th>Links</th>
-			<th>Info</th>
+			<th><?=$this->transEsc('PPN')?></th>
+			<th><?=$this->transEsc('Driver')?></th>
+			<th><?=$this->transEsc('Description')?></th>
+			<th><?=$this->transEsc('Expected')?></th>
+			<th><?=$this->transEsc('Result')?></th>
+			<th><?=$this->transEsc('Links')?></th>
+			<th><?=$this->transEsc('Info')?></th>
 		</tr>
 		<? foreach ($cases AS $key => $case) { ?>
 		    <?
@@ -54,9 +54,9 @@
 				<td><?=$expected?></td>
 				<td><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
                 <td>
-                    <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank">Ergebnislisten-Ansicht</a><br>
-                    <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank">Detail-Ansicht</a><br>
-                    <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank">Debug-Ansicht</a><br>
+                    <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
+                    <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$this->transEsc('RecordView')?></a><br>
+                    <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
                 </td>
                 <td>
                     <? if(!empty($reason)) { ?>
@@ -69,10 +69,10 @@
                         Erstellt am: <?=$date?><br>
                     <? } ?>
                     <? if(!empty($detailsLink)) { ?>
-                        <a href="<?=$detailsLink?>" target="_blank">Link zu weiteren Details</a><br>
+                        <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('Link zu weiteren Details')?></a><br>
                     <? } ?>
                     <? if(!empty($rules)) { ?>
-                        Geprüfte Regel(n): <?=$rules?><br>
+                        <?=$this->transEsc('Checked rule(s)')?>: <?=$rules?><br>
                     <? } ?>
                 </td>
             </tr>
@@ -80,7 +80,7 @@
 		<? } ?>
 	</table>
 <? } else { ?>
-        <div>Keine TestCases definiert</div>
+        <div><?=$this->transEsc('no TestCases defined')?></div>
 <? } ?>
 </div>
 
