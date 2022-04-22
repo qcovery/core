@@ -22,9 +22,9 @@
 			<th><?=$this->transEsc('PPN')?></th>
 			<th><?=$this->transEsc('Driver')?></th>
 			<th><?=$this->transEsc('Description')?></th>
-			<th><?=$this->transEsc('Expected')?></th>
-			<th><?=$this->transEsc('Result')?></th>
-			<th><?=$this->transEsc('Links')?></th>
+			<th><?=$this->transEsc('ExpectedResult')?></th>
+			<th><?=$this->transEsc('ActualResult')?></th>
+			<th><?=$this->transEsc('ViewLinks')?></th>
 			<th><?=$this->transEsc('Info')?></th>
 		</tr>
 		<? foreach ($cases AS $key => $case) { ?>
@@ -69,7 +69,7 @@
                         Erstellt am: <?=$date?><br>
                     <? } ?>
                     <? if(!empty($detailsLink)) { ?>
-                        <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('Link zu weiteren Details')?></a><br>
+                        <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('more details')?></a><br>
                     <? } ?>
                     <? if(!empty($rules)) { ?>
                         <?=$this->transEsc('Checked rule(s)')?>: <?=$rules?><br>
