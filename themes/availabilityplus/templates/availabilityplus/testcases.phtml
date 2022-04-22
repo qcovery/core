@@ -1,18 +1,23 @@
 <?php
     // Set up page title:
 	$this->headTitle($this->translate('Availability Plus Test Cases'));
-	
+	0
 	//Load Cases
     $specsReader = new \VuFind\Config\SearchSpecsReader();
     $cases = $specsReader->get('availabilityplus-testcases.yaml');
+
+    // Variables:
+    $list = 1;
+    if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
+
 ?>
 <div class="AvailabilityPlusTestCases">
 <? if(!empty($cases)) { ?>
+    Links To TestCase Views: <a href="/vufind/AvailabilityPlus/TestCases?list=1">TestCases ResultsList</a> | <a href="/vufind/AvailabilityPlus/TestCases?list=0">TestCases DetailView</a>
 	<table>
 		<tr>
 			<th>PPN</th>
 			<th>Driver</th>
-			<th>List</th>
 			<th>Description</th>
 			<th>Expected</th>
 			<th>Result</th>
@@ -23,7 +28,6 @@
 		    <?
 				$id = $key;
 				$driver = $case['driver'];
-				$list = $case['list'];
 				$description = $case['description'];
 				$expected = $case['expected'];
 				$reason = $case['reason'];
@@ -43,7 +47,6 @@
 			<tr>
                 <td><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
 				<td><?=$driver?></td>
-				<td><?=$list?></td>
 				<td><?=$description?></td>
 				<td><?=$expected?></td>
 				<td>
