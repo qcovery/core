@@ -52,11 +52,7 @@
 				<td><?=$driver?></td>
 				<td><?=$description?></td>
 				<td><?=$expected?></td>
-				<td>
-					<div class="AvailabilityPlusTestCases">
-					<?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?>
-					</div>
-				</td>
+				<td><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
                 <td>
                     <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank">Ergebnislisten-Ansicht</a><br>
                     <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank">Detail-Ansicht</a><br>
