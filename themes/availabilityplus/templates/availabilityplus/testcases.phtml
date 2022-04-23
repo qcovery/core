@@ -29,56 +29,65 @@
 			<th><?=$this->transEsc('Info')?></th>
 		</tr>
 		<? foreach ($cases AS $key => $case) { ?>
-		    <?
-				$id = $key;
-				$driver = $case['driver'];
-				$description = $case['description'];
-				$expected = $case['expected'];
-				$reason = $case['reason'];
-				$date = $case['date'];
-				$creator = $case['creator'];
-				$detailsLink = $case['detailsLink'];
-				$rules = $case['rules'];
+            <? if(!empty($key) && !empty($case['driver'])) { ?>
+                <?
+                    $id = $key;
+                    $driver = $case['driver'];
+                    $description = '';
+                    $expected = '';
+                    $reason = '';
+                    $date = '';
+                    $creator = '';
+                    $detailsLink = '';
+                    $rules = '';
 
-                if($driver == 'Search2') {
-                    $recordRoute = 'Search2Record';
-                    $searchRoute = 'Search2';
-                } else {
-                    $recordRoute = 'Record';
-                    $searchRoute = 'Search';
-                }
-			?>
-			<tr>
-                <td><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
-				<td><span class="testcase_status"></span></td>
-				<td><?=$driver?></td>
-				<td><?=$description?></td>
-				<td><?=$expected?></td>
-				<td><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
-                <td>
-                    <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
-                    <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$this->transEsc('RecordView')?></a><br>
-                    <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
-                </td>
-                <td>
-                    <? if(!empty($reason)) { ?>
-                        Grund: <?=$reason?><br>
-                    <? } ?>
-                    <? if(!empty($creator)) { ?>
-                        Erstellt durch: <?=$creator?><br>
-                    <? } ?>
-                    <? if(!empty($date)) { ?>
-                        Erstellt am: <?=$date?><br>
-                    <? } ?>
-                    <? if(!empty($detailsLink)) { ?>
-                        <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('link to more details')?></a><br>
-                    <? } ?>
-                    <? if(!empty($rules)) { ?>
-                        <?=$this->transEsc('Checked rule(s)')?>: <?=$rules?><br>
-                    <? } ?>
-                </td>
-            </tr>
-			</tr>
+                    if(!empty($case['driver'])) $description = $case['description'];
+                    if(!empty($case['driver'])) $expected = $case['expected_'];
+                    if(!empty($case['driver'])) $reason = $case['reason'];
+                    if(!empty($case['driver'])) $date = $case['date'];
+                    if(!empty($case['driver'])) $creator = $case['creator'];
+                    if(!empty($case['driver'])) $detailsLink = $case['detailsLink'];
+                    if(!empty($case['driver'])) $rules = $case['rules'];
+
+                    if($driver == 'Search2') {
+                        $recordRoute = 'Search2Record';
+                        $searchRoute = 'Search2';
+                    } else {
+                        $recordRoute = 'Record';
+                        $searchRoute = 'Search';
+                    }
+                ?>
+                <tr>
+                    <td><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
+                    <td><span class="testcase_status"></span></td>
+                    <td><?=$driver?></td>
+                    <td><?=$description?></td>
+                    <td><?=$expected?></td>
+                    <td><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
+                    <td>
+                        <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
+                        <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$this->transEsc('RecordView')?></a><br>
+                        <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
+                    </td>
+                    <td>
+                        <? if(!empty($reason)) { ?>
+                            Grund: <?=$reason?><br>
+                        <? } ?>
+                        <? if(!empty($creator)) { ?>
+                            Erstellt durch: <?=$creator?><br>
+                        <? } ?>
+                        <? if(!empty($date)) { ?>
+                            Erstellt am: <?=$date?><br>
+                        <? } ?>
+                        <? if(!empty($detailsLink)) { ?>
+                            <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('link to more details')?></a><br>
+                        <? } ?>
+                        <? if(!empty($rules)) { ?>
+                            <?=$this->transEsc('Checked rule(s)')?>: <?=$rules?><br>
+                        <? } ?>
+                    </td>
+                </tr>
+			<? } ?>
 		<? } ?>
 	</table>
 <? } else { ?>
