@@ -24,6 +24,7 @@ function displayItemStatus(results, item) {
         } else {
             if (typeof(result.html) != 'undefined') {
                 item.find('.status').append(result.html);
+                console.log($('#testcase_expected_result_' + result.id).html());
             }
         }
     });

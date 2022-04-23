@@ -110,6 +110,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                                     if($this->debug) {
                                         $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
                                     }
+                                    $result['id'] = $id;
                                     $response[] = $result;
                                 }
                             }
