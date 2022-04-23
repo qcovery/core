@@ -62,18 +62,18 @@
                     }
                 ?>
                 <tr id="<?=$id?>">
-                    <td class="testcase_id"><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
-                    <td class="testcase_status"><span class="testcase_status"></td>
-                    <td class="testcase_driver"><?=$driver?></td>
-                    <td class="testcase_description"><?=$description?></td>
-                    <td class="testcase_expected_result"><?=$expected?></td>
-                    <td class="testcase_actual_result"><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
-                    <td class="testcase_views">
+                    <td id="testcase_id_<?=$id?>" class="testcase_id"><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
+                    <td id="testcase_status_<?=$id?>" class="testcase_status"><span class="testcase_status"></td>
+                    <td id="testcase_driver_<?=$id?>" class="testcase_driver"><?=$driver?></td>
+                    <td id="testcase_description_<?=$id?>" class="testcase_description"><?=$description?></td>
+                    <td id="testcase_expected_result_<?=$id?>" class="testcase_expected_result"><?=$expected?></td>
+                    <td id="testcase_actual_result_<?=$id?>" class="testcase_actual_result"><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
+                    <td id="testcase_views_<?=$id?>" class="testcase_views">
                         <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
                         <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$this->transEsc('RecordView')?></a><br>
                         <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
                     </td>
-                    <td class="testcase_infos">
+                    <td id="testcase_infos_<?=$id?>" class="testcase_infos">
                         <? if(!empty($reason)) { ?>
                             <?=$this->transEsc('reason')?>: <?=$reason?><br>
                         <? } ?>
