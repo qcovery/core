@@ -41,13 +41,13 @@
                     $detailsLink = '';
                     $rules = '';
 
-                    if(!empty($case['driver'])) $description = $case['description'];
-                    if(!empty($case['driver'])) $expected = $case['expected_'];
-                    if(!empty($case['driver'])) $reason = $case['reason'];
-                    if(!empty($case['driver'])) $date = $case['date'];
-                    if(!empty($case['driver'])) $creator = $case['creator'];
-                    if(!empty($case['driver'])) $detailsLink = $case['detailsLink'];
-                    if(!empty($case['driver'])) $rules = $case['rules'];
+                    if(!empty($case['description'])) $description = $case['description'];
+                    if(!empty($case['expected'])) $expected = $case['expected'];
+                    if(!empty($case['reason'])) $reason = $case['reason'];
+                    if(!empty($case['date'])) $date = $case['date'];
+                    if(!empty($case['creator'])) $creator = $case['creator'];
+                    if(!empty($case['detailsLink'])) $detailsLink = $case['detailsLink'];
+                    if(!empty($case['rules'])) $rules = $case['rules'];
 
                     if($driver == 'Search2') {
                         $recordRoute = 'Search2Record';
