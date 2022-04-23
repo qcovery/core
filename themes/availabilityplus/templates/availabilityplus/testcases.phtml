@@ -75,13 +75,13 @@
                     </td>
                     <td class="testcase_infos">
                         <? if(!empty($reason)) { ?>
-                            Grund: <?=$reason?><br>
+                            <?=$this->transEsc('reason')?>: <?=$reason?><br>
                         <? } ?>
                         <? if(!empty($creator)) { ?>
-                            Erstellt durch: <?=$creator?><br>
+                            <?=$this->transEsc('created by')?>: <?=$creator?><br>
                         <? } ?>
                         <? if(!empty($date)) { ?>
-                            Erstellt am: <?=$date?><br>
+                            <?=$this->transEsc('date')?>: <?=$date?><br>
                         <? } ?>
                         <? if(!empty($detailsLink)) { ?>
                             <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('link to more details')?></a><br>
