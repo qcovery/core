@@ -11,6 +11,7 @@ Format:
   driver: '<driver to load record>' # required, Solr, Search2, ...
   description: '<short description of test case>' # optional, text
   expected_description: '<description of what is expected to appear as availability>' # optional, text
+  expected_html: '<description of what is expected to appear as HTML as availability, if exists and not empty supersedes expected_description>' # optional, HTML
   reason: '<reason for adding test case>' # optional, text
   date: '<date when test case was added>' # optional, date yyyy-mm-dd
   creator: '<name of person who added or suggested test case>' # optional, text
@@ -23,6 +24,7 @@ Example:
   driver: 'Solr'
   description: 'sample description'
   expected_description: 'access information'
+  expected_html: '<a href="https://www.test.com" target="_blank">Link</a>'
   reason: 'to give an example for test cases'
   date: '2022-04-09'
   creator: 'Jon Doe'
