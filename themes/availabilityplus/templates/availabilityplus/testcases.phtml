@@ -62,18 +62,18 @@
                     }
                 ?>
                 <tr>
-                    <td><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
-                    <td><span class="testcase_status"></span></td>
-                    <td><?=$driver?></td>
-                    <td><?=$description?></td>
-                    <td><?=$expected?></td>
-                    <td><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
-                    <td>
+                    <td class="testcase_id"><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
+                    <td class="testcase_status"><span class="testcase_status"></td>
+                    <td class="testcase_driver"><?=$driver?></td>
+                    <td class="testcase_description"><?=$description?></td>
+                    <td class="testcase_expected_result"><?=$expected?></td>
+                    <td class="testcase_actual_result"><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
+                    <td class="testcase_views">
                         <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
                         <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$this->transEsc('RecordView')?></a><br>
                         <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
                     </td>
-                    <td>
+                    <td class="testcase_infos">
                         <? if(!empty($reason)) { ?>
                             Grund: <?=$reason?><br>
                         <? } ?>
