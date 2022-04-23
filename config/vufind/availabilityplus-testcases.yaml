@@ -3,7 +3,6 @@
 # Format is:
 # -------------
 # <id>: # id of record in index
-#  list: '0|1' # required, applicable to result list (1) or record view (0)
 #  driver: '<driver to load record>' # required, Solr, Search2, ...
 #  description: '<short description of test case>' # optional, text
 #  expected: '<description of what is expected to appear as availability>' # optional, text
@@ -16,7 +15,6 @@
 # Example:
 # -------------
 # 123456789:
-#  list: '1'
 #  driver: 'Solr'
 #  description: 'sample description'
 #  expected: 'access information'
