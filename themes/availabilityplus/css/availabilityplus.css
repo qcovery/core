@@ -111,3 +111,11 @@
 .AvailabilityPlusTestCases td {
 	padding: 5px;
 }
+
+.testcase_status_green{
+  background-color: green;
+}
+
+.testcase_status_red{
+  background-color: red;
+}
