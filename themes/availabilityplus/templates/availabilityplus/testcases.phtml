@@ -42,8 +42,10 @@
                     $rules = '';
 
                     if(!empty($case['description'])) $description = $case['description'];
+                    $testcase_expected_result_class = 'testcase_expected_result';
                     if(!empty($case['expected_html'])) {
                         $expected = $case['expected_html'];
+                        $testcase_expected_result_class = 'testcase_expected_result_html';
                     } else if(!empty($case['expected_description'])) {
                         $expected = $case['expected_description'];
                     }
@@ -66,7 +68,7 @@
                     <td id="testcase_status_<?=$id?>" class="testcase_status"><span class="testcase_status"></td>
                     <td id="testcase_driver_<?=$id?>" class="testcase_driver"><?=$driver?></td>
                     <td id="testcase_description_<?=$id?>" class="testcase_description"><?=$description?></td>
-                    <td id="testcase_expected_result_<?=$id?>" class="testcase_expected_result"><?=$expected?></td>
+                    <td id="<?=$testcase_expected_result_class?>>_<?=$id?>" class="<?=$testcase_expected_result_class?>>"><?=$expected?></td>
                     <td id="testcase_actual_result_<?=$id?>" class="testcase_actual_result"><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
                     <td id="testcase_views_<?=$id?>" class="testcase_views">
                         <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
