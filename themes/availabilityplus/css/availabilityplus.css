@@ -114,8 +114,12 @@
 
 .testcase_status_green{
   background-color: green;
+  display: block;
+  width: 100%;
 }
 
 .testcase_status_red{
   background-color: red;
+  display: block;
+  width: 100%;
 }
