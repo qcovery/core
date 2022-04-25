@@ -32,10 +32,10 @@ function displayItemStatus(results, item) {
                     console.log('#testcase_status_' + result.id);
                     if (result_actual === result_expected) {
                         console.log("Same");
-                        $('#testcase_status_' + result.id).append('<span class="testcase_status_green"></span>');
+                        $('#testcase_status_' + result.id).append('<span class="testcase_status_green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
                     } else {
                         console.log("Different");
-                        $('#testcase_status_' + result.id).append('<span class="testcase_status_red"></span>');
+                        $('#testcase_status_' + result.id).append('<span class="testcase_status_red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
                     }
                 }
             }
