@@ -16,8 +16,8 @@ function displayItemStatus(results, item) {
     item.removeClass('js-item-pending');
     item.find('.ajax-availability').removeClass('ajax-availability hidden');
     item.find('.status').empty();
+    var id = item.attr('data-id');
     $.each(results, function(index, result){
-        id = result.id;
         if (typeof(result.error) != 'undefined'
             && result.error.length > 0
         ) {
