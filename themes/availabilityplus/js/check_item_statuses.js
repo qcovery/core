@@ -17,6 +17,7 @@ function displayItemStatus(results, item) {
     item.find('.ajax-availability').removeClass('ajax-availability hidden');
     item.find('.status').empty();
     $.each(results, function(index, result){
+        id = result.id;
         if (typeof(result.error) != 'undefined'
             && result.error.length > 0
         ) {
@@ -28,17 +29,17 @@ function displayItemStatus(results, item) {
         }
     });
     if (typeof $('#testcase_expected_result_html_' + result.id).html() != "undefined") {
-        let result_expected = $('#testcase_expected_result_html_' + result.id).html().replace(/(\r\n|\n|\r)/gm, "").replace(/\>[\t ]+\</g, "><");
+        let result_expected = $('#testcase_expected_result_html_' + id).html().replace(/(\r\n|\n|\r)/gm, "").replace(/\>[\t ]+\</g, "><");
         let result_actual =  item.find('.status').html().replace(/(\r\n|\n|\r)/gm, "").replace(/\>[\t ]+\</g, "><");;
         console.log('epxpected: ' + result_expected);
         console.log('actual: ' + result_actual);
-        console.log('#testcase_status_' + result.id);
+        console.log('#testcase_status_' + id);
         if (result_actual === result_expected) {
             console.log("Same");
-            $('#testcase_status_' + result.id).append('<span class="testcase_status_green">&nbsp;</span>');
+            $('#testcase_status_' + id).append('<span class="testcase_status_green">&nbsp;</span>');
         } else {
             console.log("Different");
-            $('#testcase_status_' + result.id).append('<span class="testcase_status_red">&nbsp;</span>');
+            $('#testcase_status_' + id).append('<span class="testcase_status_red">&nbsp;</span>');
         }
     }
 }
