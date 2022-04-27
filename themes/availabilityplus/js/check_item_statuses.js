@@ -28,7 +28,7 @@ function displayItemStatus(results, item) {
             }
         }
     });
-    if (typeof $('#testcase_expected_result_html_' + result.id).html() != "undefined") {
+    if (typeof $('#testcase_expected_result_html_' + id).html() != "undefined") {
         let result_expected = $('#testcase_expected_result_html_' + id).html().replace(/(\r\n|\n|\r)/gm, "").replace(/\>[\t ]+\</g, "><");
         let result_actual =  item.find('.status').html().replace(/(\r\n|\n|\r)/gm, "").replace(/\>[\t ]+\</g, "><");;
         console.log('epxpected: ' + result_expected);
