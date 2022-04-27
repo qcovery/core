@@ -9,14 +9,14 @@
     // Variables:
     $list = 1;
     if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
-    $list_name = 'ResultList';
-    if($list == 0) $list_name = 'RecordView';
+    $view_name = 'ResultList';
+    if($list == 0) $view_name = 'RecordView';
 
 ?>
 <div class="AvailabilityPlusTestCases">
 <? if(!empty($cases)) { ?>
     <?=$this->transEsc('Links To TestCase Views')?>: <a href="/vufind/AvailabilityPlus/TestCases?list=1"><?=$this->transEsc('TestCases ResultList')?></a> | <a href="/vufind/AvailabilityPlus/TestCases?list=0"><?=$this->transEsc('TestCases RecordView')?></a>
-    <h3><?=$this->transEsc('TestCases '.$list_name)?></h3>
+    <h3><?=$this->transEsc('TestCases '.$view_name)?></h3>
     <table>
 		<tr>
 			<th><?=$this->transEsc('PPN')?></th>
@@ -43,18 +43,22 @@
 
                     if(!empty($case['description'])) $description = $case['description'];
                     $testcase_expected_result_class = 'testcase_expected_result';
-                    if(!empty($case['expected_html_'.$this->layout()->userLang])) {
-                        $expected = $case['expected_html_'.$this->layout()->userLang];
+                    if(!empty($case['expected'][strtolower($view_name)]['html_'.$this->layout()->userLang])) {
+                        $expected = $case['expected'][strtolower($view_name)]['html_'.$this->layout()->userLang];
                         $testcase_expected_result_class = 'testcase_expected_result_html';
-                    } else if(!empty($case['expected_html'])) {
-                        $expected = $case['expected_html'];
+                    } else if(!empty($case['expected'][strtolower($view_name)]['html'])) {
+                        $expected = $case['expected'][strtolower($view_name)]['html'];
                         $testcase_expected_result_class = 'testcase_expected_result_html';
-                    } else if(!empty($case['expected_description_'.$this->layout()->userLang])) {
-                        $expected = $case['expected_description_'.$this->layout()->userLang];
-                    } else if(!empty($case['expected_description'])) {
-                        $expected = $case['expected_description'];
+                    } else if(!empty($case['expected'][strtolower($view_name)]['description_'.$this->layout()->userLang])) {
+                        $expected = $case['expected'][strtolower($view_name)]['description_'.$this->layout()->userLang];
+                    } else if(!empty($case['expected'][strtolower($view_name)]['description'])) {
+                        $expected = $case['expected'][strtolower($view_name)]['description'];
+                    } else if(!empty($case['expected']['description_'.$this->layout()->userLang])) {
+                        $expected = $case['expected']['description_'.$this->layout()->userLang];
+                    } else if(!empty($case['expected']['description'])) {
+                        $expected = $case['expected']['description'];
                     }
-                    if(!empty($case['reason'])) $reason = $case['reason'];
+                if(!empty($case['reason'])) $reason = $case['reason'];
                     if(!empty($case['date'])) $date = $case['date'];
                     if(!empty($case['creator'])) $creator = $case['creator'];
                     if(!empty($case['detailsLink'])) $detailsLink = $case['detailsLink'];
