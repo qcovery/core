@@ -28,18 +28,12 @@ function displayItemStatus(results, item) {
             }
         }
     });
-    console.log('#testcase_expected_result_html_' + id);
     if (typeof $('#testcase_expected_result_html_' + id).html() != "undefined") {
         let result_expected = $('#testcase_expected_result_html_' + id).html().replace(/(\r\n|\n|\r)/gm, "").replace(/\>[\t ]+\</g, "><");
         let result_actual =  item.find('.status').html().replace(/(\r\n|\n|\r)/gm, "").replace(/\>[\t ]+\</g, "><");;
-        console.log('epxpected: ' + result_expected);
-        console.log('actual: ' + result_actual);
-        console.log('#testcase_status_' + id);
         if (result_actual === result_expected) {
-            console.log("Same");
             $('#testcase_status_' + id).append('<span class="testcase_status_green">&nbsp;</span>');
         } else {
-            console.log("Different");
             $('#testcase_status_' + id).append('<span class="testcase_status_red">&nbsp;</span>');
         }
     }
