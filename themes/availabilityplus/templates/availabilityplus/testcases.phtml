@@ -53,12 +53,18 @@
                         $expected = $case['expected'][strtolower($view_name)]['description_'.$this->layout()->userLang];
                     } else if(!empty($case['expected'][strtolower($view_name)]['description'])) {
                         $expected = $case['expected'][strtolower($view_name)]['description'];
+                    } else if(!empty($case['expected']['html_'.$this->layout()->userLang])) {
+                        $expected = $case['expected']['html_'.$this->layout()->userLang];
+                        $testcase_expected_result_class = 'testcase_expected_result_html';
+                    } else if(!empty($case['expected']['html'])) {
+                        $expected = $case['expected']['html'];
+                        $testcase_expected_result_class = 'testcase_expected_result_html';
                     } else if(!empty($case['expected']['description_'.$this->layout()->userLang])) {
                         $expected = $case['expected']['description_'.$this->layout()->userLang];
                     } else if(!empty($case['expected']['description'])) {
                         $expected = $case['expected']['description'];
                     }
-                if(!empty($case['reason'])) $reason = $case['reason'];
+                    if(!empty($case['reason'])) $reason = $case['reason'];
                     if(!empty($case['date'])) $date = $case['date'];
                     if(!empty($case['creator'])) $creator = $case['creator'];
                     if(!empty($case['detailsLink'])) $detailsLink = $case['detailsLink'];
