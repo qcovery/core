@@ -1,6 +1,6 @@
 <?php
     // Set up page title:
-	$this->headTitle($this->translate('Availability Plus Test Cases'));
+	$this->headTitle($this->transEsc('AvailabilityPlus Test Cases'));
 
 	//Load Cases
     $specsReader = new \VuFind\Config\SearchSpecsReader();
@@ -19,7 +19,7 @@
     <h3><?=$this->transEsc('TestCases '.$view_name)?></h3>
     <table>
 		<tr>
-			<th><?=$this->transEsc('PPN')?></th>
+			<th><?=$this->transEsc('ID')?></th>
 			<th><?=$this->transEsc('Status')?></th>
 			<th><?=$this->transEsc('Driver')?></th>
 			<th><?=$this->transEsc('Description')?></th>
