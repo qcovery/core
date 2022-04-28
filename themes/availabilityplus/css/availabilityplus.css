@@ -123,3 +123,7 @@
   display: block;
   width: 100%;
 }
+
+.testcase_views{
+  white-space: nowrap;
+}
