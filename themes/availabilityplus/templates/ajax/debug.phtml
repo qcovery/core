@@ -1,9 +1,9 @@
 <?php
-    if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) {
-        echo '<h4>'.$debug['check'].' - SorlMarcKey: '.$debug['SolrMarcKey'].' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span></h4>';
-    } else {
-        echo '<h4>'.$debug['check'].' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span></h4>';
-    }
+    echo '<h4>'.$debug['check'];
+    if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) echo ' - SorlMarcKey: '.$debug['SolrMarcKey'];
+    if(!empty($debug['status'])) echo ' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span>';
+    echo '</h4>';
+
     print "<pre>";
     print_r($debug);
     print "</pre>";
