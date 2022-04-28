@@ -140,7 +140,7 @@
 }
 
 /* Style the buttons that are used to open and close the accordion panel */
-.AvailabilityPlusDebug.accordion {
+.accordion {
   background-color: #eee;
   color: #444;
   cursor: pointer;
@@ -153,12 +153,12 @@
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.AvailabilityPlusDebug.active, .AvailabilityPlusDebug.accordion:hover {
+.active, .accordion:hover {
   background-color: #ccc;
 }
 
 /* Style the accordion panel. Note: hidden by default */
-.AvailabilityPlusDebug.panel {
+.panel {
   padding: 0 18px;
   background-color: white;
   display: none;
