@@ -1,8 +1,8 @@
 <?php
-    echo '<button class="accordion">'.$debug['check'];
+    echo '<h4 class="accordion">'.$debug['check'];
     if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) echo ' - SorlMarcKey: '.$debug['SolrMarcKey'];
     if(!empty($debug['status'])) echo ' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span>';
-    echo '</button>';
+    echo '</h4>';
 
     echo '<div class="panel">';
     print "<pre>";
