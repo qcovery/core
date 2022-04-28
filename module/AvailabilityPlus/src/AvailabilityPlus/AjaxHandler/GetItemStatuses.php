@@ -404,7 +404,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $params = $this->prepareResolverParams($marc_data);
         $resolver_url = $resolverHandler->getResolverUrl($params);
         $template = $this->getTemplate($marc_data);
-        /*$response = [
+        $response = [
             'mode' => $this->current_mode,
             'check' => $resolver,
             'url' => $resolver_url,
@@ -414,7 +414,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'marc_data' => $marc_data,
             'params' => $params
         ];
-        $response['data'] = '';*/
+        $response['data'] = '';
         if(!empty($resolver_url) && !empty($marc_data)) {
             $resolver_data = $resolverHandler->fetchLinks($params);
             $response['marc_data'] = $marc_data;
