@@ -352,10 +352,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
         $response = $this->generateResponse($check, '', '', '', $template, '', '', false);
-        /*$response = [
-            'check' => 'function checkParentWork',
-            'parentData' => $parentData
-        ]; */
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
                 $parentId = $parentDate['id']['data'][0];
@@ -376,14 +372,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if (!empty($url)) {
             $level = 'ParentWorkILNSolr';
             $label = 'Go to parent work (local holding)';
-            /*$response = [
-                'check' => 'function checkParentWork',
-                'url' => $url,
-                'level' => $level,
-                'label' => $label,
-                'label_translated' => $this->translate($label),
-                'parentData' => $parentData
-            ];*/
             $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
             $response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
         }
@@ -404,22 +392,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $params = $this->prepareResolverParams($marc_data);
         $resolver_url = $resolverHandler->getResolverUrl($params);
         $template = $this->getTemplate($marc_data);
-        /*$response = [
-            'mode' => $this->current_mode,
-            'check' => $resolver,
-            'url' => $resolver_url,
-            'level' => $resolver,
-            'label' => $resolver,
-            'label_translated' => $this->translate($resolver),
-            'marc_data' => $marc_data,
-            'params' => $params
-        ];
-        $response['data'] = '';*/
         if(!empty($resolver_url) && !empty($marc_data)) {
             $resolver_data = $resolverHandler->fetchLinks($params);
             $response = $this->generateResponse($resolver, '', $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true);
             $response['marc_data'] = $marc_data;
-            //$response['data'] = $resolver_data['parsed_data'];
             $response['resolver_data'] = $resolver_data['data'];
             $response['resolver_options'] = $resolverHandler->getRulesFile();
             $response['html'] = $this->applyTemplate($template, $response);
