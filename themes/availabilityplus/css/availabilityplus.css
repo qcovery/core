@@ -16,7 +16,7 @@
 }
 
 .doi {
-  font-size: 0px;
+  font-size: 0;
 }
 
 .delimiter{
@@ -47,7 +47,7 @@
 }
 
 .daia_red {
-  color: #.FF0000;
+  color: #FF0000;
   font-weight: bold;
 }
 
@@ -74,7 +74,6 @@
 }
 
 .UnknownAccess:after {
-  content: url("../images/questionmark_orange.png");
   margin-left: 5px;
 }
 
@@ -93,7 +92,7 @@
   width: 98vw;
   position: relative;
   left: calc(-49vw + 49%);
-  margin: 0px 20px 0px 20px;
+  margin: 0 20px 0 20px;
 }
 
 .AvailabilityPlusTestCases table {
@@ -110,6 +109,10 @@
 .AvailabilityPlusTestCases th,
 .AvailabilityPlusTestCases td {
 	padding: 5px;
+}
+
+.AvailabilityPlusDebug {
+  margin: 5px;
 }
 
 .testcase_status_green{
