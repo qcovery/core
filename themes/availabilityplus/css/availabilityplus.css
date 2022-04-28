@@ -127,3 +127,11 @@
 .testcase_views{
   white-space: nowrap;
 }
+
+.successful_check{
+  color: green;
+}
+
+.unsuccessful_check {
+  color: red;
+}

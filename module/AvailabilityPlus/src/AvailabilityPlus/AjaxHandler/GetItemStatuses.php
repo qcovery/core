@@ -295,9 +295,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = '', $status = false){
         if($status) {
-            $status = 'Successful - Check found a match!';
+            $status['level'] = 'successful_check';
+            $status['label'] = 'Check found a match!';
         } else {
-            $status = 'NOT successful - Check did not find a match!';
+            $status['level'] = 'unsuccessful_check';
+            $status['label'] = 'Check did not find a match!';
         }
         $response = [
             'check' => $check,

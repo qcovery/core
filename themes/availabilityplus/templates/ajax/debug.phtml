@@ -1,5 +1,9 @@
 <?php
-    echo '<h4>'.$debug['check'].'</h4>';
+    if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) {
+        echo '<h4>'.$debug['check'].' '.$debug['SolrMarcKey'].' '.$this->transEsc($debug['status']['label']).'</h4>';
+    } else {
+        echo '<h4>'.$debug['check'].' <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span></h4>';
+    }
     print "<pre>";
     print_r($debug);
     print "</pre>";
