@@ -313,11 +313,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'template' => $template,
             'data' => $data
         ];
-/*        if(empty($label)) {
-            $response['status'] = 'NOT successful - Check did not find a match!';
-        } else {
-            $response['status'] = 'Successful - Check found a match!';
-        }*/
         return array_filter($response);
     }
 
@@ -352,12 +347,15 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @return array [response data (arrays)]
      */
     private function checkParentWorkILNSolr() {
+        $check = 'function checkParentWork';
+        $template = 'ajax/link-internal.phtml';
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
-        $response = [
+        $response = $this->generateResponse($check, '', '', '', $template, '', '', false);
+        /*$response = [
             'check' => 'function checkParentWork',
             'parentData' => $parentData
-        ];
+        ]; */
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
                 $parentId = $parentDate['id']['data'][0];
@@ -378,17 +376,17 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if (!empty($url)) {
             $level = 'ParentWorkILNSolr';
             $label = 'Go to parent work (local holding)';
-            $response = [
+            /*$response = [
                 'check' => 'function checkParentWork',
                 'url' => $url,
                 'level' => $level,
                 'label' => $label,
                 'label_translated' => $this->translate($label),
                 'parentData' => $parentData
-            ];
+            ];*/
+            $response = $this->generateResponse($check, '', $level, $label, $template, $parenData, $url, true);
             $response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
         }
-
         $responses[] = $response;
         return $responses;
     }
