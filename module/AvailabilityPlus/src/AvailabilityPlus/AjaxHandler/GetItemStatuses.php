@@ -384,7 +384,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 'label_translated' => $this->translate($label),
                 'parentData' => $parentData
             ];*/
-            $response = $this->generateResponse($check, '', $level, $label, $template, $parenData, $url, true);
+            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
             $response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
         }
         $responses[] = $response;
@@ -400,27 +400,30 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             );
         }
         $resolverHandler = new Connection($this->resolverManager->get($resolverType));
-        $data = $this->driver->getMarcData($resolver);
-        $params = $this->prepareResolverParams($data);
+        $marc_data = $this->driver->getMarcData($resolver);
+        $params = $this->prepareResolverParams($marc_data);
         $resolver_url = $resolverHandler->getResolverUrl($params);
-        $template = $this->getTemplate($data);
-        $response = [
+        $template = $this->getTemplate($marc_data);
+        /*$response = [
             'mode' => $this->current_mode,
             'check' => $resolver,
             'url' => $resolver_url,
             'level' => $resolver,
             'label' => $resolver,
             'label_translated' => $this->translate($resolver),
-            'marc_data' => $data,
+            'marc_data' => $marc_data,
             'params' => $params
         ];
-        $response['data'] = '';
-        if(!empty($resolver_url) && !empty($data)) {
+        $response['data'] = '';*/
+        if(!empty($resolver_url) && !empty($marc_data)) {
             $resolver_data = $resolverHandler->fetchLinks($params);
+            $response['marc_data'] = $marc_data;
             $response['data'] = $resolver_data['parsed_data'];
             $response['resolver_data'] = $resolver_data['data'];
             $response['resolver_options'] = $resolverHandler->getRulesFile();
             $response['html'] = $this->applyTemplate($template, $response);
+        } else {
+            $response = $this->generateResponse($resolver, '', $resolver, $resolver, $template, '', $resolver_url, false);
         }
 
         $responses[] = $response;
