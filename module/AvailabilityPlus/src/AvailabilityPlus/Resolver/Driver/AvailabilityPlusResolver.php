@@ -123,14 +123,20 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                         if(!empty($action['pattern'])) {
                             $content_preg =  $item[$action['content_field']];
                             $content_new = preg_replace('|'.$action['pattern'].'|', $action['replacement'], $content_preg);
+                            $this->parsed_data[$key][$action['field'].'_org'] = $content_old;
                             $this->parsed_data[$key][$action['field']] = $content_new;
                         } else if(isset($action['content'])){
                             $content_new = preg_replace('|(.*)|', '$0', $action['content']);
+                            $this->parsed_data[$key][$action['field'].'_org'] = $content_old;
                             $this->parsed_data[$key][$action['field']] = $content_new;
                         } else if(!empty($action['function'])) {
                             switch($action['function']) {
                                 case 'removeItem' :
-                                    unset($this->parsed_data[$key]);
+                                    //unset($this->parsed_data[$key]);
+                                    foreach($this->parsed_data[$key] AS $item_key => $item_value) {
+                                        $this->parsed_data[$key][$item_key.'_org'] = $item_value;
+                                        unset($this->parsed_data[$key][$item_key]);
+                                    }
                                     break;
                             }
                         }

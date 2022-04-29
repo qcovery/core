@@ -202,7 +202,7 @@ class DAIA extends AvailabilityPlusResolver
                                     //unset($this->parsed_data[$key]);
                                     foreach($this->parsed_data[$key] AS $item_key => $item_value) {
                                         $this->parsed_data[$key][$item_key.'_org'] = $item_value;
-                                        //unset($this->parsed_data[$key][$item_key]);
+                                        unset($this->parsed_data[$key][$item_key]);
                                     }
                                     break;
                             }
