@@ -3,6 +3,7 @@
         <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
     </span>
     <? if(!empty($_GET['debug_ap']) && strip_tags($_GET['debug_ap']) == 'true') { ?>
-        <a href="/vufind/<?=$this->driver->getUniqueID();?>" target="_blank"><?=$this->transEsc('DebugView')?></a>
+        <span class="delimiter"></span>
+        <a href="/vufind/AvailabilityPlus/Debug<?=$this->driver->getUniqueID();?>?driver=<?=$this->searchClassId?>&list=1" target="_blank"><?=$this->transEsc('DebugView')?></a>
     <? } ?>
 </div>
