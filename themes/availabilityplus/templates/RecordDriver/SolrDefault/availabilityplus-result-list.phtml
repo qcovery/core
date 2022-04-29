@@ -2,4 +2,7 @@
     <span class="status ajax-availability hidden">
         <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
     </span>
+    <? if(!empty($_GET['debug_ap']) && strip_tags($_GET['debug_ap']) == 'true') { ?>
+        <a href="/vufind/<?=$this->driver->getUniqueID();?>" target="_blank"><?=$this->transEsc('DebugView')?></a>
+    <? } ?>
 </div>
