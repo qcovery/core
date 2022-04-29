@@ -1,10 +1,10 @@
 <?php
-    echo '<button class="accordion">'.$debug['check'];
+    echo '<h3>'.$debug['check'];
     if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) echo ' - SolrMarcKey: '.$debug['SolrMarcKey'];
     if(!empty($debug['status'])) echo ' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span>';
-    echo '</button>';
+    echo '</h3>';
 
-    echo '<div class="panel">';
+    echo '<div>';
     print "<pre>";
     print_r($debug);
     print "</pre>";
