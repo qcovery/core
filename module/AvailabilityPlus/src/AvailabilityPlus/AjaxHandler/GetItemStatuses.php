@@ -403,7 +403,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             }
             $response['marc_data'] = $marc_data;
             $response['resolver_data'] = $resolver_data['data'];
-            $response['resolver_options'] = $resolverHandler->getRulesFile();
+            $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
 
         } else {
             $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, '', $resolver_url, false);
