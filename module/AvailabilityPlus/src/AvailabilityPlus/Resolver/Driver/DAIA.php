@@ -168,7 +168,7 @@ class DAIA extends AvailabilityPlusResolver
 
         foreach($this->parsed_data->document[0]->item as $key => $item) {
             $rules_applied = [];
-            foreach($rules as $rule) {
+            foreach($rules as $rule_key => $rule) {
                 $rule_applies = false;
                 foreach($rule['conditions'] as $condition) {
                     $match_array = [];
@@ -209,7 +209,7 @@ class DAIA extends AvailabilityPlusResolver
                         }
                     }
 
-                    $rules_applied[] = $rule;
+                    $rules_applied[$rule_key] = $rule;
                 }
             }
             if(!empty($rules_applied)) {
