@@ -144,7 +144,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $debug_info['AvailabilityPlusConfig'] = 'availabilityplus.ini';
             $debug_info['SolrMarcYml'] = 'solrmarc.yml';
             $debug_info['SolrMarcYmlAvailabilityPlus'] = $this->config['General']['availabilityplus_yaml'];
-            $debug_info['checkRoute'] = $this->checkRoute;
+            $debug_info['checkRoute_in_AvailabilityPlusConfig'] = $this->checkRoute;
             $debug_info['checks'] = $this->checks;
             $responses[0][0]['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $debug_info ]).$responses[0][0]['html'];
         }
