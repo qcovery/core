@@ -1,13 +1,3 @@
-<link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="/resources/demos/style.css">
-<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
-<script>
-    $( function() {
-        $( "#accordion" ).accordion();
-    } );
-</script>
-
 <?php
 // Set up page title:
 $this->headTitle($this->transEsc('Availability Plus Debug'));
@@ -18,14 +8,14 @@ if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
 $list_name = 'ResultList';
 if($list == 0) $list_name = 'DetailView';
 $driver = 'Solr';
-if(isset($_GET["driver"]) && $_GET["driver"] === 'Search2') $driver = 'Search2';
+if(isset($_GET["driver"]) && $_GET["driver"] === 'Search2') $driver = 'Search2';;
 ?>
 
 <div class="AvailabilityPlusDebug">
     Links to Debug Views: <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=1&driver=Solr">Debug ID <?=$id?> ResultsList Solr</a> | <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=0&driver=Solr">Debug ID <?=$id?> DetailView Solr</a> | <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=1&driver=Search2">Debug ID <?=$id?> ResultsList Search2</a> | <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=0&driver=Search2">Debug ID <?=$id?> DetailView Search2</a>
     <h3>Debug ID <?=$this->escapeHtml($id)?> <?=$list_name?> <?=$driver?></h3>
     <div class="availabilityItem" data-id="<?=$id;?>" data-list="<?=$list?>" data-src="<?=$driver?>" data-debug="1">
-	<span id="accordion" class="status ajax-availability hidden">
+	<span class="status ajax-availability hidden">
 		<span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
 	</span>
     </div>
