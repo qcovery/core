@@ -1,6 +1,8 @@
 <?php
 	if($url) {
+        echo '<div class="availability_item">';
 		echo '<div class="delimiter"></div>';
 		echo '<a href="'.$url.'" class="'.$level.' link_internal" title="'.$label.'">'.$this->translate($label).'</a><br/>';
+        echo '</div>';
 	} 
 ?>

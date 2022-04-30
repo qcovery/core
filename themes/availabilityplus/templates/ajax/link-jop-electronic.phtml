@@ -1,11 +1,13 @@
 <?php
 foreach($data as $result) {
    if(!empty($result['label'])){
+      echo '<div class="availability_item">';
       $level = $result['level'];
       $label = $result['label'];
       $url = $result['url'];
       echo '<div class="delimiter"></div>';
       echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+      echo '</div>';
       if($mode == 'break_on_first') break;
    }
 }

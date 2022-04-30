@@ -6,7 +6,8 @@
   content: url(../images/ajax-loader.gif);
 }
 
-.daia_item {
+.daia_item,
+.availability_item {
   margin-bottom: 15px;
 }
 .delimiter{
