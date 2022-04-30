@@ -6,6 +6,9 @@
   content: url(../images/ajax-loader.gif);
 }
 
+.daia_item {
+  margin-bottom: 15px;
+}
 .delimiter{
   border-top: 1px dashed #000000;
   color: #FFFFFF;
