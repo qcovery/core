@@ -13,7 +13,7 @@ foreach($data->document[0]->item as $item) {
         if(!empty($result->storage->url)) {
             echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result->storage->url.'" class="'.$result->storage->level.'" title="'.$result->storage->label.'" target="_blank">'.$this->translate($result->storage->label).'</a></span>';
         } else {
-            echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' '.$this->translate($result->storage->label).'</span>';
+            echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($result->storage->label).'</span>';
         }
 
     }
