@@ -47,6 +47,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $debug;
 
+    protected $list;
+
     /**
      * Resolver driver plugin manager
      *
@@ -82,7 +84,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $responses = [];
         $ids = $params->fromPost('id', $params->fromQuery('id', ''));
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
-        $list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
+        $this->list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
         $this->debug = $params->fromPost('debug', $params->fromQuery('debug', ''));
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
@@ -97,7 +99,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                             $mediatype = $formats[0];
                         }
                     }
-                    $this->setChecks($list, $mediatype);
+                    $this->setChecks($mediatype);
                     $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
                     $responses = [];
                     $response = [];
@@ -152,7 +154,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $this->formatResponse(['statuses' => $responses]);
     }
 
-    private function setChecks($list, $mediatype = '') {
+    private function setChecks($mediatype = '') {
+        $list = $this->list
         $mediatype = str_replace(array(' ', '+'),array('',''), $mediatype);
         $checks = 'RecordView';
         if($list) $checks = 'ResultList';
@@ -310,6 +313,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             //'SolrMarcSpecs' => $data = $this->driver->getSolrMarcSpecs($solrMarcKey),
             'status' => $status,
             'mode' => $this->current_mode,
+            'list' => $this->list,
             'url' => $url,
             'level' => $level,
             'label' => $label,
