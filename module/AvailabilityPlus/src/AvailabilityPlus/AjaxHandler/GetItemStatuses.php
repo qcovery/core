@@ -155,7 +155,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     private function setChecks($mediatype = '') {
-        $list = $this->list
+        $list = $this->list;
         $mediatype = str_replace(array(' ', '+'),array('',''), $mediatype);
         $checks = 'RecordView';
         if($list) $checks = 'ResultList';
