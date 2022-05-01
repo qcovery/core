@@ -147,7 +147,7 @@ class DAIA extends AvailabilityPlusResolver
                             }
                             break;
                     }
-                    if ( !array_filter((array)$record) )
+                    if ( !array_filter((array)$record) ) {
                         $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                     }
                     break;
