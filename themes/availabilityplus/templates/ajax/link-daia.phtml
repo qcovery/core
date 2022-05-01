@@ -49,12 +49,10 @@ foreach($data->document[0]->item as $key => $item) {
         }
     }
     if(!empty($result)) {
+        if($list && count($data->document[0]->item) > 1 && !empty($result->storage)) echo '<a href="#">Test</a>';
         if(!$list) echo '</div>';
     }
-    if($mode == 'break_on_first') {
-        if($list && count($data->document[0]->item) > 1) echo '<a href="#">Test</a>';
-        break;
-    }
+    if($mode == 'break_on_first') break;
 }
 
 
