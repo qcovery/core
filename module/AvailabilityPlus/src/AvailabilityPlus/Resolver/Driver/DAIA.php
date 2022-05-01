@@ -57,6 +57,7 @@ class DAIA extends AvailabilityPlusResolver
                                 if(!empty($item->chronology->about)) {
                                     $record->chronology = $item->chronology->about;
                                 }
+                                $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
                             break;
                         case 'remote':
@@ -71,6 +72,7 @@ class DAIA extends AvailabilityPlusResolver
                                 if(!empty($item->chronology->about)) {
                                     $record->chronology = $item->chronology->about;
                                 }
+                                $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
                             break;
                         case 'loan':
@@ -127,6 +129,7 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($item->chronology->about)) {
                                 $record->chronology = $item->chronology->about;
                             }
+                            $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             break;
                         case 'fallback':
                             if(!empty($item->storage->id)){
@@ -145,10 +148,8 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($item->chronology->about)) {
                                 $record->chronology = $item->chronology->about;
                             }
+                            $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             break;
-                    }
-                    if ( !(array)$record ) {
-                        $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                     }
                     break;
                 }
