@@ -1,8 +1,8 @@
 <?php
 	if($url) {
-        echo '<div class="availability_item">';
+        if(!$list) echo '<div class="availability_item">';
 		echo '<div class="delimiter"></div>';
 		echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-        echo '</div>';
+        if(!$list) echo '</div>';
 	} 
 ?>
