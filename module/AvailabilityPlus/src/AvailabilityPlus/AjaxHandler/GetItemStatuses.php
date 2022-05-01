@@ -117,8 +117,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                                     }
                                     $result['id'] = $id;
                                     $response[] = $result;
-                                } elseif (in_array($check_mode,array(['break_next','break_first_next']))) {
-                                    $check_mode = $this->current_mode;
                                 }
                             }
                         }
