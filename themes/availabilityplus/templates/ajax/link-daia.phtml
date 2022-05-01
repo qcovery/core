@@ -49,7 +49,16 @@ foreach($data->document[0]->item as $key => $item) {
         }
     }
     if(!empty($result)) {
-        if($list && count($data->document[0]->item) > 1 && !empty($result->storage)) echo '<a href="#">Test</a>';
+        if($list && count($data->document[0]->item) > 1 && !empty($result->storage)) {
+
+            if($this->source == 'Search2') {
+                $recordRoute = 'Search2Record';
+            } else {
+                $recordRoute = 'Record';
+            }
+
+            echo '<a href="/vufind/'.$recordRoute.'/'.$id.'">Test</a>';
+        }
         if(!$list) echo '</div>';
     }
     if($mode == 'break_on_first') break;

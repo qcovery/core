@@ -49,6 +49,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $list;
 
+    protected $id;
+
     /**
      * Resolver driver plugin manager
      *
@@ -88,6 +90,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->debug = $params->fromPost('debug', $params->fromQuery('debug', ''));
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
+                $this->id = $id;
                 $this->checks = [];
                 $check_mode = 'continue';
                 try {
@@ -308,6 +311,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $status['label'] = 'Check did not find a match!';
         }
         $response = [
+            'id' => $this->id,
             'check' => $check,
             'SolrMarcKey' => $solrMarcKey,
             //'SolrMarcSpecs' => $data = $this->driver->getSolrMarcSpecs($solrMarcKey),
