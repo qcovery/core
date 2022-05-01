@@ -93,6 +93,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $this->id = $id;
                 $this->checks = [];
                 $check_mode = 'continue';
+                $prev_check_mode = '';
                 try {
                     $this->driver = $this->recordLoader->load($id, $this->source);
                     $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
@@ -107,21 +108,23 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     $responses = [];
                     $response = [];
                     foreach($this->checks as $check => $this->current_mode) {
-                        if(in_array($check_mode,array('continue','break_next','break_on_first_next')) || in_array($this->current_mode,array('always'))) {
+                        if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
                             $results = $this->performAvailabilityCheck($check);
                             foreach($results as $result) {
                                 if(!empty($result)) {
-                                    if(!empty($result['html'])) $check_mode = $this->current_mode;
+                                    if(!empty($result['html'])) {
+                                        $prev_check_mode = $check_mode;
+                                        $check_mode = $this->current_mode;
+                                    }
                                     if($this->debug) {
                                         $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
                                     }
                                     $result['id'] = $id;
                                     $response[] = $result;
-                                } elseif (in_array($check_mode,array('break_next','break_on_first_next'))) {
-                                    $check_mode = $this->current_mode;
                                 }
                             }
                         }
+                        if(in_array($prev_check_mode,array('break_next','break_on_firt_next'))) $check_mode = $this->current_mode;
                     }
                     $response['id'] = $id;
                     $response['mediatype'] = $mediatype;
