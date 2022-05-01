@@ -124,7 +124,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                                 }
                             }
                         }
-                        if(in_array($prev_check_mode,array('break_next','break_on_firt_next'))) $check_mode = $this->current_mode;
+                        if(in_array($prev_check_mode,array('break_next','break_on_first_next'))) $check_mode = $this->current_mode;
                     }
                     $response['id'] = $id;
                     $response['mediatype'] = $mediatype;
