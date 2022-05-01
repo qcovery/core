@@ -57,7 +57,7 @@ foreach($data->document[0]->item as $key => $item) {
                 $recordRoute = 'Record';
             }
 
-            echo '<a href="/vufind/'.$recordRoute.'/'.$id.'">Test</a>';
+            echo '<span class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></span>';
         }
         if(!$list) echo '</div>';
     }
