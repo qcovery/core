@@ -6,7 +6,7 @@ foreach($data->document[0]->item as $item) {
         $result = [];
     }
     if(!empty($result)) {
-        echo '<div class="daia_item">';
+        if(!$list) echo '<div class="daia_item">';
         echo '<div class="delimiter"></div>';
     }
     echo '<div class="daia_storage_callnumber">';
@@ -48,7 +48,7 @@ foreach($data->document[0]->item as $item) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
         }
         if(!empty($result)) {
-            echo '</div>';
+            if(!$list) echo '</div>';
         }
     }
     if($mode == 'break_on_first') break;
