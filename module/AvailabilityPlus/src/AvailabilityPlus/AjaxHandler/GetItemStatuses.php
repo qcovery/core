@@ -108,7 +108,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     $responses = [];
                     $response = [];
                     foreach($this->checks as $check => $this->current_mode) {
-                        if(in_array($check_mode,array('continue')) || in_array($this->current_mode,array('always'))) {
+                        if(in_array($check_mode,array('continue','break_next','break_on_first_next')) || in_array($this->current_mode,array('always'))) {
                             $results = $this->performAvailabilityCheck($check);
                             foreach($results as $result) {
                                 if(!empty($result)) {
