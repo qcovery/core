@@ -1,5 +1,5 @@
 <?php
-foreach($data->document[0]->item as $item) {
+foreach($data->document[0]->item as $key => $item) {
     if(!empty($item->availabilityplus)) {
         $result = $item->availabilityplus;
     } else {
@@ -47,11 +47,14 @@ foreach($data->document[0]->item as $item) {
         if(!empty($result->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
         }
-        if(!empty($result)) {
-            if(!$list) echo '</div>';
-        }
     }
-    if($mode == 'break_on_first') break;
+    if(!empty($result)) {
+        if(!$list) echo '</div>';
+    }
+    if($mode == 'break_on_first') {
+        if($list && count($data->document[0]->item) > 1) echo '<a href="#">Test</a>';
+        break;
+    }
 }
 
 
