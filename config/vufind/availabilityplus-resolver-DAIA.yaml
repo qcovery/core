@@ -6,6 +6,6 @@ Signatur:
   examples: 'Alle mit DAIA abgefragten Titel'
   details: '-'
   conditions:
-    - { field: 'availabilityplus->callnumber', content: '(.*):(.*)' }
+    - { field: 'availabilityplus->callnumber', content: '(.*?):(.*)' }
   actions:
-    - { field: 'availabilityplus->callnumber', content_field: 'availabilityplus->callnumber', pattern: '(.*):(.*)', replacement: '$2'}
+    - { field: 'availabilityplus->callnumber', content_field: 'availabilityplus->callnumber', pattern: '(.*?):(.*)', replacement: '$2'}
