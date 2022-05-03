@@ -12,7 +12,9 @@ foreach($data->document[0]->item as $result) {
 
 $break = false;
 foreach($storage_locations as $storage_label => $storage_items) {
-    echo $storage_label.'<br>';
+    if($storage_label !== 'undefined') {
+        echo '<span class="storage_link">'.$this->translate($storage_label.'</span>';
+    }
     foreach($storage_items as $key => $result) {
         if(!empty($result)) {
             if(!$list) echo '<div class="daia_item">';
