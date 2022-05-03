@@ -2,7 +2,7 @@
 
 namespace AvailabilityPlus\Resolver\Driver;
 
-class JournalsOnlinePrintHsHElectronic extends JournalsOnlinePrintElectronic
+class JournalsOnlinePrintHsHPrint extends JournalsOnlinePrintElectronic
 {
 
 }
