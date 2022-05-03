@@ -23,6 +23,11 @@
   font-size: 0;
 }
 
+.storage_group {
+  margin-top: 10px;
+  border-bottom: 1px solid #888;
+}
+
 .delimiter{
   border: none;
   border-top: 1px dashed #E00060;
