@@ -315,7 +315,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'id' => $this->id,
             'check' => $check,
             'SolrMarcKey' => $solrMarcKey,
-            //'SolrMarcSpecs' => $data = $this->driver->getSolrMarcSpecs($solrMarcKey),
+            'SolrMarcSpecs' => $data = $this->driver->getSolrMarcSpecs($solrMarcKey),
             'status' => $status,
             'mode' => $this->current_mode,
             'list' => $this->list,
