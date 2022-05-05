@@ -123,6 +123,12 @@
 	padding: 5px;
 }
 
+#tc_expectedresult,
+#tc_actualresult,
+#tc_info {
+  min-width: 400px;
+}
+
 .AvailabilityPlusDebug {
   padding: 5px;
 }

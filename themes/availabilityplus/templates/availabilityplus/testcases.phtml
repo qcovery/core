@@ -19,14 +19,14 @@
     <h3><?=$this->transEsc('TestCases '.$view_name)?></h3>
     <table>
 		<tr>
-			<th><?=$this->transEsc('ID')?></th>
-			<th><?=$this->transEsc('Status')?></th>
-			<th><?=$this->transEsc('Driver')?></th>
-			<th><?=$this->transEsc('Description')?></th>
-			<th><?=$this->transEsc('ExpectedResult')?></th>
-			<th><?=$this->transEsc('ActualResult')?></th>
-			<th><?=$this->transEsc('ViewLinks')?></th>
-			<th><?=$this->transEsc('Info')?></th>
+			<th id="tc_id"><?=$this->transEsc('ID')?></th>
+			<th id="tc_status"><?=$this->transEsc('Status')?></th>
+			<th id="tc_driver"><?=$this->transEsc('Driver')?></th>
+			<th id="tc_description"><?=$this->transEsc('Description')?></th>
+			<th id="tc_expectedresult"><?=$this->transEsc('ExpectedResult')?></th>
+			<th id="tc_actualresult"><?=$this->transEsc('ActualResult')?></th>
+			<th id="tc_viewlinks"><?=$this->transEsc('ViewLinks')?></th>
+			<th id="tc_info"><?=$this->transEsc('Info')?></th>
 		</tr>
 		<? foreach ($cases AS $key => $case) { ?>
             <? if(!empty($key) && !empty($case['driver'])) { ?>
