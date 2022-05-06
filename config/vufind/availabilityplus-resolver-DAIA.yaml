@@ -4,8 +4,9 @@ Signatur:
   date: '2022-03-29'
   creator: 'Kristof Keßler'
   examples: 'Alle mit DAIA abgefragten Titel'
-  details: '-'
+  details: 'https://gitlab.effective-webwork.de/beluga/availabilityplus/-/issues/118'
   conditions:
-    - { field: 'availabilityplus->callnumber', content: '(.*?):(.*)' }
+    - { field: 'availabilityplus->callnumber', content: '^(\S*?):(.*)' }
   actions:
-    - { field: 'availabilityplus->callnumber', content_field: 'availabilityplus->callnumber', pattern: '(.*?):(.*)', replacement: '$2'}
+    - { field: 'availabilityplus->callnumber', content_field: 'availabilityplus->callnumber', pattern: '^(\S*?):(.*)', replacement: '$2'}
+
