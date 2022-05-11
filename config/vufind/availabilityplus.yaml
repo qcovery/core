@@ -1,4 +1,4 @@
-1ArticleFulltextFreeIndicator2:
+1ArticleFulltextFreeIndicator:
   category: FreeAccess
   mandatory-field: url
   view-method: ajax/link-external.phtml
@@ -17,7 +17,7 @@
       - [indicator, 2, 0|1]
     u:
       - [name, url]
-2ArticleFulltextFreeSubfield3:
+2ArticleFulltextFreeSubfield:
   category: FreeAccess
   mandatory-field: url
   view-method: ajax/link-external.phtml
