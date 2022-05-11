@@ -10,7 +10,7 @@
 #    description_xy: '<description of what is expected to appear as availability for specific language selected in VuFind, xy represents language code, supersedes expected->description>' # optional, text, multiple possible, up to one for every language code used in VuFind installation
 #    html: '<html which is expected to appear as availability, supersedes expected->description_xy>' # optional, html
 #    html_xy: '<html which is expected to appear as availability for specific language selected in VuFind, xy represents language code, supersedes expected->html>' # optional, html, multiple possible, up to one for every language code used in VuFind installation
-#    listview: # expected availability for result list view, optional, array
+#    resultlist: # expected availability for result list view, optional, array
 #      description: '<description of what is expected to appear as availability in listview, supersedes any node with text or html directly below expected>' # optional, text
 #      description_xy: '<description of what is expected to appear as availability in listview for specific language selected in VuFind, xy represents language code, supersedes expected->listview->description>' # optional, text, multiple possible, up to one for every language code used in VuFind installation
 #      html: '<html which is expected to appear as availability in listview, supersedes expected->listview->description_xy>' # optional, html
@@ -32,7 +32,7 @@
 #  driver: 'Solr'
 #  description: 'sample description'
 #  expected:
-#    listview:
+#    resultlist:
 #      html_en: '<a href="https://www.fulltext.com">Fulltext</a>'
 #      html_de: '<a href="https://www.fulltext.com">Volltext</a>'
 #    recordview:
