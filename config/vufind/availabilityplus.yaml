@@ -56,7 +56,7 @@
   856:
     conditions:
       - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
-      - [field, z, 'Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
       - [indicator, 1, 4]
       - [indicator, 2, 0|1]
     u:
