@@ -32,6 +32,7 @@ return [
         'storageinfo',
         'listadmin',
         'availabilityfeedback',
+	    'publicationsuggestion',
     ],
     "less" => [
         "active" => false,

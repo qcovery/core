@@ -1,0 +1,7 @@
+<?php
+    // Set page title
+    $this->headTitle($this->translate('publication_suggestion_pageTitle'));
+    // Get rid of the feedback tab since this uses the same variables
+    $this->layout()->feedbacktab = false;
+?>
+<?=$this->render('publicationsuggestion/form.phtml');?>
