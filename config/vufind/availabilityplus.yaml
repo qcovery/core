@@ -24,7 +24,7 @@
   856:
     conditions:
       - [field, 3, Volltext]
-      - [field, z, 'kostenfrei|Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
       - [indicator, 1, 4]
     u:
       - [name, url]
@@ -35,7 +35,7 @@
   856:
     conditions:
       - [field, u, 'doi.org']
-      - [field, z, 'kostenfrei|Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
     u:
       - [name, url]
 4ArticleFulltextFreeUrlParts:
