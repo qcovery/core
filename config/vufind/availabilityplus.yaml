@@ -19,7 +19,7 @@ MonographSeriesRecordView:
       - [field, a, '\(DE-627\)([0-9xX]+)']
     a:
       - [name, label]
-      - [replace, '(^.*$)', 'DependentWorks']
+      - [replace, '(^.*$)', 'See DependentWorks']
 1ArticleFulltextFreeIndicator:
   category: FreeAccess
   mandatory-field: url
