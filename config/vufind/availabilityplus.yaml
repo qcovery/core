@@ -1,4 +1,4 @@
-MongraphSeriesResultList:
+MonographSeriesResultList:
   mandatory-field: url
   view-method: ajax/link-internal.phtml
   '035':
@@ -11,7 +11,7 @@ MongraphSeriesResultList:
     a:
       - [ name, label ]
       - [replace, '(^.*$)', 'DependentWorks']
-MongraphSeriesRecordView:
+MonographSeriesRecordView:
   view-method: ajax/default.phtml
   mandatory-field: label
   '035':
