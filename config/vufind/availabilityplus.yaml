@@ -1,3 +1,25 @@
+MongraphicSeriesResultList:
+  mandatory-field: url
+  view-method: ajax/link-internal.phtml
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', '/vufind/Record/$1']
+  245:
+    a:
+      - [ name, label ]
+      - [replace, '(^.*$)', 'DependentWorks']
+MongraphicSeriesRecordView:
+  view-method: ajax/default.phtml
+  mandatory-field: label
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, label]
+      - [replace, '(^.*$)', 'DependentWorks']
 1ArticleFulltextFreeIndicator:
   category: FreeAccess
   mandatory-field: url
@@ -165,12 +187,3 @@ ArticleParentId:
     w:
       - [name, id]
       - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
-#TODO Später anpassen?
-ArticleFulltextFreeCollection:
-  category: FreeAccessIndirect
-  view-method: ajax/link-external.phtml
-  912:
-    conditions:
-      - [field, a, 'OPENACCESS|GBV_DOAJ|Gutenberg|ZDB-94-OAB|ZDB-23-GOA|GBV_XBI|GBV_XAR|GBV_XCH|GBV_CTG']
-    a:
-      - [name, collection]
