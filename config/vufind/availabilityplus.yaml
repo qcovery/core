@@ -97,6 +97,14 @@ TestLevel:
   category: FullTextFallbackUrls
   view-method: ajax/link-external.phtml
   mandatory-field: url
+  '035':
+    a:
+      - [ name, level ]
+      - [ replace, '(^.*$)', 'uncertain_article_access_level']
+  245:
+    a:
+      - [ name, label ]
+      - [ replace, '(^.*$)', 'Got to Publication']
   856:
     conditions:
       - [field, 3, Volltext]
@@ -105,7 +113,7 @@ TestLevel:
     u:
       - [name, url]
 2ArticleDirectLinkUrlParts:
-  category: FullTextFallbackUrls
+  category: Zur Publikation
   view-method: ajax/link-external.phtml
   mandatory-field: url
   856:
