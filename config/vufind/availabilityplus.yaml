@@ -104,7 +104,7 @@ TestLevel:
   245:
     a:
       - [ name, label ]
-      - [ replace, '(^.*$)', 'Got to Publication']
+      - [ replace, '(^.*$)', 'Go to Publication']
   856:
     conditions:
       - [field, 3, Volltext]
