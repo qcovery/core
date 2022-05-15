@@ -100,7 +100,7 @@ TestLevel:
   '035':
     a:
       - [ name, level ]
-      - [ replace, '(^.*$)', 'uncertain_article_access_level']
+      - [ replace, '(^.*$)', 'UncertainAccess']
   245:
     a:
       - [ name, label ]
