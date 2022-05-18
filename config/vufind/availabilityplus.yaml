@@ -163,34 +163,34 @@ ResultFeedbackSearch2:
       - [replace, '\(DE-627\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Search2']
 SubitoISBN:
   category: resolver
-  mandatory-field: isbn
+  mandatory-field: SB
   view-method: ajax/link-external.phtml
   '035':
     a:
-      - [name, ppn]
+      - [name, ND]
       - [replace, '\(.*\)([0-9A-Z]+)', '$1']
   '020':
     a:
-      - [name, isbn]
+      - [name, SB]
 SubitoISSN:
   category: resolver
-  mandatory-field: issn
+  mandatory-field: SS
   view-method: ajax/link-external.phtml
   245:
     a:
-      - [name, atitle]
+      - [name, ATI]
   773:
     t:
-      - [name, title]
+      - [name, TI]
     x:
-      - [name, issn]
+      - [name, SS]
   952:
     d:
-      - [name, volume]
+      - [name, VOL]
     j:
-      - [name, date]
+      - [name, APY]
     h:
-      - [name, pages]
+      - [name, PG]
 SubitoISBNMARC:
   # Example: https://www.subito-doc.de/preorder?SB=1-61779-245-4&NB=666430268
   #category: Subito
