@@ -15,13 +15,8 @@ class Subito extends AvailabilityPlusResolver
      */
     public function getResolverUrl($openUrl)
     {
-
         $subito_base_url = 'https://www.subito-doc.de/preorder?';
-        if(strpos($openUrl,"isbn") !== false) {
-            $url = $subito_base_url.'SB='.$isbn.'&ND='.$ppn;
-        } else if(strpos($openUrl,"issn") !== false) {
-            $url = $subito_base_url.'ATI='.$atitle.'&JT='.$title.'&SS='.$issn.'&VOL='.$volume.'&APY='.$date.'&PG='.$pages.'&CAT=ZDB';
-        }
+        $url = $subito_base_url.$params;
         return $url;
     }
     /**
