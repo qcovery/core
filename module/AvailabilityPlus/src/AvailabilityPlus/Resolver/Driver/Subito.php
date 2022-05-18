@@ -13,12 +13,12 @@ class Subito extends AvailabilityPlusResolver
      *
      * @return string Returns resolver specific url
      */
-    public function getResolverUrl($openUrl)
+    /*public function getResolverUrl($openUrl)
     {
         $subito_base_url = 'https://www.subito-doc.de/preorder';
         $url = $subito_base_url.$openUrl;
         return $url;
-    }
+    }*/
     /**
      * Fetch Links
      *

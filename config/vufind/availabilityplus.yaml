@@ -168,7 +168,7 @@ SubitoISBN:
   '035':
     a:
       - [name, ppn]
-      - [replace, '\(.*\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Solr']
+      - [replace, '\(.*\)([0-9A-Z]+)', '$1']
   '020':
     a:
       - [name, isbn]
