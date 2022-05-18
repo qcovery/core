@@ -164,7 +164,7 @@ ResultFeedbackSearch2:
 SubitoISBN:
   # Example: https://www.subito-doc.de/preorder?SB=1-61779-245-4&NB=666430268
   category: Subito
-  mandatory-field: isbn
+  mandatory-field: SB
   view-method: ajax/link-subito.phtml
   '035':
     a:
@@ -174,7 +174,7 @@ SubitoISBN:
       - [name, SB]
 SubitoISSN:
   category: Subito
-  mandatory-field: issn
+  mandatory-field: SS
   view-method: ajax/link-subito.phtml
   245:
     a:
