@@ -1,10 +1,10 @@
 <?php
     $url = '';
     $subito_base_url = 'https://www.subito-doc.de/preorder?';
-    if($SB) {
-        $url= $subito_base_url.'SB='.$SB.'&ND='.$ND;
-    } else if ($SS) {
-        $url= $subito_base_url.'ATI='.$ATI.'&JT='.$JT.'&SS='.$SS.'&VOL='.$VOL.'&APY='.$APY.'&PG='.$PG.'&CAT=ZDB';
+    if(!empty($isbn)) {
+        $url = $subito_base_url.'SB='.$isbn.'&ND='.$ppn;
+    } else if (!empty($issn)) {
+        $url = $subito_base_url.'ATI='.$atitle.'&JT='.$title.'&SS='.$issn.'&VOL='.$volume.'&APY='.$date.'&PG='.$pages.'&CAT=ZDB';
     }
     if($url) {
         if(!$list) echo '<div class="availability_item">';

@@ -164,33 +164,33 @@ ResultFeedbackSearch2:
 SubitoISBN:
   # Example: https://www.subito-doc.de/preorder?SB=1-61779-245-4&NB=666430268
   category: Subito
-  mandatory-field: SB
+  mandatory-field: isbn
   view-method: ajax/link-subito.phtml
   '035':
     a:
-      - [name, ND]
+      - [name, ppn]
   '020':
     a:
-      - [name, SB]
+      - [name, isbn]
 SubitoISSN:
   category: Subito
-  mandatory-field: SS
+  mandatory-field: issn
   view-method: ajax/link-subito.phtml
   245:
     a:
-      - [name, ATI]
+      - [name, atitle]
   773:
     t:
-      - [name, JT]
+      - [name, title]
     x:
-      - [name, SS]
+      - [name, issn]
   952:
     d:
-      - [name, VOL]
+      - [name, volume]
     j:
-      - [name, APY]
+      - [name, date]
     h:
-      - [name, PG]
+      - [name, pages]
 JournalsOnlinePrintElectronic:
   category: resolver
   view-method: ajax/link-jop-electronic.phtml
