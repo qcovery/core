@@ -164,7 +164,7 @@ ResultFeedbackSearch2:
 SubitoISBN:
   category: resolver
   mandatory-field: SB
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-subito.phtml
   '035':
     a:
       - [name, NB]
@@ -175,7 +175,7 @@ SubitoISBN:
 SubitoISSN:
   category: resolver
   mandatory-field: SS
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-subito.phtml
   245:
     a:
       - [name, ATI]

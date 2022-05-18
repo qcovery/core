@@ -1,15 +1,14 @@
 <?php
-    $url = '';
-    $subito_base_url = 'https://www.subito-doc.de/preorder?';
-    if(!empty($isbn)) {
-        $url = $subito_base_url.'SB='.$isbn.'&ND='.$ppn;
-    } else if (!empty($issn)) {
-        $url = $subito_base_url.'ATI='.$atitle.'&JT='.$title.'&SS='.$issn.'&VOL='.$volume.'&APY='.$date.'&PG='.$pages.'&CAT=ZDB';
-    }
-    if($url) {
+foreach($data as $result) {
+    if(!empty($result['label'])){
         if(!$list) echo '<div class="availability_item">';
-		echo '<div class="delimiter"></div>';
-		echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+        $level = $result['level'];
+        $label = $result['label'];
+        $url = $result['url'];
+        echo '<div class="delimiter"></div>';
+        echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
         if(!$list) echo '</div>';
-	} 
+        if($mode == 'break_on_first') break;
+    }
+}
 ?>
