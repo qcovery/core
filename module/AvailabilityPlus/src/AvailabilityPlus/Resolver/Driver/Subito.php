@@ -5,21 +5,6 @@ namespace AvailabilityPlus\Resolver\Driver;
 class Subito extends AvailabilityPlusResolver
 {
     /**
-     * Get Resolver Url
-     *
-     * Transform the OpenURL as needed to get a working link to the resolver.
-     *
-     * @param string $openURL openURL (url-encoded)
-     *
-     * @return string Returns resolver specific url
-     */
-    /*public function getResolverUrl($openUrl)
-    {
-        $subito_base_url = 'https://www.subito-doc.de/preorder';
-        $url = $subito_base_url.$openUrl;
-        return $url;
-    }*/
-    /**
      * Fetch Links
      *
      * Fetches a set of links corresponding to an OpenURL
@@ -50,8 +35,8 @@ class Subito extends AvailabilityPlusResolver
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
 
-        $record['level'] = "Subito";
-        $record['label'] = "Subito";
+        $record['level'] = "subito_preorder_check";
+        $record['label'] = "subito_preorder_check";
         $record['url'] = $data_org;
         $records[] = $record;
 

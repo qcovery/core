@@ -165,10 +165,6 @@ SubitoISBN:
   category: resolver
   mandatory-field: SB
   view-method: ajax/link-external.phtml
-  245:
-    a:
-      - [name, label]
-      - [replace, '(^.*$)', 'subito_preorder_check']
   '035':
     a:
       - [name, NB]
@@ -180,10 +176,6 @@ SubitoISSN:
   category: resolver
   mandatory-field: SS
   view-method: ajax/link-external.phtml
-  '035':
-    a:
-      - [name, label]
-      - [replace, '(^.*$)', 'subito_preorder_check']
   245:
     a:
       - [name, ATI]
