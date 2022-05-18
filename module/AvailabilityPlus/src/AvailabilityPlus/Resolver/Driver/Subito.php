@@ -16,7 +16,7 @@ class Subito extends AvailabilityPlusResolver
     public function getResolverUrl($openUrl)
     {
         $subito_base_url = 'https://www.subito-doc.de/preorder?';
-        $url = $subito_base_url.$params;
+        $url = $subito_base_url.$openUrl;
         return $url;
     }
     /**
