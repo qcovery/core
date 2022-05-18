@@ -143,6 +143,24 @@ TestLevel:
     a:
       - [name, url]
       - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
+ResultFeedbackSolr:
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9xX]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Solr']
+ResultFeedbackSearch2:
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9xX]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Search2']
 JournalsOnlinePrintElectronic:
   category: resolver
   view-method: ajax/link-jop-electronic.phtml
@@ -195,3 +213,4 @@ ArticleParentId:
     w:
       - [name, id]
       - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+
