@@ -148,19 +148,19 @@ ResultFeedbackSolr:
   view-method: ajax/link-external.phtml
   '035':
     conditions:
-      - [ field, a, '\(DE-627\)([0-9xX]+)' ]
+      - [ field, a, '\(DE-627\)([0-9A-Z]+)' ]
     a:
       - [name, url]
-      - [replace, '\(DE-627\)([0-9xX]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Solr']
+      - [replace, '\(DE-627\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Solr']
 ResultFeedbackSearch2:
   mandatory-field: url
   view-method: ajax/link-external.phtml
   '035':
     conditions:
-      - [ field, a, '\(DE-627\)([0-9xX]+)' ]
+      - [ field, a, '\(DE-627\)([0-9A-Z]+)' ]
     a:
       - [name, url]
-      - [replace, '\(DE-627\)([0-9xX]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Search2']
+      - [replace, '\(DE-627\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Search2']
 JournalsOnlinePrintElectronic:
   category: resolver
   view-method: ajax/link-jop-electronic.phtml
