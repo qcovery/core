@@ -28,6 +28,8 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'JournalsOnlinePrintHsHPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintHsHPrint',
         'JournalsOnlinePrintKSFPrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintKSFPrint',
         'Subito' => 'AvailabilityPlus\Resolver\Driver\Subito',
+        'SubitoISSN' => 'AvailabilityPlus\Resolver\Driver\SubitoISSN',
+        'SubitoISBN' => 'AvailabilityPlus\Resolver\Driver\SubitoISBN',
     ];
 
     /**
