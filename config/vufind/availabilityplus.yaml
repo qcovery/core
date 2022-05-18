@@ -167,7 +167,7 @@ SubitoISBN:
   view-method: ajax/link-external.phtml
   '035':
     a:
-      - [name, ND]
+      - [name, NB]
       - [replace, '\(.*\)([0-9A-Z]+)', '$1']
   '020':
     a:
