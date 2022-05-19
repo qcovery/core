@@ -93,7 +93,25 @@ TestLevel:
   245:
     a: 
       - [name, level]
-1ArticleDirectLink:
+1ArticleDirectLinkIndicatorFullTextFallbackUrls:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  '035':
+    a:
+      - [ name, level ]
+      - [ replace, '(^.*$)', 'UncertainAccess']
+  245:
+    a:
+      - [ name, label ]
+      - [ replace, '(^.*$)', 'Go to Publication']
+  856:
+    conditions:
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+2ArticleDirectLinkSubFieldFullTextFallbackUrls:
   category: FullTextFallbackUrls
   view-method: ajax/link-external.phtml
   mandatory-field: url
@@ -109,11 +127,10 @@ TestLevel:
     conditions:
       - [field, 3, Volltext]
       - [indicator, 1, 4]
-      - [indicator, 2, 0|1]
     u:
       - [name, url]
-2ArticleDirectLinkUrlParts:
-  category: Zur Publikation
+3ArticleDirectLinkUrlPartsFullTextFallbackUrls:
+  category: FullTextFallbackUrls
   view-method: ajax/link-external.phtml
   mandatory-field: url
   856:
