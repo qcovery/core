@@ -118,6 +118,10 @@
 	border: 1px solid black;
 }
 
+.AvailabilityPlusTestCases tr {
+  vertical-align: top;
+}
+
 .AvailabilityPlusTestCases th,
 .AvailabilityPlusTestCases td {
 	padding: 5px;
