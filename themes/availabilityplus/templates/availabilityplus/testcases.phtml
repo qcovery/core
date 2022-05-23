@@ -11,6 +11,7 @@
     if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
     $view_name = 'ResultList';
     if($list == 0) $view_name = 'RecordView';
+    $counter = 1;
 
 ?>
 <div class="AvailabilityPlusTestCases">
@@ -19,6 +20,7 @@
     <h3><?=$this->transEsc('TestCases '.$view_name)?></h3>
     <table>
 		<tr>
+			<th id="tc_ncounter"><?=$this->transEsc('#')?></th>
 			<th id="tc_id"><?=$this->transEsc('ID')?></th>
 			<th id="tc_status"><?=$this->transEsc('Status')?></th>
 			<th id="tc_driver"><?=$this->transEsc('Driver')?></th>
@@ -79,6 +81,7 @@
                     }
                 ?>
                 <tr id="<?=$id?>">
+                    <td id="testcase_counter_<?=$id?>" class="testcase_counter"><?=$counter?></td>
                     <td id="testcase_id_<?=$id?>" class="testcase_id"><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
                     <td id="testcase_status_<?=$id?>" class="testcase_status"></td>
                     <td id="testcase_driver_<?=$id?>" class="testcase_driver"><?=$driver?></td>
@@ -109,6 +112,7 @@
                     </td>
                 </tr>
 			<? } ?>
+            <? $counter = $counter + 1;
 		<? } ?>
 	</table>
 <? } else { ?>
