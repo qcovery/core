@@ -24,7 +24,6 @@ class DAIA extends AvailabilityPlusResolver
         $this->parsed_data = $data;
 
         foreach($data->document[0]->item as $key => $item) {
-            $best_record = (object)[];
 
             $item_services['available']['openaccess'] = [];
             $item_services['available']['remote'] = [];
@@ -164,10 +163,6 @@ class DAIA extends AvailabilityPlusResolver
                             $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             break;
                     }
-                    if(!empty($record) && (empty($best_record) || $record->score < $this->parsed_data->best_result->availabilityplus->score)) {
-                        $best_record = $this->parsed_data->document[0]->item[$key];
-                        $this->parsed_data->best_result = $this->parsed_data->document[0]->item[$key];
-                    }
                     break;
                 }
             }
@@ -175,6 +170,7 @@ class DAIA extends AvailabilityPlusResolver
 
         $response['data'] = $data_org;
         $this->applyCustomChanges();
+        $this->determineBestItem();
         $response['parsed_data'] = $this->parsed_data;
         return $response;
     }
@@ -279,6 +275,15 @@ class DAIA extends AvailabilityPlusResolver
                 $this->parsed_data->document[0]->item[$key]->{$path[0]}->{$path[1]}->{$path[2]}->{$path[3]}->{$path[4]}->{$path[5]} = $value;
                 break;
         }
+    }
+
+    protected function determineBestItem(){
+        foreach($this->parsed_data->document[0]->item as $key => $item) {
+            if(empty(this->parsed_data->best_result) || $item->availabilityplus->score < $this->parsed_data->best_result->availabilityplus->score) {
+                $this->parsed_data->best_result = $this->parsed_data->document[0]->item[$key];
+            }
+        }
+
     }
 
     protected function generateOrderLink ($action, $doc_id, $item_id, $storage_id) {
