@@ -165,9 +165,9 @@ class DAIA extends AvailabilityPlusResolver
                             break;
                     }
                     break;
-                }
-                if(!empty($record) && (empty($best_record) || $record->score < $best_record->score)) {
-                    $best_record = $record;
+                    if(empty($best_record) || $record->score < $best_record->score) {
+                        $best_record = $record;
+                    }
                 }
             }
         }
