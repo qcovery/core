@@ -164,7 +164,7 @@ class DAIA extends AvailabilityPlusResolver
                             $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             break;
                     }
-                    if(empty($best_record) || $record->score < $best_record->availabilityplus->score) {
+                    if(empty($best_record) || (!empty($record->score) && $record->score < $best_record->availabilityplus->score)) {
                         $best_record = $this->parsed_data->document[0]->item[$key];
                     }
                     break;
