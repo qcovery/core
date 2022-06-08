@@ -82,7 +82,7 @@ class DAIA extends AvailabilityPlusResolver
                         case 'presentation':
                             if($service_key == 'loan') {
                                 $record->score = 20;
-                            } elseif($service_key == 'presentation') {
+                            } else {
                                 $record->score = 30;
                             }
                             if(!empty($item->storage->href)){
@@ -164,9 +164,9 @@ class DAIA extends AvailabilityPlusResolver
                             $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             break;
                     }
-                    //if(empty($best_record) || $record->score < $best_record->score) {
+                    if(empty($best_record) || $record->score < $best_record->availabilityplus->score) {
                         $best_record = $this->parsed_data->document[0]->item[$key];
-                    //}
+                    }
                     break;
                 }
             }
