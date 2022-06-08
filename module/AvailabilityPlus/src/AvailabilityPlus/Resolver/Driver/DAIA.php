@@ -24,7 +24,7 @@ class DAIA extends AvailabilityPlusResolver
         $this->parsed_data = $data;
 
         foreach($data->document[0]->item as $key => $item) {
-            $record =  (object)[];
+            $best_record = (object)[];
 
             $item_services['available']['openaccess'] = [];
             $item_services['available']['remote'] = [];
@@ -43,6 +43,7 @@ class DAIA extends AvailabilityPlusResolver
             }
 
             foreach($item_services['available'] as $service_key=>$service_content) {
+                $record =  (object)[];
                 if(!empty($service_content)) {
                     switch($service_key) {
                         case 'openaccess':
@@ -57,6 +58,7 @@ class DAIA extends AvailabilityPlusResolver
                                 if(!empty($item->chronology->about)) {
                                     $record->chronology = $item->chronology->about;
                                 }
+                                $record->score = 0;
                                 $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
                             break;
@@ -72,11 +74,17 @@ class DAIA extends AvailabilityPlusResolver
                                 if(!empty($item->chronology->about)) {
                                     $record->chronology = $item->chronology->about;
                                 }
+                                $record->score = 10;
                                 $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
                             break;
                         case 'loan':
                         case 'presentation':
+                            if($service_key == 'loan') {
+                                $record->score = 20;
+                            } elseif($service_key == 'presentation') {
+                                $record->score = 30;
+                            }
                             if(!empty($item->storage->href)){
                                 $record->storage->level = 'link_external';
                                 $record->storage->label = $item->storage->content;
@@ -93,15 +101,18 @@ class DAIA extends AvailabilityPlusResolver
                                 $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
                                 $record->daia_hint->level = $limitation;
                                 $record->daia_hint->label = $service_content->service.$limitation;
+                                $record->score += 5;
                             } elseif(!empty($service_content->limitation[0]->content)) {
                                 $limitation = $service_content->limitation[0]->content;
                                 $record->daia_hint->level = $limitation;
                                 $record->daia_hint->label = $service_content->service.$limitation;
+                                $record->score += 5;
                             } elseif(!empty($service_content->expected)) {
                                 $record->daia_hint->level = "daia_orange";
                                 $date = date_create($service_content->expected);
                                 $record->daia_hint->label = 'on_loan_until';
                                 $record->daia_hint->label_date = date_format($date,"d.m.Y");
+                                $record->score += 20;
                             } else {
                                 $record->daia_hint->level = "daia_green";
                                 $record->daia_hint->label = $service_content->service;
@@ -122,6 +133,7 @@ class DAIA extends AvailabilityPlusResolver
                                 } else {
                                     $record->queue->label .=  'Recalls';
                                 }
+                                $record->score += $service_content->queue;
                             }
                             if(!empty($item->about)) {
                                 $record->about = $item->about;
@@ -148,14 +160,19 @@ class DAIA extends AvailabilityPlusResolver
                             if(!empty($item->chronology->about)) {
                                 $record->chronology = $item->chronology->about;
                             }
+                            $record->score = 100;
                             $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             break;
                     }
                     break;
                 }
+                if(!empty($record) && (empty($best_record) || $record->score < $best_record->score)) {
+                    $best_record = $record;
+                }
             }
         }
 
+        $this->parsed_data->best_result = $best_record;
         $response['data'] = $data_org;
         $this->applyCustomChanges();
         $response['parsed_data'] = $this->parsed_data;
