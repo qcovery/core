@@ -279,8 +279,8 @@ class DAIA extends AvailabilityPlusResolver
 
     protected function determineBestItem(){
         foreach($this->parsed_data->document[0]->item as $key => $item) {
-            if(empty(this->parsed_data->best_result) || $item->availabilityplus->score < $this->parsed_data->best_result->availabilityplus->score) {
-                $this->parsed_data->best_result = $this->parsed_data->document[0]->item[$key];
+            if(empty($this->parsed_data->best_item) || $item->availabilityplus->score < $this->parsed_data->best_item->availabilityplus->score) {
+                $this->parsed_data->best_item = $this->parsed_data->document[0]->item[$key];
             }
         }
 
