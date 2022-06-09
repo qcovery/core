@@ -435,14 +435,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $check = 'function MultipartWork';
         $template = 'ajax/default.phtml';
         $responses = [];
-        $data = $this->driver->getMultipartResourceRecordLevel();
-
-        $level = 'MultipartWork';
-        $label = 'See DependentWorks';
-        $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
-        $response['html'] = $this->renderer->render($template, $response);
-
-        $responses[] = $response;
+        if($this->driver->getMultipartResourceRecordLevel() == "Set") {
+            $level = 'MultipartWork';
+            $label = 'See DependentWorks';
+            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
+            $response['html'] = $this->renderer->render($template, $response);
+            $responses[] = $response;
+        }
         return $responses;
     }
 
