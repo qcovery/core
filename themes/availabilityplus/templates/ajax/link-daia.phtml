@@ -1,6 +1,6 @@
 <?php
 
-if($mode == 'break_on_first') {
+if($mode == 'break_on_first' && $data->best_item) {
     unset($data->document[0]);
     $data->document[0]->item[0] = $data->best_item;
 }
