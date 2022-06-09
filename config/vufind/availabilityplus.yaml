@@ -1,5 +1,6 @@
 MarcLeader19A:
   view-method: ajax/default.phtml
+  mandatory-field: label
   '000':
     parent:
       - [name, label]
