@@ -1,12 +1,11 @@
 <?php
 
-if($mode == 'break_on_first' && $data->best_item) {
-    $items->item[0] = $data->best_item;
-} else {
-    $items = $data->document[0]->item;
-}
+/*if($mode == 'break_on_first' && $data->best_item) {
+    unset($data->document[0]);
+    $data->document[0]->item[0] = $data->best_item;
+}*/
 
-foreach($items as $key => $item) {
+foreach($data->document[0]->item as $key => $item) {
     if(!empty($item->availabilityplus)) {
         $result = $item->availabilityplus;
     } else {
