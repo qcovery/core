@@ -1,3 +1,9 @@
+MarcLeader19A:
+  view-method: ajax/default.phtml
+  '000':
+    parent:
+      - [name, label]
+      - [method, getMultipartResourceRecordLevel()]
 MonographSeriesResultList:
   mandatory-field: url
   view-method: ajax/link-internal.phtml
