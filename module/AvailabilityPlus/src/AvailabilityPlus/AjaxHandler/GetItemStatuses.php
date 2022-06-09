@@ -426,6 +426,60 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $responses;
     }
 
+    /**
+     * Custom method to check for a MultipartWork (indicated by MARC Leader Positon 19 = A
+     *
+     * @return array [response data (arrays)]
+     */
+    private function checkMultipartWork() {
+        $check = 'function MultipartWork';
+        $template = 'ajax/default.phtml';
+        $responses = [];
+        $data = $this->driver->getMultipartResourceRecordLevel();
+
+        $level = 'MultipartWork';
+        $label = 'See DependentWorks';
+        $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
+        $response['html'] = $this->renderer->render($template, $response);
+
+        $responses[] = $response;
+        return $responses;
+    }
+
+    private function getResolverResponse($resolver) {
+        $resolverType = $resolver;
+        if (!$this->resolverManager->has($resolverType)) {
+            return $this->formatResponse(
+                $this->translate("Could not load driver for $resolverType"),
+                self::STATUS_HTTP_ERROR
+            );
+        }
+        $resolverHandler = new Connection($this->resolverManager->get($resolverType));
+        $marc_data = $this->driver->getMarcData($resolver);
+        $params = $this->prepareResolverParams($marc_data);
+        $resolver_url = $resolverHandler->getResolverUrl($params);
+        $template = $this->getTemplate($marc_data);
+        if(!empty($resolver_url) && !empty($marc_data)) {
+            $resolver_data = $resolverHandler->fetchLinks($params);
+            $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true);
+            $response['html'] = $this->applyTemplate($template, $response);
+            if(empty($response['html'])) {
+                $response['status']['level'] = 'unsuccessful_check';
+                $response['status']['label'] = 'Check did not find a match!';
+            }
+            $response['marc_data'] = $marc_data;
+            $response['resolver_data'] = $resolver_data['data'];
+            $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
+
+        } else {
+            $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, '', $resolver_url, false);
+        }
+
+        $responses[] = $response;
+
+        return $responses;
+    }
+
     private function prepareResolverParams($resolverData) {
         $used_params = [];
         $params = '';
