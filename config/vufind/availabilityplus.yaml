@@ -4,7 +4,7 @@ MarcLeader19A:
   '000':
     parent:
       - [name, label]
-      - [method, getMultipartResourceRecordLevel()]
+      - [method, getMultipartResourceRecordLevel]
 MonographSeriesResultList:
   mandatory-field: url
   view-method: ajax/link-internal.phtml
