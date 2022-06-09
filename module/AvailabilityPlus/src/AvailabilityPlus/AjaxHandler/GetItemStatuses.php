@@ -427,16 +427,16 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     /**
-     * Custom method to check for a MultipartWork (indicated by MARC Leader Positon 19 = A
+     * Custom method to check for a MultiVolumeWork (indicated by MARC Leader Positon 19 = A
      *
      * @return array [response data (arrays)]
      */
-    private function checkMultipartWork() {
-        $check = 'function MultipartWork';
+    private function checkMultiVolumeWork() {
+        $check = 'function MultiVolumeWork';
         $template = 'ajax/default.phtml';
         $responses = [];
         if($this->driver->getMultipartResourceRecordLevel() == "Set") {
-            $level = 'MultipartWork';
+            $level = 'MultiVolumeWork';
             $label = 'See DependentWorks';
             $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
             $response['html'] = $this->renderer->render($template, $response);
