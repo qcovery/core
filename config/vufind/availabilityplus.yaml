@@ -20,18 +20,22 @@ MonographSeriesRecordView:
     a:
       - [name, label]
       - [replace, '(^.*$)', 'See DependentWorks']
-1ArticleFulltextFreeIndicator:
+1ArticleFulltextDOAJDOAB:
   category: FreeAccess
   mandatory-field: url
   view-method: ajax/link-external.phtml
-  '035':
-    a:
-      - [ name, requirednumberofconditions ]
-      - [ replace, '(^.*$)', 1 ]
-  912:
-    a:
-      - [ name, condition_false ]
-      - [ replace, '(^GBV_DOAJ $)', 'false' ]
+  856:
+    conditions:
+      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+2ArticleFulltextFreeIndicator:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
   856:
     conditions:
       - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
@@ -39,7 +43,7 @@ MonographSeriesRecordView:
       - [indicator, 2, 0|1]
     u:
       - [name, url]
-2ArticleFulltextFreeSubfield:
+3ArticleFulltextFreeSubfield:
   category: FreeAccess
   mandatory-field: url
   view-method: ajax/link-external.phtml
@@ -50,7 +54,7 @@ MonographSeriesRecordView:
       - [indicator, 1, 4]
     u:
       - [name, url]
-3ArticleDirectLinkUrlParts:
+4ArticleDirectLinkUrlParts:
   category: FreeAccess
   view-method: ajax/link-external.phtml
   mandatory-field: url
@@ -60,25 +64,13 @@ MonographSeriesRecordView:
       - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
     u:
       - [name, url]
-4ArticleFulltextFreeUrlParts:
+5ArticleFulltextFreeUrlParts:
   category: FreeAccess
   mandatory-field: url
   view-method: ajax/link-external.phtml
   856:
     conditions:
       - [field, u, 'doaj.org\/article|doaj.org\/toc|edocs.tib.eu\/files|tib.uni-hannover.de\/edoks\/|digibib.tu-bs.de|resolver.sub.uni-goettingen.de|resolver.staatsbibliothek-berlin.de|hdl.handle.net|lib.dr.iastate.edu|www.dzhw.eu\/pdf|www.his.de\/pdf|arxiv.org|publikationsserver.tu-braunschweig.de\/get|bib-pubdb1.desy.de\/record|inef.uni-due.de\/index.php?article_id=|kluedo.ub.uni-kl.de\/frontdoor\/index\/index\/docId\/|wiiw.ac.at|library.fes.de\/pdf-files|www.bis.org\/publ\/bppdf|www.bsu-bund.de\/SharedDocs\/pdf|www.bamf.de\/SharedDocs\/Anlagen\/DE\/Publikationen|bib-pubdb1.desy.de\/record|www.doabooks.org\/doab?func=fulltext|www.pharmazeutische-zeitung.de|clinicaltrials.gov\/show|www.jfe-steel.co.jp\/en\/research\/report\/|www.ressource-deutschland.de\/fileadmin\/|juser.fz-juelich.de\/record\/|www.qip-journal.eu\/index.php\/ams\/article\/download\/|www.ita.rwth-aachen.de\/global\/show_document.asp|opus.bibliothek.uni-wuerzburg.de\/files\/|kth.diva-portal.org\/smash\/record|www.teses.usp.br\/teses\/disponiveis\/|edoc.difu.de\/edoc.php|haab-digital.klassik-stiftung.de\/viewer|darwin-online.org.uk|www.doabooks.org|revistas.unam.mx|produccioncientificaluz.org|www.gbv.de\/dms\/|serwiss.bib.hs-hannover.de|openjournals.hs-hannover.de']
-      - [indicator, 1, 4]
-      - [indicator, 2, 0|1]
-    u:
-      - [name, url]
-5ArticleFulltextFreeUrlParts2:
-  category: FreeAccess
-  mandatory-field: url
-  view-method: ajax/link-external.phtml
-  856:
-    conditions:
-      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
-      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
       - [indicator, 1, 4]
       - [indicator, 2, 0|1]
     u:
