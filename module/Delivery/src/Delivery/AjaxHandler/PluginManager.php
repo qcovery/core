@@ -83,7 +83,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'DAIAplus\AjaxHandler\GetArticleStatuses' =>
             'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
         'DAIAplus\AjaxHandler\GetItemStatuses' =>
-            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
+            'AvailabilityPlus\AjaxHandler\GetItemStatuses',
         'Delivery\AjaxHandler\CheckAvailability' =>
             'Delivery\AjaxHandler\CheckAvailabilityFactory',
         'DependentWorks\AjaxHandler\GetDependentWorks' =>

@@ -85,7 +85,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'DAIAplus\AjaxHandler\GetArticleStatuses' =>
             'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
         'DAIAplus\AjaxHandler\GetItemStatuses' =>
-            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
+            'AvailabilityPlus\AjaxHandler\GetItemStatuses',
         'BelugaConfig\AjaxHandler\GetResultCount' =>
             'BelugaConfig\AjaxHandler\GetResultCountFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>
