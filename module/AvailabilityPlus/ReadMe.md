@@ -1,5 +1,18 @@
 # AvailabilityPlus - Module Description
 
+## Installation (manual steps)
+Required Module: RecordDriver
+
+Besides the Module Package these files are required:
+- from directory config/vufind all files starting with availabilityplus
+- from directory themes the directory availabilityplus
+
+Changes to PluginManager.php-files: References to GetItemStatuses and GetItemStatuses Factory need to be changed to the AvailabilityPlus Namespace
+
+Changes to Theme config: the availabilityplus theme needs to be added as a mixin
+
+The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
+
 ## Test-Tool
 --> short description of Test-Tool to be added
 ### Configuration of Test Cases
