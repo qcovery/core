@@ -97,7 +97,7 @@ class SolrMarc extends SolrDefault
      *
      * @return array
      */
-    private function getSolrMarcSpecs($item)
+    public function getSolrMarcSpecs($item)
     {
         if (empty($this->solrMarcSpecs)) {
             $this->parseSolrMarcSpecs();
