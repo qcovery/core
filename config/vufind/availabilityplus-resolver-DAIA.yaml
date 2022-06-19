@@ -1,0 +1,12 @@
+Signatur:
+  descripton: 'Entfernung des Standortkürzels vor dem Doppelpunkt'
+  reason: 'Signaturen sollen für Nutzer*innen ohne Standortkürzel angezeigt werden'
+  date: '2022-03-29'
+  creator: 'Kristof Keßler'
+  examples: 'Alle mit DAIA abgefragten Titel'
+  details: '-'
+  conditions:
+    - { field: 'availabilityplus->callnumber', content: '(.*?):(.*)' }
+  actions:
+    - { field: 'availabilityplus->callnumber', content_field: 'availabilityplus->callnumber', pattern: '(.*?):(.*)', replacement: '$2'}
+

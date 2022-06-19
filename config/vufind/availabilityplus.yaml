@@ -1,0 +1,285 @@
+MonographSeriesResultList:
+  mandatory-field: url
+  view-method: ajax/link-internal.phtml
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', '/vufind/Record/$1']
+  245:
+    a:
+      - [ name, label ]
+      - [replace, '(^.*$)', 'DependentWorks']
+MonographSeriesRecordView:
+  view-method: ajax/default.phtml
+  mandatory-field: label
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, label]
+      - [replace, '(^.*$)', 'See DependentWorks']
+1ArticleFulltextDOAJDOAB:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+2ArticleFulltextFreeIndicator:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+3ArticleFulltextFreeSubfield:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, 3, Volltext]
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+      - [indicator, 1, 4]
+    u:
+      - [name, url]
+4ArticleDirectLinkUrlParts:
+  category: FreeAccess
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  856:
+    conditions:
+      - [field, u, 'doi.org']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+    u:
+      - [name, url]
+5ArticleFulltextFreeUrlParts:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, u, 'doaj.org\/article|doaj.org\/toc|edocs.tib.eu\/files|tib.uni-hannover.de\/edoks\/|digibib.tu-bs.de|resolver.sub.uni-goettingen.de|resolver.staatsbibliothek-berlin.de|hdl.handle.net|lib.dr.iastate.edu|www.dzhw.eu\/pdf|www.his.de\/pdf|arxiv.org|publikationsserver.tu-braunschweig.de\/get|bib-pubdb1.desy.de\/record|inef.uni-due.de\/index.php?article_id=|kluedo.ub.uni-kl.de\/frontdoor\/index\/index\/docId\/|wiiw.ac.at|library.fes.de\/pdf-files|www.bis.org\/publ\/bppdf|www.bsu-bund.de\/SharedDocs\/pdf|www.bamf.de\/SharedDocs\/Anlagen\/DE\/Publikationen|bib-pubdb1.desy.de\/record|www.doabooks.org\/doab?func=fulltext|www.pharmazeutische-zeitung.de|clinicaltrials.gov\/show|www.jfe-steel.co.jp\/en\/research\/report\/|www.ressource-deutschland.de\/fileadmin\/|juser.fz-juelich.de\/record\/|www.qip-journal.eu\/index.php\/ams\/article\/download\/|www.ita.rwth-aachen.de\/global\/show_document.asp|opus.bibliothek.uni-wuerzburg.de\/files\/|kth.diva-portal.org\/smash\/record|www.teses.usp.br\/teses\/disponiveis\/|edoc.difu.de\/edoc.php|haab-digital.klassik-stiftung.de\/viewer|darwin-online.org.uk|www.doabooks.org|revistas.unam.mx|produccioncientificaluz.org|www.gbv.de\/dms\/|serwiss.bib.hs-hannover.de|openjournals.hs-hannover.de']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+TestLabel:
+  view-method: ajax/default.phtml
+  245:
+    a: 
+      - [name, label]
+TestLevel:
+  view-method: ajax/default.phtml
+  245:
+    a: 
+      - [name, level]
+1ArticleDirectLinkIndicatorFullTextFallbackUrls:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  '035':
+    a:
+      - [ name, level ]
+      - [ replace, '(^.*$)', 'UncertainAccess']
+  245:
+    a:
+      - [ name, label ]
+      - [ replace, '(^.*$)', 'Go to Publication']
+  856:
+    conditions:
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+2ArticleDirectLinkSubFieldFullTextFallbackUrls:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  '035':
+    a:
+      - [ name, level ]
+      - [ replace, '(^.*$)', 'UncertainAccess']
+  245:
+    a:
+      - [ name, label ]
+      - [ replace, '(^.*$)', 'Go to Publication']
+  856:
+    conditions:
+      - [field, 3, Volltext]
+      - [indicator, 1, 4]
+    u:
+      - [name, url]
+3ArticleDirectLinkUrlPartsFullTextFallbackUrls:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  856:
+    conditions:
+      - [field, u, 'doi.org']
+    u:
+      - [name, url]
+1GBVILLPPN:
+  category: GBVILL
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9xX]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($1)&ACT=SRCH']
+2GBVILLTitle:
+  category: GBVILL
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  245:
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
+  490:
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
+ResultFeedbackSolr:
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9A-Z]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Solr']
+ResultFeedbackSearch2:
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9A-Z]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Search2']
+SubitoISBN:
+  category: resolver
+  mandatory-field: SB
+  view-method: ajax/link-subito.phtml
+  '035':
+    a:
+      - [name, NB]
+      - [replace, '\(.*\)([0-9A-Z]+)', '$1']
+  '020':
+    a:
+      - [name, SB]
+SubitoISSN:
+  category: resolver
+  mandatory-field: SS
+  view-method: ajax/link-subito.phtml
+  245:
+    a:
+      - [name, ATI]
+  773:
+    t:
+      - [name, JT]
+    x:
+      - [name, SS]
+  952:
+    d:
+      - [name, VOL]
+    j:
+      - [name, APY]
+    h:
+      - [name, PG]
+SubitoISBNMARC:
+  # Example: https://www.subito-doc.de/preorder?SB=1-61779-245-4&NB=666430268
+  #category: Subito
+  mandatory-field: isbn
+  view-method: ajax/link-subito.phtml
+  '035':
+    a:
+      - [name, ppn]
+  '020':
+    a:
+      - [name, isbn]
+SubitoISSNMARC:
+  #category: Subito
+  mandatory-field: issn
+  view-method: ajax/link-subito.phtml
+  245:
+    a:
+      - [name, atitle]
+  773:
+    t:
+      - [name, title]
+    x:
+      - [name, issn]
+  952:
+    d:
+      - [name, volume]
+    j:
+      - [name, date]
+    h:
+      - [name, pages]
+JournalsOnlinePrintElectronic:
+  category: resolver
+  view-method: ajax/link-jop-electronic.phtml
+  mandatory-field: issn
+  773:
+    t:
+      - [name, title]
+    x:
+      - [name, issn]
+  952:
+    d:
+      - [name, volume]
+    j:
+      - [name, date]
+    e:
+      - [name, issue]
+    h:
+      - [name, pages]
+JournalsOnlinePrintPrint:
+  category: resolver
+  view-method: ajax/link-jop-print.phtml
+  mandatory-field: issn
+  773:
+    t:
+      - [name, title]
+    x:
+      - [name, issn]
+  952:
+#    d:
+#      - [name, volume]
+    j:
+      - [name, date]
+#    e:
+#      - [name, issue]
+    h:
+      - [name, pages]
+DAIA:
+  category: resolver
+  view-method: ajax/link-daia.phtml
+  mandatory-field: id
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, id]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+ArticleParentId:
+  category: resolver
+  773:
+    w:
+      - [name, id]
+      - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+
