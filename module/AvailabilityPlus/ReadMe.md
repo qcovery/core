@@ -1,7 +1,9 @@
 # AvailabilityPlus - Module Description
 
 ## Installation (manual steps)
-Required Module: RecordDriver
+Required Module:
+- RecordDriver
+- Needs to be a version which provides the public function addSolrMarcYaml and the public function getSolrMarcSpecs
 
 Besides the Module Package these files are required:
 - from directory config/vufind all files starting with availabilityplus
