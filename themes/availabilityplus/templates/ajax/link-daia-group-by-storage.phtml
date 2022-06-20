@@ -5,7 +5,7 @@ $storage_locations = [];
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
         $storage_locations[$result->availabilityplus->storage->label][] = $result->availabilityplus;
-    } else {
+    } else if(!empty($result->availabilityplus)) {
         $storage_locations['undefined'][] = $result->availabilityplus;
     }
 }
