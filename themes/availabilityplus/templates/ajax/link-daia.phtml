@@ -11,7 +11,7 @@ foreach($items->item as $key => $item) {
     if(!empty($item->availabilityplus)) {
         $result = $item->availabilityplus;
     } else {
-        $result = [];
+        break;
     }
     if(!empty($result)) {
         if(!$list) echo '<div class="daia_item">';
