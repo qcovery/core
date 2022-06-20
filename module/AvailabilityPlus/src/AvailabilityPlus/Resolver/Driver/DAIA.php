@@ -224,7 +224,12 @@ class DAIA extends AvailabilityPlusResolver
                 }
             }
             if(!empty($rules_applied)) {
-                $this->parsed_data->document[0]->item[$key]->availabilityplus->rules_applied = $rules_applied;
+                if(!empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
+                    $this->parsed_data->document[0]->item[$key]->availabilityplus->rules_applied = $rules_applied;
+                } else if(!empty($this->parsed_data->document[0]->item[$key]->availabilityplus_org) {
+                    $this->parsed_data->document[0]->item[$key]->availabilityplus_org->rules_applied = $rules_applied;
+                }
+
             }
         }
     }
