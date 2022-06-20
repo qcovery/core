@@ -213,11 +213,8 @@ class DAIA extends AvailabilityPlusResolver
                         } else if(!empty($action['function'])) {
                             switch($action['function']) {
                                 case 'removeItem' :
-                                    //unset($this->parsed_data[$key]);
-                                    foreach($this->parsed_data[$key] AS $item_key => $item_value) {
-                                        $this->parsed_data[$key][$item_key.'_org'] = $item_value;
-                                        unset($this->parsed_data[$key][$item_key]);
-                                    }
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus_org = $this->parsed_data->document[0]->item[$key]->availabilityplus;
+                                    unset($this->parsed_data->document[0]->item[$key]->availabilityplus);
                                     break;
                             }
                         }
