@@ -216,6 +216,9 @@ class DAIA extends AvailabilityPlusResolver
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus_org = $this->parsed_data->document[0]->item[$key]->availabilityplus;
                                     unset($this->parsed_data->document[0]->item[$key]->availabilityplus);
                                     break;
+                                case 'adjustScore' :
+                                    if ($action['score']) $this->parsed_data->document[0]->item[$key]->availabilityplus->score += $action['score'];
+                                    break;
                             }
                         }
                     }
