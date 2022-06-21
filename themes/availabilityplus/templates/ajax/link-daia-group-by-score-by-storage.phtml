@@ -24,7 +24,7 @@ foreach($data->document[0]->item as $result) {
     }
 }
 
-usort($data, function($a, $b) {
+uasort($storage_locations, function($a, $b) {
     return $a['score'] <=> $b['score'];
 });
 
