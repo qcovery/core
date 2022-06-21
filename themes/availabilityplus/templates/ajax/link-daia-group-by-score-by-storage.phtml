@@ -2,15 +2,31 @@
 
 $storage_locations = [];
 
-usort($data, fn($a, $b) => $a->document[0]->item->availabilityplus->score - $b->document[0]->item->availabilityplus->score);
-
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
         $storage_locations[$result->availabilityplus->storage->label][] = $result->availabilityplus;
+        if(empty($storage_locations[$result->availabilityplus->storage->label]['score'])) {
+            $storage_locations[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
+        } else {
+            if($storage_locations[$result->availabilityplus->storage->label]['score'] > $result->availabilityplus->score) {
+                $storage_locations[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
+            }
+        }
     } else if(!empty($result->availabilityplus)) {
         $storage_locations['undefined'][] = $result->availabilityplus;
+        if(empty($storage_locations['undefined']['score'])) {
+            $storage_locations['undefined']['score'] = $result->availabilityplus->score;
+        } else {
+            if($storage_locations['undefined']['score'] > $result->availabilityplus->score) {
+                $storage_locations['undefined']['score'] = $result->availabilityplus->score;
+            }
+        }
     }
 }
+
+usort($data, function($a, $b) {
+    return $a['score'] <=> $b['score'];
+});
 
 $break = false;
 foreach($storage_locations as $storage_label => $storage_items) {
