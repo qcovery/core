@@ -1,0 +1,19 @@
+.resultfeedback-formtitle {
+    margin: 20px 0px 0px 0px;
+}
+
+.resultfeedback-formtext {
+    margin: 20px 0px 0px 0px;
+}
+
+.resultfeedback-info {
+    margin: 20px 0px 0px 0px;
+}
+
+.resultfeedback-patron {
+    margin: 20px 0px 20px 0px;
+}
+
+.control-label.error {
+    color: #d2322d;
+}
