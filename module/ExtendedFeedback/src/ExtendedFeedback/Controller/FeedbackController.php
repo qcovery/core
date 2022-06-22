@@ -43,17 +43,37 @@ class FeedbackController extends BasicFeedbackController
         $view->email = $this->params()->fromPost('email');
         $view->comments = $this->params()->fromPost('comments');
         $view->category = $this->params()->fromPost('category');
+		$config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('config');
+
+		// use a simple captcha
+        $useSimpleCaptcha = $config->Feedback->simple_captcha ?? false;
+		if ($useSimpleCaptcha) {
+			session_start();
+			if (!isset($_SESSION['captchaFirst']) || !isset($_SESSION['captchaSecond'])) {
+				$_SESSION['captchaFirst'] = rand(0, 9);
+				$_SESSION['captchaSecond'] = rand(0, 9);
+			}
+			$captchaResult = $this->params()->fromPost('captcha_result');
+			$view->captchaFirst = $_SESSION['captchaFirst'];
+			$view->captchaSecond = $_SESSION['captchaSecond'];
+			$view->useSimpleCaptcha = $useSimpleCaptcha;
+		}
 
         // Process form submission:
         if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
             if (empty($view->email) || empty($view->comments)) {
                 $this->flashMessenger()->addMessage('bulk_error_missing', 'error');
-                return;
+                return $view;
             }
 
+			if ($useSimpleCaptcha) {
+				if ($_SESSION['captchaFirst'] + $_SESSION['captchaSecond'] != $captchaResult) {
+					$this->flashMessenger()->addMessage('captcha_wrong', 'error');
+					return $view;
+				}
+			}
+
             // These settings are set in the feedback settion of your config.ini
-            $config = $this->serviceLocator->get('VuFind\Config\PluginManager')
-                ->get('config');
             $feedback = isset($config->Feedback) ? $config->Feedback : null;
             $recipient_email = isset($feedback->recipient_email)
                 ? $feedback->recipient_email : null;
@@ -95,6 +115,8 @@ class FeedbackController extends BasicFeedbackController
             } catch (MailException $e) {
                 $this->flashMessenger()->addMessage($e->getMessage(), 'error');
             }
+		    unset($_SESSION['captchaFirst']);
+		    unset($_SESSION['captchaSecond']);
         }
         return $view;
     }
