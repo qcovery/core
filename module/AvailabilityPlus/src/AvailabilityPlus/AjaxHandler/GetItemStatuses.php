@@ -255,7 +255,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                 }
             } else {
-                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, $check_type);
+                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, false, $check_type);
                 $responses[] = $response;
             }
             if($break) break;
