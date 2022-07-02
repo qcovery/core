@@ -246,7 +246,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 }
 
                 if(empty($urls)) {
-                    $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, '', true);
+                    $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, '', true, $check_type);
                     $response['html'] = $this->applyTemplate($template, $response);
                     $responses[] = $response;
                     if($this->current_mode == 'break_on_first') {
