@@ -40,6 +40,7 @@ Format:
       description_xy: '<description of what is expected to appear as availability in recordview for specific language selected in VuFind, xy represents language code, supersedes expected->recordview->description>' # optional, text, multiple possible, up to one for every language code used in VuFind installation
       html: '<html which is expected to appear as availability in recordview, supersedes expected->recordview->description_xy>' # optional, html
       html_xy: '<html which is expected to appear as availability in recordview for specific language selected in VuFind, xy represents language code, supersedes expected->öistview->html>' # optional, html, multiple possible, up to one for every language code used in VuFind installation
+  title: '<title of publication as reference>' # optional, text
   reason: '<reason for adding test case>' # optional, text
   date: '<date when test case was added>' # optional, date yyyy-mm-dd
   creator: '<name of person who added or suggested test case>' # optional, text
@@ -58,6 +59,7 @@ Example:
     recordview:
       description_en: 'access information'
       description_de: 'Zugangsinformation'
+  title: 'Example Title'
   reason: 'to give an example for test cases'
   date: '2022-04-09'
   creator: 'Jon Doe'

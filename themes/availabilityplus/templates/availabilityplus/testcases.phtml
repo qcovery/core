@@ -38,6 +38,7 @@
                     $description = '';
                     $expected = '';
                     $reason = '';
+                    $title = '';
                     $date = '';
                     $creator = '';
                     $detailsLink = '';
@@ -66,6 +67,7 @@
                     } else if(!empty($case['expected']['description'])) {
                         $expected = $case['expected']['description'];
                     }
+                    if(!empty($case['title'])) $title = $case['title'];
                     if(!empty($case['reason'])) $reason = $case['reason'];
                     if(!empty($case['date'])) $date = $case['date'];
                     if(!empty($case['creator'])) $creator = $case['creator'];
@@ -94,6 +96,9 @@
                         <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
                     </td>
                     <td id="testcase_infos_<?=$id?>" class="testcase_infos">
+                        <? if(!empty($title)) { ?>
+                            <?=$this->transEsc('title')?>: <?=$title?><br>
+                        <? } ?>
                         <? if(!empty($reason)) { ?>
                             <?=$this->transEsc('reason')?>: <?=$reason?><br>
                         <? } ?>
