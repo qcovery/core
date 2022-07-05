@@ -66,7 +66,14 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
         $driver = $recordLoader->load($id, $searchclassid, false);
 
         $view->title = $this->getMarcValue($driver, '245|a');
-        $view->callnumber = $this->getMarcValue($driver, '980|d');
+
+        $callnumbers = $this->getMarcValues($driver, '980');
+        foreach ($callnumbers as $callnumber) {
+            if  ($callnumber->getSubField('2')->getData() == $config['DeliveryMicroform']['callnumber_iln']) {
+                $view->callnumber = $callnumber->getSubField('d')->getData();
+            }
+        }
+
         $view->date_order = date('d.m.Y');
 
         $user = $this->getUser();
@@ -200,6 +207,10 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
             return $driver->getMarcRecord()->getField($marcFieldArray[0])->getSubField($marcFieldArray[1])->getData();
         }
         return '';
+    }
+
+    private function getMarcValues($driver, $marcField) {
+        return $driver->getMarcRecord()->getFields($marcField);
     }
 
     private function getFormValue($parameter) {
