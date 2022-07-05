@@ -86,6 +86,9 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
         $dateTime = $this->getFormValue('deliverymicroform_date_time');
         $view->date_time = $dateTime;
 
+        $deliverymicroformIntroduction = $this->getFormValue('deliverymicroform_introduction');
+        $view->deliverymicroform_introduction = $deliverymicroformIntroduction;
+
         $view->comments = $this->params()->fromPost('comments');
 
         $view->hideForm = false;
@@ -104,6 +107,11 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
             if (empty($dateTime)) {
                 $this->flashMessenger()->addMessage('bulk_error_missing', 'error');
                 $view->deliverymicroform_date_time_error = true;
+                $error = true;
+            }
+            if (empty($deliverymicroformIntroduction)) {
+                $this->flashMessenger()->addMessage('bulk_error_missing', 'error');
+                $view->deliverymicroform_introduction_error = true;
                 $error = true;
             }
 

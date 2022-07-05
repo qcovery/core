@@ -33,9 +33,9 @@
         <label class="control-label<?=$this->deliverymicroform_date_time_error ? ' error' : '' ?>" for="deliverymicroform_date_time" style="vertical-align:top;">* <?=$this->transEsc("DeliveryMicroform Date Time")?>: </label>
         <input type="text" name="deliverymicroform_date_time" value="<?=$this->date_time?>"/><br/><br/>
 
-        <label class="control-label" for="deliverymicroform_introduction" style="vertical-align:top;"><?=$this->transEsc("DeliveryMicroform Introduction")?>: </label><br/>
-        <?=$this->transEsc("Yes")?> <input type="checkbox" name="deliverymicroform_introduction" value="<?=$this->transEsc("Yes")?>"/>
-        <?=$this->transEsc("No")?> <input type="checkbox" name="deliverymicroform_introduction" value="<?=$this->transEsc("No")?>"/>
+        <label class="control-label<?=$this->deliverymicroform_introduction_error ? ' error' : '' ?>" for="deliverymicroform_introduction" style="vertical-align:top;">* <?=$this->transEsc("DeliveryMicroform Introduction")?>: </label><br/>
+        <?=$this->transEsc("Yes")?> <input type="radio" name="deliverymicroform_introduction" value="<?=$this->transEsc("Yes")?>" <?=($this->deliverymicroform_introduction == $this->transEsc("Yes")) ? 'checked="checked"' : ''?>"/>
+        <?=$this->transEsc("No")?> <input type="radio" name="deliverymicroform_introduction" value="<?=$this->transEsc("No")?>" <?=($this->deliverymicroform_introduction == $this->transEsc("No")) ? 'checked="checked"' : '' ?>"/>
         <br/><br/>
 
       </div>
