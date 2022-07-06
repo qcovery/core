@@ -140,7 +140,42 @@ TestLevel:
     a:
       - [name, url]
       - [replace, '\(DE-627\)([0-9xX]+)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($1)&ACT=SRCH']
-2GBVILLTitle:
+2GBVILLPPNJournal:
+  category: GBVILL
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  773:
+    conditions:
+      - [ field, w, '\(DE-627\)([0-9xX]+)' ]
+    w:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($1)&ACT=SRCH']
+3GBVILLISBN:
+  category: GBVILL
+  view-method: ajax/link-external.phtml
+  '020':
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=isb($1)&ACT=SRCH']
+4GBVILLISSN:
+  category: GBVILL
+  view-method: ajax/link-external.phtml
+  '022':
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=iss($1)&ACT=SRCH']
+  773:
+    x:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=iss($1)&ACT=SRCH']
+5GBVILLTitleJournal:
+  category: GBVILL
+  view-method: ajax/link-external.phtml
+  773:
+    t:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
+6GBVILLTitle:
   category: GBVILL
   mandatory-field: url
   view-method: ajax/link-external.phtml

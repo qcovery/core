@@ -1,5 +1,20 @@
 # AvailabilityPlus - Module Description
 
+## Installation (manual steps)
+Required Module:
+- RecordDriver
+- Needs to be a version which provides the public function addSolrMarcYaml and the public function getSolrMarcSpecs
+
+Besides the Module Package these files are required:
+- from directory config/vufind all files starting with availabilityplus
+- from directory themes the directory availabilityplus
+
+Changes to PluginManager.php-files: References to GetItemStatuses and GetItemStatuses Factory need to be changed to the AvailabilityPlus Namespace
+
+Changes to Theme config: the availabilityplus theme needs to be added as a mixin
+
+The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
+
 ## Test-Tool
 --> short description of Test-Tool to be added
 ### Configuration of Test Cases
@@ -25,6 +40,7 @@ Format:
       description_xy: '<description of what is expected to appear as availability in recordview for specific language selected in VuFind, xy represents language code, supersedes expected->recordview->description>' # optional, text, multiple possible, up to one for every language code used in VuFind installation
       html: '<html which is expected to appear as availability in recordview, supersedes expected->recordview->description_xy>' # optional, html
       html_xy: '<html which is expected to appear as availability in recordview for specific language selected in VuFind, xy represents language code, supersedes expected->öistview->html>' # optional, html, multiple possible, up to one for every language code used in VuFind installation
+  title: '<title of publication as reference>' # optional, text
   reason: '<reason for adding test case>' # optional, text
   date: '<date when test case was added>' # optional, date yyyy-mm-dd
   creator: '<name of person who added or suggested test case>' # optional, text
@@ -43,6 +59,7 @@ Example:
     recordview:
       description_en: 'access information'
       description_de: 'Zugangsinformation'
+  title: 'Example Title'
   reason: 'to give an example for test cases'
   date: '2022-04-09'
   creator: 'Jon Doe'

@@ -1,5 +1,7 @@
 <?php
-    echo '<button class="accordion">'.$debug['check'];
+    echo '<button class="accordion">';
+    if($debug['check_type']) echo $debug['check_type'].' - ';
+    echo $debug['check'];
     if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) echo ' - SorlMarcKey: '.$debug['SolrMarcKey'];
     if(!empty($debug['status'])) echo ' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span>';
     echo '</button>';

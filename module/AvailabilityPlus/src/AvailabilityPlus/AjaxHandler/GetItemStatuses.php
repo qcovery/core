@@ -218,6 +218,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      */
     private function checkSolrMarcData($solrMarcKeys, $check) {
         sort($solrMarcKeys);
+        $check_type = 'MARC';
         $urls = [];
         $break = false;
         foreach ($solrMarcKeys as $solrMarcKey) {
@@ -231,7 +232,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                         foreach ($date['url']['data'] as $url) {
                             if(!in_array($url, $urls)) {
                                 $urls[] = $url;
-                                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, true);
+                                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, true, $check_type);
                                 $response['html'] = $this->applyTemplate($template, $response);
                                 $responses[] = $response;
                                 if($this->current_mode == 'break_on_first') {
@@ -245,7 +246,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 }
 
                 if(empty($urls)) {
-                    $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, '', true);
+                    $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, '', true, $check_type);
                     $response['html'] = $this->applyTemplate($template, $response);
                     $responses[] = $response;
                     if($this->current_mode == 'break_on_first') {
@@ -254,7 +255,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                 }
             } else {
-                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url);
+                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, false, $check_type);
                 $responses[] = $response;
             }
             if($break) break;
@@ -303,7 +304,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $label;
     }
 
-    private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = '', $status_bool = false){
+    private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = '', $status_bool = false, $check_type){
         if($status_bool) {
             $status['level'] = 'successful_check';
             $status['label'] = 'Check found a match!';
@@ -314,6 +315,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $response = [
             'id' => $this->id,
             'check' => $check,
+            'check_type' => $check_type,
             'SolrMarcKey' => $solrMarcKey,
             'SolrMarcSpecs' => $this->driver->getSolrMarcSpecs($solrMarcKey),
             'status' => $status,
@@ -360,11 +362,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @return array [response data (arrays)]
      */
     private function checkParentWorkILNSolr() {
-        $check = 'function checkParentWorkILNSolr';
+        $check = 'checkParentWorkILNSolr';
+        $check_type = 'function';
         $template = 'ajax/link-internal.phtml';
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
-        $response = $this->generateResponse($check, '', '', '', $template, '', '', false);
+        $response = $this->generateResponse($check, '', '', '', $template, '', '', false, $check_type);
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
                 $parentId = $parentDate['id']['data'][0];
@@ -385,7 +388,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if (!empty($url)) {
             $level = 'ParentWorkILNSolr';
             $label = 'Go to parent work (local holding)';
-            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
+            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);
             $response['html'] = $this->renderer->render('ajax/link-internal.phtml', $response);
         }
         $responses[] = $response;
@@ -393,6 +396,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     private function getResolverResponse($resolver) {
+        $check_type = 'Resolver';
         $resolverType = $resolver;
         if (!$this->resolverManager->has($resolverType)) {
             return $this->formatResponse(
@@ -407,7 +411,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $template = $this->getTemplate($marc_data);
         if(!empty($resolver_url) && !empty($marc_data)) {
             $resolver_data = $resolverHandler->fetchLinks($params);
-            $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true);
+            $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
             $response['html'] = $this->applyTemplate($template, $response);
             if(empty($response['html'])) {
                 $response['status']['level'] = 'unsuccessful_check';
@@ -418,7 +422,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
 
         } else {
-            $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, '', $resolver_url, false);
+            $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, '', $resolver_url, false, $check_type);
         }
 
         $responses[] = $response;
@@ -432,13 +436,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @return array [response data (arrays)]
      */
     private function checkMultiVolumeWork() {
-        $check = 'function MultiVolumeWork';
+        $check = 'MultiVolumeWork';
+        $check_type = 'function';
         $template = 'ajax/default.phtml';
         $responses = [];
         if($this->driver->getMultipartResourceRecordLevel() == "Set") {
             $level = 'MultiVolumeWork';
             $label = 'See DependentWorks';
-            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true);
+            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);
             $response['html'] = $this->renderer->render($template, $response);
             $responses[] = $response;
         }

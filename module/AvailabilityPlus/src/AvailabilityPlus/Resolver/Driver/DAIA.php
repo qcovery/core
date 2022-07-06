@@ -213,11 +213,11 @@ class DAIA extends AvailabilityPlusResolver
                         } else if(!empty($action['function'])) {
                             switch($action['function']) {
                                 case 'removeItem' :
-                                    //unset($this->parsed_data[$key]);
-                                    foreach($this->parsed_data[$key] AS $item_key => $item_value) {
-                                        $this->parsed_data[$key][$item_key.'_org'] = $item_value;
-                                        unset($this->parsed_data[$key][$item_key]);
-                                    }
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus_org = $this->parsed_data->document[0]->item[$key]->availabilityplus;
+                                    unset($this->parsed_data->document[0]->item[$key]->availabilityplus);
+                                    break;
+                                case 'adjustScore' :
+                                    if ($action['score']) $this->parsed_data->document[0]->item[$key]->availabilityplus->score += $action['score'];
                                     break;
                             }
                         }
@@ -227,7 +227,12 @@ class DAIA extends AvailabilityPlusResolver
                 }
             }
             if(!empty($rules_applied)) {
-                $this->parsed_data->document[0]->item[$key]->availabilityplus->rules_applied = $rules_applied;
+                if(!empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
+                    $this->parsed_data->document[0]->item[$key]->availabilityplus->rules_applied = $rules_applied;
+                } else if(!empty($this->parsed_data->document[0]->item[$key]->availabilityplus_org)) {
+                    $this->parsed_data->document[0]->item[$key]->availabilityplus_org->rules_applied = $rules_applied;
+                }
+
             }
         }
     }
