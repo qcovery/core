@@ -21,6 +21,8 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'DAIAHsH' => 'AvailabilityPlus\Resolver\Driver\DAIAHsH',
         'DAIAKSF' => 'AvailabilityPlus\Resolver\Driver\DAIAKSF',
         'FulltextFinder' => 'AvailabilityPlus\Resolver\Driver\FulltextFinder',
+        'FulltextFinderISSN' => 'AvailabilityPlus\Resolver\Driver\FulltextFinderISSN',
+        'FulltextFinderISBN' => 'AvailabilityPlus\Resolver\Driver\FulltextFinderISBN',
         'JournalsOnlinePrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrint',
         'JournalsOnlinePrintElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
         'JournalsOnlinePrintHsHElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintHsHElectronic',
