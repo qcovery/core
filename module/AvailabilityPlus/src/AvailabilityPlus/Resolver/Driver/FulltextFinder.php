@@ -5,6 +5,24 @@ namespace AvailabilityPlus\Resolver\Driver;
 class FulltextFinder extends AvailabilityPlusResolver
 {
     /**
+     * Get Resolver Url
+     *
+     * Transform the OpenURL as needed to get a working link to the resolver.
+     *
+     * @param string $openURL openURL (url-encoded)
+     *
+     * @return string Returns resolver specific url
+     */
+    public function getResolverUrl($openUrl)
+    {
+        $url = '';
+        if(!empty($this->baseUrl)) {
+            $url = $this->baseUrl.$openUrl;
+        }
+        return $url;
+    }
+
+    /**
      * Fetch Links
      *
      * Fetches a set of links corresponding to an OpenURL
@@ -15,11 +33,8 @@ class FulltextFinder extends AvailabilityPlusResolver
      */
     public function fetchLinks($openUrl)
     {
-        parse_str($openUrl, $openUrl_arr);
-        $password = $openUrl_arr['password'];
-        //unset($openUrl_arr['password']);
-        $openUrl=http_build_query($openUrl_arr);
         $url = $this->getResolverUrl($openUrl);
+        $password = $this->additionalParams;
         $headers = $this->httpClient->getRequest()->getHeaders();
         $headers->addHeaderLine('Accept', 'application/json');
         if(!empty($password)) $headers->addHeaderLine('password', $password);
