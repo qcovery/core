@@ -33,7 +33,8 @@ class FulltextFinder extends AvailabilityPlusResolver
     {
         parse_str($openUrl, $openUrl_arr);
         $password = $openUrl_arr['password'];
-        unset($openUrl_arr['password']);
+        print_r($openUrl_arr);
+        //unset($openUrl_arr['password']);
         $openUrl=http_build_query($openUrl_arr);
         $url = $this->getResolverUrl($openUrl);
         $headers = $this->httpClient->getRequest()->getHeaders();
