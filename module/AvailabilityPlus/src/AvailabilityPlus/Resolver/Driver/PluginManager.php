@@ -55,7 +55,8 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\JournalsOnlinePrintElectronic' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
-
+        'VuFind\Resolver\Driver\FulltextFinder' =>
+            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
     ];
 
 }
