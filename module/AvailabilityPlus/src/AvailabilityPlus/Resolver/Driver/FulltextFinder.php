@@ -15,11 +15,9 @@ class FulltextFinder extends AvailabilityPlusResolver
      */
     public function fetchLinks($openUrl)
     {
-        echo $openUrl;
         parse_str($openUrl, $openUrl_arr);
-        print_r($openUrl_arr);
         $password = $openUrl_arr['password'];
-        unset($openUrl_arr['password']);
+        //unset($openUrl_arr['password']);
         $openUrl=http_build_query($openUrl_arr);
         $url = $this->getResolverUrl($openUrl);
         $headers = $this->httpClient->getRequest()->getHeaders();
