@@ -31,15 +31,16 @@ class FulltextFinder extends AvailabilityPlusResolver
      */
     public function fetchLinks($openUrl)
     {
+        echo $openUrl;
         parse_str($openUrl, $openUrl_arr);
-        $password = $openUrl_arr['password'];
         print_r($openUrl_arr);
-        //unset($openUrl_arr['password']);
+        $password = $openUrl_arr['password'];
+        unset($openUrl_arr['password']);
         $openUrl=http_build_query($openUrl_arr);
         $url = $this->getResolverUrl($openUrl);
         $headers = $this->httpClient->getRequest()->getHeaders();
         $headers->addHeaderLine('Accept', 'application/json');
-        $headers->addHeaderLine('password', $password);
+        if(!empty($password)) $headers->addHeaderLine('password', $password);
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
     }
