@@ -32,7 +32,7 @@ class FulltextFinder extends AvailabilityPlusResolver
     public function fetchLinks($openUrl)
     {
         $url = $this->getResolverUrl($openUrl);
-        $headers = $client->getRequest()->getHeaders();
+        $headers = $this->httpClient->getRequest()->getHeaders();
         $headers->addHeaderLine('Accept', 'application/json');
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
