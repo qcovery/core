@@ -15,7 +15,7 @@ class FulltextFinder extends AvailabilityPlusResolver
      */
     public function getResolverUrl($openUrl)
     {
-        $url = $this->baseUrl.urlencode($openUrl); //.$this->additionalParams;
+        $url = $this->baseUrl.urlencode($openUrl).$this->additionalParams;
 
         return $url;
     }
