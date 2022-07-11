@@ -76,11 +76,14 @@ class FulltextFinder extends AvailabilityPlusResolver
             }
         }
 
- /*       if(empty($records)) {
-            $record['level'] = $level;
-            $record['label'] = $label;
-            $record['url'] = $url;
-        }*/
+        if(empty($records)) {
+            $checkAvailabilityLink = new \stdClass();
+            $checkAvailabilityLink->targetUrl = 'https://search.ebscohost.com/login.aspx?site=ftf-live&authtype=ip,guest&custid=s2982038&groupid=main&direct=true&'.$this->openUrl;
+            $checkAvailabilityLink->linkText = 'Verfügbarkeit prüfen';
+            $checkAvailabilityLink->linkName = 'Verfügbarkeit prüfen';
+            $checkAvailabilityLink->category = 'CheckAvailability';
+            $links[] = $checkAvailabilityLink;
+        }
 
         $response['data'] = $data_org;
         $this->parsed_data = $links;
