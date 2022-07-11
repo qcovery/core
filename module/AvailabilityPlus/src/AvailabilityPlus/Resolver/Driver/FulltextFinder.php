@@ -58,7 +58,7 @@ class FulltextFinder extends AvailabilityPlusResolver
     {
         $urls = []; // to check for duplicate urls
         $links = []; // array to return
-        $data = $data_org;
+        $data = json_decode($data_org);
         $break = false;
 
         if (isset($data->contextObjects)) {
