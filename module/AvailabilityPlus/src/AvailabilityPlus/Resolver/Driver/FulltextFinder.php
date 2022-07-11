@@ -57,7 +57,7 @@ class FulltextFinder extends AvailabilityPlusResolver
     public function parseLinks($data_org)
     {
         $urls = []; // to check for duplicate urls
-        $records = []; // array to return
+        $links = []; // array to return
         $data = $data_org;
         $break = false;
 
@@ -65,14 +65,8 @@ class FulltextFinder extends AvailabilityPlusResolver
             foreach ($data->contextObjects as $contextObject) {
                 if (isset($contextObject->targetLinks)) {
                     foreach ($contextObject->targetLinks as $targetLink) {
-                        if ($targetLink->category == "Fulltext") {
-                            $level = 'FulltextLeuphana';
-                            $label = 'FulltextLeuphana';
-                            $url = $targetLink;
-                            $record['level'] = $level;
-                            $record['label'] = $label;
-                            $record['url'] = $url;
-                            $records[] = $record;
+                        if ($targetLink->category == "FullText") {
+                            $links[] = $targetLink;
                             $break = true;
                             break;
                         }
@@ -89,7 +83,7 @@ class FulltextFinder extends AvailabilityPlusResolver
         }*/
 
         $response['data'] = $data_org;
-        $this->parsed_data = $records;
+        $this->parsed_data = $links;
         $this->applyCustomChanges();
         $response['parsed_data'] = $this->parsed_data;
         return $response;
