@@ -61,7 +61,7 @@ class FulltextFinder extends AvailabilityPlusResolver
         $data = $data_org;
         $break = false;
 
-        if (isset($fulltextfinderApiResult->contextObjects)) {
+        if (isset($data->contextObjects)) {
             foreach ($data->contextObjects as $contextObject) {
                 if (isset($contextObject->targetLinks)) {
                     foreach ($contextObject->targetLinks as $targetLink) {
@@ -76,9 +76,11 @@ class FulltextFinder extends AvailabilityPlusResolver
             }
         }
 
-        if(empty($records)) {
+        if(empty($links)) {
+            //"https://api.ebsco.io/ftf/ftfaccount/s2982038.main.ftf/openurl"
+            $custid=substr($this->baseUrl, strpos($this->baseUrl,'ftfaccount/') +11, strlen($this->baseUrl) - strpos($this->baseUrl,'.main.ftf') - 9);
             $checkAvailabilityLink = new \stdClass();
-            $checkAvailabilityLink->targetUrl = 'https://search.ebscohost.com/login.aspx?site=ftf-live&authtype=ip,guest&custid=s2982038&groupid=main&direct=true&'.$this->openUrl;
+            $checkAvailabilityLink->targetUrl = 'https://search.ebscohost.com/login.aspx?site=ftf-live&authtype=ip,guest&custid='.$custid.'&groupid=main&direct=true&'.$this->openUrl;
             $checkAvailabilityLink->linkText = 'Verfügbarkeit prüfen';
             $checkAvailabilityLink->linkName = 'Verfügbarkeit prüfen';
             $checkAvailabilityLink->category = 'CheckAvailability';
