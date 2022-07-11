@@ -1,14 +1,10 @@
-<?php
-foreach($data as $result) {
-   if(!empty($result['label'])){
-      if(!$list) echo '<div class="availability_item">';
-      $level = $result['level'];
-      $label = $result['label'];
-      $url = $result['url'];
-      echo '<div class="delimiter"></div>';
-      echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
-      if(!$list) echo '</div>';
-      if($mode == 'break_on_first') break;
-   }
-}
-?>
+<? var_dump($this); ?>
+<?php if(!empty($this->links)): ?>
+   <div class="fulltextfinder-result">
+      <ul>
+         <?php foreach ($this->links as $link): ?>
+            <li><a href="<?=$link->targetUrl?>" title="<?=$link->linkText?>" target="_blank"><?=$this->translate('FulltextFinder::'.$link->category)?></a></li>
+         <?php endforeach; ?>
+      </ul>
+   </div>
+<?php endif; ?>
