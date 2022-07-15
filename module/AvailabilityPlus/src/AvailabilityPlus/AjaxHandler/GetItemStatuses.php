@@ -449,7 +449,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 } else {
                     $url = "/vufind/Record/".$this->id;
                 }
-                $label = 'See DependentWorks';
             }
             $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);
             $response['html'] = $this->renderer->render($template, $response);
