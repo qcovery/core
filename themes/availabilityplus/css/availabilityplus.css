@@ -186,3 +186,7 @@
   display: none;
   overflow: hidden;
 }
+
+.MultiVolumeWork {
+  font-weight: bold;
+}
