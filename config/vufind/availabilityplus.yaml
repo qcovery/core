@@ -10,7 +10,7 @@ MonographSeriesResultList:
   245:
     a:
       - [ name, label ]
-      - [replace, '(^.*$)', 'DependentWorks']
+      - [replace, '(^.*$)', 'MonographSeriesResultList']
 MonographSeriesRecordView:
   view-method: ajax/default.phtml
   mandatory-field: label
@@ -19,7 +19,7 @@ MonographSeriesRecordView:
       - [field, a, '\(DE-627\)([0-9xX]+)']
     a:
       - [name, label]
-      - [replace, '(^.*$)', 'See DependentWorks']
+      - [replace, '(^.*$)', 'MonographSeriesRecordView']
 1ArticleFulltextDOAJDOAB:
   category: FreeAccess
   mandatory-field: url
