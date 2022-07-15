@@ -442,7 +442,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $responses = [];
         if($this->driver->getMultipartResourceRecordLevel() == "Set") {
             $level = 'MultiVolumeWork';
-            $label = 'See DependentWorks';
+            $label = 'MultiVolumeWork';
             if($this->list) {
                 if($this->source == "Search2") {
                     $url = "/vufind/Search2Record/".$this->id;
