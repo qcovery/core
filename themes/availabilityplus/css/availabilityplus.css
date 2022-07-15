@@ -187,6 +187,8 @@
   overflow: hidden;
 }
 
-.MultiVolumeWork {
+.MultiVolumeWork,
+.MonographSeriesRecordView,
+.MonographSeriesResultList {
   font-weight: bold;
 }
