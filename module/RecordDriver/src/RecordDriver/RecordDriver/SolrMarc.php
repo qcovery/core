@@ -42,8 +42,8 @@ use VuFind\RecordDriver\SolrDefault;
  */
 class SolrMarc extends SolrDefault
 {
-    use \VuFind\RecordDriver\IlsAwareTrait;
-    use \VuFind\RecordDriver\MarcReaderTrait;
+    use \VuFind\RecordDriver\Feature\IlsAwareTrait;
+    use \VuFind\RecordDriver\Feature\MarcReaderTrait;
 
     /**
      * actual Configuration (yaml)
@@ -607,4 +607,40 @@ class SolrMarc extends SolrDefault
         return $params;
     }
 
+    /**
+     * Get the full title of the record.
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        $title =  isset($this->fields['title']) ?
+            $this->fields['title'] : '';
+        return is_array($title) ? $title[0] : $title;
+    }
+
+
+    /**
+     * Get the short (pre-subtitle) title of the record.
+     *
+     * @return string
+     */
+    public function getShortTitle()
+    {
+        $title =  isset($this->fields['title_short']) ?
+            $this->fields['title_short'] : '';
+        return is_array($title) ? $title[0] : $title;
+    }
+
+    /**
+     * Get the subtitle of the record.
+     *
+     * @return string
+     */
+    public function getSubtitle()
+    {
+        $title =  isset($this->fields['title_sub']) ?
+            $this->fields['title_sub'] : '';
+        return is_array($title) ? $title[0] : $title;
+    }
 }
