@@ -251,10 +251,22 @@ class SideFacets extends \VuFind\Recommend\SideFacets
         $config = $this->configLoader->get('facets');
 
         $facetSet = \VuFind\Recommend\SideFacets::getFacetSet();
-        if (isset($facetSet['publishDate'])) {
-            $facetSet['publishDate']['list'] = $this->getYearFacets($facetSet['publishDate']['list'], $facetSet['publishDate']['label']);
-        }
-        
+		if (isset($facetSet['publishDate'])) {
+			if ($config->SideFacetsExtras->publishDate) {
+                $labels = [];
+                $values = [];
+                $rawValues = $facetSet['publishDate']['list'];
+                usort($rawValues, function ($a, $b) {return $a['displayText'] < $b['displayText'] ? -1 : 1;});
+                foreach ($rawValues as $value) {
+                    $labels[] = $value['displayText'];
+                    $values[] = $value['count'];
+                }
+                $facetSet['publishDate']['list'] = ['labels' => $labels, 'values' => $values];
+            } else {
+				$facetSet['publishDate']['list'] = $this->getYearFacets($facetSet['publishDate']['list'], $facetSet['publishDate']['label']);
+			}
+		}
+
         if ($config->SideFacetsExtras->format_facet) {
             if (isset($facetSet['format_facet'])) {
               $facetSet['format_facet']['list'] = $this->getFacetHierarchies($facetSet['format_facet']['list'], $facetSet['format_facet']['label']);
@@ -271,4 +283,10 @@ class SideFacets extends \VuFind\Recommend\SideFacets
 
         return $facetSet;
     }
+
+	public function extendedFacetActivated($name)
+	{
+		$config = $this->configLoader->get('facets');
+		return $config->SideFacetsExtras[$name];
+	}
 }
