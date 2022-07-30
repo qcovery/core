@@ -15,7 +15,7 @@
 
 ?>
 <div class="AvailabilityPlusTestCases">
-<? if(!empty($cases)) { ?>
+<?php if(!empty($cases)) { ?>
     <?=$this->transEsc('Links To TestCase Views')?>: <a href="/vufind/AvailabilityPlus/TestCases?list=1"><?=$this->transEsc('TestCases ResultList')?></a> | <a href="/vufind/AvailabilityPlus/TestCases?list=0"><?=$this->transEsc('TestCases RecordView')?></a>
     <h3><?=$this->transEsc('TestCases '.$view_name)?></h3>
     <table>
@@ -30,9 +30,9 @@
 			<th id="tc_viewlinks"><?=$this->transEsc('ViewLinks')?></th>
 			<th id="tc_info"><?=$this->transEsc('Info')?></th>
 		</tr>
-		<? foreach ($cases AS $key => $case) { ?>
-            <? if(!empty($key) && !empty($case['driver'])) { ?>
-                <?
+		<?php foreach ($cases AS $key => $case) { ?>
+            <?php if(!empty($key) && !empty($case['driver'])) { ?>
+                <?php
                     $id = $key;
                     $driver = $case['driver'];
                     $description = '';
@@ -96,32 +96,32 @@
                         <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
                     </td>
                     <td id="testcase_infos_<?=$id?>" class="testcase_infos">
-                        <? if(!empty($title)) { ?>
+                        <?php if(!empty($title)) { ?>
                             <?=$this->transEsc('title')?>: <?=$title?><br>
-                        <? } ?>
-                        <? if(!empty($reason)) { ?>
+                        <?php } ?>
+                        <?php if(!empty($reason)) { ?>
                             <?=$this->transEsc('reason')?>: <?=$reason?><br>
-                        <? } ?>
-                        <? if(!empty($creator)) { ?>
+                        <?php } ?>
+                        <?php if(!empty($creator)) { ?>
                             <?=$this->transEsc('created by')?>: <?=$creator?><br>
-                        <? } ?>
-                        <? if(!empty($date)) { ?>
+                        <?php } ?>
+                        <?php if(!empty($date)) { ?>
                             <?=$this->transEsc('date')?>: <?=$date?><br>
-                        <? } ?>
-                        <? if(!empty($detailsLink)) { ?>
+                        <?php } ?>
+                        <?php if(!empty($detailsLink)) { ?>
                             <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('link to more details')?></a><br>
-                        <? } ?>
-                        <? if(!empty($rules)) { ?>
+                        <?php } ?>
+                        <?php if(!empty($rules)) { ?>
                             <?=$this->transEsc('Checked rule(s)')?>: <?=$rules?><br>
-                        <? } ?>
+                        <?php } ?>
                     </td>
                 </tr>
-			<? } ?>
-            <? $counter = $counter + 1; ?>
-		<? } ?>
+			<?php } ?>
+            <?php $counter = $counter + 1; ?>
+		<?php } ?>
 	</table>
-<? } else { ?>
+<?php } else { ?>
         <div><?=$this->transEsc('no TestCases defined')?></div>
-<? } ?>
+<?php } ?>
 </div>
 
