@@ -600,7 +600,7 @@ class SolrMarc extends SolrDefault
     {
         $params = parent::getArticleOpenUrlParams();
         $pages = $this->getMarcData('Pages');
-        if (strpos($pages[0]['pages']['data'][0], '-') !== false) {
+        if (!empty($pages) && strpos($pages[0]['pages']['data'][0], '-') !== false) {
             list($spage, $epage) = explode('-', $pages[0]['pages']['data'][0]);
             $params['rft.epage'] = $epage;
         }
