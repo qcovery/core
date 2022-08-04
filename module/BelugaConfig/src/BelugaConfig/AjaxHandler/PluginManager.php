@@ -55,7 +55,7 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
         'getDependentWorks' => 'DependentWorks\AjaxHandler\GetDependentWorks',
         'getFacetData' => 'VuFind\AjaxHandler\GetFacetData',
         'getIlsStatus' => 'VuFind\AjaxHandler\GetIlsStatus',
-        'getItemStatuses' => 'DAIAplus\AjaxHandler\GetItemStatuses',
+        'getItemStatuses' => 'AvailabilityPlus\AjaxHandler\GetItemStatuses',
         'getLibraries' => 'Libraries\AjaxHandler\GetLibraries',
         'getLibraryPickupLocations' =>
             'VuFind\AjaxHandler\GetLibraryPickupLocations',
@@ -87,8 +87,8 @@ class PluginManager extends \VuFind\AjaxHandler\PluginManager
             'DAIAplus\AjaxHandler\GetArticleStatusesFactory',
         'DAIAplus\AjaxHandler\GetArticleStatusesUW' =>
             'DAIAplus\AjaxHandler\GetArticleStatusesFactoryUW',
-        'DAIAplus\AjaxHandler\GetItemStatuses' =>
-            'DAIAplus\AjaxHandler\GetItemStatusesFactory',
+        'AvailabilityPlus\AjaxHandler\GetItemStatuses' =>
+            'AvailabilityPlus\AjaxHandler\GetItemStatusesFactory',
         'BelugaConfig\AjaxHandler\GetResultCount' =>
             'BelugaConfig\AjaxHandler\GetResultCountFactory',
         'Delivery\AjaxHandler\CheckAvailability' =>
