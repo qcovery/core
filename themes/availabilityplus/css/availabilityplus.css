@@ -186,3 +186,9 @@
   display: none;
   overflow: hidden;
 }
+
+.MultiVolumeWork,
+.MonographSeriesRecordView,
+.MonographSeriesResultList {
+  font-weight: bold;
+}
