@@ -299,7 +299,7 @@ class AbstractSearch extends AbstractBase
             $this->rememberSearch($results);
 
             // Add to search history:
-            if ($this->saveToHistory) {
+            if ($this->saveToHistory &&    ( isset($view->params) && $view->params->getView() != 'rss') ) {
                 $this->saveSearchToHistory($results);
             }
 
