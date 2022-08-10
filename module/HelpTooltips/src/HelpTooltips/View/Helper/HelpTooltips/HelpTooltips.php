@@ -37,9 +37,9 @@ class HelpTooltips extends \Zend\View\Helper\AbstractHelper
     }
 
     public function showHelp () {
-        if ($_POST['showHelp']) {
+        if (isset($_POST['showHelp'])) {
             $this->session->showHelp = true;
-        } else if ($_POST['hideHelp']) {
+        } else if (isset($_POST['hideHelp'])) {
             $this->session->showHelp = false;
         }
 
