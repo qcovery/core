@@ -15,8 +15,33 @@ Changes to Theme config: the availabilityplus theme needs to be added as a mixin
 
 The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
 
-## Test-Tool
---> short description of Test-Tool to be added
+## Configuration of Order and Mode of Availability Checks
+
+...
+
+## Configuration of MARC-Data used for Availability Checks
+
+...
+
+## Configuration of Resolvers used for Availability Checks
+
+...
+
+## Debug-Tool: Debugging of Availability Checks
+
+/vufind/AvailabilityPlus/Debug/{id}
+or
+/AvailabilityPlus/Debug/{id}
+
+Add &debug_ap=true to the URL and a link to the Debug-Tool for each record will appear
+
+## TestCase-Tool: One Place to Check Returns of Availability Checks
+
+... 
+/vufind/AvailabilityPlus/TestCases 
+or
+/AvailabilityPlus/TestCases
+
 ### Configuration of Test Cases
 Configuration file: availabilityplus-testcases.yaml
 

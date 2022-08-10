@@ -10,7 +10,7 @@ MonographSeriesResultList:
   245:
     a:
       - [ name, label ]
-      - [replace, '(^.*$)', 'DependentWorks']
+      - [replace, '(^.*$)', 'MonographSeriesResultList']
 MonographSeriesRecordView:
   view-method: ajax/default.phtml
   mandatory-field: label
@@ -19,7 +19,7 @@ MonographSeriesRecordView:
       - [field, a, '\(DE-627\)([0-9xX]+)']
     a:
       - [name, label]
-      - [replace, '(^.*$)', 'See DependentWorks']
+      - [replace, '(^.*$)', 'MonographSeriesRecordView']
 1ArticleFulltextDOAJDOAB:
   category: FreeAccess
   mandatory-field: url
@@ -133,7 +133,7 @@ TestLevel:
 1GBVILLPPN:
   category: GBVILL
   mandatory-field: url
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-gbvill.phtml
   '035':
     conditions:
       - [ field, a, '\(DE-627\)([0-9xX]+)' ]
@@ -143,7 +143,7 @@ TestLevel:
 2GBVILLPPNJournal:
   category: GBVILL
   mandatory-field: url
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-gbvill.phtml
   773:
     conditions:
       - [ field, w, '\(DE-627\)([0-9xX]+)' ]
@@ -152,14 +152,14 @@ TestLevel:
       - [replace, '\(DE-627\)([0-9xX]+)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($1)&ACT=SRCH']
 3GBVILLISBN:
   category: GBVILL
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-gbvill.phtml
   '020':
     a:
       - [name, url]
       - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=isb($1)&ACT=SRCH']
 4GBVILLISSN:
   category: GBVILL
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-gbvill.phtml
   '022':
     a:
       - [name, url]
@@ -170,7 +170,7 @@ TestLevel:
       - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=iss($1)&ACT=SRCH']
 5GBVILLTitleJournal:
   category: GBVILL
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-gbvill.phtml
   773:
     t:
       - [name, url]
@@ -178,7 +178,7 @@ TestLevel:
 6GBVILLTitle:
   category: GBVILL
   mandatory-field: url
-  view-method: ajax/link-external.phtml
+  view-method: ajax/link-gbvill.phtml
   245:
     a:
       - [name, url]

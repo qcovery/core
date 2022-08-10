@@ -20,6 +20,7 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'DAIA' => 'AvailabilityPlus\Resolver\Driver\DAIA',
         'DAIAHsH' => 'AvailabilityPlus\Resolver\Driver\DAIAHsH',
         'DAIAKSF' => 'AvailabilityPlus\Resolver\Driver\DAIAKSF',
+        'FulltextFinder' => 'AvailabilityPlus\Resolver\Driver\FulltextFinder',
         'JournalsOnlinePrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrint',
         'JournalsOnlinePrintElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
         'JournalsOnlinePrintHsHElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintHsHElectronic',
@@ -54,7 +55,8 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\JournalsOnlinePrintElectronic' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
-
+        'VuFind\Resolver\Driver\FulltextFinder' =>
+            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
     ];
 
 }
