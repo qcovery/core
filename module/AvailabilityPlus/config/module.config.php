@@ -1,60 +1,60 @@
 <?php
 
 return array (
-  'controllers' => 
+  'controllers' =>
   array (
-    'factories' => 
+    'factories' =>
     array (
       'AvailabilityPlus\\Controller\\AvailabilityPlusController' => 'VuFind\\Controller\\AbstractBaseFactory',
     ),
-    'aliases' => 
+    'aliases' =>
     array (
       'AvailabilityPlus' => 'AvailabilityPlus\\Controller\\AvailabilityPlusController',
       'availabilityplus' => 'AvailabilityPlus\\Controller\\AvailabilityPlusController',
     ),
   ),
-  'router' => 
+  'router' =>
   array (
-    'routes' => 
+    'routes' =>
     array (
-      'availabilityplus-home' => 
+      'availabilityplus-home' =>
       array (
         'type' => 'Zend\\Router\\Http\\Literal',
-        'options' => 
+        'options' =>
         array (
           'route' => '/AvailabilityPlus/Home',
-          'defaults' => 
+          'defaults' =>
           array (
             'controller' => 'AvailabilityPlus',
             'action' => 'Home',
           ),
         ),
       ),
-      'availabilityplus-testcases' => 
+      'availabilityplus-testcases' =>
       array (
         'type' => 'Zend\\Router\\Http\\Literal',
-        'options' => 
+        'options' =>
         array (
           'route' => '/AvailabilityPlus/TestCases',
-          'defaults' => 
+          'defaults' =>
           array (
             'controller' => 'AvailabilityPlus',
             'action' => 'TestCases',
           ),
         ),
       ),
-      'availabilityplus-debug' => 
+      'availabilityplus-debug' =>
       array (
         'type' => 'Zend\\Router\\Http\\Segment',
-        'options' => 
+        'options' =>
         array (
           'route' => '/AvailabilityPlus/Debug/[:id]',
-          'constraints' => 
+          'constraints' =>
           array (
             'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
             'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
           ),
-          'defaults' => 
+          'defaults' =>
           array (
             'controller' => 'AvailabilityPlus',
             'action' => 'Debug',
@@ -63,24 +63,24 @@ return array (
       ),
     ),
   ),
-  'vufind' => 
+  'vufind' =>
   array (
-    'plugin_managers' => 
+    'plugin_managers' =>
     array (
-      'ajaxhandler' => 
+      'ajaxhandler' =>
       array (
-        'factories' => 
+        'factories' =>
         array (
           'AvailabilityPlus\\AjaxHandler\\GetItemStatuses' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatusesFactory',
         ),
-        'aliases' => 
+        'aliases' =>
         array (
           'VuFind\\AjaxHandler\\GetItemStatuses' => 'AvailabilityPlus\\AjaxHandler\\GetItemStatuses',
         ),
       ),
-      'resolver_driver' => 
+      'resolver_driver' =>
       array (
-        'factories' => 
+        'factories' =>
         array (
           'AvailabilityPlus\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\DAIA' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
@@ -99,20 +99,20 @@ return array (
           'AvailabilityPlus\\Resolver\\Driver\\SubitoISBN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\SubitoISSN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
         ),
-        'aliases' => 
+        'aliases' =>
         array (
           'VuFind\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\AbstractBase',
         ),
       ),
     ),
   ),
-  'service_manager' => 
+  'service_manager' =>
   array (
-    'factories' => 
+    'factories' =>
     array (
       'AvailabilityPlus\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\ServiceManager\\AbstractPluginManagerFactory',
     ),
-    'aliases' => 
+    'aliases' =>
     array (
       'VuFind\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\Resolver\\Driver\\PluginManager',
     ),

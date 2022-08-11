@@ -36,7 +36,7 @@ class FulltextFinder extends AvailabilityPlusResolver
     {
         $this->openUrl = $openUrl;
         $url = $this->getResolverUrl($openUrl);
-        $password = $this->additionalParams;
+        $password = $this->resolverConfig->password;
         $headers = $this->httpClient->getRequest()->getHeaders();
         $headers->addHeaderLine('Accept', 'application/json');
         if(!empty($password)) $headers->addHeaderLine('password', $password);
