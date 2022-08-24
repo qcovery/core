@@ -44,6 +44,7 @@ class DAIA extends AvailabilityPlusResolver
             foreach($item_services['available'] as $service_key=>$service_content) {
                 $record =  (object)[];
                 if(!empty($service_content)) {
+                    $record->id = $data->document[0]->id;
                     $record->daia->service = $service_key;
                     if($item->{'temporary-hack-do-not-use'}) $record->daia->epn = $item->{'temporary-hack-do-not-use'};
                     switch($service_key) {
