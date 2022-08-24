@@ -317,4 +317,8 @@ ArticleParentId:
     w:
       - [name, id]
       - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+  810:
+    w:
+      - [name, id]
+      - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
 
