@@ -141,6 +141,9 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                                         unset($this->parsed_data[$key][$item_key]);
                                     }
                                     break;
+                                case 'adjustScore' :
+                                    if ($action['score']) $this->parsed_data->document[0]->item[$key]->availabilityplus->score += $action['score'];
+                                    break;
                             }
                         }
 

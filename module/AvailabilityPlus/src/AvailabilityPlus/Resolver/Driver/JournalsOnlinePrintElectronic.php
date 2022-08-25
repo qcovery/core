@@ -40,6 +40,7 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
                             break;
                     }
                     if(!empty($level)) {
+                        $record['score'] = 0;
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;

@@ -33,6 +33,7 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
                     }
 
                     if(!in_array($url, $urls)) {
+                        $record['score'] = 0;
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
