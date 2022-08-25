@@ -52,7 +52,9 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
         $response['data'] = $data_org;
         $this->parsed_data = $records;
         $this->applyCustomChanges();
-        uasort($this->parsed_data, 'compareScore');
+        uasort($this->parsed_data, function($a, $b) {
+            return $a['score'] <=> $b['score'];
+        });
         $response['parsed_data'] = $this->parsed_data;
         return $response;
     }
