@@ -163,7 +163,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     }
 
     protected function compareScore($a, $b) {
-        if ($a['score'] == $b['score']) {
+        if($a['score'] == $b['score']) {
             return 0;
         }
         return ($a['score'] < $b['score']) ? -1 : 1;
