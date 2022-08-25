@@ -90,6 +90,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $this->parsed_data = $data_org;
         $response['data'] = $data_org;
         $this->applyCustomChanges();
+        uasort($this->parsed_data, 'compareScore');
         $response['parsed_data'] = $this->parsed_data;
         return $response;
     }
@@ -159,6 +160,13 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 $this->parsed_data[$key]['rules_applied'] = $rules_applied;
             }
         }
+    }
+
+    protected function compareScore($a, $b) {
+        if ($a['score'] == $b['score']) {
+            return 0;
+        }
+        return ($a['score'] < $b['score']) ? -1 : 1;
     }
 
     protected function getObjectPathValue($item, $path) {
