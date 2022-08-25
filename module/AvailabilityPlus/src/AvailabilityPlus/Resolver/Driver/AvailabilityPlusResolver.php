@@ -160,7 +160,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     }
 
     protected function determineBestItem(){
-        foreach($this->parsed_dataas $key => $item) {
+        foreach($this->parsed_data as $key => $item) {
             if(empty($this->parsed_data->best_item) || (!empty($item->score) && $item->score < $this->parsed_data->best_item->score)) {
                 $this->parsed_data->best_item = $this->parsed_data->item[$key];
             }
