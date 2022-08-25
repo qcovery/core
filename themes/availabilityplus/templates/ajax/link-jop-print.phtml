@@ -1,10 +1,4 @@
 <?php
-
-if($mode == 'break_on_first' && $data->best_item) {
-    $data_temp[0] = $data->best_item;
-    $data = $data_temp[0];
-}
-
 foreach($data as $result) {
     if(!empty($result['label'])){
         if(!$list) echo '<div class="availability_item">';

@@ -51,7 +51,6 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
         $response['data'] = $data_org;
         $this->parsed_data = $records;
         $this->applyCustomChanges();
-        $this->determineBestItem();
         $response['parsed_data'] = $this->parsed_data;
         return $response;
     }

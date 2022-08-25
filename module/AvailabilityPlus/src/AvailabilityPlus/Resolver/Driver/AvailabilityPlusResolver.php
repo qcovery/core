@@ -90,7 +90,6 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $this->parsed_data = $data_org;
         $response['data'] = $data_org;
         $this->applyCustomChanges();
-        $this->determineBestItem();
         $response['parsed_data'] = $this->parsed_data;
         return $response;
     }
@@ -160,15 +159,6 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 $this->parsed_data[$key]['rules_applied'] = $rules_applied;
             }
         }
-    }
-
-    protected function determineBestItem(){
-        foreach($this->parsed_data as $key => $item) {
-            if(empty($this->parsed_data['best_item']) || (!empty($item['score']) && $item['score'] < $this->parsed_data['best_item'][0]['score'])) {
-                $this->parsed_data['best_item'][0] = $this->parsed_data[$key];
-            }
-        }
-
     }
 
     protected function getObjectPathValue($item, $path) {
