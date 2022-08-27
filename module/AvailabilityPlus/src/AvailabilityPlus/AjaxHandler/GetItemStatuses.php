@@ -51,6 +51,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $id;
 
+    protected $mediatype;
+
     /**
      * Resolver driver plugin manager
      *
@@ -102,6 +104,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                             $mediatype = $formats[0];
                         }
                     }
+                    $this->mediatype = $mediatype;
                     $this->setChecks($mediatype);
                     $this->driver->addSolrMarcYaml($this->config['General']['availabilityplus_yaml'], false);
                     $responses = [];
@@ -314,6 +317,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
         $response = [
             'id' => $this->id,
+            'mediatype' => $this->mediatype,
             'check' => $check,
             'check_type' => $check_type,
             'SolrMarcKey' => $solrMarcKey,
