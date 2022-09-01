@@ -119,6 +119,17 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
 
             // This sets up the email to be sent
             // Attempt to send the email and show an appropriate flash message:
+
+            $replyTo = $view->email;
+            if (isset($resultFeedbackConfig['resultFeedback']['set_user_email_as_reply_to']) && !$resultFeedbackConfig['resultFeedback']['set_user_email_as_reply_to']) {
+                $replyTo = new Address($view->email, $view->name);
+            }
+
+            $cc = null;
+            if (isset($resultFeedbackConfig['resultFeedback']['set_user_email_as_cc']) && $resultFeedbackConfig['resultFeedback']['set_user_email_as_cc']) {
+                $cc = new Address($view->email, $view->name);
+            }
+
             try {
                 $mailer = $this->serviceLocator->get('VuFind\Mailer\Mailer');
                 $mailer->send(
@@ -126,8 +137,8 @@ class ResultFeedbackController extends \VuFind\Controller\AbstractBase
                     new Address($sender_email, $sender_name),
                     $email_subject,
                     $email_message,
-                    null,
-                    $view->email
+                    $cc,
+                    $replyTo
                 );
                 $this->flashMessenger()->addMessage(
                     'Your result feedback has been send', 'success'
