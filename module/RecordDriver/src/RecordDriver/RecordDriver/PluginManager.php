@@ -52,6 +52,7 @@ class PluginManager extends \VuFind\RecordDriver\PluginManager
         'missing' => 'VuFind\RecordDriver\Missing',
         'pazpar2' => 'VuFind\RecordDriver\Pazpar2',
         'primo' => 'VuFind\RecordDriver\Primo',
+        'search2' => 'VuFind\RecordDriver\Search2Default',
         'solrauth' => 'VuFind\RecordDriver\SolrAuthMarc', // legacy name
         'solrauthdefault' => 'VuFind\RecordDriver\SolrAuthDefault',
         'solrauthmarc' => 'VuFind\RecordDriver\SolrAuthMarc',
@@ -94,6 +95,8 @@ class PluginManager extends \VuFind\RecordDriver\PluginManager
         'VuFind\RecordDriver\Pazpar2' =>
             'VuFind\RecordDriver\NameBasedConfigFactory',
         'VuFind\RecordDriver\Primo' => 'VuFind\RecordDriver\NameBasedConfigFactory',
+        'VuFind\RecordDriver\Search2Default' =>
+            'VuFind\RecordDriver\SolrDefaultFactory',
         'VuFind\RecordDriver\SolrAuthDefault' =>
             'VuFind\RecordDriver\SolrDefaultWithoutSearchServiceFactory',
         'VuFind\RecordDriver\SolrAuthMarc' =>
