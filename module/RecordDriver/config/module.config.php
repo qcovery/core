@@ -1,17 +1,35 @@
 <?php
-namespace RecordDriver\Module\Config;
 
-$config = [
-    'service_manager' => [
-        'allow_override' => true,
-        'factories' => [
-            'RecordDriver\RecordDriver\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-        ],
-        'aliases' => [
-            'VuFind\RecordDriver\PluginManager' => 'RecordDriver\RecordDriver\PluginManager',
-        ],
-    ],
-];
+return array (
+    'vufind' =>
+        array (
+            'plugin_managers' =>
+                array (
+                    'recorddriver' =>
+                        array (
+                            'factories' =>
+                                array (
+                                    'RecordDriver\\RecordDriver\\SolrMarc' => 'RecorDriver\RecordDriver\\SolrDefaultFactory',
+                                ),
+                            'aliases' =>
+                                array (
+                                    'VuFind\\RecordDriver\\SolrMarc' => 'RecordDriver\\RecordDriver\\SolrMarc',
+                                ),
+                            'delegators' =>
+                                array (
+                                    'RecorDriver\\RecordDriver\\SolrMarc' =>
+                                        array (
+                                            0 => 'VuFind\\RecordDriver\\IlsAwareDelegatorFactory',
+                                        ),
+                                    'VuFind\RecordDriver\\SolrMarcRemote' =>
+                                        array (
+                                            0 => 'VuFind\\RecordDriver\\IlsAwareDelegatorFactory',
+                                        ),
 
-return $config;
+                                ),
+                        ),
+                ),
+        ),
+);
+
 
