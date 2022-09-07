@@ -89,7 +89,7 @@
                     <td id="testcase_driver_<?=$id?>" class="testcase_driver"><?=$driver?></td>
                     <td id="testcase_description_<?=$id?>" class="testcase_description"><?=$description?></td>
                     <td id="<?=$testcase_expected_result_class?>_<?=$id?>" class="<?=$testcase_expected_result_class?>>"><?=$expected?></td>
-                    <td id="testcase_actual_result_<?=$id?>" class="testcase_actual_result"><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list, 'mediatype' => $mediatype]) ?></td>
+                    <td id="testcase_actual_result_<?=$id?>" class="testcase_actual_result"><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list ]) ?></td>
                     <td id="testcase_views_<?=$id?>" class="testcase_views">
                         <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
                         <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$this->transEsc('RecordView')?></a><br>
