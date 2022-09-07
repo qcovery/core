@@ -9,7 +9,7 @@ return array (
                         array (
                             'factories' =>
                                 array (
-                                    'RecordDriver\\RecordDriver\\SolrMarc' => 'RecorDriver\RecordDriver\\SolrDefaultFactory',
+                                    'RecordDriver\\RecordDriver\\SolrMarc' => 'RecordDriver\\RecordDriver\\SolrDefaultFactory',
                                 ),
                             'aliases' =>
                                 array (
@@ -17,7 +17,7 @@ return array (
                                 ),
                             'delegators' =>
                                 array (
-                                    'RecorDriver\\RecordDriver\\SolrMarc' =>
+                                    'RecordDriver\\RecordDriver\\SolrMarc' =>
                                         array (
                                             0 => 'VuFind\\RecordDriver\\IlsAwareDelegatorFactory',
                                         ),
