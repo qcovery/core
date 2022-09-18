@@ -20,7 +20,9 @@ uasort($services, function($a, $b) {
 $break = false;
 foreach($services as $service_label => $service_items) {
 
-    echo '<div class="service_group">'.$this->translate($service_label).'</div>';
+    if(!in_array($service,array('openaccess','remote'))) {
+        echo '<div class="service_group">'.$this->translate($service_label).'</div>';
+    }
 
     foreach($service_items as $key => $result) {
         if(!empty($result)) {
