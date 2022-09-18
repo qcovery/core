@@ -90,6 +90,9 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $this->parsed_data = $data_org;
         $response['data'] = $data_org;
         $this->applyCustomChanges();
+        uasort($this->parsed_data, function($a, $b) {
+            return $a['score'] <=> $b['score'];
+        });
         $response['parsed_data'] = $this->parsed_data;
         return $response;
     }
@@ -139,6 +142,12 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                                     foreach($this->parsed_data[$key] AS $item_key => $item_value) {
                                         $this->parsed_data[$key][$item_key.'_org'] = $item_value;
                                         unset($this->parsed_data[$key][$item_key]);
+                                    }
+                                    break;
+                                case 'adjustScore' :
+                                    if ($action['score']) {
+                                        $this->parsed_data[$key]['score_org'] = $this->parsed_data[$key]['score'];
+                                        $this->parsed_data[$key]['score'] += $action['score'];
                                     }
                                     break;
                             }
