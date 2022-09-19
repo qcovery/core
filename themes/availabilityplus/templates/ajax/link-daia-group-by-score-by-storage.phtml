@@ -65,6 +65,13 @@ foreach($storage_locations as $storage_label => $storage_items) {
             if(!$list) echo '<div class="daia_item">';
         }
         echo '<div class="daia_storage_callnumber">';
+        if(!empty($result->storage)) {
+            if(!empty($result->storage->url)) {
+                echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result->storage->url.'" class="'.$result->storage->level.'" title="'.$result->storage->label.'" target="_blank">'.$this->translate($result->storage->label).'</a></span></br>';
+            } else {
+                echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($result->storage->label).'</span></br>';
+            }
+        }
         if(!empty($result->callnumber)) {
             echo ' <span class="item_label">' . $result->callnumber . '</span>';
         }

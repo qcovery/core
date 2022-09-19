@@ -24,7 +24,6 @@ foreach($items->item as $key => $item) {
         } else {
             echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($result->storage->label).'</span>';
         }
-
     }
     if(!empty($result->callnumber)) {
         echo ' <span class="item_label">' . $result->callnumber . '</span>';
