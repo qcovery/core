@@ -607,4 +607,8 @@ class SolrMarc extends SolrDefault
         return $params;
     }
 
+    public function getLibraryHolding () {
+        return $this->getMarcRecord()->getFields('980');
+    }
+
 }
