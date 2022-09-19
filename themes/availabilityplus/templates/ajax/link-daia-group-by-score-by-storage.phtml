@@ -77,13 +77,13 @@ foreach($storage_locations as $storage_label => $storage_items) {
                 echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($result->storage->label).'</span>';
             }
         }
-        if($overlay && !empty($result->about)) {
-            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
-        }
         if(!empty($result->callnumber)) {
             echo ' <span class="item_label">' . $result->callnumber . '</span>';
         }
         echo '</div>';
+        if($overlay && !empty($result->about)) {
+            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
+        }
         if(!empty($result->daia_hint)) {
             echo '<span class="daia_hint"><span class="'.$result->daia_hint->level.'">'.$this->translate($result->daia_hint->label);
             if(!empty($result->daia_hint->label_date)) echo ' '.$result->daia_hint->label_date;
