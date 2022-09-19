@@ -39,7 +39,11 @@ foreach($storage_locations as $storage_label => $storage_items) {
 
     if ($overlay) {
         echo '<div class="daiaplus-title">';
-        echo '<span class="storage_group">'.$this->translate($storage_label).'</span><br/>';
+        if(!empty($storage_items[0]->storage->url)) {
+            echo '<span class="storage_group"><a href="'.$storage_items[0]->storage->url.'" class="'.$storage_items[0]->storage->level.'" title="'.$storage_label.'" target="_blank">'.$this->translate($storage_label).'</a></span>';
+        } else {
+            echo '<span class="storage_group">'.$this->translate($storage_label).'</span><br/>';
+        }
         if(!empty($storage_items[0]->callnumber)) {
             echo ' <span class="item_label">' . $storage_items[0]->callnumber . '</span>';
         }
