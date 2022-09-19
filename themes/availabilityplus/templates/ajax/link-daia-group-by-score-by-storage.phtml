@@ -40,6 +40,9 @@ foreach($storage_locations as $storage_label => $storage_items) {
     if ($overlay) {
         echo '<div class="daiaplus-title">';
         echo '<span>'.$this->translate($storage_label).'</span><br/>';
+        if(!empty($result->chronology)) {
+            echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
+        }
         echo '<a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$index.'">'.$this->transEsc('show').'</a>';
         echo '<div>';
         echo '<div id="daiaplus-overlay-'.$index.'" style="display:none;">';
@@ -81,7 +84,7 @@ foreach($storage_locations as $storage_label => $storage_items) {
             if(!empty($result->about)) {
                 echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
             }
-            if(!empty($result->chronology)) {
+            if(!$overlay && !empty($result->chronology)) {
                 echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
             }
         }
