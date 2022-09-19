@@ -50,9 +50,14 @@ foreach($storage_locations as $storage_label => $storage_items) {
         if(!empty($result->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$storage_items[0]->chronology.'</div>';
         }
-        echo '<a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$index.'">'.$this->transEsc('show_overlay').'</a>';
+        if($list) {
+            echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
+        } else {
+            echo '<a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$index.'">'.$this->transEsc('show_overlay').'</a>';
+        }
         echo '<div>';
         echo '<div id="daiaplus-overlay-'.$index.'" style="display:none;">';
+
     } else {
         if($storage_label !== 'undefined') {
             echo '<div class="storage_group">'.$this->translate($storage_label).'</div>';
