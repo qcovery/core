@@ -41,7 +41,7 @@ foreach($storage_locations as $storage_label => $storage_items) {
         echo '<div class="daiaplus-title">';
         echo '<span class="storage_group">'.$this->translate($storage_label).'</span><br/>';
         if(!empty($storage_items[0]->callnumber)) {
-            echo ' <span class="item_label">' . $result->callnumber . '</span>';
+            echo ' <span class="item_label">' . $storage_items[0]->callnumber . '</span>';
         }
         if(!empty($result->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$storage_items[0]->chronology.'</div>';
