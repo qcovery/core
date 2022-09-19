@@ -1,6 +1,7 @@
 <?php
 
 $storage_locations = [];
+$index = 0;
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
@@ -30,9 +31,24 @@ uasort($storage_locations, function($a, $b) {
 
 $break = false;
 foreach($storage_locations as $storage_label => $storage_items) {
-    if($storage_label !== 'undefined') {
-        echo '<div class="storage_group">'.$this->translate($storage_label).'</div>';
+
+    $overlay = false;
+    if ($storage_label !== 'undefined' && sizeof($storage_items) > 1) {
+        $overlay = true;
     }
+
+    if ($overlay) {
+        echo '<div class="daiaplus-title">';
+        echo '<span>'.$this->translate($storage_label).'</span><br/>';
+        echo '<a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$index.'">'.$this->transEsc('show').'</a>';
+        echo '<div>';
+        echo '<div id="daiaplus-overlay-'.$index.'" style="display:none;">';
+    } else {
+        if($storage_label !== 'undefined') {
+            echo '<div class="storage_group">'.$this->translate($storage_label).'</div>';
+        }
+    }
+
     foreach($storage_items as $key => $result) {
         if(!empty($result)) {
             echo '<div class="delimiter"></div>';
@@ -87,6 +103,12 @@ foreach($storage_locations as $storage_label => $storage_items) {
             break;
         }
     }
+    if($overlay) {
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+    $index++;
     if($break) break;
 }
 
