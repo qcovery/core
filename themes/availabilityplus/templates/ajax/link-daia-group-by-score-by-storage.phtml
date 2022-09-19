@@ -69,9 +69,6 @@ foreach($storage_locations as $storage_label => $storage_items) {
             echo '<div class="delimiter"></div>';
             if(!$list) echo '<div class="daia_item">';
         }
-        if($overlay && !empty($result->about)) {
-            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
-        }
         echo '<div class="daia_storage_callnumber">';
         if(!empty($result->storage)) {
             if(!empty($result->storage->url)) {
@@ -79,6 +76,9 @@ foreach($storage_locations as $storage_label => $storage_items) {
             } else {
                 echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($result->storage->label).'</span>';
             }
+        }
+        if($overlay && !empty($result->about)) {
+            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
         }
         if(!empty($result->callnumber)) {
             echo ' <span class="item_label">' . $result->callnumber . '</span>';
