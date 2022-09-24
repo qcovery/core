@@ -156,5 +156,7 @@ foreach($storage_locations as $storage_label => $storage_items) {
     $index++;
     if($break) break;
 }
-echo '<script type="text/javascript">initDaiaPlusOverlay()</script>';
+
+if(!empty($storage_locations)) echo '<script type="text/javascript">initDaiaPlusOverlay()</script>';
+
 ?>
