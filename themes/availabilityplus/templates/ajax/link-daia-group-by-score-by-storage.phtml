@@ -2,6 +2,7 @@
 
 $storage_locations = [];
 $index = 0;
+$ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
@@ -71,7 +72,7 @@ foreach($storage_locations as $storage_label => $storage_items) {
         }
 
         echo '<div>';
-        echo '<div id="daiaplus-overlay-'.$index.'" style="display:none;">';
+        echo '<div id="daiaplus-overlay-'.$ppn.'-'.$index.'" style="display:none;">';
 
     } else {
         if($storage_label !== 'undefined') {
