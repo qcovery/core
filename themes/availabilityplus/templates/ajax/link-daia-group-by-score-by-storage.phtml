@@ -44,17 +44,32 @@ foreach($storage_locations as $storage_label => $storage_items) {
         } else {
             echo '<span class="storage_group">'.$this->translate($storage_label).'</span><br/>';
         }
-        if(!empty($storage_items[0]->callnumber)) {
-            echo ' <span class="item_label">' . $storage_items[0]->callnumber . '</span>';
+
+        $signature = '';
+        if(!empty($storage_items[0]->daia->epn)) {
+            $item_epn = $storage_items[0]->daia->epn;
+            foreach($SolrMarcSupportData as $key => $value) {
+                if(!empty($value['epn']['data'][0]) && $item_epn == $value['epn']['data'][0] && !empty($value['signature']['data'][0])) {
+                    $signature = $value['signature']['data'][0];
+                    break;
+                }
+            }
         }
+        if(empty($signature) && !empty($storage_items[0]->callnumber)) {
+            $signature = $storage_items[0]->callnumber;
+        }
+        if(!empty($signature)) echo ' <span class="item_label">' . $signature . '</span>';
+
         if(!empty($result->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$storage_items[0]->chronology.'</div>';
         }
+
         if($list) {
             echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
         } else {
             echo '<a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$index.'">'.$this->transEsc('show_overlay').'</a>';
         }
+
         echo '<div>';
         echo '<div id="daiaplus-overlay-'.$index.'" style="display:none;">';
 
