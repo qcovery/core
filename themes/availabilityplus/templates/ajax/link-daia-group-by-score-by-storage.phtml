@@ -3,6 +3,11 @@
 $groups = [];
 $index = 0;
 $ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
+if($this->source == 'Search2') {
+    $recordRoute = 'Search2Record';
+} else {
+    $recordRoute = 'Record';
+}
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
@@ -128,13 +133,6 @@ foreach($groups as $group_label => $group_items) {
         }
         if(!empty($result)) {
             if($list && count($data->document[0]->item) > 1 && !empty($result->storage)) {
-
-                if($this->source == 'Search2') {
-                    $recordRoute = 'Search2Record';
-                } else {
-                    $recordRoute = 'Record';
-                }
-
                 echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
             }
             if(!$list) echo '</div>';
