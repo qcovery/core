@@ -37,7 +37,7 @@ uasort($groups, function($a, $b) {
 
 $break = false;
 foreach($groups as $group_label => $group_items) {
-
+    unset($group_items['score']);
     $overlay = false;
     if ($group_label !== 'undefined' && sizeof($group_items) > 1) {
         $overlay = true;
@@ -80,7 +80,7 @@ foreach($groups as $group_label => $group_items) {
         echo '<div id="daiaplus-overlay-'.$ppn.'-'.$index.'" style="display:none;">';
 
     } else {
-        if($group_label !== 'undefined') {
+        if($group_label !== 'undefined' && !in_array($service_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
             echo '<div class="storage_group">'.$this->translate($group_label).'</div>';
         }
     }
