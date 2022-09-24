@@ -1,54 +1,54 @@
 <?php
 
-$storage_locations = [];
+$groups = [];
 $index = 0;
 $ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
-        $storage_locations[$result->availabilityplus->storage->label][] = $result->availabilityplus;
-        if(empty($storage_locations[$result->availabilityplus->storage->label]['score'])) {
-            $storage_locations[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
+        $groups[$result->availabilityplus->storage->label][] = $result->availabilityplus;
+        if(empty($groups[$result->availabilityplus->storage->label]['score'])) {
+            $groups[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
         } else {
-            if($storage_locations[$result->availabilityplus->storage->label]['score'] > $result->availabilityplus->score) {
-                $storage_locations[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
+            if($groups[$result->availabilityplus->storage->label]['score'] > $result->availabilityplus->score) {
+                $groups[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
             }
         }
     } else if(!empty($result->availabilityplus)) {
-        $storage_locations['undefined'][] = $result->availabilityplus;
-        if(empty($storage_locations['undefined']['score'])) {
-            $storage_locations['undefined']['score'] = $result->availabilityplus->score;
+        $groups['undefined'][] = $result->availabilityplus;
+        if(empty($groups['undefined']['score'])) {
+            $groups['undefined']['score'] = $result->availabilityplus->score;
         } else {
-            if($storage_locations['undefined']['score'] > $result->availabilityplus->score) {
-                $storage_locations['undefined']['score'] = $result->availabilityplus->score;
+            if($groups['undefined']['score'] > $result->availabilityplus->score) {
+                $groups['undefined']['score'] = $result->availabilityplus->score;
             }
         }
     }
 }
 
-uasort($storage_locations, function($a, $b) {
+uasort($groups, function($a, $b) {
     return $a['score'] <=> $b['score'];
 });
 
 $break = false;
-foreach($storage_locations as $storage_label => $storage_items) {
+foreach($groups as $group_label => $group_items) {
 
     $overlay = false;
-    if ($storage_label !== 'undefined' && sizeof($storage_items) > 1) {
+    if ($group_label !== 'undefined' && sizeof($group_items) > 1) {
         $overlay = true;
     }
 
     if ($overlay) {
         echo '<div class="daiaplus-title">';
-        if(!empty($storage_items[0]->storage->url)) {
-            echo '<span class="storage_group"><a href="'.$storage_items[0]->storage->url.'" class="link_external" title="'.$storage_label.'" target="_blank">'.$this->translate($storage_label).'</a></span><br/>';
+        if(!empty($group_items[0]->storage->url)) {
+            echo '<span class="storage_group"><a href="'.$group_items[0]->storage->url.'" class="link_external" title="'.$group_label.'" target="_blank">'.$this->translate($group_label).'</a></span><br/>';
         } else {
-            echo '<span class="storage_group">'.$this->translate($storage_label).'</span><br/>';
+            echo '<span class="storage_group">'.$this->translate($group_label).'</span><br/>';
         }
 
         $signature = '';
-        if(!empty($storage_items[0]->daia->epn)) {
-            $item_epn = $storage_items[0]->daia->epn;
+        if(!empty($group_items[0]->daia->epn)) {
+            $item_epn = $group_items[0]->daia->epn;
             foreach($SolrMarcSupportData as $key => $value) {
                 if(!empty($value['epn']['data'][0]) && $item_epn == $value['epn']['data'][0] && !empty($value['signature']['data'][0])) {
                     $signature = $value['signature']['data'][0];
@@ -56,13 +56,13 @@ foreach($storage_locations as $storage_label => $storage_items) {
                 }
             }
         }
-        if(empty($signature) && !empty($storage_items[0]->callnumber)) {
-            $signature = $storage_items[0]->callnumber;
+        if(empty($signature) && !empty($group_items[0]->callnumber)) {
+            $signature = $group_items[0]->callnumber;
         }
         if(!empty($signature)) echo ' <span class="item_label">' . $signature . '</span>';
 
         if(!empty($result->chronology)) {
-            echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$storage_items[0]->chronology.'</div>';
+            echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$group_items[0]->chronology.'</div>';
         }
 
         if($list) {
@@ -75,12 +75,12 @@ foreach($storage_locations as $storage_label => $storage_items) {
         echo '<div id="daiaplus-overlay-'.$ppn.'-'.$index.'" style="display:none;">';
 
     } else {
-        if($storage_label !== 'undefined') {
-            echo '<div class="storage_group">'.$this->translate($storage_label).'</div>';
+        if($group_label !== 'undefined') {
+            echo '<div class="storage_group">'.$this->translate($group_label).'</div>';
         }
     }
 
-    foreach($storage_items as $key => $result) {
+    foreach($group_items as $key => $result) {
         if(!empty($result)) {
             echo '<div class="delimiter"></div>';
             if(!$list) echo '<div class="daia_item">';
@@ -157,6 +157,6 @@ foreach($storage_locations as $storage_label => $storage_items) {
     if($break) break;
 }
 
-if(!empty($storage_locations)) echo '<script type="text/javascript">initDaiaPlusOverlay()</script>';
+if(!empty($groups)) echo '<script type="text/javascript">initDaiaPlusOverlay()</script>';
 
 ?>
