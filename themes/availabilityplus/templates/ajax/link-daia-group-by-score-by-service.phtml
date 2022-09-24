@@ -45,7 +45,7 @@ foreach($groups as $group_label => $group_items) {
 
     if ($overlay) {
         echo '<div class="daiaplus-title">';
-        echo '<span class="service_label '.$group_label.'">'.$this->translate($group_label).'</span><br/>';
+        echo '<span class="service_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
 
         if(!empty($group_items[0]->storage)) {
             if(!empty($group_items[0]->storage->url)) {
