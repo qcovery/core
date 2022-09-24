@@ -46,9 +46,9 @@ foreach($groups as $group_label => $group_items) {
     if ($overlay) {
         echo '<div class="daiaplus-title">';
         if(!empty($group_items[0]->storage->url)) {
-            echo '<span class="storage_group"><a href="'.$group_items[0]->storage->url.'" class="link_external" title="'.$group_label.'" target="_blank">'.$this->translate($group_label).'</a></span><br/>';
+            echo '<span class="group_label"><a href="'.$group_items[0]->storage->url.'" class="link_external" title="'.$group_label.'" target="_blank">'.$this->translate($group_label).'</a></span><br/>';
         } else {
-            echo '<span class="storage_group">'.$this->translate($group_label).'</span><br/>';
+            echo '<span class="group_label">'.$this->translate($group_label).'</span><br/>';
         }
 
         $signature = '';
@@ -81,7 +81,7 @@ foreach($groups as $group_label => $group_items) {
 
     } else {
         if($group_label !== 'undefined' && !in_array($service_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
-            echo '<div class="storage_group">'.$this->translate($group_label).'</div>';
+            echo '<div class="group_label">'.$this->translate($group_label).'</div>';
         }
     }
 
