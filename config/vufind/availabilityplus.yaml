@@ -78,12 +78,12 @@ MonographSeriesRecordView:
 TestLabel:
   view-method: ajax/default.phtml
   245:
-    a: 
+    a:
       - [name, label]
 TestLevel:
   view-method: ajax/default.phtml
   245:
-    a: 
+    a:
       - [name, level]
 1ArticleDirectLinkIndicatorFullTextFallbackUrls:
   category: FullTextFallbackUrls
@@ -293,12 +293,12 @@ JournalsOnlinePrintPrint:
     x:
       - [name, issn]
   952:
-#    d:
-#      - [name, volume]
+    #    d:
+    #      - [name, volume]
     j:
       - [name, date]
-#    e:
-#      - [name, issue]
+    #    e:
+    #      - [name, issue]
     h:
       - [name, pages]
 DAIA:
@@ -325,3 +325,35 @@ ArticleParentId:
     w:
       - [name, id]
       - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+SupportData:
+  '020':
+    9:
+      - [name, isbn]
+  '022':
+    a:
+      - [name, issn]
+  '024':
+    conditions:
+      - [field, 2, 'doi']
+    a:
+      - [name, doi]
+  '773':
+    x:
+      - [name, issn]
+  856:
+    conditions:
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, fallbackurl]
+#  '980':
+#    conditions:
+#      - [field, 2, 'ILN']
+#    1:
+#      - [name, number]
+#    b:
+#      - [name, epn]
+#    d:
+#      - [name, signature]
+#    e:
+#      - [name, indicator]

@@ -330,7 +330,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label' => $label,
             'label_translated' => $this->translate($label),
             'template' => $template,
-            'data' => $data
+            'data' => $data,
+            'SolrMarcSupportData' => $this->driver->getMarcData('SupportData')
         ];
         return array_filter($response);
     }
