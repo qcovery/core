@@ -23,7 +23,8 @@
   font-size: 0;
 }
 
-.group_label {
+.group_label,
+.service_label {
   margin-top: 10px;
   border-bottom: 1px solid #888;
   font-weight: bold;
