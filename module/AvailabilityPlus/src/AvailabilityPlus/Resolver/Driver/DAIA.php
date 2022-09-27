@@ -124,8 +124,10 @@ class DAIA extends AvailabilityPlusResolver
                                 $record->daia_action->level = 'internal_link';
                                 $url_components = parse_url($service_content->href);
                                 parse_str($url_components['query'], $params);
-                                $record->daia_action->label = $params['action'];
-                                $record->daia_action->url = $this->generateOrderLink($params->action, $data->document[0]->id, $item->id, $item->storage->id);
+                                $action = $params['action'];
+                                if ($action == 'reserve') $action = 'recall';
+                                $record->daia_action->label = $action;
+                                $record->daia_action->url = $this->generateOrderLink($action, $data->document[0]->id, $item->id, $item->storage->id);
                             } else {
                                 $record->daia_action->label = $service_content->service.'_default_action'.$limitation;
                             }
@@ -299,7 +301,6 @@ class DAIA extends AvailabilityPlusResolver
     }
 
     protected function generateOrderLink ($action, $doc_id, $item_id, $storage_id) {
-        if ($action == 'reserve') $action = 'recall';
         $id = substr($doc_id, strrpos($doc_id, ":") + 1);
         $hmacKeys = explode(':','id:item_id:doc_id');
         $hmacPairs = [
