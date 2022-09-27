@@ -380,6 +380,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 break;
             }
         }
+        $response['parentId'] = $parentId;
         if (!empty($parentId)) {
             try {
                 $parentDriver = $this->recordLoader->load($parentId, 'Solr');
