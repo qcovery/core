@@ -372,7 +372,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $template = 'ajax/link-parent.phtml';
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
-        $response = $this->generateResponse($check, '', '', '', $template, '', '', false, $check_type);
+        $response = $this->generateResponse($check, 'ArticleParentId', '', '', $template, '', '', false, $check_type);
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
                 $parentId = $parentDate['id']['data'][0];
@@ -393,7 +393,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if (!empty($url)) {
             $level = 'ParentWorkILNSolr';
             $label = 'Go to parent work (local holding)';
-            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);
+            $response = $this->generateResponse($check, 'ArticleParentId', $level, $label, $template, $parentData, $url, true, $check_type);
             $response['html'] = $this->renderer->render($template , $response);
         }
         $responses[] = $response;
