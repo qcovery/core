@@ -381,7 +381,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             }
         }
         $response['parentId'] = $parentId;
-        $response['ILM'] = $parentDriver->getMarcData('ILN');
+        $response['ILN'] = $this->driver->getMarcData('ILN');
         if (!empty($parentId)) {
             try {
                 $parentDriver = $this->recordLoader->load($parentId, 'Solr');
