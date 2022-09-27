@@ -368,7 +368,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     private function checkParentWorkILNSolr() {
         $check = 'checkParentWorkILNSolr';
         $check_type = 'function';
-        $template = 'ajax/link-internal.phtml';
+        $template = 'ajax/link-parent.phtml';
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
         $response = $this->generateResponse($check, '', '', '', $template, '', '', false, $check_type);
@@ -393,7 +393,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $level = 'ParentWorkILNSolr';
             $label = 'Go to parent work (local holding)';
             $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);
-            $response['html'] = $this->renderer->render($template, $response);
+            $response['html'] = $this->renderer->render($template , $response);
         }
         $responses[] = $response;
         return $responses;
