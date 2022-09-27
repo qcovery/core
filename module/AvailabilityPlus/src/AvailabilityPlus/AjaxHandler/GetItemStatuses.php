@@ -322,6 +322,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'check_type' => $check_type,
             'SolrMarcKey' => $solrMarcKey,
             'SolrMarcSpecs' => $this->driver->getSolrMarcSpecs($solrMarcKey),
+            'SolrMarcData' => $this->driver->getMarcData($solrMarcKey),
             'status' => $status,
             'mode' => $this->current_mode,
             'list' => $this->list,
@@ -410,7 +411,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             );
         }
         $resolverHandler = new Connection($this->resolverManager->get($resolverType));
-        $marc_data = $this->driver->getMarcData($resolver);
         $params = $this->prepareResolverParams($marc_data);
         $resolver_url = $resolverHandler->getResolverUrl($params);
         $template = $this->getTemplate($marc_data);
@@ -422,7 +422,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $response['status']['level'] = 'unsuccessful_check';
                 $response['status']['label'] = 'Check did not find a match!';
             }
-            $response['marc_data'] = $marc_data;
             $response['resolver_data'] = $resolver_data['data'];
             $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
 
