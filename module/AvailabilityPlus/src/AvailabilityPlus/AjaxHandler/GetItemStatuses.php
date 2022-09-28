@@ -322,6 +322,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'check_type' => $check_type,
             'SolrMarcKey' => $solrMarcKey,
             'SolrMarcSpecs' => $this->driver->getSolrMarcSpecs($solrMarcKey),
+            'SolrMarcData' => $this->driver->getMarcData($solrMarcKey),
             'status' => $status,
             'mode' => $this->current_mode,
             'list' => $this->list,
@@ -372,17 +373,21 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $template = 'ajax/link-parent.phtml';
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
-        $response = $this->generateResponse($check, '', '', '', $template, '', '', false, $check_type);
+        $response = $this->generateResponse($check, 'ArticleParentId', '', '', $template, '', '', false, $check_type);
         foreach ($parentData as $parentDate) {
             if (!empty(($parentDate['id']['data'][0]))) {
                 $parentId = $parentDate['id']['data'][0];
                 break;
             }
         }
+        $response['parentId'] = $parentId;
+
         if (!empty($parentId)) {
             try {
                 $parentDriver = $this->recordLoader->load($parentId, 'Solr');
+                $response['ILNMarcSpecs'] = $parentDriver->getSolrMarcSpecs('ILN');
                 $ilnMatch = $parentDriver->getMarcData('ILN');
+                $response['ILN'] = $ilnMatch;
                 if (!empty($ilnMatch[0]['iln']['data'][0])) {
                     $url = '/vufind/Record/' . $parentId;
                 }
@@ -393,7 +398,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if (!empty($url)) {
             $level = 'ParentWorkILNSolr';
             $label = 'Go to parent work (local holding)';
-            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);
+            $response = $this->generateResponse($check, 'ArticleParentId', $level, $label, $template, $parentData, $url, true, $check_type);
             $response['html'] = $this->renderer->render($template , $response);
         }
         $responses[] = $response;
@@ -422,7 +427,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $response['status']['level'] = 'unsuccessful_check';
                 $response['status']['label'] = 'Check did not find a match!';
             }
-            $response['marc_data'] = $marc_data;
             $response['resolver_data'] = $resolver_data['data'];
             $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
 

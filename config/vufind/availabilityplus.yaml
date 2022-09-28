@@ -78,12 +78,12 @@ MonographSeriesRecordView:
 TestLabel:
   view-method: ajax/default.phtml
   245:
-    a:
+    a: 
       - [name, label]
 TestLevel:
   view-method: ajax/default.phtml
   245:
-    a:
+    a: 
       - [name, level]
 1ArticleDirectLinkIndicatorFullTextFallbackUrls:
   category: FullTextFallbackUrls
@@ -293,12 +293,12 @@ JournalsOnlinePrintPrint:
     x:
       - [name, issn]
   952:
-    #    d:
-    #      - [name, volume]
+#    d:
+#      - [name, volume]
     j:
       - [name, date]
-    #    e:
-    #      - [name, issue]
+#    e:
+#      - [name, issue]
     h:
       - [name, pages]
 DAIA:
