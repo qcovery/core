@@ -221,6 +221,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      */
     private function checkSolrMarcData($solrMarcKeys, $check) {
         sort($solrMarcKeys);
+        array_unique($solrMarcKeys);
         $check_type = 'MARC';
         $urls = [];
         $break = false;
