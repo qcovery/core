@@ -110,7 +110,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     $responses = [];
                     $response = [];
                     foreach($this->checks as $check => $this->current_mode) {
-                        if(in_array($check_mode,array('continue','break_next','break_on_first_next')) || in_array($this->current_mode,array('always'))) {
+                        if(in_array($check_mode,array('continue','break_next','break_on_first_next')) || in_array($this->current_mode,array('always', 'always_break_on_first'))) {
                             $results = $this->performAvailabilityCheck($check);
                             foreach($results as $result) {
                                 if(!empty($result)) {
@@ -315,6 +315,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $status['level'] = 'unsuccessful_check';
             $status['label'] = 'Check did not find a match!';
         }
+        $data->mediatype = $this->mediatype;
         $response = [
             'id' => $this->id,
             'mediatype' => $this->mediatype,
