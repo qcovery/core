@@ -315,6 +315,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $status['level'] = 'unsuccessful_check';
             $status['label'] = 'Check did not find a match!';
         }
+        $data->mediatype = $this->mediatype;
         $response = [
             'id' => $this->id,
             'mediatype' => $this->mediatype,
