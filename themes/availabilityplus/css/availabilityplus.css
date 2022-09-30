@@ -23,7 +23,8 @@
   font-size: 0;
 }
 
-.storage_group {
+.group_label,
+.service_label {
   margin-top: 10px;
   border-bottom: 1px solid #888;
   font-weight: bold;
@@ -108,14 +109,14 @@
 }
 
 .AvailabilityPlusTestCases table {
-	width: 100%;
+  width: 100%;
 }
 
 .AvailabilityPlusTestCases tr,
 .AvailabilityPlusTestCases th,
 .AvailabilityPlusTestCases td
 {
-	border: 1px solid black;
+  border: 1px solid black;
 }
 
 .AvailabilityPlusTestCases tr {
@@ -124,7 +125,7 @@
 
 .AvailabilityPlusTestCases th,
 .AvailabilityPlusTestCases td {
-	padding: 5px;
+  padding: 5px;
 }
 
 #tc_expectedresult,
