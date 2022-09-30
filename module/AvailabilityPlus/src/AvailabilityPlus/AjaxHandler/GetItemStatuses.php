@@ -425,6 +425,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $template = $this->getTemplate($marc_data);
         if(!empty($resolver_url) && !empty($marc_data)) {
             $resolver_data = $resolverHandler->fetchLinks($params);
+            if(str_starts_with($resolverType,'DAIA')) {
+                $resolver_data['parsed_data']->document[0]->mediatype = $this->mediatype;
+            } else {
+                $resolver_data['parsed_data']->mediatype = $this->mediatype;
+            }
             $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
             $response['html'] = $this->applyTemplate($template, $response);
             if(empty($response['html'])) {
