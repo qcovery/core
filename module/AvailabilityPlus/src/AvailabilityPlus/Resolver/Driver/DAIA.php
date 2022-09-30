@@ -52,6 +52,7 @@ class DAIA extends AvailabilityPlusResolver
                         case 'openaccess':
                             if(!in_array($service_content->href, $urls)) {
                                 $record->daia_action->level = 'FreeAccess link_external';
+                                if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                 $record->daia_action->label = 'FreeAccess';
                                 $record->daia_action->url = $service_content->href;
                                 $urls[] = $record->daia_action->url;
@@ -64,10 +65,11 @@ class DAIA extends AvailabilityPlusResolver
                                 $record->score = 0;
                                 $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
-                            break;
+                            //break;
                         case 'remote':
                             if(!in_array($service_content->href, $urls)) {
                                 $record->daia_action->level = 'LicensedAccess link_external';
+                                if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                 $record->daia_action->label = 'LicensedAccess';
                                 $record->daia_action->url = $service_content->href;
                                 $urls[] = $record->daia_action->url;
@@ -80,7 +82,7 @@ class DAIA extends AvailabilityPlusResolver
                                 $record->score = 10;
                                 $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
-                            break;
+                            //break;
                         case 'loan':
                         case 'presentation':
                             if($service_key == 'loan') {
