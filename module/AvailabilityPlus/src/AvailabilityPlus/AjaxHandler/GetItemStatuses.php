@@ -234,8 +234,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                         foreach ($date['url']['data'] as $url) {
                             if(!in_array($url, $urls)) {
                                 $level = $this->getLevel($date, $check, $solrMarcKey);
-                                $label = $check;
-                                if($date['label']['data']) $label = $date['label']['data'];
+                                $label = $this->getLabel($date, $check);
                                 $urls[] = $url;
                                 $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, true, $check_type);
                                 $response['html'] = $this->applyTemplate($template, $response);
@@ -298,6 +297,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if($level != $solrMarcKey) $level = $level.' '.$solrMarcKey;
             if(!empty($date['level']['data'][0])) $level = $date['level']['data'][0];
         return $level;
+    }
+
+    private function getLabel($date, $label) {
+        if(!empty($date['label']['data'][0])) $label = $date['label']['data'][0];
+        return $label;
     }
 
     private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = '', $status_bool = false, $check_type){
