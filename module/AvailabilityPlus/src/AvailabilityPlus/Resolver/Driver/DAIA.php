@@ -161,7 +161,7 @@ class DAIA extends AvailabilityPlusResolver
                                     break;
                                 }
                             case 'fallback':
-                                if(empty($item_services['available']['loan']) && empty($item_services['available']['presentation'])) {
+                                if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote']) && empty($item_services['available']['loan']) && empty($item_services['available']['presentation'])) {
                                     if(!empty($item->storage->id)){
                                         $record->storage->level = 'link_external';
                                         $record->storage->label = $item->storage->content;
