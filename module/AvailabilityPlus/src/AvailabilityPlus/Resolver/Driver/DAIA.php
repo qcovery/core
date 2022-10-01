@@ -71,7 +71,6 @@ class DAIA extends AvailabilityPlusResolver
                                     }
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
-                                break;
                             case 'remote':
                                 if(!in_array($service_content->href, $urls)) {
                                     $record->daia_action->level = 'LicensedAccess link_external';
@@ -91,7 +90,6 @@ class DAIA extends AvailabilityPlusResolver
                                     }
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
-                                break;
                             case 'loan':
                             case 'presentation':
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote'])) {
@@ -182,11 +180,12 @@ class DAIA extends AvailabilityPlusResolver
                                     }
                                     $record->score = 100;
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                                    $break = true;
                                     break;
 
                                 }
                         }
-                        break;
+                        if($break) break;
                     }
                 }
                 if($break) break;
