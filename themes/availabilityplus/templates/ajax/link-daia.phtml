@@ -2,7 +2,7 @@
 
 $items = $data->document[0];
 
-if($mode == 'break_on_first' && $data->best_item) {
+if(in_array($mode, array('break_on_first', 'break_on_first_next', 'always_break_on_first')) && $data->best_item) {
     unset($items);
     $items->item[0] = $data->best_item;
 }

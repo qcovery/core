@@ -29,148 +29,166 @@ class DAIA extends AvailabilityPlusResolver
             $item_services['available']['remote'] = [];
             $item_services['available']['loan'] = [];
             $item_services['available']['presentation'] = [];
-            $item_services['available']['fallback'] = 'fallback';
+            $item_services['available']['fallback'][] = 'fallback';
 
             foreach($item->available as $service) {
-                $item_services['available'][$service->service] = $service;
+                $item_services['available'][$service->service][] = $service;
+                $item_services['available']['fallback'] = [];
             }
 
             foreach($item->unavailable as $service) {
                 if(count(get_object_vars($service)) > 1) {
-                    $item_services['available'][$service->service] = $service;
+                    $item_services['available'][$service->service][] = $service;
                 }
             }
 
-            foreach($item_services['available'] as $service_key=>$service_content) {
-                $record =  (object)[];
-                if(!empty($service_content)) {
-                    $record->id = $data->document[0]->id;
-                    $record->ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
-                    $record->daia->service = $service_key;
-                    if($item->{'temporary-hack-do-not-use'}) $record->daia->epn = $item->{'temporary-hack-do-not-use'};
-                    switch($service_key) {
-                        case 'openaccess':
-                            if(!in_array($service_content->href, $urls)) {
-                                $record->daia_action->level = 'FreeAccess link_external';
-                                $record->daia_action->label = 'FreeAccess';
-                                $record->daia_action->url = $service_content->href;
-                                $urls[] = $record->daia_action->url;
-                                if(!empty($item->about)) {
-                                    $record->about = $item->about;
+            $break = false;
+            foreach($item_services['available'] as $service_key=>$service_group) {
+                foreach($service_group as $service_content) {
+                    $record =  (object)[];
+                    if(!empty($service_content)) {
+                        $record->id = $data->document[0]->id;
+                        $record->ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
+                        $record->daia->service = $service_key;
+                        if($item->{'temporary-hack-do-not-use'}) $record->daia->epn = $item->{'temporary-hack-do-not-use'};
+                        switch($service_key) {
+                            case 'openaccess':
+                                if(!in_array($service_content->href, $urls)) {
+                                    $record->daia_action->level = 'FreeAccess link_external';
+                                    if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
+                                    $record->daia_action->label = 'FreeAccess';
+                                    $record->daia_action->url = $service_content->href;
+                                    $urls[] = $record->daia_action->url;
+                                    if(!empty($item->about)) {
+                                        $record->about = $item->about;
+                                    }
+                                    if(!empty($item->chronology->about)) {
+                                        $record->chronology = $item->chronology->about;
+                                    }
+                                    $record->score = 0;
+                                    if(empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
+                                        $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                                    }
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
-                                if(!empty($item->chronology->about)) {
-                                    $record->chronology = $item->chronology->about;
+                            case 'remote':
+                                if(!in_array($service_content->href, $urls)) {
+                                    $record->daia_action->level = 'LicensedAccess link_external';
+                                    if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
+                                    $record->daia_action->label = 'LicensedAccess';
+                                    $record->daia_action->url = $service_content->href;
+                                    $urls[] = $record->daia_action->url;
+                                    if(!empty($item->about)) {
+                                        $record->about = $item->about;
+                                    }
+                                    if(!empty($item->chronology->about)) {
+                                        $record->chronology = $item->chronology->about;
+                                    }
+                                    $record->score = 10;
+                                    if(empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
+                                        $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                                    }
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
-                                $record->score = 0;
-                                $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                            }
-                            break;
-                        case 'remote':
-                            if(!in_array($service_content->href, $urls)) {
-                                $record->daia_action->level = 'LicensedAccess link_external';
-                                $record->daia_action->label = 'LicensedAccess';
-                                $record->daia_action->url = $service_content->href;
-                                $urls[] = $record->daia_action->url;
-                                if(!empty($item->about)) {
-                                    $record->about = $item->about;
+                            case 'loan':
+                            case 'presentation':
+                                if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote'])) {
+                                    if($service_key == 'loan') {
+                                        $record->score = 20;
+                                    } else {
+                                        $record->score = 30;
+                                    }
+                                    if(!empty($item->storage->href)){
+                                        $record->storage->level = 'link_external';
+                                        $record->storage->label = $item->storage->content;
+                                        $record->storage->url = $item->storage->href;
+                                    } elseif(!empty($item->storage->id)){
+                                        $record->storage->level = 'link_external';
+                                        $record->storage->label = $item->storage->content;
+                                        $record->storage->url = $item->storage->id;
+                                    } else {
+                                        $record->storage->label = 'unknown_location';
+                                    }
+                                    if(!empty($item->label)) $record->callnumber = $item->label;
+                                    if(!empty($service_content->limitation[0]->id)) {
+                                        $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
+                                        $record->daia_hint->level = $limitation;
+                                        $record->daia_hint->label = $service_content->service.$limitation;
+                                        $record->score += 5;
+                                    } elseif(!empty($service_content->limitation[0]->content)) {
+                                        $limitation = $service_content->limitation[0]->content;
+                                        $record->daia_hint->level = $limitation;
+                                        $record->daia_hint->label = $service_content->service.$limitation;
+                                        $record->score += 5;
+                                    } elseif(!empty($service_content->expected)) {
+                                        $record->daia_hint->level = "daia_orange";
+                                        $date = date_create($service_content->expected);
+                                        $record->daia_hint->label = 'on_loan_until';
+                                        $record->daia_hint->label_date = date_format($date,"d.m.Y");
+                                        $record->score += 20;
+                                    } else {
+                                        $record->daia_hint->level = "daia_green";
+                                        $record->daia_hint->label = $service_content->service;
+                                    }
+                                    if(!empty($service_content->href)) {
+                                        $record->daia_action->level = 'internal_link';
+                                        $url_components = parse_url($service_content->href);
+                                        parse_str($url_components['query'], $params);
+                                        $action = $params['action'];
+                                        if ($action == 'reserve') $action = 'recall';
+                                        $record->daia_action->label = $action;
+                                        $record->daia_action->url = $this->generateOrderLink($action, $data->document[0]->id, $item->id, $item->storage->id);
+                                    } else {
+                                        $record->daia_action->label = $service_content->service.'_default_action'.$limitation;
+                                    }
+                                    if(isset($service_content->queue)) {
+                                        $record->queue->length = $service_content->queue;
+                                        if($service_content->queue == 1) {
+                                            $record->queue->label .=  'Recall';
+                                        } else {
+                                            $record->queue->label .=  'Recalls';
+                                        }
+                                        $record->score += $service_content->queue;
+                                    }
+                                    if(!empty($item->about)) {
+                                        $record->about = $item->about;
+                                    }
+                                    if(!empty($item->chronology->about)) {
+                                        $record->chronology = $item->chronology->about;
+                                    }
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                                    $break = true;
+                                    break;
                                 }
-                                if(!empty($item->chronology->about)) {
-                                    $record->chronology = $item->chronology->about;
+                            case 'fallback':
+                                if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote']) && empty($item_services['available']['loan']) && empty($item_services['available']['presentation'])) {
+                                    if(!empty($item->storage->id)){
+                                        $record->storage->level = 'link_external';
+                                        $record->storage->label = $item->storage->content;
+                                        $record->storage->url = $item->storage->id;
+                                    } else {
+                                        $record->storage->label = 'unknown_location';
+                                    }
+                                    if(!empty($item->label)) $record->callnumber = $item->label;
+                                    $record->daia_hint->level = 'daia_red';
+                                    $record->daia_hint->label = 'not_available';
+                                    if(!empty($item->about)) {
+                                        $record->about = $item->about;
+                                    }
+                                    if(!empty($item->chronology->about)) {
+                                        $record->chronology = $item->chronology->about;
+                                    }
+                                    $record->score = 100;
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                                    $break = true;
+                                    break;
+
                                 }
-                                $record->score = 10;
-                                $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                            }
-                            break;
-                        case 'loan':
-                        case 'presentation':
-                            if($service_key == 'loan') {
-                                $record->score = 20;
-                            } else {
-                                $record->score = 30;
-                            }
-                            if(!empty($item->storage->href)){
-                                $record->storage->level = 'link_external';
-                                $record->storage->label = $item->storage->content;
-                                $record->storage->url = $item->storage->href;
-                            } elseif(!empty($item->storage->id)){
-                                $record->storage->level = 'link_external';
-                                $record->storage->label = $item->storage->content;
-                                $record->storage->url = $item->storage->id;
-                            } else {
-                                $record->storage->label = 'unknown_location';
-                            }
-                            if(!empty($item->label)) $record->callnumber = $item->label;
-                            if(!empty($service_content->limitation[0]->id)) {
-                                $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
-                                $record->daia_hint->level = $limitation;
-                                $record->daia_hint->label = $service_content->service.$limitation;
-                                $record->score += 5;
-                            } elseif(!empty($service_content->limitation[0]->content)) {
-                                $limitation = $service_content->limitation[0]->content;
-                                $record->daia_hint->level = $limitation;
-                                $record->daia_hint->label = $service_content->service.$limitation;
-                                $record->score += 5;
-                            } elseif(!empty($service_content->expected)) {
-                                $record->daia_hint->level = "daia_orange";
-                                $date = date_create($service_content->expected);
-                                $record->daia_hint->label = 'on_loan_until';
-                                $record->daia_hint->label_date = date_format($date,"d.m.Y");
-                                $record->score += 20;
-                            } else {
-                                $record->daia_hint->level = "daia_green";
-                                $record->daia_hint->label = $service_content->service;
-                            }
-                            if(!empty($service_content->href)) {
-                                $record->daia_action->level = 'internal_link';
-                                $url_components = parse_url($service_content->href);
-                                parse_str($url_components['query'], $params);
-                                $action = $params['action'];
-                                if ($action == 'reserve') $action = 'recall';
-                                $record->daia_action->label = $action;
-                                $record->daia_action->url = $this->generateOrderLink($action, $data->document[0]->id, $item->id, $item->storage->id);
-                            } else {
-                                $record->daia_action->label = $service_content->service.'_default_action'.$limitation;
-                            }
-                            if(isset($service_content->queue)) {
-                                $record->queue->length = $service_content->queue;
-                                if($service_content->queue == 1) {
-                                    $record->queue->label .=  'Recall';
-                                } else {
-                                    $record->queue->label .=  'Recalls';
-                                }
-                                $record->score += $service_content->queue;
-                            }
-                            if(!empty($item->about)) {
-                                $record->about = $item->about;
-                            }
-                            if(!empty($item->chronology->about)) {
-                                $record->chronology = $item->chronology->about;
-                            }
-                            $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                            break;
-                        case 'fallback':
-                            if(!empty($item->storage->id)){
-                                $record->storage->level = 'link_external';
-                                $record->storage->label = $item->storage->content;
-                                $record->storage->url = $item->storage->id;
-                            } else {
-                                $record->storage->label = 'unknown_location';
-                            }
-                            if(!empty($item->label)) $record->callnumber = $item->label;
-                            $record->daia_hint->level = 'daia_red';
-                            $record->daia_hint->label = 'not_available';
-                            if(!empty($item->about)) {
-                                $record->about = $item->about;
-                            }
-                            if(!empty($item->chronology->about)) {
-                                $record->chronology = $item->chronology->about;
-                            }
-                            $record->score = 100;
-                            $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                            break;
+                        }
+                        if($break) break;
                     }
-                    break;
                 }
+                if($break) break;
             }
         }
 

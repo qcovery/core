@@ -110,7 +110,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     $responses = [];
                     $response = [];
                     foreach($this->checks as $check => $this->current_mode) {
-                        if(in_array($check_mode,array('continue','break_next','break_on_first_next')) || in_array($this->current_mode,array('always'))) {
+                        if(in_array($check_mode,array('continue','break_next','break_on_first_next')) || in_array($this->current_mode,array('always', 'always_break_on_first'))) {
                             $results = $this->performAvailabilityCheck($check);
                             foreach($results as $result) {
                                 if(!empty($result)) {
@@ -221,6 +221,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      */
     private function checkSolrMarcData($solrMarcKeys, $check) {
         sort($solrMarcKeys);
+        array_unique($solrMarcKeys);
         $check_type = 'MARC';
         $urls = [];
         $break = false;
@@ -228,12 +229,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $data = $this->driver->getMarcData($solrMarcKey);
             if(!empty($data) && $this->checkConditions($data)) {
                 $template = $this->getTemplate($data);
-                $level = $this->getLevel($data, $check, $solrMarcKey);
-                $label = $this->getLabel($data, $check);
                 foreach ($data as $date) {
                     if (!empty($date['url']['data'][0])) {
                         foreach ($date['url']['data'] as $url) {
                             if(!in_array($url, $urls)) {
+                                $level = $this->getLevel($date, $check, $solrMarcKey);
+                                $label = $this->getLabel($date, $check);
                                 $urls[] = $url;
                                 $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, true, $check_type);
                                 $response['html'] = $this->applyTemplate($template, $response);
@@ -292,18 +293,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $check;
     }
 
-    private function getLevel($data, $level, $solrMarcKey) {
+    private function getLevel($date, $level, $solrMarcKey) {
         if($level != $solrMarcKey) $level = $level.' '.$solrMarcKey;
-        foreach ($data as $date) {
             if(!empty($date['level']['data'][0])) $level = $date['level']['data'][0];
-        }
         return $level;
     }
 
-    private function getLabel($data, $label) {
-        foreach ($data as $date) {
-            if(!empty($date['label']['data'][0])) $label = $date['label']['data'][0];
-        }
+    private function getLabel($date, $label) {
+        if(!empty($date['label']['data'][0])) $label = $date['label']['data'][0];
         return $label;
     }
 
@@ -315,6 +312,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $status['level'] = 'unsuccessful_check';
             $status['label'] = 'Check did not find a match!';
         }
+        $data->mediatype = $this->mediatype;
         $response = [
             'id' => $this->id,
             'mediatype' => $this->mediatype,
@@ -387,6 +385,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $parentDriver = $this->recordLoader->load($parentId, 'Solr');
                 $response['ILNMarcSpecs'] = $parentDriver->getSolrMarcSpecs('ILN');
                 $ilnMatch = $parentDriver->getMarcData('ILN');
+                if(empty($ilnMatch)) {
+                    $response['ILNMarcSpecs'] = $this->driver->getSolrMarcSpecs('ILN');
+                    $ilnMatch = $this->driver->getMarcData('ILN');
+                }
                 $response['ILN'] = $ilnMatch;
                 if (!empty($ilnMatch[0]['iln']['data'][0])) {
                     $url = '/vufind/Record/' . $parentId;
