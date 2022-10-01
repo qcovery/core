@@ -230,11 +230,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             if(!empty($data) && $this->checkConditions($data)) {
                 $template = $this->getTemplate($data);
                 $level = $this->getLevel($data, $check, $solrMarcKey);
-                $label = $this->getLabel($data, $check);
                 foreach ($data as $date) {
                     if (!empty($date['url']['data'][0])) {
                         foreach ($date['url']['data'] as $url) {
                             if(!in_array($url, $urls)) {
+                                $label = $check;
+                                if($date['label']['data']) $label = $date['label']['data'];
+                                $label = $this->getLabel($data, $check);
                                 $urls[] = $url;
                                 $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, true, $check_type);
                                 $response['html'] = $this->applyTemplate($template, $response);
