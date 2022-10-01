@@ -33,7 +33,7 @@ class DAIA extends AvailabilityPlusResolver
 
             foreach($item->available as $service) {
                 $item_services['available'][$service->service][] = $service;
-                $item_services['available']['fallback'][] = [];
+                $item_services['available']['fallback'] = [];
             }
 
             foreach($item->unavailable as $service) {
