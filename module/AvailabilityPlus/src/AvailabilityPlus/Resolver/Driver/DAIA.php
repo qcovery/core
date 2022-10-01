@@ -66,7 +66,7 @@ class DAIA extends AvailabilityPlusResolver
                                 $record->score = 0;
                                 $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
-                            break;
+                            //break;
                         case 'remote':
                             if(!in_array($service_content->href, $urls)) {
                                 $record->daia_action->level = 'LicensedAccess link_external';
@@ -83,7 +83,7 @@ class DAIA extends AvailabilityPlusResolver
                                 $record->score = 10;
                                 $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                             }
-                            break;
+                            // break;
                         case 'loan':
                         case 'presentation':
                             if($service_key == 'loan') {
