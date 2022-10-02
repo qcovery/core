@@ -385,13 +385,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if (!empty($parentId)) {
             try {
                 $parentDriver = $this->recordLoader->load($parentId, 'Solr');
-                $response['ILNMarcSpecs'] = $parentDriver->getSolrMarcSpecs('ILN');
+                $ilnMarcSpecs = $parentDriver->getSolrMarcSpecs('ILN');
                 $ilnMatch = $parentDriver->getMarcData('ILN');
                 if(empty($ilnMatch)) {
-                    $response['ILNMarcSpecs'] = $this->driver->getSolrMarcSpecs('ILN');
+                    $ilnMarcSpecs = $this->driver->getSolrMarcSpecs('ILN');
                     $ilnMatch = $this->driver->getMarcData('ILN');
                 }
-                $response['ILN'] = $ilnMatch;
+
                 if (!empty($ilnMatch[0]['iln']['data'][0])) {
                     $url = '/vufind/Record/' . $parentId;
                 }
@@ -405,6 +405,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $response = $this->generateResponse($check, 'ArticleParentId', $level, $label, $template, $parentData, $url, true, $check_type);
             $response['html'] = $this->renderer->render($template , $response);
         }
+        $response['ilnMarcSpecs'] = $ilnMarcSpecs;
+        $response['ilnMatch'] = $ilnMatch;
         $responses[] = $response;
         return $responses;
     }
