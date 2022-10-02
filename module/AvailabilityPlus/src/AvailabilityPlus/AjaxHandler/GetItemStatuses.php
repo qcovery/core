@@ -432,7 +432,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             try {
                 $resolver_data = $resolverHandler->fetchLinks($params);
                 $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
-                $response['config'] = $this->resolverConfig[$resolver];
+                $response['resolverConfig'] = $this->resolverConfig[$resolver];
                 $response['html'] = $this->applyTemplate($template, $response);
                 if(empty($response['html'])) {
                     $response['status']['level'] = 'unsuccessful_check';
