@@ -7,7 +7,8 @@
 }
 
 .daia_item,
-.availability_item {
+.availability_item,
+.daiaplus-title {
   margin-bottom: 15px;
 }
 .delimiter{
