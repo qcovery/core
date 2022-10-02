@@ -30,7 +30,6 @@ foreach($data->document[0]->item as $result) {
         }
     }
 }
-
 if($resolverConfig['sort_groups_by_score']) {
     uasort($groups, function($a, $b) {
         return $a['score'] <=> $b['score'];
@@ -47,7 +46,7 @@ foreach($groups as $group_label => $group_items) {
 
     if ($overlay) {
         echo '<div class="daiaplus-title">';
-        echo '<span class="service_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
+        echo '<span class="group_label">'.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
 
         /*if(!empty($group_items[0]->storage)) {
             if(!empty($group_items[0]->storage->url)) {
@@ -86,8 +85,8 @@ foreach($groups as $group_label => $group_items) {
         echo '<div id="daiaplus-overlay-'.$ppn.'-'.$index.'" style="display:none;">';
 
     } else {
-        if($group_label !== 'undefined' && !in_array($service_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
-            echo '<div class="service_label">'.$this->translate($group_label).'</div>';
+        if($group_label !== 'undefined' && !in_array($group_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
+            echo '<div class="group_label">'.$this->translate($group_label).'</div>';
         }
     }
 
