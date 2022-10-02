@@ -47,7 +47,7 @@ foreach($groups as $group_label => $group_items) {
         echo '<div class="daiaplus-title">';
         echo '<span class="service_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
 
-        if(!empty($group_items[0]->storage)) {
+        /*if(!empty($group_items[0]->storage)) {
             if(!empty($group_items[0]->storage->url)) {
                 echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$group_items[0]->storage->url.'" class="'.$group_items[0]->storage->level.'" title="'.$group_items[0]->storage->label.'" target="_blank">'.$this->translate($group_items[0]->storage->label).'</a></span>';
             } else {
@@ -72,7 +72,7 @@ foreach($groups as $group_label => $group_items) {
 
         if(!empty($group_items[0]->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$group_items[0]->chronology.'</div>';
-        }
+        }*/
 
         if($list) {
             echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
