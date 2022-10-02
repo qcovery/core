@@ -75,18 +75,19 @@
 }
 
 .Access:after,
-.LicensedAccess:after,
-.PubPharmProxy:after {
+.LicensedAccess::after,
+.PubPharmProxy::after {
   content: url("../images/checkmark_green.png");
   margin-left: 5px;
 }
 
-.UncertainAccess:after {
+.UncertainAccess::after,
+.FullTextFallbackUrls::after {
   content: url("../images/checkmark_orange.png");
   margin-left: 5px;
 }
 
-.UnknownAccess:after {
+.UnknownAccess::after {
   margin-left: 5px;
 }
 
