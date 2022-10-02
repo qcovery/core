@@ -103,7 +103,7 @@ foreach($groups as $group_label => $group_items) {
         }
         echo '</div>';
         if($overlay && !empty($result->about)) {
-            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
+            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
         }
         if(!empty($result->daia_hint)) {
             echo '<span class="daia_hint"><span class="'.$result->daia_hint->level.'">'.$this->translate($result->daia_hint->label);
@@ -125,7 +125,7 @@ foreach($groups as $group_label => $group_items) {
                 echo '<div class="service_queue">'.$result->queue->length.' '.$this->translate($result->queue->label).'</div>';
             }
             if(!$overlay && !empty($result->about)) {
-                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
+                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
             }
             if(!$overlay && !empty($result->chronology)) {
                 echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
