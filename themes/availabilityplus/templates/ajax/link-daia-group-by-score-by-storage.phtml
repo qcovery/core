@@ -66,7 +66,7 @@ foreach($groups as $group_label => $group_items) {
         }
         if(!empty($signature)) echo ' <span class="item_label">' . $signature . '</span>';
 
-        if(!empty($result->chronology)) {
+        if(!empty($group_items[0]->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$group_items[0]->chronology.'</div>';
         }
 
