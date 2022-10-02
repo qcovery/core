@@ -31,9 +31,11 @@ foreach($data->document[0]->item as $result) {
     }
 }
 
-uasort($groups, function($a, $b) {
-    return $a['score'] <=> $b['score'];
-});
+if($resolverConfig['sort_groups_by_score']) {
+    uasort($groups, function($a, $b) {
+        return $a['score'] <=> $b['score'];
+    });
+}
 
 $break = false;
 foreach($groups as $group_label => $group_items) {
