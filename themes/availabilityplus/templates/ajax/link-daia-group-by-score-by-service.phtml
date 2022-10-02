@@ -40,7 +40,8 @@ $break = false;
 foreach($groups as $group_label => $group_items) {
     unset($group_items['score']);
     $overlay = false;
-    if ($group_label !== 'undefined' && (sizeof($group_items) > 1 || !$list)) {
+    if ($resolverConfig['overlay'] && $group_label !== 'undefined' && (sizeof($group_items) >= $resolverConfig['overlay_min_count'] || (!$list && $resolverConfig['overlay_min_count']))) {
+    //if ($group_label !== 'undefined' && (sizeof($group_items) > 1 || !$list)) {
         $overlay = true;
     }
 
