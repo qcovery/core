@@ -227,6 +227,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $break = false;
         foreach ($solrMarcKeys as $solrMarcKey) {
             $data = $this->driver->getMarcData($solrMarcKey);
+            $level = $this->getLevel($data[0], $check, $solrMarcKey);
+            $label = $this->getLabel($data[0], $check);
             if(!empty($data) && $this->checkConditions($data)) {
                 $template = $this->getTemplate($data);
                 foreach ($data as $date) {
