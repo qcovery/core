@@ -82,7 +82,7 @@ foreach($groups as $group_label => $group_items) {
         echo '<div id="daiaplus-overlay-'.$ppn.'-'.$index.'" style="display:none;">';
 
     } else {
-        if($group_label !== 'undefined' && !in_array($service_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
+        if($group_label !== 'undefined' && !in_array($mode, ['break_on_first','break_on_first_next'])) {
             echo '<div class="group_label">'.$this->translate($group_label).'</div>';
         }
     }
