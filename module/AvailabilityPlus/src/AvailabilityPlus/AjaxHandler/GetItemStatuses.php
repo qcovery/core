@@ -31,6 +31,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $config;
 
+    protected $resolverConfig;
+
     protected $checks;
 
     protected $checkRoute;
@@ -67,9 +69,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @param Config            $config    Top-level configuration
      * @param RendererInterface $renderer  View renderer
      */
-    public function __construct(Loader $loader, Config $config, RendererInterface $renderer, ResolverManager $rm) {
+    public function __construct(Loader $loader, Config $config, RendererInterface $renderer, ResolverManager $rm, Config $resolverConfig) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
+        $this->resolverConfig = $resolverConfig->toArray();
         $this->checks = $this->config['RecordView'];
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
@@ -429,8 +432,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             try {
                 $resolver_data = $resolverHandler->fetchLinks($params);
                 $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
-                $config = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/availabilityplus-resolver.ini'), true);
-                $response['config'] = $config[$resolverType];
+                $response['config'] = $this->resolverConfig[$resolver];
                 $response['html'] = $this->applyTemplate($template, $response);
                 if(empty($response['html'])) {
                     $response['status']['level'] = 'unsuccessful_check';
