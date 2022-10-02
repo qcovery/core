@@ -429,6 +429,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             try {
                 $resolver_data = $resolverHandler->fetchLinks($params);
                 $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
+                $config = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/availabilityplus-resolver.ini'), true);
+                $response['config'] = $config[$resolverType];
                 $response['html'] = $this->applyTemplate($template, $response);
                 if(empty($response['html'])) {
                     $response['status']['level'] = 'unsuccessful_check';
