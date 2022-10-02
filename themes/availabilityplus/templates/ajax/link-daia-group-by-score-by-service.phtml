@@ -77,7 +77,7 @@ foreach($groups as $group_label => $group_items) {
         if($list) {
             echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
         } else {
-            echo '<br><a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$ppn.'-'.$index.'">'.$this->transEsc('show_overlay').'</a>';
+            echo '<div><a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$ppn.'-'.$index.'">'.$this->transEsc('show_overlay').'</a></div>';
         }
 
         echo '<div>';
