@@ -36,7 +36,7 @@ class Unpaywall extends AvailabilityPlusResolver
         $links = []; // array to return
         $data = json_decode($data_org);
 
-        if(isset($data->is_oa) && $data->is_oa == true){
+        if(isset($data->journal_is_oa) && $data->journal_is_oa == true && isset($data->is_oa) && $data->is_oa == true){
             $links[0]['url'] = $data->best_oa_location->url;
             $links[0]['label'] = 'FreeAccess';
             $links[0]['level'] = 'FreeAccess Unpaywall';
