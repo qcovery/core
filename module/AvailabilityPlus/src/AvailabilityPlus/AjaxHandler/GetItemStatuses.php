@@ -441,8 +441,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $response['resolver_data'] = $resolver_data['data'];
                 $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
             } catch (\Exception $e) {
-                $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, false, 'Resolver-EXCEPTION');
+                $template = 'ajax/default.phtml';
+                $response = $this->generateResponse($resolver, $resolver, 'resolver_error', 'resolver_error', $template, $resolver_data['parsed_data'], $resolver_url, false, 'Resolver-EXCEPTION');
                 $response['status']['label'] = 'EXCEPTION occured during processing';
+                $response['url'] = '';
+                $response['html'] = $this->applyTemplate($template, $response);
+                $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
                 $response = array('error' => $e) + $response;
                 $responses[] = $response;
                 return $responses;
