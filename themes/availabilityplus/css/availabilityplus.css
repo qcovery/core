@@ -32,6 +32,10 @@
   margin-bottom: 10px;
 }
 
+.availabilityplus_storage_label .storage_link {
+  display: none;
+}
+
 .delimiter{
   border: none;
   border-top: 1px dashed #E00060;
