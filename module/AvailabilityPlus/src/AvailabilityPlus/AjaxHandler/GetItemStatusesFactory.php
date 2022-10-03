@@ -41,7 +41,8 @@ class GetItemStatusesFactory implements \Zend\ServiceManager\Factory\FactoryInte
             $container->get('VuFind\Record\Loader'),
             $container->get('VuFind\Config\PluginManager')->get('availabilityplus'),
             $container->get('ViewRenderer'),
-            $container->get('VuFind\Resolver\Driver\PluginManager')
+            $container->get('VuFind\Resolver\Driver\PluginManager'),
+            $container->get('VuFind\Config\PluginManager')->get('availabilityplus-resolver')
         );
     }
 }
