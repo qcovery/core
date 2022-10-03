@@ -98,7 +98,7 @@ return array (
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintKSFPrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\Subito' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\SubitoISBN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
-          'AvailabilityPlus\\Resolver\\Driver\\SubitoISSN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\SubitoISSN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory', 'AvailabilityPlus\\Resolver\\Driver\\Unpaywall' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory'
         ),
         'aliases' =>
         array (
