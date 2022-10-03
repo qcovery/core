@@ -320,6 +320,10 @@ Unpaywall:
       - [field, 2, 'doi']
     a:
       - [name, doi]
+    2:
+      - [name, label]
+      - [name, label]
+      - [replace, '(^.*$)', 'FreeAccess']
 ArticleParentId:
   category: resolver
   773:
