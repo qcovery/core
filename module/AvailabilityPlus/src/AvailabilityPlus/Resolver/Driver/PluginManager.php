@@ -32,6 +32,7 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'Subito' => 'AvailabilityPlus\Resolver\Driver\Subito',
         'SubitoISSN' => 'AvailabilityPlus\Resolver\Driver\SubitoISSN',
         'SubitoISBN' => 'AvailabilityPlus\Resolver\Driver\SubitoISBN',
+        'Unpaywall' => 'AvailabilityPlus\Resolver\Driver\Unpaywall'
     ];
 
     /**
@@ -57,6 +58,8 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'VuFind\Resolver\Driver\JournalsOnlinePrintElectronic' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\FulltextFinder' =>
+            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
+        'VuFind\Resolver\Driver\UnpayWall' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
     ];
 

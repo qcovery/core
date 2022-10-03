@@ -311,6 +311,15 @@ DAIA:
     a:
       - [name, id]
       - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+Unpaywall:
+  category: resolver
+  view-method: ajax/link-unpaywall.phtml
+  mandatory-field: doi
+  '024':
+    conditions:
+      - [field, 2, 'doi']
+    a:
+      - [name, doi]
 ArticleParentId:
   category: resolver
   773:
