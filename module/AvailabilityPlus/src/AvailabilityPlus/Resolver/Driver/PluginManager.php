@@ -59,6 +59,8 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\FulltextFinder' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
+        'VuFind\Resolver\Driver\UnpayWall' =>
+            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
     ];
 
 }
