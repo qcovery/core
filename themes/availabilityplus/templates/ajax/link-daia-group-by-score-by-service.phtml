@@ -41,12 +41,14 @@ $break = false;
 foreach($groups as $group_label => $group_items) {
     unset($group_items['score']);
     $overlay = false;
+    $overlay_label = 'no_overlay';
     if ($resolverConfig['overlay'] && $group_label !== 'undefined' && (sizeof($group_items) >= $resolverConfig['overlay_min_count'] || (!$list && $resolverConfig['always_display_overlay_in_record_view']))) {
         $overlay = true;
+        $overlay_label = 'overlay_used';
     }
 
     if ($overlay) {
-        echo '<div class="daiaplus-title '.$group_by_label.'">';
+        echo '<div class="daiaplus-title '.$group_by_label.' '.$overlay_label.'">';
         echo '<span class="group_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
 
         if(!empty($group_items[0]->storage)) {
