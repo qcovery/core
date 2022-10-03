@@ -49,7 +49,7 @@ foreach($groups as $group_label => $group_items) {
 
     if ($overlay) {
         echo '<div class="daiaplus-title '.$group_by_label.'">';
-        echo '<span class="group_label  '.$overlay_label.' '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
+        echo '<div class="group_label '.$overlay_label.' '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</div>';
 
         if(!empty($group_items[0]->storage)) {
             if(!empty($group_items[0]->storage->url)) {
@@ -90,6 +90,7 @@ foreach($groups as $group_label => $group_items) {
     } else {
         if($group_label !== 'undefined' && !in_array($group_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
             echo '<div class="group_label">'.$this->translate($group_label).'</div>';
+            echo '<div class="group_label '.$overlay_label.' '.$group_label.'">'.$this->translate($group_label).'</div>';
         }
     }
 
