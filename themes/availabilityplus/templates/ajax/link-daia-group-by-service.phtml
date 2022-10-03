@@ -8,6 +8,7 @@ if($this->source == 'Search2') {
 } else {
     $recordRoute = 'Record';
 }
+$group_by_label = 'availabilityplus_daia_service';
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
@@ -40,16 +41,17 @@ $break = false;
 foreach($groups as $group_label => $group_items) {
     unset($group_items['score']);
     $overlay = false;
+    $overlay_label = 'no_overlay';
     if ($resolverConfig['overlay'] && $group_label !== 'undefined' && (sizeof($group_items) >= $resolverConfig['overlay_min_count'] || (!$list && $resolverConfig['always_display_overlay_in_record_view']))) {
-    //if ($group_label !== 'undefined' && (sizeof($group_items) > 1 || !$list)) {
         $overlay = true;
+        $overlay_label = 'overlay_used';
     }
 
     if ($overlay) {
-        echo '<div class="daiaplus-title">';
-        echo '<span class="group_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
+        echo '<div class="daiaplus-title '.$group_by_label.'">';
+        echo '<div class="group_label '.$overlay_label.' '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</div>';
 
-        /*if(!empty($group_items[0]->storage)) {
+        if(!empty($group_items[0]->storage)) {
             if(!empty($group_items[0]->storage->url)) {
                 echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$group_items[0]->storage->url.'" class="'.$group_items[0]->storage->level.'" title="'.$group_items[0]->storage->label.'" target="_blank">'.$this->translate($group_items[0]->storage->label).'</a></span>';
             } else {
@@ -74,7 +76,7 @@ foreach($groups as $group_label => $group_items) {
 
         if(!empty($group_items[0]->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$group_items[0]->chronology.'</div>';
-        }*/
+        }
 
         if($list) {
             echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
@@ -87,7 +89,7 @@ foreach($groups as $group_label => $group_items) {
 
     } else {
         if($group_label !== 'undefined' && !in_array($group_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
-            echo '<div class="group_label">'.$this->translate($group_label).'</div>';
+            echo '<div class="group_label '.$overlay_label.' '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</div>';
         }
     }
 
