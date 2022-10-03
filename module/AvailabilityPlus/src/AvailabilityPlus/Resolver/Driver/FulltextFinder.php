@@ -50,7 +50,7 @@ class FulltextFinder extends AvailabilityPlusResolver
      * Parses an XML file returned by a link resolver
      * and converts it to a standardised format for display
      *
-     * @data_org string $xmlstr Raw XML returned by resolver
+     * @param string $data_org JSON returned by resolver
      *
      * @return array         Array of values
      */
