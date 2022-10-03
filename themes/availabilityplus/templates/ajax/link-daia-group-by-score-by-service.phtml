@@ -48,8 +48,8 @@ foreach($groups as $group_label => $group_items) {
     }
 
     if ($overlay) {
-        echo '<div class="daiaplus-title '.$group_by_label.' '.$overlay_label.'">';
-        echo '<span class="group_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
+        echo '<div class="daiaplus-title '.$group_by_label.'">';
+        echo '<span class="group_label  '.$overlay_label.' '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
 
         if(!empty($group_items[0]->storage)) {
             if(!empty($group_items[0]->storage->url)) {
