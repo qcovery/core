@@ -8,6 +8,7 @@ if($this->source == 'Search2') {
 } else {
     $recordRoute = 'Record';
 }
+$group_by_label = 'availabilityplus_daia_service';
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
@@ -46,7 +47,7 @@ foreach($groups as $group_label => $group_items) {
     }
 
     if ($overlay) {
-        echo '<div class="daiaplus-title">';
+        echo '<div class="daiaplus-title '.$group_by_label.'">';
         echo '<span class="group_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
 
         /*if(!empty($group_items[0]->storage)) {
