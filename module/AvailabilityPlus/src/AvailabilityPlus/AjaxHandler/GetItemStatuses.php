@@ -31,6 +31,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $config;
 
+    protected $resolverConfig;
+
     protected $checks;
 
     protected $checkRoute;
@@ -67,9 +69,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @param Config            $config    Top-level configuration
      * @param RendererInterface $renderer  View renderer
      */
-    public function __construct(Loader $loader, Config $config, RendererInterface $renderer, ResolverManager $rm) {
+    public function __construct(Loader $loader, Config $config, RendererInterface $renderer, ResolverManager $rm, Config $resolverConfig) {
         $this->recordLoader = $loader;
         $this->config = $config->toArray();
+        $this->resolverConfig = $resolverConfig->toArray();
         $this->checks = $this->config['RecordView'];
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
@@ -235,8 +238,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     if (!empty($date['url']['data'][0])) {
                         foreach ($date['url']['data'] as $url) {
                             if(!in_array($url, $urls)) {
-                                $level = $this->getLevel($date, $check, $solrMarcKey);
-                                $label = $this->getLabel($date, $check);
+                                $level = $this->getLevel($date, $level, $solrMarcKey);
+                                $label = $this->getLabel($date, $label);
                                 $urls[] = $url;
                                 $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, true, $check_type);
                                 $response['html'] = $this->applyTemplate($template, $response);
@@ -426,15 +429,24 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $resolver_url = $resolverHandler->getResolverUrl($params);
         $template = $this->getTemplate($marc_data);
         if(!empty($resolver_url) && !empty($marc_data)) {
-            $resolver_data = $resolverHandler->fetchLinks($params);
-            $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
-            $response['html'] = $this->applyTemplate($template, $response);
-            if(empty($response['html'])) {
-                $response['status']['level'] = 'unsuccessful_check';
-                $response['status']['label'] = 'Check did not find a match!';
+            try {
+                $resolver_data = $resolverHandler->fetchLinks($params);
+                $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
+                $response['resolverConfig'] = $this->resolverConfig[$resolver];
+                $response['html'] = $this->applyTemplate($template, $response);
+                if(empty($response['html'])) {
+                    $response['status']['level'] = 'unsuccessful_check';
+                    $response['status']['label'] = 'Check did not find a match!';
+                }
+                $response['resolver_data'] = $resolver_data['data'];
+                $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
+            } catch (\Exception $e) {
+                $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, false, 'Resolver-EXCEPTION');
+                $response['status']['label'] = 'EXCEPTION occured during processing';
+                $response = array('error' => $e) + $response;
+                $responses[] = $response;
+                return $responses;
             }
-            $response['resolver_data'] = $resolver_data['data'];
-            $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
 
         } else {
             $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, '', $resolver_url, false, $check_type);

@@ -30,24 +30,26 @@ foreach($data->document[0]->item as $result) {
         }
     }
 }
-
-uasort($groups, function($a, $b) {
-    return $a['score'] <=> $b['score'];
-});
+if($resolverConfig['sort_groups_by_score']) {
+    uasort($groups, function($a, $b) {
+        return $a['score'] <=> $b['score'];
+    });
+}
 
 $break = false;
 foreach($groups as $group_label => $group_items) {
     unset($group_items['score']);
     $overlay = false;
-    if ($group_label !== 'undefined' && (sizeof($group_items) > 1 || !$list)) {
+    if ($resolverConfig['overlay'] && $group_label !== 'undefined' && (sizeof($group_items) >= $resolverConfig['overlay_min_count'] || (!$list && $resolverConfig['always_display_overlay_in_record_view']))) {
+    //if ($group_label !== 'undefined' && (sizeof($group_items) > 1 || !$list)) {
         $overlay = true;
     }
 
     if ($overlay) {
         echo '<div class="daiaplus-title">';
-        echo '<span class="service_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
+        echo '<span class="group_label '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</span><br/>';
 
-        if(!empty($group_items[0]->storage)) {
+        /*if(!empty($group_items[0]->storage)) {
             if(!empty($group_items[0]->storage->url)) {
                 echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$group_items[0]->storage->url.'" class="'.$group_items[0]->storage->level.'" title="'.$group_items[0]->storage->label.'" target="_blank">'.$this->translate($group_items[0]->storage->label).'</a></span>';
             } else {
@@ -70,22 +72,22 @@ foreach($groups as $group_label => $group_items) {
         }
         if(!empty($signature)) echo ' <span class="item_label">' . $signature . '</span>';
 
-        if(!empty($result->chronology)) {
+        if(!empty($group_items[0]->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$group_items[0]->chronology.'</div>';
-        }
+        }*/
 
         if($list) {
             echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
         } else {
-            echo '<br><a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$ppn.'-'.$index.'">'.$this->transEsc('show_overlay').'</a>';
+            echo '<div><a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$ppn.'-'.$index.'">'.$this->transEsc('show_overlay').'</a></div>';
         }
 
         echo '<div>';
         echo '<div id="daiaplus-overlay-'.$ppn.'-'.$index.'" style="display:none;">';
 
     } else {
-        if($group_label !== 'undefined' && !in_array($service_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
-            echo '<div class="service_label">'.$this->translate($group_label).'</div>';
+        if($group_label !== 'undefined' && !in_array($group_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
+            echo '<div class="group_label">'.$this->translate($group_label).'</div>';
         }
     }
 
@@ -107,7 +109,7 @@ foreach($groups as $group_label => $group_items) {
         }
         echo '</div>';
         if($overlay && !empty($result->about)) {
-            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
+            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
         }
         if(!empty($result->daia_hint)) {
             echo '<span class="daia_hint"><span class="'.$result->daia_hint->level.'">'.$this->translate($result->daia_hint->label);
@@ -129,7 +131,7 @@ foreach($groups as $group_label => $group_items) {
                 echo '<div class="service_queue">'.$result->queue->length.' '.$this->translate($result->queue->label).'</div>';
             }
             if(!$overlay && !empty($result->about)) {
-                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.$result->about.'</div>';
+                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
             }
             if(!$overlay && !empty($result->chronology)) {
                 echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
