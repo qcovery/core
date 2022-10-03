@@ -322,7 +322,7 @@ Unpaywall:
       - [name, doi]
     2:
       - [name, label]
-      - [name, label]
+      - [name, level]
       - [replace, '(^.*$)', 'FreeAccess']
 ArticleParentId:
   category: resolver
