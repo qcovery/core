@@ -15,11 +15,12 @@ class Unpaywall extends AvailabilityPlusResolver
      */
     public function getResolverUrl($params)
     {
+        parse_str($params, $param_arr);
         $doi = '';
-        if(!empty($params['doi'] && !is_array($params['doi']))) {
-            $doi = $params['doi'];
-        } elseif(!empty($params['doi'][0] && !is_array($params['doi']))) {
-            $doi = $params['doi'][0];
+        if(!empty($param_arr['doi'] && !is_array($params['doi']))) {
+            $doi = $param_arr['doi'];
+        } elseif(!empty($param_arr['doi'][0] && !is_array($param_arr['doi']))) {
+            $doi = $param_arr['doi'][0];
         }
         if($doi)  $url = $this->baseUrl.'/'.$doi.'/'.$this->additionalParams.'&is_oa=boolean';
         return $url;
