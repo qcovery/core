@@ -61,8 +61,8 @@ foreach($groups as $group_label => $group_items) {
         }
 
         $signature = '';
-        if(!empty($group_items[0]->daia->epn)) {
-            $item_epn = $group_items[0]->daia->epn;
+        if(!empty($group_items[0]->epn)) {
+            $item_epn = $group_items[0]->epn;
             foreach($SolrMarcSupportData as $key => $value) {
                 if(!empty($value['epn']['data'][0]) && $item_epn == $value['epn']['data'][0] && !empty($value['signature']['data'][0])) {
                     $signature = $value['signature']['data'][0];

@@ -12,12 +12,12 @@ $group_by_label = 'availabilityplus_daia_service';
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
-        $groups[$result->availabilityplus->daia->service][] = $result->availabilityplus;
-        if(empty($groups[$result->availabilityplus->daia->service]['score'])) {
-            $groups[$result->availabilityplus->daia->service]['score'] = $result->availabilityplus->score;
+        $groups[$result->availabilityplus->service][] = $result->availabilityplus;
+        if(empty($groups[$result->availabilityplus->service]['score'])) {
+            $groups[$result->availabilityplus->service]['score'] = $result->availabilityplus->score;
         } else {
-            if($groups[$result->availabilityplus->daia->service]['score'] > $result->availabilityplus->score) {
-                $groups[$result->availabilityplus->daia->service]['score'] = $result->availabilityplus->score;
+            if($groups[$result->availabilityplus->service]['score'] > $result->availabilityplus->score) {
+                $groups[$result->availabilityplus->service]['score'] = $result->availabilityplus->score;
             }
         }
     } else if(!empty($result->availabilityplus)) {
@@ -60,8 +60,8 @@ foreach($groups as $group_label => $group_items) {
         }
 
         $signature = '';
-        if(!empty($group_items[0]->daia->epn)) {
-            $item_epn = $group_items[0]->daia->epn;
+        if(!empty($group_items[0]->epn)) {
+            $item_epn = $group_items[0]->epn;
             foreach($SolrMarcSupportData as $key => $value) {
                 if(!empty($value['epn']['data'][0]) && $item_epn == $value['epn']['data'][0] && !empty($value['signature']['data'][0])) {
                     $signature = $value['signature']['data'][0];
