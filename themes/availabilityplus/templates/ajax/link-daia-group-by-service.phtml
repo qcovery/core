@@ -12,12 +12,12 @@ $group_by_label = 'availabilityplus_daia_service';
 
 foreach($data->document[0]->item as $result) {
     if(!empty($result->availabilityplus->storage)) {
-        $groups[$result->availabilityplus->daia->service][] = $result->availabilityplus;
-        if(empty($groups[$result->availabilityplus->daia->service]['score'])) {
-            $groups[$result->availabilityplus->daia->service]['score'] = $result->availabilityplus->score;
+        $groups[$result->availabilityplus->service][] = $result->availabilityplus;
+        if(empty($groups[$result->availabilityplus->service]['score'])) {
+            $groups[$result->availabilityplus->service]['score'] = $result->availabilityplus->score;
         } else {
-            if($groups[$result->availabilityplus->daia->service]['score'] > $result->availabilityplus->score) {
-                $groups[$result->availabilityplus->daia->service]['score'] = $result->availabilityplus->score;
+            if($groups[$result->availabilityplus->service]['score'] > $result->availabilityplus->score) {
+                $groups[$result->availabilityplus->service]['score'] = $result->availabilityplus->score;
             }
         }
     } else if(!empty($result->availabilityplus)) {
