@@ -49,13 +49,16 @@ class DAIA extends AvailabilityPlusResolver
                     if(!empty($service_content)) {
                         $record->id = $data->document[0]->id;
                         $record->ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
-                        if($item->id) {
+                        if($item->id && strpos($item->id, "epn:") !== false) {
                             $record->epn_id = $item->id;
-                            $record->epn = substr($item->id, strrpos($item->id, ":") + 1);
+                            $record->epn = substr($item->id, strrpos($item->id, "epn:") + 1);
                         } elseif ($item->{'temporary-hack-do-not-use'}) {
                             $record->epn = $item->{'temporary-hack-do-not-use'};
                         }
-                        if($service_content->href) {
+                        if($item->id && strpos($item->id, ":bar:") !== false) {
+                            $record->barcode_id = $item->id;
+                            $record->barcode = substr($item->id, strrpos($item->id, "$") + 1);
+                        } elseif($service_content->href) {
                             $query = parse_url($service_content->href,PHP_URL_QUERY);
                             $query_array = array();
                             parse_str($query, $query_array);
