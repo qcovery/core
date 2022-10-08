@@ -46,7 +46,7 @@ class SolrMarc extends SolrDefault
     use \VuFind\RecordDriver\MarcReaderTrait;
 
     /**
-     * actual Configuration (yaml)
+     * Configuration (yaml)
      *
      * @var string
      */
