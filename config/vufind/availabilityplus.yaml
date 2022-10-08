@@ -1,3 +1,78 @@
+---
+# Listing of data to be read from marc bibliographic data
+#
+# Format is:
+# <name of the data set>:
+#   mandatory-field:        <indicates whether a field given this name needs to be present
+#   view-method:            <template used to render the data retrieved>
+#   category:               <categories corresponding to categories chosen in the core-template>
+#                               title should be set; other categories are mandatory
+#   originalletters:        <yes|no> whether item in original letters should be
+#                               shown or not (see marc 880)
+#   <main field>:           at least one should be set; fields with a leading 0 should be quoted
+#                               if only parent methods are used the main field is '000'
+#     conditions:           conditions which should be fulfilled if the data is read
+#       - [<item>, <key>, <value>]          <item> is either field or indicator
+#                                           <key> is the name of the field or indicator
+#                                           <value> is the value it should have
+#     parent:               use a parent method (from SolrDefault driver)
+#       - [<method name>]       the method to use
+#     subfields:            only read the fields
+#       - [<field list>]        list of fields to read
+#     <subfield>:           enhanced processing of a subfield
+#       - [name, <name>]                     name it
+#       - [replace, <from>, <to>]            replace a substring from <from> to <to> (using a regex)
+#       - [match, <what>, <which>]           match a substring (<what>) and use the <which>th parantesis
+#                                                (using a regex)
+#       - [function, <php-function>]         use th return value of a php-function
+#
+#-----------------------------------------------------------------------------------
+#
+# Above is the same as in solrmarc.yaml
+#
+# Additions for AvailabilityPlus
+# -----------------------------------------------------------------------------------
+# AvailabilityPlus templates usually use these variables (indicated by name in this file: url, label and level
+# The label and level, if not specified are set to the name of the data set.
+#
+# Data sets with the same category name can be addressed together in AvailabilityPlus be specifying the category name as a check in availabilityplus.ini
+#
+# Special category resolver:
+# - If the category resolver is set, then AvailabilityPlus tries to find a ResolverHandler name as the dataset, e.g. DAIA.
+# - A driver class with the same name needs to be present.
+# - The fields specified need to be named corresponding to the parameters a resolver requires.
+#
+# Conditions across multiple MARC fields:
+# - If multiple conditions are required across different MARC fields, AvailabilityPlus currently uses a workaround due to the limitations of the RecordDriver module.
+# -
+#
+# An Example for conditions (two conditions => requirednumberofconditions = 2; on must be true => condition_true and one must be false => condition_false:
+# (This basically checks, if the article is associated with a journal with the ISSN 1071-7544 and is NOT published in 2022. If so then the article URL is taken from 856u, if it is a link to the fulltext and the proxy url is added as prefix.)
+# ProxyArticleConditionExample:
+#  category: PubPharmProxyArticle
+#  mandatory-field: url
+#  view-method: ajax/link-external.phtml
+#  '035':
+#    a:
+#      - [name, requirednumberofconditions]
+#      - [replace, '(^.*$)', 2]
+#  773:
+#    x:
+#      - [name, condition_true]
+#      - [replace, '(^1071-7544$)', 'true']
+#  952:
+#    j:
+#      - [name, condition_false]
+#      - [replace, '(^2022$)', 'false']
+#  856:
+#    conditions:
+#      - [ indicator, 1, 4 ]
+#      - [ indicator, 2, 0|1 ]
+#    u:
+#      - [name, url]
+#      - [replace, '(http:\/\/|https:\/\/)(.*$)', 'http://www.proxy.com/$2']
+# -----------------------------------------------------------------------------------
+
 MonographSeriesResultList:
   mandatory-field: url
   view-method: ajax/link-internal.phtml
