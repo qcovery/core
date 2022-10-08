@@ -78,10 +78,18 @@ trait HoldsTrait
         $validRequest = $catalog->checkRequestIsValid(
             $driver->getUniqueID(), $gatheredDetails, $patron
         );
+
+        $errorMessage = 'hold_error_blocked';
+        if (isset($this->config['Holds']['usePatronStatusForErrorMessage']) && $this->config['Holds']['usePatronStatusForErrorMessage']) {
+            if (isset($patron['status'])) {
+                $errorMessage = 'hold_error_blocked_status_'.$patron['status'];
+            }
+        }
+
         if ((is_array($validRequest) && !$validRequest['valid']) || !$validRequest) {
             $this->flashMessenger()->addErrorMessage(
                 is_array($validRequest)
-                    ? $validRequest['status'] : 'hold_error_blocked'
+                    ? $validRequest['status'] : $errorMessage
             );
             return $this->redirectToRecord('#top');
         }
@@ -113,10 +121,7 @@ trait HoldsTrait
         $pickupDetails['type'] = $type;
         $pickupDetails['storage_id'] = $this->request->getQuery('storage_id');
 
-        $pickup = [];
-        if (in_array('pickUpLocation', $extraHoldFields)) {
-            $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
-        }
+        $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
 
         // Process form submissions if necessary:
         if (null !== $this->params()->fromPost('placeHold')) {
