@@ -36,17 +36,15 @@
 # The label and level, if not specified are set to the name of the data set.
 #
 # Data sets with the same category name can be addressed together in AvailabilityPlus be specifying the category name as a check in availabilityplus.ini
+# The names of these data sets are sorted, so that e.g. names with digits appear first, see for example the FreeAccess category below.
 #
 # Special category resolver:
 # - If the category resolver is set, then AvailabilityPlus tries to find a ResolverHandler name as the dataset, e.g. DAIA.
 # - A driver class with the same name needs to be present.
 # - The fields specified need to be named corresponding to the parameters a resolver requires.
 #
-# Conditions across multiple MARC fields:
-# - If multiple conditions are required across different MARC fields, AvailabilityPlus currently uses a workaround due to the limitations of the RecordDriver module.
-# -
-#
-# An Example for conditions (two conditions => requirednumberofconditions = 2; on must be true => condition_true and one must be false => condition_false:
+# Conditions across multiple MARC fields: If multiple conditions are required across different MARC fields, AvailabilityPlus currently uses a workaround due to the limitations of the RecordDriver module.
+# Using an Example to exemplify how conditions work (two conditions => requirednumberofconditions = 2; on must be true => condition_true and one must be false => condition_false:
 # (This basically checks, if the article is associated with a journal with the ISSN 1071-7544 and is NOT published in 2022. If so then the article URL is taken from 856u, if it is a link to the fulltext and the proxy url is added as prefix.)
 # ProxyArticleConditionExample:
 #  category: PubPharmProxyArticle
