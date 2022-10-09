@@ -67,7 +67,7 @@ class DAIA extends AvailabilityPlusResolver
                         $record->service = $service_key;
                         switch($service_key) {
                             case 'openaccess':
-                                if(!in_array($service_content->href, $urls) && $this->resolverConfig->hide_url_duplicates) {
+                                if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
                                     $record->daia_action->level = 'FreeAccess link_external';
                                     if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                     $record->daia_action->label = 'FreeAccess';
@@ -86,7 +86,7 @@ class DAIA extends AvailabilityPlusResolver
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
                             case 'remote':
-                                if(!in_array($service_content->href, $urls) && $this->resolverConfig->hide_url_duplicates) {
+                                if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
                                     $record->daia_action->level = 'LicensedAccess link_external';
                                     if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                     $record->daia_action->label = 'LicensedAccess';
