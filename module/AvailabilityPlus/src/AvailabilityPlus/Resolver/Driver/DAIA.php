@@ -67,39 +67,43 @@ class DAIA extends AvailabilityPlusResolver
                         $record->service = $service_key;
                         switch($service_key) {
                             case 'openaccess':
-                                $record->daia_action->level = 'FreeAccess link_external';
-                                if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
-                                $record->daia_action->label = 'FreeAccess';
-                                $record->daia_action->url = $service_content->href;
-                                $urls[] = $record->daia_action->url;
-                                if(!empty($item->about)) {
-                                    $record->about = $item->about;
+                                if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
+                                    $record->daia_action->level = 'FreeAccess link_external';
+                                    if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
+                                    $record->daia_action->label = 'FreeAccess';
+                                    $record->daia_action->url = $service_content->href;
+                                    $urls[] = $record->daia_action->url;
+                                    if (!empty($item->about)) {
+                                        $record->about = $item->about;
+                                    }
+                                    if (!empty($item->chronology->about)) {
+                                        $record->chronology = $item->chronology->about;
+                                    }
+                                    $record->score = 0;
+                                    if (empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
+                                        $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                                    }
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
-                                if(!empty($item->chronology->about)) {
-                                    $record->chronology = $item->chronology->about;
-                                }
-                                $record->score = 0;
-                                if(empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
-                                    $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                                }
-                                $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                             case 'remote':
-                                $record->daia_action->level = 'LicensedAccess link_external';
-                                if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
-                                $record->daia_action->label = 'LicensedAccess';
-                                $record->daia_action->url = $service_content->href;
-                                $urls[] = $record->daia_action->url;
-                                if(!empty($item->about)) {
-                                    $record->about = $item->about;
+                                if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
+                                    $record->daia_action->level = 'LicensedAccess link_external';
+                                    if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
+                                    $record->daia_action->label = 'LicensedAccess';
+                                    $record->daia_action->url = $service_content->href;
+                                    $urls[] = $record->daia_action->url;
+                                    if (!empty($item->about)) {
+                                        $record->about = $item->about;
+                                    }
+                                    if (!empty($item->chronology->about)) {
+                                        $record->chronology = $item->chronology->about;
+                                    }
+                                    $record->score = 10;
+                                    if (empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
+                                        $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
+                                    }
+                                    $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
-                                if(!empty($item->chronology->about)) {
-                                    $record->chronology = $item->chronology->about;
-                                }
-                                $record->score = 10;
-                                if(empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
-                                    $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
-                                }
-                                $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                             case 'loan':
                             case 'presentation':
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote'])) {
