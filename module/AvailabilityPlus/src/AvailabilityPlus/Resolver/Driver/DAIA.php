@@ -67,7 +67,7 @@ class DAIA extends AvailabilityPlusResolver
                         $record->service = $service_key;
                         switch($service_key) {
                             case 'openaccess':
-                                if(!in_array($service_content->href, $urls)) {
+                                //if(!in_array($service_content->href, $urls)) {
                                     $record->daia_action->level = 'FreeAccess link_external';
                                     if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                     $record->daia_action->label = 'FreeAccess';
@@ -84,9 +84,9 @@ class DAIA extends AvailabilityPlusResolver
                                         $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                                     }
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
-                                }
+                                //}
                             case 'remote':
-                                if(!in_array($service_content->href, $urls)) {
+                                //if(!in_array($service_content->href, $urls)) {
                                     $record->daia_action->level = 'LicensedAccess link_external';
                                     if(!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                     $record->daia_action->label = 'LicensedAccess';
@@ -103,7 +103,7 @@ class DAIA extends AvailabilityPlusResolver
                                         $this->parsed_data->document[0]->item[$key]->availabilityplus = $record;
                                     }
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
-                                }
+                                //}
                             case 'loan':
                             case 'presentation':
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote'])) {
