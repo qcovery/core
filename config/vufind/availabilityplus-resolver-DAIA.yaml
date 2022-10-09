@@ -1,9 +1,27 @@
+# In this file rules can be configured to change the output of a resolver.
+# These rules are used in function applyCustomChanges in the resolver class.
+#
+#TestRule:  # name of the rule, required
+#  descripton: 'description' # optional
+#  reason: 'reason for rule' # optional
+#  date: 'date yyyy-mm-dd' # optional
+#  creator: 'John Doe' # optional
+#  examples: 'e.g. an id in the index' # optional
+#  details: 'http://www.more-details.vufind'  # optional, a url
+#  conditions: # one or multiple conditions can be specified that need to match for the actions to take place
+#    - { field: 'field1->subfield1', content: '(.*)' } #field: specifies the path to a field that needs to be checked, use -> to indicate a subfield, subsubfield ... / content: can be a string or regular expression
+#  actions: # indicate what actions are to be taken, if all conditions are fullfilled
+#    - { field: 'field1->subfield1->subsubfield1', content: '' } # complete string replacement by indicating a field and the new content
+#    - { field: 'field1->subfield1', content_field: 'field2->contentfromsubfield2', pattern: '(.*?):(.*)', replacement: '$2'} # regex-based replacement, content can be from the same field or another field
+#    - { function: 'removeItem'} # a function in the resolver can be specified, currently only one function is supported for all resolvers: removeItem
+#    - { function: 'adjustScore', score: 200} # DAIA also supports the function adjustScore, requiring a score parameter with an integer
+# Example
 Signatur:
-  descripton: 'Entfernung des Standortkürzels vor dem Doppelpunkt'
-  reason: 'Signaturen sollen für Nutzer*innen ohne Standortkürzel angezeigt werden'
+  descripton: 'Remove location code before colon in callnumbers'
+  reason: 'Callnumbers are to be shown to users without location codes'
   date: '2022-03-29'
-  creator: 'Kristof Keßler'
-  examples: 'Alle mit DAIA abgefragten Titel'
+  creator: 'Kristof Kessler'
+  examples: 'All DAIA requests'
   details: '-'
   conditions:
     - { field: 'availabilityplus->callnumber', content: '(.*?):(.*)' }
