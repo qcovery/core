@@ -1,0 +1,158 @@
+<?php
+
+$groups = [];
+$index = 0;
+$ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
+if($this->source == 'Search2') {
+    $recordRoute = 'Search2Record';
+} else {
+    $recordRoute = 'Record';
+}
+$group_by_label = 'availabilityplus_group';
+
+foreach($data->document[0]->item as $result) {
+        $groups['1'][] = $result->availabilityplus;
+        if(empty($groups['1']['score'])) {
+            $groups['1']['score'] = $result->availabilityplus->score;
+        } else {
+            if($groups['1']['score'] > $result->availabilityplus->score) {
+                $groups['1']['score'] = $result->availabilityplus->score;
+            }
+        }
+}
+if($resolverConfig['sort_groups_by_score']) {
+    uasort($groups, function($a, $b) {
+        return $a['score'] <=> $b['score'];
+    });
+}
+
+$break = false;
+foreach($groups as $group_label => $group_items) {
+    unset($group_items['score']);
+    $overlay = false;
+    $overlay_label = 'no_overlay';
+    if ($resolverConfig['overlay'] && $group_label !== 'undefined' && (sizeof($group_items) >= $resolverConfig['overlay_min_count'] || (!$list && $resolverConfig['always_display_overlay_in_record_view']))) {
+        $overlay = true;
+        $overlay_label = 'overlay_used';
+    }
+
+    if ($overlay) {
+        echo '<div class="daiaplus-title '.$group_by_label.'">';
+        echo '<div class="group_label '.$overlay_label.' '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</div>';
+
+        if(!empty($group_items[0]->storage)) {
+            if(!empty($group_items[0]->storage->url)) {
+                echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$group_items[0]->storage->url.'" class="'.$group_items[0]->storage->level.'" title="'.$group_items[0]->storage->label.'" target="_blank">'.$this->translate($group_items[0]->storage->label).'</a></span>';
+            } else {
+                echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($group_items[0]->storage->label).'</span>';
+            }
+        }
+
+        $signature = '';
+        if(!empty($group_items[0]->epn)) {
+            $item_epn = $group_items[0]->epn;
+            foreach($SolrMarcSupportData as $key => $value) {
+                if(!empty($value['epn']['data'][0]) && $item_epn == $value['epn']['data'][0] && !empty($value['signature']['data'][0])) {
+                    $signature = $value['signature']['data'][0];
+                    break;
+                }
+            }
+        }
+        if(empty($signature) && !empty($group_items[0]->callnumber)) {
+            $signature = $group_items[0]->callnumber;
+        }
+        if(!empty($signature)) echo ' <span class="item_label">' . $signature . '</span>';
+
+        if(!empty($group_items[0]->chronology)) {
+            echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$group_items[0]->chronology.'</div>';
+        }
+
+        if($list) {
+            echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
+        } else {
+            echo '<div><a href="" class="daiaplus-overlay" data-daiaplus-overlay="daiaplus-overlay-'.$ppn.'-'.$index.'">'.$this->transEsc('show_overlay').'</a></div>';
+        }
+
+        echo '<div>';
+        echo '<div id="daiaplus-overlay-'.$ppn.'-'.$index.'" style="display:none;">';
+
+    } else {
+        if($group_label !== 'undefined' && !in_array($group_label,array('openaccess','remote')) && !in_array($mode, ['break_on_first','break_on_first_next'])) {
+            echo '<div class="group_label '.$overlay_label.' '.$group_label.' '.$group_items[0]->daia_hint->level.'">'.$this->translate($group_label).'</div>';
+        }
+    }
+
+    foreach($group_items as $key => $result) {
+        if(!empty($result)) {
+            echo '<div class="delimiter"></div>';
+            if(!$list) echo '<div class="daia_item">';
+        }
+        echo '<div class="daia_storage_callnumber">';
+        if(!empty($result->storage)) {
+            if(!empty($result->storage->url)) {
+                echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result->storage->url.'" class="'.$result->storage->level.'" title="'.$result->storage->label.'" target="_blank">'.$this->translate($result->storage->label).'</a></span>';
+            } else {
+                echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($result->storage->label).'</span>';
+            }
+        }
+        if(!empty($result->callnumber)) {
+            echo ' <span class="item_label">' . $result->callnumber . '</span>';
+        }
+        echo '</div>';
+        if($overlay && !empty($result->about)) {
+            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
+        }
+        if(!empty($result->daia_hint)) {
+            echo '<span class="daia_hint"><span class="'.$result->daia_hint->level.'">'.$this->translate($result->daia_hint->label);
+            if(!empty($result->daia_hint->label_date)) echo ' '.$result->daia_hint->label_date;
+            echo '</span></span>';
+        }
+        if(!empty($result->daia_hint) && !empty($result->daia_action)) {
+            echo '<span class="daia_arrow"> ➝ </span>';
+        }
+        if(!empty($result->daia_action)) {
+            if(!empty($result->daia_action->url)) {
+                echo '<span class="daia_action"><a href="'.$result->daia_action->url.'" class="'.$result->daia_action->level.' link_external" title="'.$result->daia_action->label.'" target="_blank">'.$this->translate($result->daia_action->label).'</a></span>';
+            } else {
+                echo '<span class="daia_action">'.$this->translate($result->daia_action->label).'</span>';
+            }
+        }
+        if(!$list){
+            if(!empty($result->queue)) {
+                echo '<div class="service_queue">'.$result->queue->length.' '.$this->translate($result->queue->label).'</div>';
+            }
+            if(!$overlay && !empty($result->about)) {
+                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
+            }
+            if(!$overlay && !empty($result->chronology)) {
+                echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
+            }
+        }
+        if (!empty($result->order_hint)) echo '<div class="order_hint">'.$this->translate($result->order_hint).'</div>';
+        if(!empty($result)) {
+            if($list && count($data->document[0]->item) > 1 && !empty($result->storage)) {
+                echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
+            }
+            if(!$list) echo '</div>';
+        }
+        if(!$overlay && in_array($mode, ['break_on_first','break_on_first_next'])) {
+            $break = true;
+            break;
+        }
+    }
+    if($overlay) {
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+    if(in_array($mode, ['break_on_first','break_on_first_next'])) {
+        $break = true;
+        break;
+    }
+    $index++;
+    if($break) break;
+}
+
+if(!empty($groups)) echo '<script type="text/javascript">initDaiaPlusOverlay()</script>';
+
+?>
