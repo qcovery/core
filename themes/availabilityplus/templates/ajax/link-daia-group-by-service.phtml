@@ -11,7 +11,7 @@ if($this->source == 'Search2') {
 $group_by_label = 'availabilityplus_daia_service';
 
 foreach($data->document[0]->item as $result) {
-    if(!empty($result->availabilityplus->storage)) {
+    if(!empty($result->availabilityplus->service)) {
         $groups[$result->availabilityplus->service][] = $result->availabilityplus;
         if(empty($groups[$result->availabilityplus->service]['score'])) {
             $groups[$result->availabilityplus->service]['score'] = $result->availabilityplus->score;
