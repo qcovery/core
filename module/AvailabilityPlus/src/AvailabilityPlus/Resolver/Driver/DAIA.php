@@ -51,7 +51,7 @@ class DAIA extends AvailabilityPlusResolver
                         $record->ppn = substr($data->document[0]->id, strrpos($data->document[0]->id, ":") + 1);
                         if($item->id && strpos($item->id, "epn:") !== false) {
                             $record->epn_id = $item->id;
-                            $record->epn = substr($item->id, strrpos($item->id, "epn:") + 1);
+                            $record->epn = substr($item->id, strrpos($item->id, ":") + 1);
                         } elseif ($item->{'temporary-hack-do-not-use'}) {
                             $record->epn = $item->{'temporary-hack-do-not-use'};
                         }
