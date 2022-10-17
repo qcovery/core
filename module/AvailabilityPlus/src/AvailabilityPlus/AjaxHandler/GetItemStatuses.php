@@ -96,7 +96,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
         $this->debug = $params->fromPost('debug', $params->fromQuery('debug', ''));
         $this->language = 'en';
-        if(!empty($params->fromPost('debug', $params->fromQuery('language', '')))) $this->language = $params->fromPost('debug', $params->fromQuery('debug', ''));
+        if(!empty($params->fromPost('language', $params->fromQuery('language', '')))) $this->language = $params->fromPost('language', $params->fromQuery('language', ''));
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $this->id = $id;
