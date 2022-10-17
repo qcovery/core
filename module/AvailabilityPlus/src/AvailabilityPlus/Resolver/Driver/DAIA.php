@@ -20,7 +20,7 @@ class DAIA extends AvailabilityPlusResolver
     {
         $url = $this->getResolverUrl($openUrl);
         $headers = $this->httpClient->getRequest()->getHeaders();
-        $headers->addHeaderLine('Accept-Language', $this->getTranslatorLocale());
+        $headers->addHeaderLine('Accept-Language', $this->language);
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
     }
