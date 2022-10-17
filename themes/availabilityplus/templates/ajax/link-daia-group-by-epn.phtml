@@ -112,7 +112,7 @@ foreach($groups as $group_label => $group_items) {
         echo '</div>';
         if($overlay && !empty($result->about)) {
             if($mediatype == 'Journal') {
-                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('daia_volume_issue').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
+                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('volume_issue').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
             } else {
                 echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
             }
