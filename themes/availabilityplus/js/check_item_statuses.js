@@ -58,6 +58,7 @@ var itemStatusSource = '';
 var itemStatusHideLink = '';
 var itemStatusType = '';
 var itemStatusMediatype = '';
+var itemLanguage = '';
 var itemStatusDebug = '';
 
 function runItemAjaxForQueue() {
@@ -73,12 +74,13 @@ function runItemAjaxForQueue() {
 		itemStatusSource = item.attr('data-src');
 		itemStatusList = (item.attr('data-list') == 1);
 		itemStatusMediatype = item.attr('data-mediatype');
+        itemLanguage = item.attr('data-language');
 		itemStatusDebug = item.attr('data-debug');
         $.ajax({
             url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
             method: 'get',
-            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype, debug:itemStatusDebug}
+            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype, language:itemLanguage, debug:itemStatusDebug}
         })
             .done(function checkItemStatusDone(response) {
                 for (var j = 0; j < response.data.statuses.length; j++) {
@@ -106,6 +108,7 @@ function itemQueueAjax(id, el) {
 	itemStatusSource = item.attr('data-src');
     itemStatusList = (item.attr('data-list') == 1);
     itemStatusMediatype = item.attr('data-mediatype');
+    itemLanguage = item.attr('data-language');
     itemStatusDebug = item.attr('data-debug');
     itemStatusTimer = setTimeout(runItemAjaxForQueue, itemStatusDelay);
     el.addClass('js-item-pending').removeClass('hidden');
@@ -121,6 +124,7 @@ function checkItemStatus(el) {
     itemStatusSource = item.attr('data-src');
     itemStatusList = (item.attr('data-list') == 1);
     itemStatusMediatype = item.attr('data-mediatype');
+    itemLanguage = item.attr('data-language');
     itemStatusDebug = item.attr('data-debug');
     itemQueueAjax(id + '', item);
 }
@@ -138,6 +142,7 @@ function checkItemStatuses(_container) {
         itemStatusSource = $(availabilityItems[i]).attr('data-src');
         itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
         itemStatusMediatype = $(availabilityItems[i]).attr('data-mediatype');
+        itemLanguage = $(availabilityItems[i]).attr('data-language');
         itemStatusDebug = $(availabilityItems[i]).attr('data-debug');
         itemQueueAjax(id, $(availabilityItems[i]));
     }
