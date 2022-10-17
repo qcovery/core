@@ -25,6 +25,8 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $parsed_data;
 
+    protected $language;
+
     /**
      * Constructor
      *
@@ -39,6 +41,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $this->rules = $rules;
         $this->hmac = $hmac;
         $this->resolverConfig = $resolverConfig;
+        $this->setLanguage();
     }
 
     /**
@@ -204,6 +207,10 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 $this->parsed_data->item[$key][$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] = $value;
                 break;
         }
+    }
+
+    public function setLanguage($language = 'en') {
+        $this->language = $language;
     }
 }
 
