@@ -198,3 +198,7 @@
 .MonographSeriesResultList {
   font-weight: bold;
 }
+
+.availabilityplus_epn .group_label {
+  display: none !important;
+}
