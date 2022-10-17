@@ -55,6 +55,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $mediatype;
 
+    protected $language;
+
     /**
      * Resolver driver plugin manager
      *
@@ -93,6 +95,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
         $this->list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
         $this->debug = $params->fromPost('debug', $params->fromQuery('debug', ''));
+        $this->language = 'en';
+        if(!empty($params->fromPost('debug', $params->fromQuery('language', '')))) $this->language = $params->fromPost('debug', $params->fromQuery('debug', ''));
         if (!empty($ids) && !empty($this->source)) {
             foreach ($ids as $id) {
                 $this->id = $id;
@@ -334,7 +338,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'label_translated' => $this->translate($label),
             'template' => $template,
             'data' => $data,
-            'SolrMarcSupportData' => $this->driver->getMarcData('SupportData')
+            'SolrMarcSupportData' => $this->driver->getMarcData('SupportData'),
+            'language' => $this->language
         ];
         return array_filter($response);
     }
