@@ -41,6 +41,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $this->rules = $rules;
         $this->hmac = $hmac;
         $this->resolverConfig = $resolverConfig;
+        $this->setLanguage();
     }
 
     /**
