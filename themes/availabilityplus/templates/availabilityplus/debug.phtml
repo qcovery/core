@@ -8,13 +8,14 @@ if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
 $list_name = 'ResultList';
 if($list == 0) $list_name = 'DetailView';
 $driver = 'Solr';
-if(isset($_GET["driver"]) && $_GET["driver"] === 'Search2') $driver = 'Search2';;
+if(isset($_GET["driver"]) && $_GET["driver"] === 'Search2') $driver = 'Search2';
+$language = $this->layout()->userLang;
 ?>
 
 <div class="AvailabilityPlusDebug">
     Links to Debug Views: <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=1&driver=Solr">Debug ID <?=$id?> ResultsList Solr</a> | <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=0&driver=Solr">Debug ID <?=$id?> DetailView Solr</a> | <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=1&driver=Search2">Debug ID <?=$id?> ResultsList Search2</a> | <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=0&driver=Search2">Debug ID <?=$id?> DetailView Search2</a>
     <h3>Debug ID <?=$this->escapeHtml($id)?> <?=$list_name?> <?=$driver?></h3>
-    <div class="availabilityItem" data-id="<?=$id;?>" data-list="<?=$list?>" data-src="<?=$driver?>" data-language="<?=$this->layout()->userLang; ?>" data-debug="1">
+    <div class="availabilityItem" data-id="<?=$id;?>" data-list="<?=$list?>" data-src="<?=$driver?>" data-language="<?=$language?>" data-debug="1">
 	<span class="status ajax-availability hidden">
 		<span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
 	</span>
