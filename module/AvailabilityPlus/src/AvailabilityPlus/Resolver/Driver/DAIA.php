@@ -6,6 +6,25 @@ use VuFind\Config\SearchSpecsReader;
 
 class DAIA extends AvailabilityPlusResolver
 {
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
+    /**
+     * Fetch Links
+     *
+     * Fetches a set of links corresponding to an OpenURL
+     *
+     * @param string $openURL openURL (url-encoded)
+     *
+     * @return string         raw XML returned by resolver
+     */
+    public function fetchLinks($openUrl)
+    {
+        $url = $this->getResolverUrl($openUrl);
+        $headers = $this->httpClient->getRequest()->getHeaders();
+        $headers->addHeaderLine('Accept-Language', $this->getTranslatorLocale());
+        $feed = $this->httpClient->setUri($url)->send()->getBody();
+        return $feed;
+    }
+
     /**
      * Parse Links
      *
