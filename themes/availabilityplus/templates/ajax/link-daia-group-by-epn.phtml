@@ -8,16 +8,16 @@ if($this->source == 'Search2') {
 } else {
     $recordRoute = 'Record';
 }
-$group_by_label = 'availabilityplus_storage_label';
+$group_by_label = 'availabilityplus_epn';
 
 foreach($data->document[0]->item as $result) {
-    if(!empty($result->availabilityplus->storage)) {
-        $groups[$result->availabilityplus->storage->label][] = $result->availabilityplus;
-        if(empty($groups[$result->availabilityplus->storage->label]['score'])) {
-            $groups[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
+    if(!empty($result->availabilityplus->epn)) {
+        $groups[$result->availabilityplus->epn][] = $result->availabilityplus;
+        if(empty($groups[$result->availabilityplus->epn]['score'])) {
+            $groups[$result->availabilityplus->epn]['score'] = $result->availabilityplus->score;
         } else {
-            if($groups[$result->availabilityplus->storage->label]['score'] > $result->availabilityplus->score) {
-                $groups[$result->availabilityplus->storage->label]['score'] = $result->availabilityplus->score;
+            if($groups[$result->availabilityplus->epn]['score'] > $result->availabilityplus->score) {
+                $groups[$result->availabilityplus->epn]['score'] = $result->availabilityplus->score;
             }
         }
     } else if(!empty($result->availabilityplus)) {
@@ -31,7 +31,6 @@ foreach($data->document[0]->item as $result) {
         }
     }
 }
-
 if($resolverConfig['sort_groups_by_score']) {
     uasort($groups, function($a, $b) {
         return $a['score'] <=> $b['score'];
