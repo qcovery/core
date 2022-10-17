@@ -50,8 +50,11 @@ foreach($items->item as $key => $item) {
             echo '<div class="service_queue">'.$result->queue->length.' '.$this->translate($result->queue->label).'</div>';
         }
         if(!empty($result->about)) {
-            echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
-        }
+            if($mediatype == 'Journal') {
+                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('volume_issue').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
+            } else {
+                echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
+            }        }
         if(!empty($result->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
         }
