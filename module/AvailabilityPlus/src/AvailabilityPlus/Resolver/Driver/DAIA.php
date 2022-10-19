@@ -119,7 +119,7 @@ class DAIA extends AvailabilityPlusResolver
                                     }
                                     $record->score = 10;
                                     if(!empty($item->limitation[0]->content)) {
-                                        $record->limitation = $item->limitation[0]->content;
+                                        $record->dai_action->limitation = $item->limitation[0]->content;
                                         $record->score = 15;
                                     }
                                     if (empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
