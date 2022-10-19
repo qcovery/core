@@ -118,8 +118,8 @@ class DAIA extends AvailabilityPlusResolver
                                         $record->chronology = $item->chronology->about;
                                     }
                                     $record->score = 10;
-                                    if(!empty($item->limitation[0]->content)) {
-                                        $record->dai_action->limitation = $item->limitation[0]->content;
+                                    if(!empty($service_content->limitation[0]->content)) {
+                                        $record->daia_action->limitation = $service_content->limitation[0]->content;
                                         $record->score = 15;
                                     }
                                     if (empty($this->parsed_data->document[0]->item[$key]->availabilityplus)) {
