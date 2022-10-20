@@ -31,10 +31,10 @@ namespace DependentWorks\AjaxHandler;
 use VuFind\AjaxHandler\AbstractBase;
 use VuFind\Search\Results\PluginManager as ResultsManager;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
-use Zend\Http\PhpEnvironment\Request;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\Stdlib\Parameters;
-use Zend\Config\Config;
+use Laminas\Http\PhpEnvironment\Request;
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\Stdlib\Parameters;
+use Laminas\Config\Config;
 
 /**
  * This controller handles global AJAX functionality
