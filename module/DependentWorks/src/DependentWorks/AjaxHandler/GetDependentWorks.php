@@ -101,7 +101,7 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
         }
         $search_prefix = $params->fromQuery('search_prefix');
         if (empty($search_prefix)) {
-            $ppn_search = $search_prefix.$ppn;
+            $ppn_search = '"'.$search_prefix.$ppn.'"';
         } else {
             $ppn_search = $ppn;
         }
