@@ -33,6 +33,7 @@ return [
         'listadmin',
         'availabilityfeedback',
 	    'publicationsuggestion',
+	    'autocompleteterms',
     ],
     "less" => [
         "active" => false,
