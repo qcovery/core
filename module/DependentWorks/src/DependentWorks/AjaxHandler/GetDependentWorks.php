@@ -99,11 +99,17 @@ class GetDependentWorks extends AbstractBase implements TranslatorAwareInterface
         if (empty($ppn)) {
             return $this->formatResponse([]);
         }
+        $search_prefix = $params->fromQuery('search_prefix');
+        if (empty($search_prefix)) {
+            $ppn_search = $search_prefix.$ppn;
+        } else {
+            $ppn_search = $ppn;
+        }
         $backend = $params->fromQuery('source');
         $results = $this->resultsManager->get($backend);
         $results->getOptions()->setLimitOptions([$limit, $limit]);
         $paramsObj = $results->getParams();
-        $paramsObj->initFromRequest(new Parameters(['lookfor' => $searchfield.':'.$ppn.' -id:'.$ppn, 'filter' => $filter]));
+        $paramsObj->initFromRequest(new Parameters(['lookfor' => $searchfield.':'.$ppn_search.' -id:'.$ppn, 'filter' => $filter]));
 
         $records = $results->getResults();
         $resultTotal = $results->getResultTotal();
