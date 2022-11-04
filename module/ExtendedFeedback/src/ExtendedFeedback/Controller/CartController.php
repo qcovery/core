@@ -80,10 +80,10 @@ class CartController extends BasicCartController
             $citationsArray = [];
             $records = $this->getRecordLoader()->loadBatch($ids);
             foreach ($records as $record) {
-                //$citation = new Citation(new \VuFind\Date\Converter());
-                //$citation->setView($this->getViewRenderer());
-                //$cb = $citation->__invoke($record);
-                //$citationsArray[] = $cb->getCitation('MLA');
+                $citation = new Citation(new \VuFind\Date\Converter());
+                $citation->setView($this->getViewRenderer());
+                $cb = $citation->__invoke($record);
+                $citationsArray[] = $cb->getCitation('MLA');
             }
             $citationsMessage = implode("\n\n", $citationsArray);
             // Qcovery
