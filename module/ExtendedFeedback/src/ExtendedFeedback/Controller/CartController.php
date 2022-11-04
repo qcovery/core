@@ -83,9 +83,9 @@ class CartController extends BasicCartController
                 $citation = new Citation(new \VuFind\Date\Converter());
                 $citation->setView($this->getViewRenderer());
                 $cb = $citation->__invoke($record);
-                $citationsArray[] = $cb->getCitation('MLA');
+                $citationsArray[] = strip_tags($cb->getCitation('MLA'));
             }
-            $citationsMessage = implode("\n\n", $citationsArray);
+            $citationsMessage = "\n".implode("\n\n", $citationsArray);
             // Qcovery
 
             // Attempt to send the email and show an appropriate flash message:
