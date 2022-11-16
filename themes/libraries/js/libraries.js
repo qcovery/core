@@ -54,7 +54,8 @@ jQuery(document).ready(function() {
         jQuery('div#side-panel-location').attr('style', 'display:none');
         if (typeof(queryString) != "undefined") {
             queryString = queryString.substring(1, queryString.length - 1);
-            queryString = queryString.replace(/filter%5B%5D=%23.+&/, '');
+            //queryString = queryString.replace(/filter%5B%5D=%23.+&/, '');
+            queryString = queryString.replace(/filter%5B%5D=%23.+%22&/, '');
             jQuery.ajax({
                 url:'/vufind/AJAX/JSON?method=getLibraries',
                 dataType:'json',
