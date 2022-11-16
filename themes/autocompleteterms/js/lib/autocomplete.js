@@ -333,9 +333,6 @@
                   return window.location.assign(selected.attr('href'));
                 } else {
                   _populate(selected.data(), $(this), { key: true });
-                  // Qcovery
-                  $('#searchForm').submit();
-                  // Qcovery
                 }
               }
               break;
