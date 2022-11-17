@@ -1,19 +1,21 @@
 # AvailabilityPlus - Module Description
 
+Aim of module: To ...
+
 ## Installation (manual steps)
-Required Module:
-- RecordDriver
-- Needs to be a version which provides the public function addSolrMarcYaml and the public function getSolrMarcSpecs
 
-Besides the Module Package these files are required:
-- from directory config/vufind all files starting with availabilityplus
-- from directory themes the directory availabilityplus
+Currently only a manual installation is possible. The module will be made available as a Composer module in the future. 
 
-Changes to PluginManager.php-files: References to GetItemStatuses and GetItemStatuses Factory need to be changed to the AvailabilityPlus Namespace
-
-Changes to Theme config: the availabilityplus theme needs to be added as a mixin
-
-The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
+- [ ] This branch needs to be cloned into a separate folder and then the files copied or linked in the vufind folder of the system in which AvailabilityPlus is to be integrated. 
+- [ ] Required Module: [RecordDriver from this branch](../RecordDriver)
+- [ ] Besides the Module Package these files are required:
+  - [ ] AvailabilityPlus-Configuration [../../config/vufind](../../config/vufind) all files starting with availabilityplus
+  - [ ] AvailabilityPlus-Theme [../../themes/availabilityplus](../../themes/availabilityplus)
+  - [ ] AvailabilityPlus-Translations [languages](languages/) need to be added to the respective language files
+- [ ] Changes to PluginManager.php-files might be required: References to GetItemStatuses and GetItemStatuses Factory need to be changed to the AvailabilityPlus Namespace
+- [ ] Changes to Theme config: the availabilityplus theme needs to be added as a mixin
+- [ ] The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind in the Apache configuration. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
+- [ ] If a custom js/check_item_statuses.js is in the Theme used, then it needs to be removed.
 
 ## Configuration of Order and Mode of Availability Checks
 
@@ -91,3 +93,10 @@ Example:
   rules: 'no rule applicable'
   detailsLink: 'http://www.test.com'
 ```
+
+## ToDos
+- Create Composer module
+- Rework DAIA configuration and move grouping from templates to DAIA-Resolver
+- Change Resolver interface to allow for providing MARC-Data for configuration or rules based on MARC-Data
+- Add A+ parsing for SFX-Resolver
+- Add CrossRef to get DOIs to pass on to Unpaywall
