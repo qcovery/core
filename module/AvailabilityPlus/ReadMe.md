@@ -1,6 +1,6 @@
 # AvailabilityPlus - Module Description
 
-Aim of module: To ...
+This module tries to address the complex issue of checking and displaying availability information. The order and behaviour of availability checks can be configured for different Backends (Solr and Search2 have been confirmed to work) providing MARC-Data and for different media formats. It also provides a TestCase-Tool for displaying the availability information for a configured set of Index-Ids in on spot. Lastly, it provides a Debug-Tool which displays details on which checks were performed and their result. 
 
 ## Installation (manual steps)
 
@@ -54,15 +54,9 @@ The TestCase-Tool also provides links to the Debug-Tool.
 
 ## Debug-Tool
 
+The Debug-Tool was developed to display detailed information about which availability checks were performed and about their results. It can be accessed via the TestCase-Tool, by adding `debug_ap=true` as URL-parameter or by using `/vufind/AvailabilityPlus/Debug/{id}` (or `/AvailabilityPlus/Debug/{id}`).
 
-
-Depending on your setup you will find /vufind/AvailabilityPlus/Debug/{id}
-or
-/AvailabilityPlus/Debug/{id}
-
-Add &debug_ap=true to the URL and a link to the Debug-Tool for each record will appear
-
-
+**It might be necessary to remove `/vufind` in URL paths set in [debug.phtml](../../themes/availabilityplus/templates/availabilityplus/debug.phtml), if your system is set up without using `/vufind`.**
 
 ## ToDos
 - Create Composer module
@@ -73,3 +67,4 @@ Add &debug_ap=true to the URL and a link to the Debug-Tool for each record will 
 - Add A+ parsing for SFX-Resolver
 - Add CrossRef to get DOIs to pass on to Unpaywall
 - rework availabilityplus-result-list.phtml and availabilityplus-result-list.phtml, only one Template might be necessary, potentially they might not be needed if parameter values can be obtained directly in [GetItemStatuses.php](src/AvailabilityPlus/AjaxHandler/GetItemStatuses.php#L94)
+- rework backend/source/driver handling to make sure it can be used with different backends, although at this point, the module will not work with backends not providing MARC-Data
