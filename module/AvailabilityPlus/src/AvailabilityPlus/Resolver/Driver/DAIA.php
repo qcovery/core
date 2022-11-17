@@ -149,12 +149,12 @@ class DAIA extends AvailabilityPlusResolver
                                     }
                                     if(!empty($item->label)) $record->callnumber = $item->label;
                                     if(!empty($service_content->limitation[0]->id)) {
-                                        $limitation = substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1);
+                                        $limitation = str_replace(' ','', substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1));
                                         $record->daia_hint->level = $limitation;
                                         $record->daia_hint->label = $service_content->service.$limitation;
                                         $record->score += 5;
                                     } elseif(!empty($service_content->limitation[0]->content)) {
-                                        $limitation = $service_content->limitation[0]->content;
+                                        $limitation = str_replace(' ','',$service_content->limitation[0]->content);
                                         $record->daia_hint->level = $limitation;
                                         $record->daia_hint->label = $service_content->service.$limitation;
                                         $record->score += 5;
