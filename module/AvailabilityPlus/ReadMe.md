@@ -16,20 +16,34 @@ Currently only a manual installation is possible. The module will be made availa
 - [ ] Changes to Theme config: the availabilityplus theme needs to be added as a mixin
 - [ ] The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind in the Apache configuration. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
 - [ ] If a custom js/check_item_statuses.js is in the Theme used, then it needs to be removed.
+- [ ] Add rendering of availabilityplus-Templates
+  - [ ] in lists: [availabilityplus-result-list.phtml](../../themes/availabilityplus/templates/RecordDriver/SolrDefault/availabilityplus-result-list.phtml)
+  - [ ] in record view (preferably on the right hand side): [availabilityplus-view.phtml](../themes/availabilityplus/templates/record/availabilityplus-view.phtml)
 
-## Configuration of Order and Mode of Availability Checks
+Example for rendering:
+```
+<!--Module AvailabilityPlus-->
+<?=$this->render('RecordDriver/SolrDefault/availabilityplus-result-list.phtml', ['driver' => $this->driver]) ?>
+<!--Module AvailabilityPlus-->
+```
+
+## Module configuration
+
+### Configuration of Order and Mode of Availability Checks
 
 ...
 
-## Configuration of MARC-Data used for Availability Checks
+### Configuration of MARC-Data used for Availability Checks
 
 ...
 
-## Configuration of Resolvers used for Availability Checks
+### Configuration of Resolvers used for Availability Checks
 
 ...
 
 ## Debug-Tool: Debugging of Availability Checks
+
+
 
 /vufind/AvailabilityPlus/Debug/{id}
 or
@@ -96,7 +110,10 @@ Example:
 
 ## ToDos
 - Create Composer module
+- remove hard-coded references to `/vufind/...`, so URLs are generated independently of whether `/vufind` is used with URL path
+- rework MARC configuration in [../../config/vufind/availabilityplus.yaml](../../config/vufind/availabilityplus.yaml) to be more generic, currently it is based on the MARC structure used by [K10plus-Zentral](https://github.com/gbv/findex-config/tree/master/SolrCloud)
 - Rework DAIA configuration and move grouping from templates to DAIA-Resolver
 - Change Resolver interface to allow for providing MARC-Data for configuration or rules based on MARC-Data
 - Add A+ parsing for SFX-Resolver
 - Add CrossRef to get DOIs to pass on to Unpaywall
+- rework availabilityplus-result-list.phtml and availabilityplus-result-list.phtml, only one Template might be necessary, potentially they might not be needed if parameter values can be obtained directly in [GetItemStatuses.php](src/AvailabilityPlus/AjaxHandler/GetItemStatuses.php#L94)
