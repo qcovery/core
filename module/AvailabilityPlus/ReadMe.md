@@ -54,7 +54,7 @@ The TestCase-Tool also provides links to the Debug-Tool.
 
 ## Debug-Tool
 
-The Debug-Tool was developed to display detailed information about which availability checks were performed and about their results. It can be accessed via the TestCase-Tool, by adding `debug_ap=true` as URL-parameter or by using `/vufind/AvailabilityPlus/Debug/{id}` (or `/AvailabilityPlus/Debug/{id}`).
+The Debug-Tool was developed to display detailed information about which availability checks were performed and about their results. It can be accessed via the TestCase-Tool, by adding `debug_ap=true` as URL-parameter or by using `/vufind/AvailabilityPlus/Debug/{id}` (or `/AvailabilityPlus/Debug/{id}`). An example can be found [here](https://hilkat.uni-hildesheim.de/vufind/AvailabilityPlus/Debug/389600296?list=1&driver=Solr).
 
 **It might be necessary to remove `/vufind` in URL paths set in [debug.phtml](../../themes/availabilityplus/templates/availabilityplus/debug.phtml), if your system is set up without using `/vufind`.**
 
