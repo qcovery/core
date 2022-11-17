@@ -1,93 +1,68 @@
 # AvailabilityPlus - Module Description
 
+This module tries to address the complex issue of checking and displaying availability information. The order and mode of availability checks can be configured for different Backends (Solr and Search2 have been confirmed to work) providing MARC-Data and for different media formats. It also provides a TestCase-Tool for displaying the availability information for a configured set of Index-Ids in on spot. Lastly, it provides a Debug-Tool which displays details on which checks were performed and their result. It was also an aim to be able to easily integrate different resolvers into this process and adjust their results based on configurable rules.
+
+The module works in VuFind 5 and 8, only a dependency, the RecordDriver module, has some small differences between these VuFind versions:
+- For VuFind 5 use this branch: https://github.com/qcovery/core/tree/develop-5-aplus/
+- For VuFind 8 use this branch: https://github.com/qcovery/core/tree/develop-8-availability-plus
+
 ## Installation (manual steps)
-Required Module:
-- RecordDriver
-- Needs to be a version which provides the public function addSolrMarcYaml and the public function getSolrMarcSpecs
 
-Besides the Module Package these files are required:
-- from directory config/vufind all files starting with availabilityplus
-- from directory themes the directory availabilityplus
+Currently only a manual installation is possible. The module will be made available as a Composer module in the future. 
 
-Changes to PluginManager.php-files: References to GetItemStatuses and GetItemStatuses Factory need to be changed to the AvailabilityPlus Namespace
-
-Changes to Theme config: the availabilityplus theme needs to be added as a mixin
-
-The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
-
-## Configuration of Order and Mode of Availability Checks
-
-...
-
-## Configuration of MARC-Data used for Availability Checks
-
-...
-
-## Configuration of Resolvers used for Availability Checks
-
-...
-
-## Debug-Tool: Debugging of Availability Checks
-
-/vufind/AvailabilityPlus/Debug/{id}
-or
-/AvailabilityPlus/Debug/{id}
-
-Add &debug_ap=true to the URL and a link to the Debug-Tool for each record will appear
-
-## TestCase-Tool: One Place to Check Returns of Availability Checks
-
-... 
-/vufind/AvailabilityPlus/TestCases 
-or
-/AvailabilityPlus/TestCases
-
-### Configuration of Test Cases
-Configuration file: availabilityplus-testcases.yaml
-
-Format:
-```yaml
-<id>: # id of record in index
-  driver: '<driver to load record>' # required, Solr, Search2, ...
-  description: '<short description of test case>' # optional, text
-  expected: # definition of expected results, optional, array
-    description: '<description of what is expected to appear as availability>' # optional, text
-    description_xy: '<description of what is expected to appear as availability for specific language selected in VuFind, xy represents language code, supersedes expected->description>' # optional, text, multiple possible, up to one for every language code used in VuFind installation
-    html: '<html which is expected to appear as availability, supersedes expected->description_xy>' # optional, html
-    html_xy: '<html which is expected to appear as availability for specific language selected in VuFind, xy represents language code, supersedes expected->html>' # optional, html, multiple possible, up to one for every language code used in VuFind installation
-    resultlist: # expected availability for result list view, optional, array
-      description: '<description of what is expected to appear as availability in listview, supersedes any node with text or html directly below expected>' # optional, text
-      description_xy: '<description of what is expected to appear as availability in listview for specific language selected in VuFind, xy represents language code, supersedes expected->listview->description>' # optional, text, multiple possible, up to one for every language code used in VuFind installation
-      html: '<html which is expected to appear as availability in listview, supersedes expected->listview->description_xy>' # optional, html
-      html_xy: '<html which is expected to appear as availability in listview for specific language selected in VuFind, xy represents language code, supersedes expected->öistview->html>' # optional, html, multiple possible, up to one for every language code used in VuFind installation
-    recordview: # expected availability for record view, optional, array
-      description: '<description of what is expected to appear as availability in recordview, supersedes any node with text or html directly below expected>' # optional, text
-      description_xy: '<description of what is expected to appear as availability in recordview for specific language selected in VuFind, xy represents language code, supersedes expected->recordview->description>' # optional, text, multiple possible, up to one for every language code used in VuFind installation
-      html: '<html which is expected to appear as availability in recordview, supersedes expected->recordview->description_xy>' # optional, html
-      html_xy: '<html which is expected to appear as availability in recordview for specific language selected in VuFind, xy represents language code, supersedes expected->öistview->html>' # optional, html, multiple possible, up to one for every language code used in VuFind installation
-  title: '<title of publication as reference>' # optional, text
-  reason: '<reason for adding test case>' # optional, text
-  date: '<date when test case was added>' # optional, date yyyy-mm-dd
-  creator: '<name of person who added or suggested test case>' # optional, text
-  rules: 'use to mention rule from availabilityplus-resolver-<driver>.yaml if tested by test case' # optional, text
-  detailsLink: '<url which leads to more details about this test case, e.g. a GitHub Issue, an internal GitLab Issue>' # optional, url
+- [ ] This branch needs to be cloned into a separate folder and then the files copied or linked in the vufind folder of the system in which AvailabilityPlus is to be integrated. 
+- [ ] Required Module: [RecordDriver from this branch](../RecordDriver)
+- [ ] Besides the Module Package these files are required:
+  - [ ] AvailabilityPlus-Configuration [../../config/vufind](../../config/vufind) all files starting with availabilityplus
+  - [ ] AvailabilityPlus-Theme [../../themes/availabilityplus](../../themes/availabilityplus)
+  - [ ] AvailabilityPlus-Translations [languages](languages/) need to be added to the respective language files
+- [ ] Changes to PluginManager.php-files might be required: References to GetItemStatuses and GetItemStatuses Factory need to be changed to the AvailabilityPlus Namespace
+- [ ] Changes to Theme config: the availabilityplus theme needs to be added as a mixin
+- [ ] The modules RecordDriver and AvailabilityPlus need to be added to the modules used by VuFind in the Apache configuration. AvailabilityPlus needs to be specified after RecordDriver as it depends on it. 
+- [ ] If a custom js/check_item_statuses.js is in the Theme used, then it needs to be removed.
+- [ ] Add rendering of availabilityplus-Templates
+  - [ ] in lists: [availabilityplus-result-list.phtml](../../themes/availabilityplus/templates/RecordDriver/SolrDefault/availabilityplus-result-list.phtml)
+  - [ ] in record view (preferably on the right hand side): [availabilityplus-view.phtml](../themes/availabilityplus/templates/record/availabilityplus-view.phtml)
+- [ ] If your system does not use `/vufind` as root in the URL path, then it might be necessary to remove `/vufind´ in some configuration, template and module files. In some case the path is still hard-coded. An alternative could be to add a rewrite rule in your web server configuration.
+Example for rendering:
 ```
-Example:
-```yaml
-123456789:
-  driver: 'Solr'
-  description: 'sample description'
-  expected:
-    resultlist:
-      html_en: '<a href="https://www.fulltext.com">Fulltext</a>'
-      html_de: '<a href="https://www.fulltext.com">Volltext</a>'
-    recordview:
-      description_en: 'access information'
-      description_de: 'Zugangsinformation'
-  title: 'Example Title'
-  reason: 'to give an example for test cases'
-  date: '2022-04-09'
-  creator: 'Jon Doe'
-  rules: 'no rule applicable'
-  detailsLink: 'http://www.test.com'
+<!--Module AvailabilityPlus-->
+<?=$this->render('RecordDriver/SolrDefault/availabilityplus-result-list.phtml', ['driver' => $this->driver]) ?>
+<!--Module AvailabilityPlus-->
 ```
+
+## Module configuration
+Configuration files in this module:
+- Order and mode of availability checks: [availabilityplus.ini](../../config/vufind/availabilityplus.ini)
+- MARC-Data used for availability checks and as parameter for resolvers: [availabilityplus.yaml](../../config/vufind/availabilityplus.yaml)
+- TestCases: [availabilityplus-testcases.yaml](../../config/vufind/availabilityplus-testcases.yaml)
+- Resolver:
+  - Basic configuration, such as base url, parameters and, for DAIA only, grouping: [availabilityplus-resolver.ini](../../config/vufind/availabilityplus-resolver.ini)
+  - Rules for adjusting resolver results, one file per resolver, with the name pattern availabilityplus-resolver-{name of resolver}.yaml, e.g. [availabilityplus-resolver-DAIA.yaml](../../config/vufind/availabilityplus-resolver-DAIA.yaml)
+
+## TestCase-Tool
+
+The TestCase-Tool was developed to provide one page which displays the availability information for a set of configured Index-IDs. The configuration can also included a description or an expected result in HTML against which the actual result is being checked. An example how the TestCase-Tool works, can be found [here] (https://hilkat.uni-hildesheim.de/vufind/AvailabilityPlus/).
+
+The TestCase-Tool can be configured [here](../../config/vufind/availabilityplus-testcases.yaml). The yaml-File provides comments on how to structure the configuration and an example.
+
+The TestCase-Tool also provides links to the Debug-Tool. 
+
+**It might be necessary to remove `/vufind` in URL paths set in [testcases.phtml](../../themes/availabilityplus/templates/availabilityplus/testcases.phtml), if your system is set up without using `/vufind`.**
+
+## Debug-Tool
+
+The Debug-Tool was developed to display detailed information about which availability checks were performed and about their results. It can be accessed via the TestCase-Tool, by adding `debug_ap=true` as URL-parameter or by using `/vufind/AvailabilityPlus/Debug/{id}` (or `/AvailabilityPlus/Debug/{id}`). An example can be found [here](https://hilkat.uni-hildesheim.de/vufind/AvailabilityPlus/Debug/389600296?list=1&driver=Solr).
+
+**It might be necessary to remove `/vufind` in URL paths set in [debug.phtml](../../themes/availabilityplus/templates/availabilityplus/debug.phtml), if your system is set up without using `/vufind`.**
+
+## ToDos
+- Create Composer module
+- remove hard-coded references to `/vufind/...`, so URLs are generated independently of whether `/vufind` is used with URL path
+- rework MARC configuration in [../../config/vufind/availabilityplus.yaml](../../config/vufind/availabilityplus.yaml) to be more generic, currently it is based on the MARC structure used by [K10plus-Zentral](https://github.com/gbv/findex-config/tree/master/SolrCloud)
+- Rework DAIA configuration and move grouping from templates to DAIA-Resolver
+- Change Resolver interface to allow for providing MARC-Data for configuration or rules based on MARC-Data
+- Add A+ parsing for SFX-Resolver
+- Add CrossRef to get DOIs to pass on to Unpaywall
+- rework availabilityplus-result-list.phtml and availabilityplus-result-list.phtml, only one Template might be necessary, potentially they might not be needed if parameter values can be obtained directly in [GetItemStatuses.php](src/AvailabilityPlus/AjaxHandler/GetItemStatuses.php#L94)
+- rework backend/source/driver handling to make sure it can be used with different backends, although at this point, the module will not work with backends not providing MARC-Data
