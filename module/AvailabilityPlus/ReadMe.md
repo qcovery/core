@@ -2,6 +2,10 @@
 
 This module tries to address the complex issue of checking and displaying availability information. The order and mode of availability checks can be configured for different Backends (Solr and Search2 have been confirmed to work) providing MARC-Data and for different media formats. It also provides a TestCase-Tool for displaying the availability information for a configured set of Index-Ids in on spot. Lastly, it provides a Debug-Tool which displays details on which checks were performed and their result. It was also an aim to be able to easily integrate different resolvers into this process and adjust their results based on configurable rules.
 
+The module works in VuFind 5 and 8, only a dependency, the RecordDriver module, has some small differences between these VuFind versions:
+- For VuFind 5 use this branch: https://github.com/qcovery/core/tree/develop-5-aplus/
+- For VuFind 8 use this branch: https://github.com/qcovery/core/tree/develop-8-availability-plus
+
 ## Installation (manual steps)
 
 Currently only a manual installation is possible. The module will be made available as a Composer module in the future. 
