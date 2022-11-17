@@ -1,6 +1,6 @@
 # AvailabilityPlus - Module Description
 
-This module tries to address the complex issue of checking and displaying availability information. The order and behaviour of availability checks can be configured for different Backends (Solr and Search2 have been confirmed to work) providing MARC-Data and for different media formats. It also provides a TestCase-Tool for displaying the availability information for a configured set of Index-Ids in on spot. Lastly, it provides a Debug-Tool which displays details on which checks were performed and their result. 
+This module tries to address the complex issue of checking and displaying availability information. The order and mode of availability checks can be configured for different Backends (Solr and Search2 have been confirmed to work) providing MARC-Data and for different media formats. It also provides a TestCase-Tool for displaying the availability information for a configured set of Index-Ids in on spot. Lastly, it provides a Debug-Tool which displays details on which checks were performed and their result. It was also an aim to be able to easily integrate different resolvers into this process and adjust their results based on configurable rules.
 
 ## Installation (manual steps)
 
@@ -28,19 +28,13 @@ Example for rendering:
 ```
 
 ## Module configuration
-
-### Configuration of Order and Mode of Availability Checks
-
-...
-
-### Configuration of MARC-Data used for Availability Checks
-
-...
-
-### Configuration of Resolvers used for Availability Checks
-
-...
-
+Configuration files in this module:
+- Order and mode of availability checks: [availabilityplus.ini](../../config/vufind/availabilityplus.ini)
+- MARC-Data used for availability checks and as parameter for resolvers: [availabilityplus.yaml](../../config/vufind/availabilityplus.yaml)
+- TestCases: [availabilityplus-testcases.yaml](../../config/vufind/availabilityplus-testcases.yaml)
+- Resolver:
+  - Basic configuration, such as base url, parameters and, for DAIA only, grouping: [availabilityplus-resolver.ini](../../config/vufind/availabilityplus-resolver.ini)
+  - Rules for adjusting resolver results, one file per resolver, with the name pattern availabilityplus-resolver-{name of resolver}.yaml, e.g. [availabilityplus-resolver-DAIA.yaml](../../config/vufind/availabilityplus-resolver-DAIA.yaml)
 
 ## TestCase-Tool
 
