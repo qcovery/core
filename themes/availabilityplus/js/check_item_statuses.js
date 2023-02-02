@@ -134,7 +134,7 @@ var itemStatusObserver = null;
 function checkItemStatuses() {
     $(window).on('scroll resize', function() {
         $('.availabilityItem').each(function() {
-            if ($(this).offset().top < $(window).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(window).scrollTop()) {
+            if ($(this).offset().top < $(window).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(window).scrollTop() && $(this).find('.ajax-availability').length !== 0 ) {
                 var id = $(this).attr('data-id');
                 itemStatusSource = $(this).attr('data-src');
                 itemStatusList = ($(this).attr('data-list') == 1);
