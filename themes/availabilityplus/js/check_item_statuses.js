@@ -151,6 +151,7 @@ function checkItemStatuses() {
     }
 }
 $(document).ready(function() {
+    window.scrollBy(0, 1); //to trigger AJAX-Request, is more or less a hack that needs to be replaced
     checkItemStatuses();
 });
 
