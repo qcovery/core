@@ -131,41 +131,27 @@ function checkItemStatus(el) {
 
 var itemStatusObserver = null;
 
-function checkItemStatuses(_container) {
-    var container = typeof _container === 'undefined'
-        ? document.body
-        : _container;
-
-    var availabilityItems = $(container).find('.availabilityItem');
-    for (var i = 0; i < availabilityItems.length; i++) {
-        var id = $(availabilityItems[i]).attr('data-id');
-        itemStatusSource = $(availabilityItems[i]).attr('data-src');
-        itemStatusList = ($(availabilityItems[i]).attr('data-list') == 1);
-        itemStatusMediatype = $(availabilityItems[i]).attr('data-mediatype');
-        itemLanguage = $(availabilityItems[i]).attr('data-language');
-        itemStatusDebug = $(availabilityItems[i]).attr('data-debug');
-        itemQueueAjax(id, $(availabilityItems[i]));
-    }
+function checkItemStatuses() {
+    $(window).on('scroll resize', function() {
+        $('.availabilityItem').each(function() {
+            if ($(this).offset().top < $(window).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(window).scrollTop()) {
+                var id = $(this).attr('data-id');
+                itemStatusSource = $(this).attr('data-src');
+                itemStatusList = ($(this).attr('data-list') == 1);
+                itemStatusMediatype = $(this).attr('data-mediatype');
+                itemLanguage = $(this).attr('data-language');
+                itemStatusDebug = $(this).attr('data-debug');
+                itemQueueAjax(id, $(this));
+            }
+        });
+    });
     // Stop looking for a scroll loader
     if (itemStatusObserver) {
         itemStatusObserver.disconnect();
     }
 }
 $(document).ready(function() {
-    function checkItemStatusReady() {
-        if (typeof Hunt === 'undefined') {
-            checkItemStatuses();
-        } else {
-            itemStatusObserver = new Hunt(
-                $('.availabilityItem').toArray(),
-                {
-                    enter: checkItemStatus,
-                    offset: 100000
-                }
-            );
-        }
-    }
-    checkItemStatusReady();
+    checkItemStatuses();
 });
 
 function initDaiaPlusOverlay () {
