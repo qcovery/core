@@ -1,17 +1,6 @@
 /*global Hunt, VuFind */
 /*exported checkItemStatuses, itemStatusFail */
 
-function linkCallnumbers(callnumber, callnumber_handler) {
-    if (callnumber_handler) {
-        let cns = callnumber.split(',\t');
-        for (let i = 0; i < cns.length; i++) {
-            cns[i] = '<a href="' + VuFind.path + '/Alphabrowse/Home?source=' + encodeURI(callnumber_handler) + '&amp;from=' + encodeURI(cns[i]) + '">' + cns[i] + '</a>';
-        }
-        return cns.join(',\t');
-    }
-    return callnumber;
-}
-
 function displayItemStatus(results, item) {
     item.removeClass('js-item-pending');
     item.find('.ajax-availability').removeClass('ajax-availability hidden');
@@ -55,8 +44,6 @@ let itemStatusDelay = 200;
 let itemStatusRunning = false;
 let itemStatusList = false;
 let itemStatusSource = '';
-let itemStatusHideLink = '';
-let itemStatusType = '';
 let itemStatusMediatype = '';
 let itemLanguage = '';
 let itemStatusDebug = '';
