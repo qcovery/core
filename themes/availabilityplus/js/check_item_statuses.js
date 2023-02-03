@@ -117,18 +117,6 @@ function itemQueueAjax(id, el) {
     el.find('.status').removeClass('hidden');
 }
 
-//Listenansicht
-function checkItemStatus(el) {
-    let item = $(el);
-    let id = item.attr('data-id');
-    itemStatusSource = item.attr('data-src');
-    itemStatusList = (item.attr('data-list') == 1);
-    itemStatusMediatype = item.attr('data-mediatype');
-    itemLanguage = item.attr('data-language');
-    itemStatusDebug = item.attr('data-debug');
-    itemQueueAjax(id + '', item);
-}
-
 let itemStatusObserver = null;
 
 function checkItemStatuses() {
