@@ -3,8 +3,8 @@
 
 function linkCallnumbers(callnumber, callnumber_handler) {
     if (callnumber_handler) {
-        var cns = callnumber.split(',\t');
-        for (var i = 0; i < cns.length; i++) {
+        let cns = callnumber.split(',\t');
+        for (let i = 0; i < cns.length; i++) {
             cns[i] = '<a href="' + VuFind.path + '/Alphabrowse/Home?source=' + encodeURI(callnumber_handler) + '&amp;from=' + encodeURI(cns[i]) + '">' + cns[i] + '</a>';
         }
         return cns.join(',\t');
@@ -16,7 +16,7 @@ function displayItemStatus(results, item) {
     item.removeClass('js-item-pending');
     item.find('.ajax-availability').removeClass('ajax-availability hidden');
     item.find('.status').empty();
-    var id = item.attr('data-id');
+    let id = item.attr('data-id');
     $.each(results, function(index, result){
         if (typeof(result.error) != 'undefined'
             && result.error.length > 0
@@ -48,18 +48,18 @@ function itemStatusFail(response, textStatus) {
         .append(typeof response.responseJSON.data === 'string' ? response.responseJSON.data : VuFind.translate('error_occurred'));
 }
 
-var itemStatusIds = [];
-var itemStatusEls = {};
-var itemStatusTimer = null;
-var itemStatusDelay = 200;
-var itemStatusRunning = false;
-var itemStatusList = false;
-var itemStatusSource = '';
-var itemStatusHideLink = '';
-var itemStatusType = '';
-var itemStatusMediatype = '';
-var itemLanguage = '';
-var itemStatusDebug = '';
+let itemStatusIds = [];
+let itemStatusEls = {};
+let itemStatusTimer = null;
+let itemStatusDelay = 200;
+let itemStatusRunning = false;
+let itemStatusList = false;
+let itemStatusSource = '';
+let itemStatusHideLink = '';
+let itemStatusType = '';
+let itemStatusMediatype = '';
+let itemLanguage = '';
+let itemStatusDebug = '';
 
 function runItemAjaxForQueue() {
     // Only run one item status AJAX request at a time:
@@ -69,8 +69,8 @@ function runItemAjaxForQueue() {
     }
     itemStatusRunning = true;
 
-    for (var i=0; i<itemStatusIds.length; i++) {
-		var item = itemStatusEls[itemStatusIds[i]];
+    for (let i=0; i<itemStatusIds.length; i++) {
+		let item = itemStatusEls[itemStatusIds[i]];
 		itemStatusSource = item.attr('data-src');
 		itemStatusList = (item.attr('data-list') == 1);
 		itemStatusMediatype = item.attr('data-mediatype');
@@ -83,8 +83,8 @@ function runItemAjaxForQueue() {
             data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype, language:itemLanguage, debug:itemStatusDebug}
         })
             .done(function checkItemStatusDone(response) {
-                for (var j = 0; j < response.data.statuses.length; j++) {
-                    var status = response.data.statuses[j];
+                for (let j = 0; j < response.data.statuses.length; j++) {
+                    let status = response.data.statuses[j];
                     displayItemStatus(status, itemStatusEls[status.id]);
                     itemStatusIds.splice(itemStatusIds.indexOf(status.id), 1);
                 }
@@ -104,7 +104,7 @@ function itemQueueAjax(id, el) {
     clearTimeout(itemStatusTimer);
     itemStatusIds.push(id);
     itemStatusEls[id] = el;
-	var item = $(el);
+	let item = $(el);
 	itemStatusSource = item.attr('data-src');
     itemStatusList = (item.attr('data-list') == 1);
     itemStatusMediatype = item.attr('data-mediatype');
@@ -119,8 +119,8 @@ function itemQueueAjax(id, el) {
 
 //Listenansicht
 function checkItemStatus(el) {
-    var item = $(el);
-    var id = item.attr('data-id');
+    let item = $(el);
+    let id = item.attr('data-id');
     itemStatusSource = item.attr('data-src');
     itemStatusList = (item.attr('data-list') == 1);
     itemStatusMediatype = item.attr('data-mediatype');
@@ -129,12 +129,12 @@ function checkItemStatus(el) {
     itemQueueAjax(id + '', item);
 }
 
-var itemStatusObserver = null;
+let itemStatusObserver = null;
 
 function checkItemStatuses() {
     $('.availabilityItem').each(function() {
         if ($(this).offset().top < $(window).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(window).scrollTop() && $(this).find('.ajax-availability').length !== 0 ) {
-            var id = $(this).attr('data-id');
+            let id = $(this).attr('data-id');
             itemStatusSource = $(this).attr('data-src');
             itemStatusList = ($(this).attr('data-list') == 1);
             itemStatusMediatype = $(this).attr('data-mediatype');
