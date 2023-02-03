@@ -132,18 +132,16 @@ function checkItemStatus(el) {
 var itemStatusObserver = null;
 
 function checkItemStatuses() {
-    $(window).on('scroll resize', function() {
-        $('.availabilityItem').each(function() {
-            if ($(this).offset().top < $(window).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(window).scrollTop() && $(this).find('.ajax-availability').length !== 0 ) {
-                var id = $(this).attr('data-id');
-                itemStatusSource = $(this).attr('data-src');
-                itemStatusList = ($(this).attr('data-list') == 1);
-                itemStatusMediatype = $(this).attr('data-mediatype');
-                itemLanguage = $(this).attr('data-language');
-                itemStatusDebug = $(this).attr('data-debug');
-                itemQueueAjax(id, $(this));
-            }
-        });
+    $('.availabilityItem').each(function() {
+        if ($(this).offset().top < $(window).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(window).scrollTop() && $(this).find('.ajax-availability').length !== 0 ) {
+            var id = $(this).attr('data-id');
+            itemStatusSource = $(this).attr('data-src');
+            itemStatusList = ($(this).attr('data-list') == 1);
+            itemStatusMediatype = $(this).attr('data-mediatype');
+            itemLanguage = $(this).attr('data-language');
+            itemStatusDebug = $(this).attr('data-debug');
+            itemQueueAjax(id, $(this));
+        }
     });
     // Stop looking for a scroll loader
     if (itemStatusObserver) {
@@ -151,8 +149,10 @@ function checkItemStatuses() {
     }
 }
 $(document).ready(function() {
-    window.scrollBy(0, 1); //to trigger AJAX-Request, is more or less a hack that needs to be replaced
     checkItemStatuses();
+    $(window).on('scroll resize', function() {
+        checkItemStatuses();
+    });
 });
 
 function initDaiaPlusOverlay () {
