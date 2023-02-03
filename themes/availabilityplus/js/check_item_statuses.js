@@ -117,8 +117,6 @@ function itemQueueAjax(id, el) {
     el.find('.status').removeClass('hidden');
 }
 
-let itemStatusObserver = null;
-
 function checkItemStatuses() {
     $('.availabilityItem').each(function() {
         if ($(this).offset().top < $(window).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(window).scrollTop() && $(this).find('.ajax-availability').length !== 0 ) {
@@ -131,10 +129,6 @@ function checkItemStatuses() {
             itemQueueAjax(id, $(this));
         }
     });
-    // Stop looking for a scroll loader
-    if (itemStatusObserver) {
-        itemStatusObserver.disconnect();
-    }
 }
 $(document).ready(function() {
     checkItemStatuses();
