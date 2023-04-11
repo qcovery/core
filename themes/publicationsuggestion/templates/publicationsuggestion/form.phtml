@@ -10,7 +10,7 @@
     <form class="publication-suggestion" name="publicationsuggestion" method="post" action="<?=$this->url('publicationsuggestion-email')?>">
         <!-- Recipient -->
         <div class="form-group">
-            <span><?=$this->transEsc('publication_suggestion_recipient')?></span>
+            <span><?=$this->transEsc('publication_suggestion_recipient')?> *</span>
 		    <?php foreach ($this->recipient['values'] as $key => $value): ?>
                 <div>
                     <input type="radio" id="recipient-<?= $key ?>" name="recipient" value="<?= $value ?>" required>
@@ -21,25 +21,25 @@
 
         <!-- Author -->
         <div class="form-group">
-            <label for="author"><?=$this->transEsc('publication_suggestion_author')?></label>
+            <label for="author"><?=$this->transEsc('publication_suggestion_author')?><?=$this->author['required'] ? ' *' : ''?></label>
             <input type="text" id="author" name="author" class="form-control" placeholder="<?=$this->transEsc($this->author['placeholder'])?>" <?=$this->author['required'] ? 'required' : ''?>/>
         </div>
 
         <!-- Title -->
         <div class="form-group">
-            <label for="title"><?=$this->transEsc('publication_suggestion_title')?></label>
+            <label for="title"><?=$this->transEsc('publication_suggestion_title')?><?=$this->title['required'] ? ' *' : ''?></label>
             <input type="text" id="title" name="title" class="form-control" placeholder="<?=$this->transEsc($this->title['placeholder'])?>" <?=$this->title['required'] ? 'required' : ''?>/>
         </div>
 
         <!-- Date -->
         <div class="form-group">
-            <label for="date"><?=$this->transEsc('publication_suggestion_date')?></label>
+            <label for="date"><?=$this->transEsc('publication_suggestion_date')?><?=$this->date['required'] ? ' *' : ''?></label>
             <input type="text" id="date" name="date" class="form-control" placeholder="<?=$this->transEsc($this->date['placeholder'])?>" <?=$this->date['required'] ? 'required' : ''?>/>
         </div>
 
         <!-- Source -->
         <div class="form-group">
-            <span><?=$this->transEsc('publication_suggestion_source')?></span>
+            <span><?=$this->transEsc('publication_suggestion_source')?><?=$this->source['required'] ? ' *' : ''?></span>
 	        <?php foreach ($this->source['values'] as $key => $value): ?>
                 <div>
                     <input type="radio" id="source-<?= $key ?>" name="source" value="<?= $value ?>" <?=$this->source['required'] ? 'required' : ''?>>
@@ -50,19 +50,19 @@
 
         <!-- Username -->
         <div class="form-group">
-            <label for="username"><?=$this->transEsc('publication_suggestion_username')?></label>
+            <label for="username"><?=$this->transEsc('publication_suggestion_username')?><?=$this->username['required'] ? ' *' : ''?></label>
             <input type="text" id="username" name="username" class="form-control" placeholder="<?=$this->transEsc($this->username['placeholder'])?>" value="<?=$this->userLoggedInName?>" <?=$this->username['required'] ? 'required' : ''?>/>
         </div>
 
         <!-- Userid -->
         <div class="form-group">
-            <label for="userid"><?=$this->transEsc('publication_suggestion_userid')?></label>
+            <label for="userid"><?=$this->transEsc('publication_suggestion_userid')?><?=$this->userid['required'] ? ' *' : ''?></label>
             <input type="text" id="userid" name="userid" class="form-control" placeholder="<?=$this->transEsc($this->userid['placeholder'])?>" value="<?=$this->userLoggedInId?>" <?=$this->userid['required'] ? 'required' : ''?>/>
         </div>
 
         <!-- Department -->
         <div class="form-group">
-            <span><?=$this->transEsc('publication_suggestion_department')?></span>
+            <span><?=$this->transEsc('publication_suggestion_department')?><?=$this->department['required'] ? ' *' : ''?></span>
 		    <?php foreach ($this->department['values'] as $key => $value): ?>
                 <div>
                     <input type="radio" id="department-<?= $key ?>" name="department" value="<?= $value ?>" <?=$this->department['required'] ? 'required' : ''?>>
@@ -73,13 +73,13 @@
 
         <!-- Mail Address -->
         <div class="form-group">
-            <label for="usermail"><?=$this->transEsc('publication_suggestion_usermail')?></label>
-            <input type="text" id="usermail" name="usermail" class="form-control" placeholder="<?=$this->transEsc($this->userMail['placeholder'])?>" value="<?=$this->userLoggedInMail?>" required/>
+            <label for="usermail"><?=$this->transEsc('publication_suggestion_usermail')?> *</label>
+            <input type="text" id="usermail" name="usermail" class="form-control" placeholder="<?=$this->transEsc($this->userMail['placeholder'])?>" value="<?=$this->userLoggedInMail?>" pattern=".+@.+\..+"  title="<?=$this->transEsc('publication_suggestion_usermail')?>" required/>
         </div>
 
         <!-- Message -->
         <div class="form-group">
-            <label for="message"><?=$this->transEsc('publication_suggestion_message')?></label>
+            <label for="message"><?=$this->transEsc('publication_suggestion_message')?><?=$this->message['required'] ? ' *' : ''?></label>
             <input type="text" id="message" name="message" class="form-control" placeholder="<?=$this->transEsc($this->message['placeholder'])?>" <?=$this->message['required'] ? 'required' : ''?>/>
         </div>
 
@@ -87,12 +87,12 @@
         <div class="form-group">
             <span><?=$this->transEsc('publication_suggestion_hold')?></span>
             <input type="checkbox" id="hold" name="hold" <?=$this->hold['required'] ? 'required' : ''?>/>
-            <label for="hold"><?=$this->transEsc($this->hold['value'])?></label>
+            <label for="hold"><?=$this->transEsc($this->hold['value'])?><?=$this->hold['required'] ? ' *' : ''?></label>
         </div>
 
         <!-- Hint -->
         <div class="form-group">
-            <label for="hint"><?=$this->transEsc('publication_suggestion_hint')?></label>
+            <label for="hint"><?=$this->transEsc('publication_suggestion_hint')?><?=$this->hint['required'] ? ' *' : ''?></label>
             <input type="text" id="hint" name="hint" class="form-control" placeholder="<?=$this->transEsc($this->hint['placeholder'])?>" <?=$this->hint['required'] ? 'required' : ''?>/>
         </div>
 
@@ -101,7 +101,7 @@
         <!-- Privacy -->
         <?php if ($this->privacy['required']): ?>
             <div class="form-group">
-                <span><?=$this->transEsc('publication_suggestion_privacy')?></span>
+                <span><?=$this->transEsc('publication_suggestion_privacy')?> *</span>
                 <input type="checkbox" id="privacy" name="privacy" required/>
                 <label for="privacy"><?=$this->transEsc($this->privacy['value'])?></label>
             </div>

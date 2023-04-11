@@ -228,7 +228,7 @@ class PublicationSuggestionController extends \VuFind\Controller\AbstractBase
                     $email_subject,
                     $email_message,
                     null,
-                    $view->email
+                    new Address($formUserMail, $formUserName)
                 );
 
                 $formConfirm = '';

@@ -1,0 +1,71 @@
+<div class="mainbody">
+<h2><?=$this->transEsc('deliveryMicroformTitle')?></h2>
+<?=$this->flashmessages() ?>
+<?php if(!$this->hideForm): ?>
+    <div class="resultfeedback-formtext">
+        <?=$this->translate('deliveryMicroformText')?>
+    </div>
+    <br/>
+    <form class="form-feedback result-feedback" name="feedback" method="post" action="<?=$this->url('deliverymicroform-email').'?id='.$this->id.'&searchclassid='.$this->searchclassid?>">
+      <input type="hidden" id="recordid" name="recordid" value="<?=$this->id?>" />
+      <div class="form-group">
+        <label class="control-label" for="deliverymicroform_title" style="vertical-align:top;"><?=$this->transEsc("DeliveryMicroform Title")?>: </label>
+        <input type="text" name="deliverymicroform_title"  value="<?=$this->title?>"/><br/><br/>
+
+        <label class="control-label" for="deliverymicroform_callnumber" style="vertical-align:top;"><?=$this->transEsc("DeliveryMicroform Callnumber")?>: </label>
+        <input type="text" name="deliverymicroform_callnumber" value="<?=$this->callnumber?>"/><br/><br/>
+
+        <label class="control-label<?=$this->deliverymicroform_year_date_error ? ' error' : '' ?>" for="deliverymicroform_year_date" style="vertical-align:top;">* <?=$this->transEsc("DeliveryMicroform Year")?>: </label>
+        <input type="text" name="deliverymicroform_year_date" value="<?=$this->year_date?>"/><br/><br/>
+
+        <label class="control-label" for="deliverymicroform_name" style="vertical-align:top;"><?=$this->transEsc("DeliveryMicroform Name")?>: </label>
+        <input type="text" name="deliverymicroform_name" value="<?=$this->userFullname?> "/><br/><br/>
+
+        <label class="control-label" for="deliverymicroform_id" style="vertical-align:top;"><?=$this->transEsc("DeliveryMicroform ID")?>: </label>
+        <input type="text" name="deliverymicroform_id" value="<?=$this->userName?>" /><br/><br/>
+
+        <label class="control-label<?=$this->deliverymicroform_email_error ? ' error' : '' ?>" for="deliverymicroform_email" style="vertical-align:top;">* <?=$this->transEsc("DeliveryMicroform Email")?>: </label>
+        <input type="text" name="deliverymicroform_email" value="<?=$this->userEmail?>" /><br/><br/>
+
+        <label class="control-label" for="deliverymicroform_date_order" style="vertical-align:top;"><?=$this->transEsc("DeliveryMicroform Date Order")?>: </label>
+        <input type="text" name="deliverymicroform_date_order" value="<?=$this->date_order?>"/><br/><br/>
+
+        <label class="control-label<?=$this->deliverymicroform_date_time_error ? ' error' : '' ?>" for="deliverymicroform_date_time" style="vertical-align:top;">* <?=$this->transEsc("DeliveryMicroform Date Time")?>: </label>
+        <input type="text" name="deliverymicroform_date_time" value="<?=$this->date_time?>"/><br/><br/>
+
+        <label class="control-label<?=$this->deliverymicroform_introduction_error ? ' error' : '' ?>" for="deliverymicroform_introduction" style="vertical-align:top;">* <?=$this->transEsc("DeliveryMicroform Introduction")?>: </label><br/>
+        <?=$this->transEsc("Yes")?> <input type="radio" name="deliverymicroform_introduction" value="<?=$this->transEsc("Yes")?>" <?=($this->deliverymicroform_introduction == $this->transEsc("Yes")) ? 'checked="checked"' : ''?>"/>
+        <?=$this->transEsc("No")?> <input type="radio" name="deliverymicroform_introduction" value="<?=$this->transEsc("No")?>" <?=($this->deliverymicroform_introduction == $this->transEsc("No")) ? 'checked="checked"' : '' ?>"/>
+        <br/><br/>
+
+      </div>
+      <?php /*
+      <div class="form-group">
+        <input type="checkbox" name="privacy" required />
+        <label class="control-label privacy" for="privacy"><?=$this->translate("I Accept The Privacy Policy")?></label>
+      </div>
+      */ ?>
+      <?=$this->recaptcha()->html($this->useRecaptcha) ?>
+      <div class="form-group">
+        <input type="submit" name="submit" class="btn btn-primary" value="<?=$this->transEsc("Send")?>" />
+      </div>
+    </form>
+<?php endif; ?>
+</div>
+<script>
+    $( function() {
+        jQuery.datetimepicker.setLocale('de');
+        $datetimepicker = $("[name='deliverymicroform_date_time']").datetimepicker({
+            firstDay: 1,
+            minDate : 0,
+            format:'d.m.Y H:i',
+            dayOfWeekStart: 1,
+            i18n:{
+                de:{
+                    months:['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+                    dayOfWeek:['So','Mo','Di','Mi','Do','Fr','Sa']
+                }
+            }
+        });
+    } );
+</script>
