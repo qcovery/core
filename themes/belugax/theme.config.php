@@ -10,6 +10,7 @@ return [
         'belugax.css',
     ],
     'js' => [
+        'jquery.tablesorter.min.js',
         'jquery.qtip.min.js',
         'uikit.min.js',
         'belugax.js',
