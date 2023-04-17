@@ -85,7 +85,7 @@ class CartController extends BasicCartController
                 $cb = $citation->__invoke($record);
                 $citationsArray[] = strip_tags($cb->getCitation('MLA'));
             }
-            $citationsMessage = "\n".implode("\n\n", $citationsArray);
+            $citationsMessage = "\n\n".implode("\n\n", $citationsArray);
             // Qcovery
 
             // Attempt to send the email and show an appropriate flash message:
