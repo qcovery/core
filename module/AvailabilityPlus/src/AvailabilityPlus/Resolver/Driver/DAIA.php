@@ -164,7 +164,11 @@ class DAIA extends AvailabilityPlusResolver
                                         $record->daia_hint->label = 'on_loan_until';
                                         $record->daia_hint->label_date = date_format($date,"d.m.Y");
                                         $record->score += 20;
-                                    } else {
+                                    } elseif(isset($service_content->queue)) {
+                                        $record->daia_hint->level = "daia_orange";
+                                        $record->daia_hint->label = 'on_loan';
+                                        $record->score += 20;
+                                    }  else {
                                         $record->daia_hint->level = "daia_green";
                                         $record->daia_hint->label = $service_content->service;
                                     }
