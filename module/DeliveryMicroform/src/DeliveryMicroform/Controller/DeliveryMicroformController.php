@@ -154,6 +154,7 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
             $email_message .= $translator->translate('PPN') . ': ' . $this->getFormValue('recordid') . "\n";
             $email_message .= $translator->translate('DeliveryMicroform Title') . ': ' . $this->getFormValue('deliverymicroform_title') . "\n";
             $email_message .= $translator->translate('DeliveryMicroform Callnumber') . ': ' . $this->getFormValue('deliverymicroform_callnumber') . "\n";
+            $email_message .= $translator->translate('DeliveryMicroform Year') . ': ' . $this->getFormValue('deliverymicroform_year_date') . "\n";
             $email_message .= $translator->translate('DeliveryMicroform ID') . ': ' . $this->getFormValue('deliverymicroform_id') . "\n";
             $email_message .= $translator->translate('DeliveryMicroform Date Order') . ': ' . $this->getFormValue('deliverymicroform_date_order') . "\n";
             $email_message .= $translator->translate('DeliveryMicroform Date Time') . ': ' . $this->getFormValue('deliverymicroform_date_time') . "\n";
