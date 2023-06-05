@@ -1,0 +1,9 @@
+<?php if(!empty($data)): ?>
+   <div class="fulltextfinder-result">
+      <ul>
+         <?php foreach ($data as $link): ?>
+            <li><a href="<?=$link->targetUrl?>" title="<?=$link->linkText?>" target="_blank"><?=$this->translate('FulltextFinder::'.$link->category)?></a></li>
+         <?php endforeach; ?>
+      </ul>
+   </div>
+<?php endif; ?>

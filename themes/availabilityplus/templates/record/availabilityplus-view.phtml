@@ -1,0 +1,10 @@
+<div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="0" data-src="<?=$this->driver->getSourceIdentifier(); ?>" data-language="<?=$this->layout()->userLang; ?>">
+	<span class="status ajax-availability hidden">
+		<span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
+	</span>
+    <?php if(!empty($_GET['debug_ap']) && strip_tags($_GET['debug_ap']) == 'true') { ?>
+        <div class="delimiter"></div>
+        <a href="/vufind/AvailabilityPlus/Debug/<?=$this->driver->getUniqueID();?>?driver=<?=$this->driver->getSourceIdentifier();?>&list=0" target="_blank"><?=$this->transEsc('DebugView')?></a>
+    <? } ?>
+</div>
+

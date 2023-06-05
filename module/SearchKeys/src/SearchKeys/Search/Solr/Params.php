@@ -54,13 +54,14 @@ class Params extends BaseParams
         }
         parent::initSearch($request);
     }
-
+    
+    /** Removed 2023, because Booloperator where not showed in Search. Searchbox.phtml in themes modified for that aswell **/
     /**
      * Build a string for onscreen display showing the
      *   query used in the search (not the filters).
      *
      * @return string user friendly version of 'query'
-     */
+     *
     public function getDisplayQuery()
     {
         $translate = [$this, 'translate'];
@@ -74,7 +75,7 @@ class Params extends BaseParams
      *   query used in the search (not the filters).
      *
      * @return string raw version of 'query'
-     */
+     *
     public function getRawQuery()
     {
         $config = $this->configLoader->get('searchkeys');
@@ -88,11 +89,6 @@ class Params extends BaseParams
         }
         return preg_replace('/^\((.*?)\)/', '$1', $query);
     }
-
-    public function returnIdentic($item) {
-        return $item;
-    }
-
+    */
+    
 }
-
-
