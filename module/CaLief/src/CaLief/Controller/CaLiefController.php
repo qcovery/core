@@ -727,10 +727,15 @@ class CaLiefController extends AbstractBase
                     //    $dataEmail['user_type'] = $output_array[0];
                     //}
                     //$dataEmail['user_type'] = 'USER_TYPE';
-                    if (isset($patron->note)) {
+                    /* if (isset($patron->note)) {
                         $dataEmail['user_type'] = $patron->note;
                     } else {
                         $dataEmail['user_type'] = 'USER_TYPE';
+                    } */
+                    if (isset($_POST['comment']) && $_POST['comment'] != '') {
+                        $dataEmail['user_type'] = $_POST['comment'];
+                    } else {
+                        $dataEmail['user_type'] = 'NO COMMENT SUBMITTED';
                     }
 
                     $dataEmail['ppn'] = (isset($_POST['ppn'])) ? $_POST['ppn'] : ''; 
