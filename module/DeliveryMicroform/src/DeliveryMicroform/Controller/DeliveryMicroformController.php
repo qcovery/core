@@ -46,11 +46,6 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
      */
     public function emailAction()
     {
-        $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
-            return $this->forceLogin();
-        }
-
         $config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('DeliveryMicroform');
         $translator = $this->serviceLocator->get('Zend\Mvc\I18n\Translator');
 
@@ -78,14 +73,16 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
 
         $user = $this->getUser();
 
-        $view->userName = $user->username;
-        $view->userFullname = $user->firstname.' '.$user->lastname;
+        if ($user) {
+            $view->userName = $user->username;
+            $view->userFullname = $user->firstname . ' ' . $user->lastname;
+        }
 
         $yearDate = $this->getFormValue('deliverymicroform_year_date');
         $view->year_date = $yearDate;
 
         $userEmail = $this->getFormValue('deliverymicroform_email');
-        if (empty($userEmail)) {
+        if (empty($userEmail) && $user) {
             $userEmail = $user->email;
         }
         $view->userEmail = $userEmail;
