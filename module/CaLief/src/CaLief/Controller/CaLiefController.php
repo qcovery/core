@@ -779,7 +779,7 @@ class CaLiefController extends AbstractBase
         //if (isset($output_array[0])) {
         //    $fileContentArray[] = $output_array[0];
         //} else {
-            $fileContentArray[] = 'USER_TYPE';
+            $fileContentArray[] = $_POST['comment'];
         //}
         
         $fileContentArray[] = (isset($_POST['signature'])) ? $_POST['signature'] : 'SIGNATUR';
