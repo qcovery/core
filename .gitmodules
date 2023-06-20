@@ -10,3 +10,6 @@
 [submodule "module/Findex"]
 	path = module/Findex
 	url = git@github.com:qcovery/Findex.git
+[submodule "module/DependentWorks"]
+	path = module/DependentWorks
+	url = git@github.com:qcovery/DependentWorks.git
