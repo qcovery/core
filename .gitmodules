@@ -1,3 +1,6 @@
+[submodule "module/DismaxMunge"]
+	path = module/DismaxMunge
+	url = https://github.com/qcovery/DismaxMunge
 [submodule "module/Findex"]
 	path = module/Findex
 	url = git@github.com:qcovery/Findex.git
