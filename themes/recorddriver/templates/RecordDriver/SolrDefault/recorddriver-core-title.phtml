@@ -1,0 +1,52 @@
+<?php $titleFields = $this->solrDetails()->getCoreFields($this->driver, ['title']); ?>
+<h3 property="name">
+<?php $originalLetters = ''; ?>
+<?php if (!empty($titleFields['ShortTitle'][0])): ?>
+    <?php if (!empty($titleFields['ShortTitle']['originalLetters'])): ?>
+        <?php $originalLetters = $titleFields['ShortTitle']['originalLetters']; ?>
+    <?php endif; ?>
+    <?=$titleFields['ShortTitle'][0] ?>
+    <?php if (!empty($titleFields['SubTitle'][0])): ?>
+        <?php if (!empty($titleFields['SubTitle']['originalLetters'])): ?>
+            <?php $originalLetters .= ' : ' . $titleFields['SubTitle']['originalLetters']; ?>
+        <?php endif; ?>
+        : <?=$titleFields['SubTitle'][0] ?>
+    <?php endif; ?>
+    <?=$titleFields['TitleSection'][0] ?? '' ?>
+    <?php if (!empty($titleFields['TitleSection']['originalLetters'])): ?>
+        <?php $originalLetters .= ' ' . $titleFields['TitleSection']['originalLetters']; ?>
+    <?php endif; ?>
+    <?= !empty($titleFields['TitleStatement'][0]) ? '/ ' . $titleFields['TitleStatement'][0] : '' ?>
+    <?php if (!empty($titleFields['TitleStatement']['originalLetters'])): ?>
+        <?php $originalLetters .= ' / ' . $titleFields['TitleStatement']['originalLetters']; ?>
+    <?php endif; ?>
+    <?php if (!empty($titleFields['TitleAdditionalPart'])): ?>
+        <?= ' ; ' . implode(' ; ', $titleFields['TitleAdditionalPart']) ?>
+        <?php if (!empty($titleFields['TitleAdditionalVolume'])): ?>
+            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalVolume']) ?>
+        <?php endif; ?>
+        <?php if (!empty($titleFields['TitleAdditionalStatement'])): ?>
+            <?= ' / ' . implode(' / ', $titleFields['TitleAdditionalStatement']) ?>
+        <?php endif; ?>
+    <?php endif; ?>
+<?php else: ?>
+    <?=$this->transEsc('no title') ?>
+<?php endif; ?>
+</h3>
+<?php if (!empty($titleFields['Summary'][0])): ?>
+    <?php $summary = $titleFields['Summary'][0]; ?>
+<p id="short_summary">
+    <?=$this->truncate($summary, 300) ?>
+    <?php if(strlen($summary) > 300): ?>
+    <br /><a href="" class="showSummary"><?=$this->transEsc('Full description')?><i class="bel-pfeil-u01"></i></a>
+</p>
+<p id="long_summary" style="display:none">
+    <?=$summary ?>
+</p>
+   <?php else: ?>
+</p>
+   <?php endif; ?>
+<?php endif; ?>
+<?php if (!empty($originalLetters)): ?>
+    <p><strong><?=$this->transEsc('Original Letters')?>:</strong> <?=$originalLetters ?></p>
+<?php endif; ?>

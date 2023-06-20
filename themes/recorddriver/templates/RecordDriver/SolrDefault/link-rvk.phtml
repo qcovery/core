@@ -1,0 +1,2 @@
+<?php $searchRoute = $this->searchOptions($this->driver->getSourceIdentifier())->getSearchAction(); ?>
+<?=$this->url($searchRoute)?>?lookfor=%22<?=urlencode($this->lookfor . ' rvk')?>%22&type=class 
