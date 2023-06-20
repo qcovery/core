@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+
+  qcovery_db:
+    image: mariadb:10.2
+    container_name: qcovery_db
+    volumes:
+      - "./.data/db:/var/lib/mysql"
+    networks:
+      - default
+    ports:
+      - "3306:3306"
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root"
+      - "MYSQL_DATABASE=qcovery"
+      - "MYSQL_USER=qcovery"
+      - "MYSQL_PASSWORD=qcovery"
+
+  qcovery_apache2:
+      build: ./apache2
+      container_name: qcovery_apache2
+      volumes:
+        - "./.data/logs/nginx:/var/log/nginx"
+        - "./../:/var/www/html:cached"
+      ports:
+        - "8080:80"
+      networks:
+        - default
+      depends_on:
+        - qcovery_php
+
+  qcovery_php:
+      build: ./php
+      container_name: qcovery_php
+      volumes:
+        - "./.data/logs:/var/www/html/var/logs"
+        - "./../:/var/www/html:cached"
+      depends_on:
+        - qcovery_db
+        - qcovery_mailhog
+      networks:
+        - default
+      extra_hosts:
+        - "findex.gbv.de:192.168.65.254"
+
+  qcovery_mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "8025:8025"
+    networks:
+      - default
+
+networks:
+  default:

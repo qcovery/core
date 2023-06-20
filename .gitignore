@@ -24,3 +24,9 @@ public/swagger-ui
 local/config/vufind/*.ini
 local/config/vufind/*.json
 local/config/vufind/*.yaml
+
+# Local/Dev directories
+/.idea
+/docker/.data
+/qcovery_local/cache
+/logs
