@@ -13,6 +13,9 @@
 [submodule "module/DependentWorks"]
 	path = module/DependentWorks
 	url = git@github.com:qcovery/DependentWorks.git
+[submodule "module/SearchKeys"]
+	path = module/SearchKeys
+	url = git@github.com:qcovery/SearchKeys.git
 [submodule "module/FacetPrefix"]
 	path = module/FacetPrefix
 	url = git@github.com:qcovery/FacetPrefix.git
