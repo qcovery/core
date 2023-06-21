@@ -1,21 +1,27 @@
 [submodule "module/DismaxMunge"]
 	path = module/DismaxMunge
 	url = https://github.com/qcovery/DismaxMunge
+	branch = vufind9
 [submodule "module/ExtendedFeedback"]
 	path = module/ExtendedFeedback
 	url = git@github.com:qcovery/ExtendedFeedback.git
+	branch = vufind9
 [submodule "module/RecordDriver"]
 	path = module/RecordDriver
 	url = git@github.com:qcovery/RecordDriver.git
+	branch = vufind9
 [submodule "module/Findex"]
 	path = module/Findex
 	url = git@github.com:qcovery/Findex.git
 [submodule "module/DependentWorks"]
 	path = module/DependentWorks
 	url = git@github.com:qcovery/DependentWorks.git
+	branch = vufind9
 [submodule "module/SearchKeys"]
 	path = module/SearchKeys
 	url = git@github.com:qcovery/SearchKeys.git
+	branch = vufind9
 [submodule "module/FacetPrefix"]
 	path = module/FacetPrefix
 	url = git@github.com:qcovery/FacetPrefix.git
+	branch = vufind9
