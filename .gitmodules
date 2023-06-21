@@ -29,3 +29,7 @@
 	path = module/FacetPrefix
 	url = git@github.com:qcovery/FacetPrefix.git
 	branch = vufind9
+[submodule "module/ExtendedFacets"]
+	path = module/ExtendedFacets
+	url = git@github.com:qcovery/ExtendedFacets.git
+	branch = vufind9
