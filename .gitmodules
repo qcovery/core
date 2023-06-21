@@ -21,6 +21,10 @@
 	path = module/SearchKeys
 	url = git@github.com:qcovery/SearchKeys.git
 	branch = vufind9
+[submodule "module/Libraries"]
+	path = module/Libraries
+	url = git@github.com:qcovery/Libraries.git
+	branch = vufind9
 [submodule "module/FacetPrefix"]
 	path = module/FacetPrefix
 	url = git@github.com:qcovery/FacetPrefix.git
