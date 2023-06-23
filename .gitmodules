@@ -33,3 +33,7 @@
 	path = module/ExtendedFacets
 	url = git@github.com:qcovery/ExtendedFacets.git
 	branch = vufind9
+[submodule "module/DAIAplus"]
+	path = module/DAIAplus
+	url = git@github.com:qcovery/DAIAplus.git
+	branch = vufind9
