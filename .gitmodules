@@ -37,3 +37,7 @@
 	path = module/DAIAplus
 	url = git@github.com:qcovery/DAIAplus.git
 	branch = vufind9
+[submodule "module/PAIAplus"]
+	path = module/PAIAplus
+	url = git@github.com:qcovery/PAIAplus.git
+	branch = vufind9
