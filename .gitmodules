@@ -37,6 +37,10 @@
 	path = module/DAIAplus
 	url = git@github.com:qcovery/DAIAplus.git
 	branch = vufind9
+[submodule "module/LimitBatch"]
+	path = module/LimitBatch
+	url = git@github.com:qcovery/LimitBatch.git
+	branch = vufind9
 [submodule "module/PAIAplus"]
 	path = module/PAIAplus
 	url = git@github.com:qcovery/PAIAplus.git
