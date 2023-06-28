@@ -49,3 +49,7 @@
 	path = module/Delivery
 	url = git@github.com:qcovery/Delivery.git
 	branch = vufind9
+[submodule "module/HelpTooltips"]
+	path = module/HelpTooltips
+	url = git@github.com:qcovery/HelpTooltips.git
+	branch = vufind9
