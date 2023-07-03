@@ -53,3 +53,7 @@
 	path = module/HelpTooltips
 	url = git@github.com:qcovery/HelpTooltips.git
 	branch = vufind9
+[submodule "module/ResultFeedback"]
+	path = module/ResultFeedback
+	url = git@github.com:qcovery/ResultFeedback.git
+	branch = vufind9
