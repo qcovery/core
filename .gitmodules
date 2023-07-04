@@ -61,3 +61,7 @@
 	path = module/AutocompleteTerms
 	url = git@github.com:qcovery/AutocompleteTerms.git
 	branch = vufind9
+[submodule "module/BelugaConfig"]
+	path = module/BelugaConfig
+	url = git@github.com:qcovery/BelugaConfig.git
+	branch = vufind9
