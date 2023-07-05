@@ -1,0 +1,13 @@
+.publication-suggestion .form-group {
+    margin-top: 1em;
+}
+
+.publication-suggestion .form-control,
+.publication-suggestion .form-group > span {
+    display: block;
+}
+
+.publication-suggestion label,
+.publication-suggestion input {
+    font-weight: normal;
+}

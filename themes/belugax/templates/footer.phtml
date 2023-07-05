@@ -1,0 +1,43 @@
+<footer class="hidden-print">
+  <div class="footer-container">
+    <div class="footer-column">
+      <p><strong><?=$this->configreader()->getConfigData('Footer', 'links_left_title')?></strong></p>
+      <ul>
+        <? if (!empty($this->configreader()->getConfigData('Footer', 'links_left'))): ?>
+          <? foreach ($this->configreader()->getConfigData('Footer', 'links_left') as $text => $link): ?>
+            <a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a> | 
+          <? endforeach; ?>
+        <? endif; ?>
+      </ul>
+      <p><?=$this->translate($this->configreader()->getConfigData('Footer', 'content_left'))?></p>
+    </div>
+    <div class="footer-column">
+      <p><strong><?=$this->configreader()->getConfigData('Footer', 'links_center_title')?></strong></p>
+      <ul>
+        <? if (!empty($this->configreader()->getConfigData('Footer', 'links_center'))): ?>
+          <? foreach ($this->configreader()->getConfigData('Footer', 'links_center') as $text => $link): ?>
+            <a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a> |
+          <? endforeach; ?>
+        <? endif; ?>
+      </ul>
+      <p><?=$this->translate($this->configreader()->getConfigData('Footer', 'content_center'))?></p>
+    </div>
+    <div class="footer-column">
+      <p><strong><?=$this->configreader()->getConfigData('Footer', 'links_right_title')?></strong></p>
+      <ul>
+        <? if (!empty($this->configreader()->getConfigData('Footer', 'links_right'))): ?>
+          <? foreach ($this->configreader()->getConfigData('Footer', 'links_right') as $text => $link): ?>
+            <a href="<?=$this->translate($link)?>"><?=$this->transEsc($text)?></a> |
+          <? endforeach; ?>
+        <? endif; ?>
+      </ul>
+      <p><?=$this->translate($this->configreader()->getConfigData('Footer', 'content_right'))?></p>
+    </div>
+  </div>
+  <div class="poweredby">
+    <?=$this->layout()->poweredBy ?>
+  </div>
+  <div id="belugax-version">
+    beluga core <?=$this->configreader()->getConfigData('Global', 'version')?>
+  </div>
+</footer>
