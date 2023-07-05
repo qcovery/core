@@ -57,3 +57,15 @@
 	path = module/ResultFeedback
 	url = git@github.com:qcovery/ResultFeedback.git
 	branch = vufind9
+[submodule "module/AutocompleteTerms"]
+	path = module/AutocompleteTerms
+	url = git@github.com:qcovery/AutocompleteTerms.git
+	branch = vufind9
+[submodule "module/RVK"]
+	path = module/RVK
+	url = git@github.com:qcovery/RVK.git
+	branch = vufind9
+[submodule "module/BelugaConfig"]
+	path = module/BelugaConfig
+	url = git@github.com:qcovery/BelugaConfig.git
+	branch = vufind9
