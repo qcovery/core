@@ -76,6 +76,9 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
         if ($user) {
             $view->userName = $user->username;
             $view->userFullname = $user->firstname . ' ' . $user->lastname;
+        } else {
+            $view->userName = 'Nicht angemeldet';
+            $view->userFullname = $this->getFormValue('deliverymicroform_name');
         }
 
         $yearDate = $this->getFormValue('deliverymicroform_year_date');
