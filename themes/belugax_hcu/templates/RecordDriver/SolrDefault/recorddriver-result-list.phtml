@@ -1,0 +1,65 @@
+<?php
+$listViewOptions = '';
+if ($this->params) {
+    $listViewOptions = $this->params->getOptions()->getListViewOption();
+}
+?>
+
+<?php $resultList = $this->solrDetails()->getResultListLine($this->driver); ?>
+      <div>
+        <a href="<?=$this->recordLinker->getUrl($this->driver)?>" class="title getFull" data-view="<?=$listViewOptions?>" data-lightbox-ignore>
+        <?=$resultList['title'][0] ?>
+    <?php if(!empty($resultList['subtitle'][0])): ?>
+        : <?=$resultList['subtitle'][0] ?>
+    <?php endif; ?>
+    <?php if(!empty($resultList['partnumber'][0])): ?>
+        <?=$resultList['partnumber'][0] ?>
+    <?php endif; ?>
+    <?php if(!empty($resultList['partname'][0])): ?>
+        <?=$resultList['partname'][0] ?>
+    <?php endif; ?>
+        </a>
+    <?php if(!empty($resultList['volume'][0])): ?>
+        <? if(in_array('Serial Volume', $this->driver->getFormats())): ?>
+          <?=$resultList['volume'][0] ?>
+        <? endif; ?>
+    <?php endif; ?>
+      </div>
+    <?php if(!empty($resultList['author'][0])): ?>
+      <div>
+        <?=$this->transEsc('by')?> <?=$resultList['author'][0] ?>
+      </div>
+    <?php endif; ?>
+    <?php if(!empty($resultList['journal'][0])): ?>
+      <div>
+        <?php if(!empty($resultList['publishdate'][0])): ?>
+          <?=$resultList['publishdate'][0] ?>,
+        <?php endif; ?>
+        <?php if(!empty($resultList['relation'][0])): ?>
+          <?=strtolower($this->transEsc($resultList['relation'][0]))?>:
+        <?php endif; ?>
+        <?php if(!empty($resultList['journallink'][0])): ?>
+          <a href="<?=$this->record($this->driver)->getLink('ppn', $resultList['journallink'][0])?>">
+            <?=$resultList['journal'][0] ?>
+          </a>
+        <?php else: ?>
+          <?=$resultList['journal'][0] ?>
+        <?php endif; ?>
+      </div>
+    <?php elseif(!empty($resultList['publisher'][0]) || !empty($resultList['publishdate'][0])): ?>
+       <div>
+            <?php
+                $data = [];
+                if (!empty($resultList['publishdate'][0])) {
+                    $data[] = $resultList['publishdate'][0];
+                }
+                if (!empty($resultList['edition'][0])) {
+                    $data[] = $resultList['edition'][0];
+                }
+                if (!empty($resultList['publisher'][0])) {
+                    $data[] = $resultList['publisher'][0];
+                }
+            ?>
+            <?=implode(', ', $data)?>
+      </div>
+    <?php endif; ?>

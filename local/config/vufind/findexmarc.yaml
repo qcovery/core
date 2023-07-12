@@ -1,0 +1,307 @@
+ShortTitle:
+  245:
+    subfields:
+      - [a]
+SubTitle:
+  245:
+    subfields:
+      - [b]
+TitleSection:
+  245:
+    subfields:
+      - [n]
+    p:
+      - [name, extended]
+TitleStatement:
+  245:
+    subfields:
+      - [c]
+Summary:
+  538:
+    subfields:
+      - [a]
+DeduplicatedAuthors:
+  100:
+    a:
+      - [name, person]
+    c:
+      - [name, title]
+    e:
+      - [name, description]
+      - [replace, 'in( |$)$', 'In ']
+      - [function, 'ucfirst']
+  700:
+    a:
+      - [name, person]
+    c:
+      - [name, title]
+    e:
+      - [name, description]
+      - [replace, 'in( |$)$', 'In ']
+      - [function, 'ucfirst']
+UniformTitle:
+  240:
+    subfields:
+      - [a]
+OtherTitles:
+  246:
+    subfields:
+      - [a]
+PreviousTitles:
+  780:
+    t:
+      - [name, title]
+    w:
+      - [name, id]
+      - [match, '\(DE-(599)|(600)\)([0-9xX-]+)', 3]
+NewerTitlesFromMarc:
+  785:
+    t:
+      - [name, title]
+    w:
+      - [name, id]
+      - [match, '\(DE-(599)|(600)\)([0-9xX-]+)', 3]
+DeduplicatedCooperations:
+  110:
+    a:
+      - [name, cooperation]
+    b:
+      - [name, unit]
+    e:
+      - [name, description]
+      - [function, 'ucfirst']
+  710:
+    a:
+      - [name, cooperation]
+    b:
+      - [name, unit]
+    e:
+      - [name, description]
+      - [function, 'ucfirst']
+CongressData:
+  711:
+    subfields:
+      - [a, n, d, c]
+Performers:
+  511:
+    subfields:
+      - [a]
+IncludedItems:
+  501:
+    subfields:
+      - [a]
+Formats:
+  '000':
+    parent:
+      - [getFormats]
+Languages:
+  546:
+    parent:
+      - [getLanguages]
+    subfields:
+      - [a]
+OriginalLanguage:
+  '041':
+    subfields:
+      - [a]
+PublicationDetailsFromMarc:
+  260:
+    a:
+      - [name, location]
+      - [replace, ' ;.*$', '']
+    b:
+      - [name, name]
+    c:
+      - [name, date]
+  362:
+    a:
+      - [name, date]
+#  980:
+#    conditions:
+#      - [field, 2, 22]
+#    g:
+#      - [name, date]
+Series:
+  490:
+    subfields:
+      - [a]
+    v:
+      - [name, number]
+  800:
+    subfields:
+      - [a, b, c, d, f, p, q, t]
+    v:
+      - [name, number]
+  830:
+    subfields:
+      - [a, p]
+    v:
+      - [name, number]
+    w:
+      - [name, ppn]
+      - [match, '\(DE-627\)([^()]+)', 1]
+UniversityNotes:
+  502:
+    a:
+      - [name, note]
+    b:
+      - [name, item]
+    c:
+      - [name, place]
+    d:
+      - [name, date]
+NLM:
+  '060':
+    subfields:
+      - [a]
+BasicClassifications:
+  '084':
+    conditions:
+      - [field, 2, bcl]
+    subfields:
+      - [a, 9]
+FormNote:
+  655:
+    subfields:
+      - [a]
+GeneralNotes:
+  500:
+    subfields:
+      - [a]
+PhysicalDescription:
+  300:
+    subfields:
+      - [a, b, c, e]
+MapInfos:
+  255:
+    subfields:
+      - [a, b, c, d, e, f, g]
+SystemDetails:
+  520:
+    subfields:
+      - [a]
+Citations:
+  '024':
+    subfields:
+      - [a]
+Fingerprints:
+  '026':
+    subfields:
+      - [a]
+LocationOfOriginal:
+  535:
+    subfields:
+      - [a]
+ContainingWork:
+  773:
+    i:
+      - [name, prefix]
+    t:
+      - [name, title]
+    z:
+      - [name, isn]
+      - [match, '\(.+\)([^()]+)', 1]
+    x:
+      - [name, isn]
+      - [match, '\(.+\)([^()]+)', 1]
+    w:
+      - [name, ppn]
+      - [match, '\(.+\)([^()]+)', 1]
+    d:
+      - [name, location]
+    g:
+      - [name, issue]
+  800:
+    i:
+      - [name, prefix]
+    t:
+      - [name, title]
+    z:
+      - [name, isn]
+      - [match, '\(.+\)([^()]+)', 1]
+    x:
+      - [name, isn]
+      - [match, '\(.+\)([^()]+)', 1]
+    w:
+      - [name, ppn]
+      - [match, '\(.+\)([^()]+)', 1]
+    d:
+      - [name, location]
+    g:
+      - [name, issue]
+URLs:
+  856:
+    conditions:
+      - [field, y, !C]
+    u:
+      - [name, url]
+    3:
+       - [name, description]
+    z:
+      - [name, description]
+  555:
+    conditions:
+      - [field, y, !C]
+    u:
+      - [name, url]
+    a:
+       - [name, description]
+RelationshipNotes:
+  580:
+    subfields:
+      - [a]
+ISBNs:
+  '020':
+    9:
+      - [name, isbn]
+ISSNs:
+  '022':
+    a:
+      - [match, '([0-9xX-]+)', 1]
+SecundaryEditions:
+  533:
+    subfields:
+      - [a, b, c, d, f]
+    e:
+      - [name, content]
+OtherEditions:
+  787:
+    conditions:
+      - [field, i, '*']
+    i:
+      - [name, fieldType]
+    t:
+      - [name, fieldDesc]
+    w:
+      - [name, type]
+      - [replace, '^\(DE-600\).+$', 'ZDBID']
+      - [replace, '^\(DE-627\).+$', 'PPN']
+    w:
+      - [name, id]
+      - [match, '\(DE-627\)([^()]+)', 1]
+SignatureData:
+  980:
+    conditions:
+      - [field, 2, '22']
+    d:
+      - [name, signature]
+    e:
+      - [name, indicator]
+    f:
+      - [name, sigel]
+    k:
+      - [name, foot_note]
+    x:
+      - [name, licence_note]
+    y:
+      - [name, location_note]
+LicenceData:
+  981:
+    conditions:
+      - [field, 2, '22']
+    y:
+      - [name, licence_type]
+CollectionDetails:
+  912:
+    subfields:
+      - [a]

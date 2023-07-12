@@ -30,7 +30,7 @@
         <label class="control-label privacy" for="privacy"><?=$this->translate("I Accept The Privacy Policy")?></label>
       </div>
       */ ?>
-      <?=$this->recaptcha()->html($this->useRecaptcha) ?>
+      <?=$this->captcha()->html($this->useCaptcha) ?>
       <div class="form-group">
         <input type="submit" name="submit" class="btn btn-primary" value="<?=$this->transEsc("Send")?>" />
       </div>

@@ -1,0 +1,175 @@
+<?
+
+  // Set up page title:
+  $lookfor = $this->results->getUrlQuery()->isQuerySuppressed() ? '' : $this->params->getDisplayQuery();
+  if (isset($this->overrideTitle)) {
+      $this->headTitle($this->overrideTitle);
+  } else {
+      $this->headTitle($this->translate('Search Results') . (empty($lookfor) ? '' : " - {$lookfor}"));
+  }
+  $recordTotal = $this->results->getResultTotal();
+
+  // Set up search box:
+  $this->layout()->searchbox = $this->context($this)->renderInContext(
+      'search/searchbox.phtml',
+      [
+        'recordTotal' => $recordTotal,
+        'query' => $this->results->getUrlQuery(),
+        'lookfor' => $lookfor,
+        'searchIndex' => $this->params->getSearchHandler(),
+        'searchType' => $this->params->getSearchType(),
+        'searchId' => $this->results->getSearchId(),
+        'searchClassId' => $this->params->getSearchClassId(),
+        'checkboxFilters' => $this->params->getCheckboxFacets(),
+        'filterList' => $this->params->getHiddenFilters(),
+        'hasDefaultsApplied' => $this->params->hasDefaultsApplied(),
+        'selectedShards' => $this->params->getSelectedShards(),
+        'ignoreHiddenFiltersInRequest' => isset($this->ignoreHiddenFiltersInRequest) ? $this->ignoreHiddenFiltersInRequest : false,
+        'ignoreHiddenFilterMemory' => isset($this->ignoreHiddenFilterMemory) ? $this->ignoreHiddenFilterMemory : false,
+      ]
+  );
+
+  // Set up breadcrumbs:
+  if (isset($this->overrideTitle)) {
+    $this->layout()->breadcrumbs .= '<li class="active">' . $this->escapeHtml($this->overrideTitle) . '</li>';
+  } else {
+    $this->layout()->breadcrumbs .= '<li class="active">' . $this->transEsc('Search') . ': ' . $this->escapeHtml($lookfor) . '</li>';
+  }
+
+  // Enable cart if appropriate:
+  $this->showBulkOptions = $this->params->getOptions()->supportsCart() && $this->showBulkOptions;
+  // Checkboxes if appropriate:
+  $this->showCartControls = $this->params->getOptions()->supportsCart() && $this->cart()->isActive()
+    && ($this->showBulkOptions || !$this->cart()->isActiveInSearch());
+  // Enable bulk options if appropriate:
+  $this->showCheckboxes = $this->showCartControls || $this->showBulkOptions;
+
+  // Load Javascript only if list view parameter is NOT full:
+  if ($this->params->getOptions()->getListViewOption() != "full") {
+    $this->headScript()->appendFile("record.js");
+    $this->headScript()->appendFile("embedded_record.js");
+  }
+
+  // Load Javascript dependencies into header:
+  $this->headScript()->appendFile("vendor/hunt.min.js");
+  $this->headScript()->appendFile("check_item_statuses.js");
+  $this->headScript()->appendFile("check_save_statuses.js");
+?>
+
+<div class="<?=$this->layoutClass('mainbody')?>">
+  <? if ($recordTotal > 0): // only display these at very top if we have results ?>
+    <? foreach ($this->results->getRecommendations('top') as $current): ?>
+      <?=$this->recommend($current)?>
+    <? endforeach; ?>
+  <? endif; ?>
+  <?=$this->flashmessages()?>
+    <?
+    global $tabConfig;
+    global $recordTotal;
+    global $query;
+    ?>
+    <?= $this->context($this)->renderInContext('search/searchTabs', ['searchTabs' => $tabConfig['tabs'], 'recordTotal' => $recordTotal, 'query' => $query]); ?>
+  <? /* End Listing Options */ ?>
+
+  <? if ($recordTotal < 1): ?>
+    <div class="no-results">
+        <p>
+          <? if (isset($this->overrideEmptyMessage)): ?>
+            <?=$this->overrideEmptyMessage?>
+          <? else: ?>
+            <? $this->layout()->srmessage = $this->translate('nohit_lookfor_html', ['%%lookfor%%' => $this->escapeHtml($lookfor)]); ?>
+            <?=$this->layout()->srmessage ?>
+          <? endif; ?>
+        </p>
+        <? if (isset($this->parseError)): ?>
+          <p class="alert alert-danger"><?=$this->transEsc('nohit_parse_error')?></p>
+        <? endif; ?>
+        <? foreach (($top = $this->results->getRecommendations('top')) as $current): ?>
+          <?=$this->recommend($current)?>
+        <? endforeach; ?>
+        <? foreach ($this->results->getRecommendations('noresults') as $current): ?>
+          <? if (!in_array($current, $top)): ?>
+            <?=$this->recommend($current)?>
+          <? endif; ?>
+        <? endforeach; ?>
+        <p><?=$this->translate('Ask us')?></p>
+    </div>
+  <? else: ?>
+    <form id="search-cart-form" method="post" name="bulkActionForm" action="<?=$this->url('cart-searchresultsbulk')?>" data-lightbox data-lightbox-onsubmit="bulkFormHandler">
+      <?=$this->context($this)->renderInContext('search/bulk-action-buttons.phtml', ['idPrefix' => ''])?>
+    </form>
+    <?=$this->render('search/list-' . $this->params->getView() . '.phtml')?>
+    <?=$this->context($this)->renderInContext('search/bulk-action-buttons.phtml', ['idPrefix' => 'bottom_', 'formAttr' => 'search-cart-form'])?>
+
+  <div class="belugax-end-of-results">
+    <?=$this->paginationControl($this->results->getPaginator(), 'Sliding', 'search/pagination.phtml', ['results' => $this->results, 'options' => isset($this->paginationOptions) ? $this->paginationOptions : []])?>
+
+    <div class="searchtools hidden-print">
+      <a href="<?=$this->results->getUrlQuery()->setViewParam('rss')?>"><i class="bel-rss" aria-hidden="true" title="<?=$this->transEsc('Get RSS Feed')?>" data-uk-tooltip></i></a>
+      <? if ($this->accountCapabilities()->getSavedSearchSetting() === 'enabled'): ?>
+        <? if (is_numeric($this->results->getSearchId())): ?>
+          <? if ($this->results->isSavedSearch()): ?>
+            <a href="<?=$this->url('myresearch-savesearch')?>?delete=<?=urlencode($this->results->getSearchId())?>"><i class="bel-verboten" aria-hidden="true" title="<?=$this->transEsc('Save search')?>" data-uk-tooltip></i></a>
+          <? else: ?>
+            <a href="<?=$this->url('myresearch-savesearch')?>?save=<?=urlencode($this->results->getSearchId())?>"><i class="bel-speichern" aria-hidden="true" title="<?=$this->transEsc('Save search')?>" data-uk-tooltip></i></a>
+          <? endif; ?>
+        <? endif; ?>
+      <? endif; ?>
+    </div>
+  </div>
+      <div class="not-found-contact">
+          <i class="bel-frage"></i>
+          <div class="not-found-message">
+              <?=$this->translate("Haven't found what you're looking for?")?>
+          </div>
+      </div>
+  <? endif; ?>
+</div>
+<? /* End Main Listing */ ?>
+
+<? /* Narrow Search Options */ ?>
+<div class="<?=$this->layoutClass('sidebar')?>">
+    <h3 class="belugax-sidebar-headline"><i class="bel-trichter02"></i><?=$this->transEsc('Filter and sort')?></h3>
+    <nav class="search-header hidden-print">
+        <? if ($recordTotal > 0): ?>
+            <div class="search-controls">
+                <?=$this->render('search/controls/limit.phtml')?>
+                <?=$this->render('search/controls/sort.phtml')?>
+                <?=$this->render('search/controls/view.phtml')?>
+            </div>
+        <? endif; ?>
+    </nav>
+    <!-- E-Ressourcenfilter -->
+    <?php
+        $facetField = 'format_facet';
+        $facetValue = 'Elektronische Ressource';
+        $currentPath = $this->currentPath() . $results->getUrlQuery()->__toString();
+        if (strpos($currentPath, $facetField) === false):
+            $filterLink   = $this->currentPath() . $results->getUrlQuery()->addFacet($facetField, $facetValue, 'AND');
+            ?>
+            <div class="facet-group" id="side-panel-format-electronic-resources">
+                <div id="side-collapse-format-electronic-resources" class="" aria-expanded="true">
+                    <a href="<?=$filterLink ?>" class="facet facetAND"><i class="bel-mkombo01e"></i> <strong><?=$this->transEsc('Restrict to E-Resources')?></strong></a>
+                </div>
+            </div>
+        <?php
+        endif;
+    ?>
+    <!-- E-Ressourcenfilter -->
+<!-- Module Libraries -->
+       <?=$this->render('search/libraries-results.phtml'); ?>
+<!-- Module Libraries -->
+  <? foreach ($this->results->getRecommendations('side') as $current): ?>
+    <?=$this->recommend($current)?>
+  <? endforeach; ?>
+    <div class="not-found-contact hide">
+        <i class="bel-frage"></i>
+        <div class="not-found-message">
+            <?=$this->translate("Haven't found what you're looking for?")?>
+        </div>
+    </div>
+</div>
+<? /* End Narrow Search Options */ ?>
+<!--Module HelpTooltips-->
+<?=$this->render('helptooltips/helptooltips.phtml', ['context' => 'result list']) ?>
+<!--Module HelpTooltips-->

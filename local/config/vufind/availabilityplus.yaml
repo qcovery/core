@@ -1,0 +1,450 @@
+# Change to system-specific folder structure
+#"@parent_yaml": "../../../../../../../dev.hcu.beluga-core.de/config/vufind/availabilityplus.yaml"
+
+# Listing of data to be read from marc bibliographic data
+#
+# Format is:
+# <name of the data set>:
+#   mandatory-field:        <indicates whether a field given this name needs to be present
+#   view-method:            <template used to render the data retrieved>
+#   category:               <categories corresponding to categories chosen in the core-template>
+#                               title should be set; other categories are mandatory
+#   originalletters:        <yes|no> whether item in original letters should be
+#                               shown or not (see marc 880)
+#   <main field>:           at least one should be set; fields with a leading 0 should be quoted
+#                               if only parent methods are used the main field is '000'
+#     conditions:           conditions which should be fulfilled if the data is read
+#       - [<item>, <key>, <value>]          <item> is either field or indicator
+#                                           <key> is the name of the field or indicator
+#                                           <value> is the value it should have
+#     parent:               use a parent method (from SolrDefault driver)
+#       - [<method name>]       the method to use
+#     subfields:            only read the fields
+#       - [<field list>]        list of fields to read
+#     <subfield>:           enhanced processing of a subfield
+#       - [name, <name>]                     name it
+#       - [replace, <from>, <to>]            replace a substring from <from> to <to> (using a regex)
+#       - [match, <what>, <which>]           match a substring (<what>) and use the <which>th parantesis
+#                                                (using a regex)
+#       - [function, <php-function>]         use th return value of a php-function
+#
+#-----------------------------------------------------------------------------------
+#
+# Above is the same as in solrmarc.yaml
+#
+# Additions for AvailabilityPlus
+# -----------------------------------------------------------------------------------
+# AvailabilityPlus templates usually use these variables (indicated by name in this file: url, label and level
+# The label and level, if not specified are set to the name of the data set.
+#
+# Data sets with the same category name can be addressed together in AvailabilityPlus be specifying the category name as a check in availabilityplus.ini
+# The names of these data sets are sorted, so that e.g. names with digits appear first, see for example the FreeAccess category below.
+#
+# Special category resolver:
+# - If the category resolver is set, then AvailabilityPlus tries to find a ResolverHandler name as the dataset, e.g. DAIA.
+# - A driver class with the same name needs to be present.
+# - The fields specified need to be named corresponding to the parameters a resolver requires.
+#
+# Conditions across multiple MARC fields: If multiple conditions are required across different MARC fields, AvailabilityPlus currently uses a workaround due to the limitations of the RecordDriver module.
+# Using an Example to exemplify how conditions work (two conditions => requirednumberofconditions = 2; on must be true => condition_true and one must be false => condition_false:
+# (This basically checks, if the article is associated with a journal with the ISSN 1071-7544 and is NOT published in 2022. If so then the article URL is taken from 856u, if it is a link to the fulltext and the proxy url is added as prefix.)
+# ProxyArticleConditionExample:
+#  category: PubPharmProxyArticle
+#  mandatory-field: url
+#  view-method: ajax/link-external.phtml
+#  '035':
+#    a:
+#      - [name, requirednumberofconditions]
+#      - [replace, '(^.*$)', 2]
+#  773:
+#    x:
+#      - [name, condition_true]
+#      - [replace, '(^1071-7544$)', 'true']
+#  952:
+#    j:
+#      - [name, condition_false]
+#      - [replace, '(^2022$)', 'true']
+#  856:
+#    conditions:
+#      - [ indicator, 1, 4 ]
+#      - [ indicator, 2, 0|1 ]
+#    u:
+#      - [name, url]
+#      - [replace, '(http:\/\/|https:\/\/)(.*$)', 'http://www.proxy.com/$2']
+# -----------------------------------------------------------------------------------
+
+MonographSeriesResultList:
+  mandatory-field: url
+  view-method: ajax/link-internal.phtml
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', '/vufind/Record/$1']
+  245:
+    a:
+      - [ name, label ]
+      - [replace, '(^.*$)', 'MonographSeriesResultList']
+MonographSeriesRecordView:
+  view-method: ajax/default.phtml
+  mandatory-field: label
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, label]
+      - [replace, '(^.*$)', 'MonographSeriesRecordView']
+1ArticleFulltextDOAJDOAB:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, u, 'doi.org|nbn-resolving.de|doaj.org\/article|www.doabooks.org\/doab\?func=fulltext']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+2ArticleFulltextFreeIndicator:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+3ArticleFulltextFreeSubfield:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, 3, Volltext]
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+      - [indicator, 1, 4]
+    u:
+      - [name, url]
+4ArticleDirectLinkUrlParts:
+  category: FreeAccess
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  856:
+    conditions:
+      - [field, u, 'doi.org']
+      - [field, z, '^kostenfrei|^Kostenfrei|^OpenAccess Lizenz|Description of rights in Directory of Open Access Books|^OA$|^Freier Zugriff']
+    u:
+      - [name, url]
+5ArticleFulltextFreeUrlParts:
+  category: FreeAccess
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  856:
+    conditions:
+      - [field, u, 'doaj.org\/article|doaj.org\/toc|edocs.tib.eu\/files|tib.uni-hannover.de\/edoks\/|digibib.tu-bs.de|resolver.sub.uni-goettingen.de|resolver.staatsbibliothek-berlin.de|hdl.handle.net|lib.dr.iastate.edu|www.dzhw.eu\/pdf|www.his.de\/pdf|arxiv.org|publikationsserver.tu-braunschweig.de\/get|bib-pubdb1.desy.de\/record|inef.uni-due.de\/index.php?article_id=|kluedo.ub.uni-kl.de\/frontdoor\/index\/index\/docId\/|wiiw.ac.at|library.fes.de\/pdf-files|www.bis.org\/publ\/bppdf|www.bsu-bund.de\/SharedDocs\/pdf|www.bamf.de\/SharedDocs\/Anlagen\/DE\/Publikationen|bib-pubdb1.desy.de\/record|www.doabooks.org\/doab?func=fulltext|www.pharmazeutische-zeitung.de|clinicaltrials.gov\/show|www.jfe-steel.co.jp\/en\/research\/report\/|www.ressource-deutschland.de\/fileadmin\/|juser.fz-juelich.de\/record\/|www.qip-journal.eu\/index.php\/ams\/article\/download\/|www.ita.rwth-aachen.de\/global\/show_document.asp|opus.bibliothek.uni-wuerzburg.de\/files\/|kth.diva-portal.org\/smash\/record|www.teses.usp.br\/teses\/disponiveis\/|edoc.difu.de\/edoc.php|haab-digital.klassik-stiftung.de\/viewer|darwin-online.org.uk|www.doabooks.org|revistas.unam.mx|produccioncientificaluz.org|www.gbv.de\/dms\/|serwiss.bib.hs-hannover.de|openjournals.hs-hannover.de']
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+TestLabel:
+  view-method: ajax/default.phtml
+  245:
+    a:
+      - [name, label]
+TestLevel:
+  view-method: ajax/default.phtml
+  245:
+    a:
+      - [name, level]
+1ArticleDirectLinkIndicatorFullTextFallbackUrls:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  '035':
+    a:
+      - [ name, level ]
+      - [ replace, '(^.*$)', 'UncertainAccess']
+  245:
+    a:
+      - [ name, label ]
+      - [ replace, '(^.*$)', 'Go to Publication']
+  856:
+    conditions:
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, url]
+2ArticleDirectLinkSubFieldFullTextFallbackUrls:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  '035':
+    a:
+      - [ name, level ]
+      - [ replace, '(^.*$)', 'UncertainAccess']
+  245:
+    a:
+      - [ name, label ]
+      - [ replace, '(^.*$)', 'Go to Publication']
+  856:
+    conditions:
+      - [field, 3, Volltext]
+      - [indicator, 1, 4]
+    u:
+      - [name, url]
+3ArticleDirectLinkUrlPartsFullTextFallbackUrls:
+  category: FullTextFallbackUrls
+  view-method: ajax/link-external.phtml
+  mandatory-field: url
+  856:
+    conditions:
+      - [field, u, 'doi.org']
+    u:
+      - [name, url]
+1GBVILLPPN:
+  category: GBVILL
+  mandatory-field: url
+  view-method: ajax/link-gbvill.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9xX]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($1)&ACT=SRCH']
+2GBVILLPPNJournal:
+  category: GBVILL
+  mandatory-field: url
+  view-method: ajax/link-gbvill.phtml
+  773:
+    conditions:
+      - [ field, w, '\(DE-627\)([0-9xX]+)' ]
+    w:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=ppn($1)&ACT=SRCH']
+3GBVILLISBN:
+  category: GBVILL
+  view-method: ajax/link-gbvill.phtml
+  '020':
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=isb($1)&ACT=SRCH']
+4GBVILLISSN:
+  category: GBVILL
+  view-method: ajax/link-gbvill.phtml
+  '022':
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=iss($1)&ACT=SRCH']
+  773:
+    x:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=iss($1)&ACT=SRCH']
+5GBVILLTitleJournal:
+  category: GBVILL
+  view-method: ajax/link-gbvill.phtml
+  773:
+    t:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
+6GBVILLTitle:
+  category: GBVILL
+  mandatory-field: url
+  view-method: ajax/link-gbvill.phtml
+  245:
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
+  490:
+    a:
+      - [name, url]
+      - [replace, '(^.*$)', 'https://kxp.k10plus.de/DB=2.1/CMD?TRM=tpr($0)&ACT=SRCH']
+ResultFeedbackSolr:
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9A-Z]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Solr']
+ResultFeedbackSearch2:
+  mandatory-field: url
+  view-method: ajax/link-external.phtml
+  '035':
+    conditions:
+      - [ field, a, '\(DE-627\)([0-9A-Z]+)' ]
+    a:
+      - [name, url]
+      - [replace, '\(DE-627\)([0-9A-Z]+)', '/vufind/ResultFeedback/Email?id=$1&searchclassid=Search2']
+SubitoISBN:
+  category: resolver
+  mandatory-field: SB
+  view-method: ajax/link-subito.phtml
+  '035':
+    a:
+      - [name, NB]
+      - [replace, '\(.*\)([0-9A-Z]+)', '$1']
+  '020':
+    a:
+      - [name, SB]
+SubitoISSN:
+  category: resolver
+  mandatory-field: SS
+  view-method: ajax/link-subito.phtml
+  245:
+    a:
+      - [name, ATI]
+  773:
+    t:
+      - [name, JT]
+    x:
+      - [name, SS]
+  952:
+    d:
+      - [name, VOL]
+    j:
+      - [name, APY]
+    h:
+      - [name, PG]
+SubitoISBNMARC:
+  # Example: https://www.subito-doc.de/preorder?SB=1-61779-245-4&NB=666430268
+  #category: Subito
+  mandatory-field: isbn
+  view-method: ajax/link-subito.phtml
+  '035':
+    a:
+      - [name, ppn]
+  '020':
+    a:
+      - [name, isbn]
+SubitoISSNMARC:
+  #category: Subito
+  mandatory-field: issn
+  view-method: ajax/link-subito.phtml
+  245:
+    a:
+      - [name, atitle]
+  773:
+    t:
+      - [name, title]
+    x:
+      - [name, issn]
+  952:
+    d:
+      - [name, volume]
+    j:
+      - [name, date]
+    h:
+      - [name, pages]
+JournalsOnlinePrintElectronic:
+  category: resolver
+  view-method: ajax/link-jop-electronic.phtml
+  mandatory-field: issn
+  773:
+    t:
+      - [name, title]
+    x:
+      - [name, issn]
+  952:
+    d:
+      - [name, volume]
+    j:
+      - [name, date]
+    e:
+      - [name, issue]
+    h:
+      - [name, pages]
+JournalsOnlinePrintPrint:
+  category: resolver
+  view-method: ajax/link-jop-print.phtml
+  mandatory-field: issn
+  773:
+    t:
+      - [name, title]
+    x:
+      - [name, issn]
+  952:
+#    d:
+#      - [name, volume]
+    j:
+      - [name, date]
+#    e:
+#      - [name, issue]
+    h:
+      - [name, pages]
+DAIA:
+  category: resolver
+  view-method: ajax/link-daia.phtml
+  mandatory-field: id
+  '035':
+    conditions:
+      - [field, a, '\(DE-627\)([0-9xX]+)']
+    a:
+      - [name, id]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+Unpaywall:
+  category: resolver
+  view-method: ajax/link-unpaywall.phtml
+  mandatory-field: doi
+  '024':
+    conditions:
+      - [field, 2, 'doi']
+    a:
+      - [name, doi]
+ArticleParentId:
+  category: resolver
+  773:
+    w:
+      - [name, id]
+      - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+  800:
+    w:
+      - [name, id]
+      - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+  810:
+    w:
+      - [name, id]
+      - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+  830:
+    w:
+      - [name, id]
+      - [match, '(^\(DE-601\)|^\(DE-627\))([0-9xX]+)', 2]
+SupportData:
+  '020':
+    9:
+      - [name, isbn]
+  '022':
+    a:
+      - [name, issn]
+  '024':
+    conditions:
+      - [field, 2, 'doi']
+    a:
+      - [name, doi]
+  '773':
+    x:
+      - [name, issn]
+  856:
+    conditions:
+      - [indicator, 1, 4]
+      - [indicator, 2, 0|1]
+    u:
+      - [name, fallbackurl]
+  '980':
+    conditions:
+      - [field, 2, '^370']
+    1:
+      - [name, number]
+    b:
+      - [name, epn]
+    d:
+      - [name, signature]
+    e:
+      - [name, indicator]
+  '912':
+    a:
+      - [name, collection]

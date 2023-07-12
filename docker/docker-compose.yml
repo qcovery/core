@@ -42,7 +42,7 @@ services:
       networks:
         - default
       extra_hosts:
-        - "findex.gbv.de:192.168.65.254"
+        - "findex.gbv.de:192.168.65.2"
 
   qcovery_mailhog:
     image: mailhog/mailhog:latest

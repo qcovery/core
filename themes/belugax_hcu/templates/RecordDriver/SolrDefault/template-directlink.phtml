@@ -1,0 +1,21 @@
+<?php $links = []; ?>
+<?php foreach ($this->solrMarcData as $marcData): ?>
+    <?php
+        $link = '';
+        if (isset($marcData['link']['data'][0])) {
+            $link = $marcData['link']['data'][0];
+        }
+        $linkName = '';
+        if (isset($marcData['linkname']['data'][0])) {
+            $linkName = $marcData['linkname']['data'][0];
+        }
+        $icon = '';
+        if (isset($marcData['ILN']['data'][0]) && $marcData['ILN']['data'][0] == '370') {
+            $icon = '<i class="bel-herz01"></i>';
+            $linkName = $this->transEsc('Link aufrufen');
+        }
+
+        $links[] = '<a href="'.$link.'" target="_blank">'.$linkName.$icon.'</a>';
+    ?>
+<?php endforeach; ?>
+<?=implode('<br/>', $links); ?>
