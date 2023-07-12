@@ -1,0 +1,34 @@
+Title:
+  - title_short:
+    - [name, title]
+    - [concat, ' : ', title_sub]
+  - title:
+    - [name, title]
+  - journal:
+    - [name, title]
+  - series2:
+    - [name, title]
+    - [append, '(-) ']
+NewerTitles:
+  - title_new
+PreviousTitles:
+  - title_old
+PrimaryAuthors:
+  - author
+Edition:
+  - edition
+PublicationDates:
+  - publishDate
+Formats:
+  - formats
+Languages:
+  - language
+LastIndexed:
+  - last_indexed
+HierarchyTopID:
+  - hierarchy_top_id
+HierarchyTopTitle:
+  - hierarchy_top_title
+ContainerRecordID:
+  - hierarchy_parent_id;
+

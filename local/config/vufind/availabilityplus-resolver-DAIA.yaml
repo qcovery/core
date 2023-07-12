@@ -1,0 +1,124 @@
+# In this file rules can be configured to change the output of a resolver.
+# These rules are used in function applyCustomChanges in the resolver class.
+#
+#TestRule:  # name of the rule, required
+#  descripton: 'description' # optional
+#  reason: 'reason for rule' # optional
+#  date: 'date yyyy-mm-dd' # optional
+#  creator: 'John Doe' # optional
+#  examples: 'e.g. an id in the index' # optional
+#  details: 'http://www.more-details.vufind'  # optional, a url
+#  conditions: # one or multiple conditions can be specified that need to match for the actions to take place
+#    - { field: 'field1->subfield1', content: '(.*)' } #field: specifies the path to a field that needs to be checked, use -> to indicate a subfield, subsubfield ... / content: can be a string or regular expression
+#  actions: # indicate what actions are to be taken, if all conditions are fullfilled
+#    - { field: 'field1->subfield1->subsubfield1', content: '' } # complete string replacement by indicating a field and the new content
+#    - { field: 'field1->subfield1', content_field: 'field2->contentfromsubfield2', pattern: '(.*?):(.*)', replacement: '$2'} # regex-based replacement, content can be from the same field or another field
+#    - { function: 'removeItem'} # a function in the resolver can be specified, currently only one function is supported for all resolvers: removeItem
+#    - { function: 'adjustScore', score: 200} # DAIA also supports the function adjustScore, requiring a score parameter with an integer
+
+# Change to system-specific folder structure
+#"@parent_yaml": "../../../../../../../dev.hcu.beluga-core.de/config/vufind/availabilityplus-resolver-DAIA.yaml"
+Signatur:
+  descripton: 'Entfernung des Standortkürzels vor dem Doppelpunkt'
+  reason: 'Signaturen sollen für Nutzer*innen ohne Standortkürzel angezeigt werden'
+  date: '2022-03-29'
+  creator: 'Kristof Keßler'
+  examples: 'Alle mit DAIA abgefragten Titel'
+  details: '-'
+  conditions:
+    - { field: 'availabilityplus->callnumber', content: '(.*?):(.*)' }
+  actions:
+    - { field: 'availabilityplus->callnumber', content_field: 'availabilityplus->callnumber', pattern: '(.*?):(.*)', replacement: '$2'}
+StorageURLRemoval:
+  description: 'Wenn Standort vorhanden, Entfernung der Standort-Url, somit wird keine Verlinkung angezeigt'
+  reason: ''
+  date: ''
+  creator: ''
+  examples: ''
+  detailsLink: ''
+  conditions:
+    - { field: 'storage->id', content: '^(?!\s*$).+' }
+  actions:
+    - { field: 'availabilityplus->storage->url', content: '' }
+DAIAActionRemoval:
+  description: 'Entfernung von daia_action, wenn keine URL vorhanden, also nur Anzeige, wenn Bestell- oder Vormerklink'
+  reason: ''
+  date: ''
+  creator: ''
+  examples: ''
+  detailsLink: ''
+  conditions:
+    - { field: 'availabilityplus->daia_action->url', content: '^$' }
+  actions:
+    - { field: 'availabilityplus->daia_action', content: '' }
+UnavailableDAIA:
+  description: 'Entfernung der DAIA-Ausgabe "derzeit nicht verfügbar"'
+  reason: ''
+  date: ''
+  creator: ''
+  examples: 'PPN 232049661'
+  detailsLink: ''
+  conditions:
+    - { field: 'availabilityplus->daia_hint->label', content: 'not_available' }
+  actions:
+    - { field: 'availabilityplus->daia_hint->level', content: 'daia_orange' }
+UnknownStorageLocationRemoval:
+  description: 'Entfernung der Ausgabe des Standortes bei unbekanntem Standort'
+  reason: ''
+  date: ''
+  creator: ''
+  examples: 'PPN 1666800538'
+  detailsLink: ''
+  conditions:
+    - { field: 'availabilityplus->storage->label', content: 'unknown_location' }
+  actions:
+    - { field: 'availabilityplus->storage->label', content: '' }
+Dienstapparate:
+  description: 'Anpassung für Ausgabe Nutzung bei Dienstapparat'
+  reason: ''
+  date: ''
+  creator: ''
+  examples: 'PPN 1665419822'
+  detailsLink: ''
+  conditions:
+    - { field: 'storage->id', content: 'http://uri.gbv.de/organization/isil/DE-1373@da' }
+  actions:
+    - { field: 'availabilityplus->daia_hint->label', content: 'Nutzung nur für HCU-Angehörige' }
+    - { field: 'availabilityplus->daia_hint->level', content: 'daia_orange' }
+    - { field: 'availabilityplus->callnumber', content_field: 'label', pattern: '(.*)', replacement: '$1'}
+    - Dienstapparate:
+        description: 'Anpassung für Ausgabe Nutzung bei Dienstapparat'
+        reason: ''
+        date: ''
+        creator: ''
+        examples: 'PPN 1665419822'
+        detailsLink: ''
+        conditions:
+          - { field: 'storage->id', content: 'http://uri.gbv.de/organization/isil/DE-1373@da' }
+        actions:
+          - { field: 'availabilityplus->daia_hint->label', content: 'Nutzung nur für HCU-Angehörige' }
+          - { field: 'availabilityplus->daia_hint->level', content: 'daia_orange' }
+          - { field: 'availabilityplus->callnumber', content_field: 'label', pattern: '(.*)', replacement: '$1' }
+Praesenznutzung:
+  description: 'Anpassung für Ausgabe "Nur in der Bibliothek nutzbar"'
+  reason: ''
+  date: ''
+  creator: ''
+  examples: 'PPN 125181450'
+  detailsLink: ''
+  conditions:
+    - { field: 'availabilityplus->service', content: 'presentation' }
+  actions:
+    - { field: 'availabilityplus->daia_hint->level', content: 'daia_orange' }
+Erwerbungsvorgang:
+  description: 'Anpassungen für Titel im Erwerbungsvorgang'
+  reason: ''
+  date: '2022-10-09'
+  creator: 'Kristof Kessler'
+  examples: 'PPN 1775924033 (2022-10-09)'
+  detailsLink: ''
+  conditions:
+    - { field: 'storage->id', content: 'http://uri.gbv.de/organization/isil/DE-1373@erwerb' }
+  actions:
+    - { field: 'availabilityplus->storage->label', content: 'title_is' }
+    - { field: 'availabilityplus->daia_hint', content: '' }
