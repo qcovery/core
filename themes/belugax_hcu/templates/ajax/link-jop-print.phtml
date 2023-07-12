@@ -1,0 +1,18 @@
+<?php
+foreach($data as $result) {
+    if(!empty($result['label'])){
+        $level = $result['level'];
+        $label = $result['label'];
+        $url = $result['url'];
+        echo '<div class="delimiter"></div>';
+        //echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+        echo $this->translate($label).': ';
+        if(!empty($result['signature'])) {
+            echo '<span class="'.$level.' PrintAccess">'.$result['signature'].'</span>';
+        } else {
+            echo '<span class="'.$level.' PrintAccess">'.$result['title'].'</span>';
+        }
+        if($mode == 'break_on_first') break;
+    }
+}
+?>

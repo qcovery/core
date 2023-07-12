@@ -1,0 +1,206 @@
+<?=$this->doctype('HTML5')?>
+<html lang="<?=$this->layout()->userLang?>">
+  <head>
+    <?$this->headThemeResources()?>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <?=$this->headMeta()?>
+    <?=$this->headTitle()?>
+    <?
+      // Set up OpenSearch link:
+      $this->headLink(
+        [
+          'href' => $this->url('search-opensearch') . '?method=describe',
+          'type' => 'application/opensearchdescription+xml',
+          'title' => $this->transEsc('Library Catalog Search'),
+          'rel' => 'search'
+        ]
+      );
+    ?>
+    <!-- RTL styling -->
+    <? if ($this->layout()->rtl) {
+      $this->headLink()->appendStylesheet('vendor/bootstrap-rtl.min.css');
+    } ?>
+    <?=$this->headLink()?>
+    <?=$this->headStyle()?>
+    <?
+      if (!isset($this->renderingError)) {
+        // Add translation strings
+        $this->jsTranslations()->addStrings(
+          [
+            'add_tag_success' => 'add_tag_success',
+            'bulk_email_success' => 'bulk_email_success',
+            'bulk_noitems_advice' => 'bulk_noitems_advice',
+            'bulk_save_success' => 'bulk_save_success',
+            'close' => 'close',
+            'collection_empty' => 'collection_empty',
+            'error_occurred' => 'An error has occurred',
+            'go_to_list' => 'go_to_list',
+            'input_no_space' => 'input_no_space',
+            'libphonenumber_invalid' => 'libphonenumber_invalid',
+            'libphonenumber_invalidcountry' => 'libphonenumber_invalidcountry',
+            'libphonenumber_invalidregion' => 'libphonenumber_invalidregion',
+            'libphonenumber_notanumber' => 'libphonenumber_notanumber',
+            'libphonenumber_toolong' => 'libphonenumber_toolong',
+            'libphonenumber_tooshort' => 'libphonenumber_tooshort',
+            'libphonenumber_tooshortidd' => 'libphonenumber_tooshortidd',
+            'loading' => 'Loading',
+            'more' => 'more',
+            'number_thousands_separator' => [
+                'number_thousands_separator', null, ','
+            ],
+            'sms_success' => 'sms_success'
+          ]
+        );
+        // Add libphonenumber.js strings
+        $this->jsTranslations()->addStrings(
+          [
+            "Phone number invalid" => 'libphonenumber_invalid',
+            "Invalid country calling code" => 'libphonenumber_invalidcountry',
+            "Invalid region code" => 'libphonenumber_invalidregion',
+            "The string supplied did not seem to be a phone number" => 'libphonenumber_notanumber',
+            "The string supplied is too long to be a phone number" => 'libphonenumber_toolong',
+            "The string supplied is too short to be a phone number" => 'libphonenumber_tooshort',
+            "Phone number too short after IDD" => 'libphonenumber_tooshortidd'
+          ]
+        );
+        // Deal with cart stuff:
+        $cart = $this->cart();
+        if ($cart->isActive()) {
+          $this->headScript()->appendFile("vendor/cookies.js");
+          $this->headScript()->appendFile("cart.js");
+          $domain = $cart->getCookieDomain();
+          if (!empty($domain)) {
+            $this->headScript()->appendScript(
+              'VuFind.cart.setDomain("' . $domain . '");'
+            );
+          }
+          $cookiePath = $cart->getCookiePath();
+          if (!empty($cookiePath)) {
+            $this->headScript()->appendScript(
+              'VuFind.cart.setCookiePath("' . $cookiePath . '");'
+            );
+          }
+          $this->jsTranslations()->addStrings(
+            [
+              'addBookBag' => 'Add to Book Bag',
+              'bookbagFull' => 'bookbag_full_msg',
+              'bookbagMax' => $cart->getMaxSize(),
+              'bookbagStatusFull' => 'bookbag_full',
+              'confirmDelete' => 'confirm_delete',
+              'confirmEmpty' => 'bookbag_confirm_empty',
+              'itemsAddBag' => 'items_added_to_bookbag',
+              'itemsInBag' => 'items_already_in_bookbag',
+              'removeBookBag' => 'Remove from Book Bag',
+              'viewBookBag' => 'View Book Bag'
+            ]
+          );
+        }
+        $this->headScript()->appendScript(
+          'var userIsLoggedIn = ' . ($this->auth()->isLoggedIn() ? 'true' : 'false') . ';'
+        );
+      }
+
+      // Session keep-alive
+      if ($this->keepAlive()) {
+          $this->headScript()->appendScript('var keepAliveInterval = '
+            . $this->keepAlive());
+          $this->headScript()->appendFile("keep_alive.js");
+      }
+    ?>
+    <?
+      $root = rtrim($this->url('home'), '/');
+      $translations = $this->jsTranslations()->getJSON();
+      $dsb = DEFAULT_SEARCH_BACKEND;
+      $setupJS = <<<JS
+VuFind.path = '{$root}';
+VuFind.defaultSearchBackend = '{$dsb}';
+VuFind.addTranslations({$translations});
+JS;
+      $this->headScript()->appendScript($setupJS);
+    ?>
+    <?=$this->headScript()?>
+  </head>
+  <body class="template-dir-<?=$this->templateDir?> template-name-<?=$this->templateName?> <?=$this->layoutClass('offcanvas-row')?><? if ($this->layout()->rtl): ?> rtl<? endif; ?>">
+    <? // Set up the search box -- there are three possible cases:
+      // 1. No search box was set; we should default to the normal box
+      // 2. It was set to false; we should display nothing
+      // 3. It is set to a custom string; we should display the provided version
+      // Set up default search box if no data was provided from the template;
+      // this covers case 1.  Cases 2 and 3 are then covered by logic below.
+      if (!isset($this->layout()->searchbox)) {
+        $this->layout()->searchbox = $this->render('search/searchbox.phtml');
+      }
+    ?>
+    <header class="hidden-print">
+      <? if (isset($this->layout()->srmessage)): // message for benefit of screen-reader users ?>
+        <span class="sr-only" role="heading" aria-level="1"><?=$this->layout()->srmessage ?></span>
+      <? endif; ?>
+      <a class="sr-only" href="#content"><?=$this->transEsc('Skip to content') ?></a>
+      <?=$this->render('header.phtml')?>
+    </header>
+    <? if (!preg_match('/\/vufind\/?(\/Search\/Home)?[^\/]*$/', $_SERVER['REQUEST_URI'])): ?>
+        <div role="main" class="main belugx-follow-content">
+            <nav class="breadcrumbs">
+                <div class="container">
+                    <? $notificationConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/notification.ini'), true); ?>
+                    <? if(!empty($notificationConfig['Global'])): ?>
+                        <? if (!empty($notificationConfig['Global']['error_notification'])): ?>
+                            <div id="belugax-notification"><?=$this->translate($notificationConfig['Global']['error_notification']);?></div>
+                        <? elseif (!empty($notificationConfig['Global']['ip_notification'])): ?>
+                            <?
+                            $ip = '';
+                            if(isset($_SERVER['REMOTE_ADDR'])) {
+                                $ip = $_SERVER['REMOTE_ADDR'];
+                            }
+                            ?>
+                            <?
+	                            $inIpRange = false;
+	                            foreach ($notificationConfig['Global']['ip_notification'] as $ipRange) {
+		                            if (strpos($ip, $ipRange) > -1) {
+			                            $inIpRange = true;
+		                            }
+	                            }
+                            ?>
+                            <? if (!$inIpRange) { ?>
+                                <div id="belugax-notification"><?=$this->translate($notificationConfig['Global']['ip_notification_message'])?></div>
+                            <? } ?>
+                        <? endif; ?>
+                    <? endif; ?>
+                </div>
+            </nav>
+          <div id="content" class="container">
+            <?=$this->layout()->content ?>
+          </div>
+        </div>
+    <? else: ?>
+        <div id="content" class="">
+            <?=$this->layout()->content ?>
+        </div>
+    <? endif; ?>
+    <?=$this->render('footer.phtml')?>
+    <!-- MODAL IN CASE WE NEED ONE -->
+    <div id="modal" class="modal fade hidden-print" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="bel-ende03" aria-hidden="true"></i></button>
+          <div class="modal-body"><?=$this->transEsc('Loading') ?>...</div>
+        </div>
+      </div>
+    </div>
+    <div class="offcanvas-toggle" data-toggle="offcanvas"><i class="fa" title="<?=$this->transEsc('sidebar_expand') ?>"></i></div>
+    <div class="offcanvas-overlay" data-toggle="offcanvas"></div>
+<? if (false): ?>
+    <?=$this->googleanalytics()?>
+    <?=$this->piwik()?>
+    <? if ($this->recaptcha()->active()): ?>
+      <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::FILE, "https://www.google.com/recaptcha/api.js?onload=recaptchaOnLoad&render=explicit&hl=" . $this->layout()->userLang, 'SET')?>
+    <? endif; ?>
+<? endif; ?>
+    <!--Module HelpTooltips-->
+    <?=$this->render('helptooltips/helptooltips.phtml', ['context' => 'base']) ?>
+    <!--Module HelpTooltips-->
+<script async type="text/javascript" src="https://userlike-cdn-widgets.s3-eu-west-1.amazonaws.com/30a4edb3b27a4934bec06c879fc53e41f0c5cf1e361b4d77b436efc48e4393ba.js"></script>
+  </body>
+</html>

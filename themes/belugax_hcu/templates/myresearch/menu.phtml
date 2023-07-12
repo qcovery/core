@@ -1,0 +1,90 @@
+<?
+  $user = $this->auth()->isLoggedIn();
+  $patron = $user ? $this->auth()->getILSPatron() : false;
+  $capabilityParams = $patron ? ['patron' => $patron] : [];
+?>
+<div class="belugax-item-nav">
+    <div class="myresearch-menu">
+        <span>
+            <i class="bel-nutzer05"></i><?=$this->transEsc('Your Account')?>
+        </span>
+      <? if ('ils-none' !== $this->ils()->getOfflineMode()): ?>
+        <? if ($this->ils()->checkCapability('getMyTransactions', $capabilityParams)): ?>
+          <a href="<?=$this->url('myresearch-checkedout')?>"<?=$this->active == 'checkedout' ? ' class="active"' : ''?>>
+            <?=$this->transEsc('Checked Out Items')?>
+          </a>
+        <? endif; ?>
+        <? if ($this->ils()->checkFunction('getMyTransactionHistory', $capabilityParams)): ?>
+          <a href="<?=$this->url('myresearch-historicloans')?>"<?=$this->active == 'historicloans' ? ' class="active"' : ''?>">
+            <?=$this->transEsc('Loan History')?>
+          </a>
+        <? endif; ?>
+        <? if ($this->ils()->checkCapability('getMyHolds', $capabilityParams)): ?>
+          <a href="<?=$this->url('myresearch-holds')?>"<?=$this->active == 'holds' ? ' class="active"' : ''?>>
+            <?=$this->transEsc('Holds_Interlibrary_Loans')?>
+          </a>
+          <? /*
+          <a href="<?=str_replace("Holds","Recalls",$this->url('myresearch-holds'))?>"<?=$this->active == 'recalls' ? ' class="active"' : ''?>>
+            <?=$this->transEsc('Recalls')?>
+          </a>
+          */ ?>
+        <? endif; ?>
+        <? if ($this->ils()->checkFunction('StorageRetrievalRequests', $capabilityParams)): ?>
+          <a href="<?=$this->url('myresearch-storageretrievalrequests')?>"<?=$this->active == 'storageRetrievalRequests' ? ' class="active"' : ''?>>
+            <?=$this->transEsc('Storage Retrieval Requests')?>
+          </a>
+        <? endif; ?>
+        <? if ($this->ils()->checkFunction('ILLRequests', $capabilityParams)): ?>
+        <a href="<?=$this->url('myresearch-illrequests')?>"<?=$this->active == 'ILLRequests' ? ' class="active"' : ''?>>
+          <?=$this->transEsc('Interlibrary Loan Requests')?>
+        </a>
+        <? endif; ?>
+        <? if ($this->ils()->checkCapability('getMyFines', $capabilityParams)): ?>
+          <a href="<?=$this->url('myresearch-fines')?>"<?=$this->active == 'fines' ? ' class="active"' : ''?>>
+            <?=$this->transEsc('Fines')?>
+          </a>
+        <? endif; ?>
+        <? if ($this->ils()->checkCapability('getMyProfile', $capabilityParams)): ?>
+          <a href="<?=$this->url('myresearch-profile')?>"<?=$this->active == 'profile' ? ' class="active"' : ''?>>
+            <?=$this->transEsc('Profile')?>
+          </a>
+        <? endif; ?>
+        <? if ($user && $user->libraryCardsEnabled()): ?>
+          <a href="<?=$this->url('librarycards-home')?>"<?=$this->active == 'librarycards' ? ' class="active"' : ''?>>
+            <?=$this->transEsc('Library Cards')?>
+          </a>
+        <? endif; ?>
+      <? endif; ?>
+      <? if ($user && $this->auth()->getManager()->supportsPasswordChange()): ?>
+          <div class="myresearch-menu">
+              <a href="<?=$this->url('myresearch-changepassword') ?>"<?=$this->active == 'newpassword' ? ' class="active"' : ''?>>
+                  <?=$this->transEsc('Change Password') ?>
+              </a>
+          </div>
+      <? endif; ?>
+    </div>
+</div>
+<? if ($user && $this->userlist()->getMode() !== 'disabled'): ?>
+<div class="belugax-item-nav">
+      <div class="myresearch-menu">
+          <span>
+              <i class="bel-inhalt"></i><?=$this->transEsc('Your Lists')?>
+          </span>
+        <? if ($this->accountCapabilities()->getSavedSearchSetting() === 'enabled'): ?>
+            <a href="<?=$this->url('search-history')?>?require_login"<?=$this->active == 'history' ? ' class="active"' : ''?>>
+                <?=$this->transEsc('history_saved_searches')?>
+            </a>
+        <? endif; ?>
+        <? $lists = $user->getLists() ?>
+        <? foreach ($lists as $list): ?>
+          <a href="<?=$this->url('userList', ['id' => $list['id']])?>"<?=$this->active == 'list' . $list['id'] ? ' class="active"' : ''?>>
+            <?=$this->escapeHtml($list['title'])?>
+            <span class="badge"><?=$list->cnt ?></span>
+          </a>
+        <? endforeach; ?>
+        <a href="<?=$this->url('editList', ['id' => 'NEW'])?>">
+          <?=$this->transEsc('Create a List') ?>
+        </a>
+      </div>
+</div>
+<? endif ?>

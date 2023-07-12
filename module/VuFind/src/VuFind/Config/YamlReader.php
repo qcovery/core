@@ -175,7 +175,7 @@ class YamlReader
     {
         // First load current file:
         $results = (!empty($file) && file_exists($file))
-            ? Yaml::parse(file_get_contents($file)) : [];
+            ? Yaml::parse(file_get_contents($file), Yaml::PARSE_CUSTOM_TAGS) : [];
 
         // Override default parent with explicitly-defined parent, if present:
         if (isset($results['@parent_yaml'])) {

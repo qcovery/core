@@ -1,0 +1,8 @@
+<? foreach ($solrMarcData as $rvk): ?>
+    <? if (isset($rvk['link']['data'][0])): ?>
+        <div class="rvk-wrapper">
+            <span class="rvk-name"><a class="rvk-link" href="<?=$this->context($this)->renderInContext('RecordDriver/SolrDefault/link-rvk.phtml', ['lookfor' => $rvk['link']['data'][0]])?>"><?=$rvk['link']['data'][0];?></a><i class="rvk-status"></i></span>
+            <div class="rvk-details" data-rvk="<?=$rvk['link']['data'][0];?>" data-rvk-hover></div>
+        </div>
+    <? endif; ?>
+<? endforeach; ?>

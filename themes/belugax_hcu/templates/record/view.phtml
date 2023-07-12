@@ -1,0 +1,115 @@
+<?
+  // Set up standard record scripts:
+  $this->headScript()->appendFile("record.js");
+  $this->headScript()->appendFile("check_save_statuses.js");
+  // Activate Syndetics Plus if necessary:
+  if ($this->syndeticsPlus()->isActive()) {
+    $this->headScript()->appendFile($this->syndeticsPlus()->getScript());
+  }
+
+  // Add RDF header link if applicable:
+  if ($this->export()->recordSupportsFormat($this->driver, 'RDF')) {
+    $this->headLink()->appendAlternate($this->recordLink()->getActionUrl($this->driver, 'RDF'), 'application/rdf+xml', 'RDF Representation');
+  }
+
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs = '<li>' . $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '', '</li> ') .
+    '<li class="active">' . $this->recordLink()->getBreadcrumb($this->driver) . '</li> ';
+  $this->layout()->title = $this->driver->getShortTitle();
+?>
+
+<div class="record source<?=$this->escapeHtmlAttr($this->driver->getSourceIdentifier())?>">
+  <div class="<?=$this->layoutClass('mainbody')?>">
+    <input type="hidden" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueId())?>" class="hiddenId" />
+    <input type="hidden" value="<?=$this->escapeHtmlAttr($this->driver->getSourceIdentifier()) ?>" class="hiddenSource" />
+    <?=$this->flashmessages()?>
+    <?=$this->record($this->driver)->getCoreMetadata()?>
+    <?=$this->driver->supportsCoinsOpenURL()?'<span class="Z3988" title="' . $this->escapeHtmlAttr($this->driver->getCoinsOpenURL()) . '"></span>':''?>
+  </div>
+
+  <div class="<?=$this->layoutClass('sidebar')?>">
+      <? if (isset($this->scrollData) && ($this->scrollData['previousRecord'] || $this->scrollData['nextRecord'])): ?>
+          <div class="belugax-item-nav">
+              <? if ($this->scrollData['previousRecord']): ?>
+                  <? if ($this->scrollData['firstRecord']): ?>
+                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['firstRecord'])?>" class="button-red" title="<?=$this->transEsc('First Search Result')?>" rel="nofollow"><i class="bel-pfeil-r01"></i></a>
+                  <? endif; ?>
+                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['previousRecord'])?>" class="button-red" title="<?=$this->transEsc('Previous Search Result')?>" rel="nofollow"><i class="bel-pfeil-r01"></i></a>
+              <? else: ?>
+                  <? if ($this->scrollData['firstRecord']): ?>
+                      <a href="#" class="button-red"><i class="bel-pfeil-r01"></i></a>
+                  <? endif; ?>
+                  <a href="#" class="button-red"><i class="bel-pfeil-r01"></i></a>
+              <? endif; ?>
+              <? if ($this->scrollData['nextRecord']): ?>
+                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['nextRecord'])?>" class="button-red" title="<?=$this->transEsc('Next Search Result')?>" rel="nofollow"><i class="bel-pfeil-l01"></i></a>
+                  <? if ($this->scrollData['lastRecord']): ?>
+                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['lastRecord'])?>" class="button-red" title="<?=$this->transEsc('Last Search Result')?>" rel="nofollow"><i class="bel-pfeil-l01"></i></a>
+                  <? endif; ?>
+              <? else: ?>
+                  <a href="#" class="button-red"><i class="bel-pfeil-l01"></i></a>
+                  <? if ($this->scrollData['lastRecord']): ?>
+                      <a href="#" class="button-red"><i class="bel-pfeil-l01"></i></a>
+                  <? endif; ?>
+              <? endif; ?>
+              <?php $last = $this->searchMemory()->getLastSearchLink(''); ?>
+              <?php $last = preg_replace('/^.+"(.+)".+/', '$1', $last); ?>
+              <? if (!empty($last)): ?>
+                  <a href="<?=$last?>" class="button-red"><?=$this->transEsc('back')?></a>
+              <? endif; ?>
+              <div class="belugax-item-count">
+                  <?=$this->transEsc('of_num_results', [
+                      '%%position%%' => $this->localizedNumber($this->scrollData['currentPosition']),
+                      '%%total%%' => $this->localizedNumber($this->scrollData['resultTotal'])
+                  ]) ?>
+              </div>
+          </div>
+      <? endif; ?>
+
+      <div class="belugax-item-checkout">
+          <h3><?=$this->transEsc('Access & availability')?></h3>
+
+          <? $selectedLibrary = $this->connectedlibraries()->getSelectedLibrary();?>
+          <?
+          $missingCopy = $this->driver->getMarcData('MissingCopy');
+          $hideMissingCopy = false;
+          /* if (isset($missingCopy[0]['field_y']['data'][0])) {
+              if ($missingCopy[0]['field_y']['data'][0] == 'z') {
+                  $hideMissingCopy = true;
+              }
+          } */
+          ?>
+          <? if (isset($selectedLibrary['code']) && $selectedLibrary['code'] != 'Hamburg' && !$hideMissingCopy): ?>
+                <!--Module AvailabilityPlus-->
+                <?=$this->render('record/availabilityplus-view.phtml', ['driver' => $this->driver]) ?>
+                <!--Module AvailabilityPlus-->
+          <? else: ?>
+              <!-- Module Libraries -->
+              <?=$this->render('RecordDriver/SolrDefault/libraries-core.phtml', ['searchClassId' => $this->searchClassId, 'driver' => $this->driver]) ?>
+              <!-- Module Libraries -->
+          <? endif; ?>
+
+          <?php
+          if (isset($this->driver->getRawData()['format_facet']) && in_array('Elektronische Ressource', $this->driver->getRawData()['format_facet'])): ?>
+              <div class="help-me">
+                  <a href="<?=$this->url('resultfeedback-email').'?id='.$this->driver->getUniqueId().'&searchclassid='.$this->searchClassId?>" target="_blank"><i class="bel-frage"></i> <?=$this->transEsc("Contact us about this title")?></a>
+              </div>
+          <?php endif; ?>
+      </div>
+
+      <!-- Module DependentWorks -->
+      <?=$this->render('RecordDriver/SolrDefault/dependentworks-core.phtml') ?>
+      <!-- Module DependentWorks -->
+
+      <div class="not-found-contact hide">
+          <i class="bel-frage"></i>
+          <div class="not-found-message">
+              <?=$this->translate("Haven't found what you're looking for?")?>
+          </div>
+      </div>
+  </div>
+</div>
+<?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, '$(document).ready(recordDocReady);', 'SET'); ?>
+<!--Module HelpTooltips-->
+<?=$this->render('helptooltips/helptooltips.phtml', ['context' => 'core']) ?>
+<!--Module HelpTooltips-->

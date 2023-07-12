@@ -1,0 +1,20 @@
+<?php
+    $display_link = true;
+    if($list){
+        foreach($SolrMarcSupportData as $data_key => $data_value) {
+            if(!empty($data_value['collection']['data'][0]) && in_array($data_value['collection']['data'][0], array('GBV_ILN_22', 'GBV_ILN_23', 'GBV_ILN_34', 'GBV_ILN_60', 'GBV_ILN_113', 'GBV_ILN_127', 'GBV_ILN_139', 'GBV_ILN_203', 'GBV_ILN_370', 'GBV_ILN_636'))) {
+                $display_link = false;
+                break;
+            }
+        }
+    }
+	if($url && $display_link) {
+        if(!$list) echo '<div class="availability_item">';
+		echo '<div class="delimiter"></div>';
+		echo '<a href="'.$url.'" class="'.$level.' link_external" title="'.$label.'" target="_blank">'.$this->translate($label).'</a><br/>';
+        if(!$list) {
+            echo '<span>'.$this->translate('interlibrary_signup').'</span>';
+            echo '</div>';
+        }
+	} 
+?>

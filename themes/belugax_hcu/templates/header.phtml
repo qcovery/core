@@ -1,0 +1,101 @@
+<div class="banner container navbar">
+    <div class="hcu-gotostart">
+        <a href="<?=$this->url('home')?>"><i class="bel-haus" aria-hidden="true"></i><?=$this->transEsc('Start search')?></a>
+    </div>
+
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <i class="bel-menu" aria-hidden="true"></i>
+        </button>
+        <a class="navbar-brand lang-<?=$this->layout()->userLang ?>" href="https://www.hcu-hamburg.de/bibliothek">
+            <img src="<?=$this->imageLink('hcu-logo.svg')?>" alt="HCU Hamburg" width="192" height="50">
+        </a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="header-collapse">
+        <nav>
+            <ul role="navigation" class="nav navbar-nav navbar-right flip">
+                <? $cart = $this->cart(); if ($cart->isActive()): ?>
+                    <li id="cartSummary">
+                        <a id="cartItems" data-lightbox title="<?=$this->transEsc('View Book Bag')?>" href="<?=$this->url('cart-home')?>">
+                            <i class="bel-stern02" aria-hidden="true"></i> <?=$this->transEsc('items')?> (<strong><?//=count($cart->getItems())?></strong>)
+                            <span class="full<?//=!$cart->isFull() ? ' hidden' : '' ?>">(<?=$this->transEsc('bookbag_full') ?>)</span>
+                        </a>
+                    </li>
+                <? endif; ?>
+
+                <? if (isset($this->layout()->allLangs) && count($this->layout()->allLangs) > 1): ?>
+                    <li class="language dropdown">
+                        <form method="post" name="langForm" id="langForm">
+                            <input type="hidden" name="mylang"/>
+                        </form>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="bel-welt"></i><?=$this->transEsc("Language")?> <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <? foreach ($this->layout()->allLangs as $langCode => $langName): ?>
+                                <li<?=$this->layout()->userLang == $langCode ? ' class="active"' : ''?>><a href="#" onClick="document.langForm.mylang.value='<?=$langCode?>';document.langForm.submit()"><?=$this->displayLanguageOption($langName)?></a></li>
+                            <? endforeach; ?>
+                        </ul>
+                    </li>
+                <? endif; ?>
+
+                <!--Module HelpTooltips-->
+                <?=$this->render('helptooltips/menu.phtml', []) ?>
+                <!--Module HelpTooltips-->
+
+                <? $account = $this->auth()->getManager(); ?>
+                <? if (is_object($account) && $account->loginEnabled()): // hide login/logout if unavailable ?>
+                    <li class="logoutOptions<? if(!$account->isLoggedIn()): ?> hidden<? endif ?>">
+                        <a href="<?=$this->url('myresearch-home', [], ['query' => ['redirect' => 0]])?>"><i class="bel-nutzer05" aria-hidden="true"></i> <?=$this->transEsc("Your Account")?></a>
+                    </li>
+                    <li>
+                        <span id="login_help"></span>
+                    </li>
+                    <li class="logoutOptions<? if(!$account->isLoggedIn()): ?> hidden<? endif ?>">
+                        <a href="<?=$this->url('myresearch-logout')?>" class="logout"><i class="bel-ausgang" aria-hidden="true"></i> <?=$this->transEsc("Log Out")?></a>
+                    </li>
+                    <li id="loginOptions"<? if($account->isLoggedIn()): ?> class="hidden"<? endif ?>>
+                        <? if ($account->getSessionInitiator($this->serverUrl($this->url('myresearch-home')))): ?>
+                            <a href="<?=$this->url('myresearch-userlogin')?>"><i class="bel-eingang" aria-hidden="true"></i> <?=$this->transEsc("Institutional Login")?></a>
+                        <? else: ?>
+                            <a href="<?=$this->url('myresearch-userlogin')?>" data-lightbox><i class="bel-eingang" aria-hidden="true"></i> <?=$this->transEsc("Login")?></a>
+                        <? endif; ?>
+                    </li>
+                <? endif; ?>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<? if ($this->layout()->searchbox !== false): ?>
+    <div class="search navbar">
+        <nav class="nav searchbox hidden-print">
+
+            <div class="container">
+
+                <div class="belugax-search-follow">
+
+                    <div class="belugax-search-input-follow">
+                        <?=$this->layout()->searchbox ?>
+                    </div>
+                    <ul class="belugax-search-aside-ph">
+                        <?php if (stristr($_SERVER['REQUEST_URI'], '/vufind/Search2/')): ?>
+                            <li><a href="/vufind/Search2/Advanced" class="belugax-low-link" rel="nofollow"><?=$this->transEsc('Advanced Search')?></a></li>
+                        <?php else: ?>
+                            <li><a href="/vufind/Search/Advanced" class="belugax-low-link" rel="nofollow"><?=$this->transEsc('Advanced Search')?></a></li>
+                        <?php endif; ?>
+                        <li><a href="/vufind/Search/History" class="belugax-low-link" rel="nofollow"><?=$this->transEsc('Search History')?></a></li>
+                        <? if (isset($_GET['lookfor'])): ?>
+                            <li><a href="https://katalog.b.tuhh.de/DB=22/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=<?=$this->escapeHtmlAttr($_GET['lookfor']);?>" class="belugax-low-link" rel="nofollow" target="_blank"><?=$this->transEsc('Search in the old catalog')?></a></li>
+                        <? else: ?>
+                            <li><a href="https://katalog.b.tuhh.de/DB=22/" class="belugax-low-link" rel="nofollow" target="_blank"><?=$this->transEsc('Search in the old catalog')?></a></li>
+                        <? endif; ?>
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </nav>
+    </div>
+<? endif; ?>

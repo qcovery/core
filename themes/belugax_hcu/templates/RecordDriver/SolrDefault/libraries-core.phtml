@@ -1,0 +1,16 @@
+<?php $collectionDetails = $this->driver->getMarcData('CollectionDetails'); ?>
+<?php $libraryList = $this->connectedlibraries()->getConnectedLibrariesCodes($this->searchClassId); ?>
+<?php if (!empty($libraryList)): ?>
+<ul id="externalLibraries">
+    <? foreach ($libraryList as $library):?>
+      <? foreach ($collectionDetails as $collectionDetail):  ?>
+        <? if (isset($collectionDetail['code']['data'][0])): ?>
+          <? if ($library == $collectionDetail['code']['data'][0]): ?>
+            <? $externalLinkData = $this->connectedlibraries()->getConnectedLibrariesLinkData($library) ?>
+            <li style="margin:0px"><a href="<?= str_ireplace('<ppn>', $this->driver->getUniqueID(), $externalLinkData['urlPattern']); ?>" target="_blank"><?=$externalLinkData['title']?></a></li>
+          <? endif; ?>
+        <? endif; ?>
+      <? endforeach;?>
+    <? endforeach;?>
+</ul>
+<?php endif; ?>

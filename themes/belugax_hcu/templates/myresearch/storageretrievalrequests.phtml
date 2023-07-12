@@ -1,0 +1,218 @@
+<?php
+  // Set up page title:
+  $this->headTitle($this->translate('Storage Retrieval Requests'));
+
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('Storage Retrieval Requests') . '</li>';
+
+  $this->cancelForm = false;
+?>
+
+<div class="<?=$this->layoutClass('mainbody')?>">
+  <h2><?=$this->transEsc('Storage Retrieval Requests') ?></h2>
+
+  <?=$this->flashmessages()?>
+
+  <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+
+  <?php if (!empty($this->recordList)): ?>
+    <?php if ($this->cancelForm): ?>
+      <form name="cancelForm" class="inline" method="post" id="cancelStorageRetrievalRequest">
+        <input type="hidden" id="submitType" name="cancelSelected" value="1"/>
+        <input type="hidden" id="cancelConfirm" name="confirm" value="0"/>
+        <div class="btn-group">
+          <input id="cancelSelected" name="cancelSelected" type="submit" value="<?=$this->transEsc("storage_retrieval_request_cancel_selected") ?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown"/>
+          <ul class="dropdown-menu">
+            <li class="disabled"><a><?=$this->transEsc("confirm_storage_retrieval_request_cancel_selected_text") ?></a></li>
+            <li><a href="#" onClick="$('#cancelConfirm').val(1);$('#submitType').attr('name','cancelSelected');$(this).parents('form').submit(); return false;"><?=$this->transEsc('confirm_dialog_yes') ?></a></li>
+            <li><a href="#" onClick="return false;"><?=$this->transEsc('confirm_dialog_no')?></a></li>
+          </ul>
+        </div>
+        <div class="btn-group">
+          <input id="cancelAll" name="cancelAll" type="submit" value="<?=$this->transEsc("storage_retrieval_request_cancel_all") ?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown"/>
+          <ul class="dropdown-menu">
+            <li class="disabled"><a><?=$this->transEsc("confirm_storage_retrieval_request_cancel_all_text") ?></a></li>
+            <li><a href="#" onClick="$('#cancelConfirm').val(1);$('#submitType').attr('name','cancelAll');$(this).parents('form').submit(); return false;"><?=$this->transEsc('confirm_dialog_yes') ?></a></li>
+            <li><a href="#" onClick="return false;"><?=$this->transEsc('confirm_dialog_no')?></a></li>
+          </ul>
+        </div>
+    <?php endif; ?>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+            <?php /*
+            <th></th>
+            <th></th>
+            */ ?>
+            <th><?=$this->transEsc('Title')?></th>
+            <th><?=$this->transEsc('Call Number')?></th>
+            <?php /*
+            <th><?=$this->transEsc('pick_up_location')?></th>
+            */ ?>
+            <th><?=$this->transEsc('Available Since')?></th>
+            <?php /*
+            <th></th>
+            <th><?=$this->transEsc('by')?></th>
+            <th></th>
+            <th><?=$this->transEsc('Volume')?></th>
+            <th><?=$this->transEsc('Year of Publication')?></th>
+            <th><?=$this->transEsc('Expires') ?></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            */ ?>
+        </tr>
+      </thead>
+      <tbody>
+        <?php $iteration = 0; ?>
+        <?php foreach ($this->recordList as $resource): ?>
+            <?php $iteration++; ?>
+            <?php $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
+
+            <tr id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>">
+              <?php /*
+              <td>
+              <?php if ($this->cancelForm && isset($ilsDetails['cancel_details'])): ?>
+                <?php $safeId = preg_replace('/[^a-zA-Z0-9]/', '', $resource->getUniqueId()); ?>
+                    <div class="checkbox">
+                      <input type="hidden" name="cancelAllIDS[]" value="<?=$this->escapeHtmlAttr($ilsDetails['cancel_details']) ?>" />
+                      <label class="pull-left flip">
+                        <input type="checkbox" name="cancelSelectedIDS[]" value="<?=$this->escapeHtmlAttr($ilsDetails['cancel_details']) ?>" id="checkbox_<?=$safeId?>" />
+                      </label>
+                    </div>
+              <?php endif; ?>
+              </td>
+              <td>
+              <?php
+                $coverDetails = $this->record($resource)->getCoverDetails('storageretrievalrequests', 'small', $this->recordLink()->getUrl($resource));
+                $cover = $coverDetails['html'];
+                $thumbnail = false;
+                $thumbnailAlignment = $this->record($resource)->getThumbnailAlignment('account');
+                if ($cover):
+                  ob_start(); ?>
+                      <div class="media-<?=$thumbnailAlignment ?> <?=$this->escapeHtmlAttr($coverDetails['size'])?>">
+                        <?=$cover ?>
+                      </div>
+                      <?php $thumbnail = ob_get_contents(); ?>
+                    <?php ob_end_clean(); ?>
+                <?php endif; ?>
+              </td>
+              */ ?>
+              <td>
+                <?php
+                  // If this is a non-missing Solr record, we should display a link:
+                  if (is_a($resource, 'VuFind\\RecordDriver\\SolrDefault') && !is_a($resource, 'VuFind\\RecordDriver\\Missing')) {
+                    $title = $resource->getTitle();
+                    $title = empty($title) ? $this->transEsc('Title not available') : $this->escapeHtml($title);
+                    echo '<a href="' . $this->recordLink()->getUrl($resource)
+                      . '" class="title">' . $title . '</a>';
+                  } elseif (isset($ilsDetails['title']) && !empty($ilsDetails['title'])){
+                    // If the record is not available in Solr, perhaps the ILS driver sent us a title we can show...
+                    echo $this->escapeHtml($ilsDetails['title']);
+                  } else {
+                    // Last resort -- indicate that no title could be found.
+                    echo $this->transEsc('Title not available');
+                  }
+                  ?>
+              </td>
+              <td>
+                  <?=$this->transEsc($ilsDetails['callnumber']) ?>
+              </td>
+              <?php /*
+              <td>
+                  <?=$this->transEsc($ilsDetails['location']) ?>
+              </td>
+              */ ?>
+              <td>
+                  <?php if (!empty($ilsDetails['create'])): ?>
+                      <?
+                      $createFormatted = '';
+                      if ($create = DateTime::createFromFormat('m-d-Y', $ilsDetails['create'])) {
+                          $createFormatted = $create->format('d.m.Y');
+                      }
+                      ?>
+                      <?=$this->escapeHtml($createFormatted) ?>
+                  <?php endif; ?>
+              </td>
+              <?php /*
+              <td>
+                <?php if ($thumbnail): ?>
+                  <?//=$thumbnail ?>
+                <?php endif ?>
+              </td>
+              <td>
+                <?php $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
+                    <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><?php if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><?php endif; ?>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (count($resource->getFormats()) > 0): ?>
+                  <?=$this->record($resource)->getFormatList() ?>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
+                    <?=$this->escapeHtml($ilsDetails['volume'])?>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (isset($ilsDetails['publication_year']) && !empty($ilsDetails['publication_year'])): ?>
+                    <?=$this->escapeHtml($ilsDetails['publication_year'])?>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (!empty($ilsDetails['expire'])): ?>
+                    <?=$this->escapeHtml($ilsDetails['expire']) ?>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (isset($this->cancelResults['items'])): ?>
+                  <?php foreach ($this->cancelResults['items'] as $itemId => $cancelResult): ?>
+                    <?php if ($itemId == $ilsDetails['item_id'] && $cancelResult['success'] == false): ?>
+                            <div class="alert alert-danger"><?=$this->transEsc($cancelResult['status']) ?><?php if ($cancelResult['sysMessage']) echo ' : ' . $this->transEsc($cancelResult['sysMessage']); ?></div>
+                    <?php endif; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (isset($ilsDetails['processed']) && $ilsDetails['processed']): ?>
+                    <div class="text-success"><?=$this->transEsc("storage_retrieval_request_processed") . (is_string($ilsDetails['processed']) ? ': ' . $ilsDetails['processed'] : '') ?></div>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (isset($ilsDetails['available']) && $ilsDetails['available']): ?>
+                    <div class="text-success"><?=$this->transEsc("storage_retrieval_request_available") ?></div>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (isset($ilsDetails['canceled']) && $ilsDetails['canceled']): ?>
+                    <div class="text-success"><?=$this->transEsc("storage_retrieval_request_canceled") . (is_string($ilsDetails['canceled']) ? ': ' . $ilsDetails['canceled'] : '') ?></div>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php if (isset($ilsDetails['cancel_link'])): ?>
+                    <p><a href="<?=$this->escapeHtmlAttr($ilsDetails['cancel_link']) ?>"><?=$this->transEsc("storage_retrieval_request_cancel") ?></a></p>
+                <?php endif; ?>
+              </td>
+
+              <?=$resource->tryMethod('supportsCoinsOpenUrl')?'<span class="Z3988" title="' . $this->escapeHtmlAttr($resource->getCoinsOpenUrl()) . '"></span>':''?>
+              */ ?>
+            </tr>
+          <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php if ($this->cancelForm): ?></form><?php endif; ?>
+  <?php else: ?>
+    <?=$this->transEsc('You do not have any storage retrieval requests placed') ?>.
+  <?php endif; ?>
+
+    <div class="hint">
+        <?=$this->transEsc("Reserved media are available for pick up for one week.") ?>
+    </div>
+</div>
+
+<div class="<?=$this->layoutClass('sidebar')?>">
+  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'storageRetrievalRequests'])?>
+</div>

@@ -1,0 +1,45 @@
+/* AvailabilityPlus*/
+.delimiter,
+.storage_prefix,
+.daia_arrow {
+    display: none;
+}
+
+.storage_link::after,
+.item_label::after {
+    content: "\A";
+    white-space: pre;
+}
+
+.daia_green {
+    color: #000000;
+}
+
+.ApprovalRequired {
+    color: black;
+    font-weight: bold;
+}
+
+.FreeAccess::after,
+.Access:after,
+.LicensedAccess:after,
+.UncertainAccess:after {
+    content: '';
+    margin-left: 0px;
+}
+
+.record .MultiVolumeWork,
+.record .MonographSeriesRecordView
+
+{
+    display: none;
+}
+
+.PrintAccess {
+    font-weight: bold;
+    display: block;
+}
+
+.JournalVolumes {
+    font-weight: bold;
+}

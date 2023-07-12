@@ -1,0 +1,24 @@
+<? $records = $this->cart()->getRecordDetails(); if (!empty($records)): ?>
+  <hr/>
+  <ul class="list-unstyled list-unstyled-cart">
+  <? foreach ($records as $i => $record): ?>
+    <li>
+      <div class="checkbox">
+        <label>
+          <?=$this->record($record)->getCheckbox('cart')?>
+          <?=$this->context($this)->renderInContext('cart/contents-record.phtml', ['driver' => $record]); ?>
+        </label>
+      </div>
+    </li>
+  <? endforeach; ?>
+  </ul>
+<? else: ?>
+  <p class="alert alert-info"><?=$this->transEsc('bookbag_is_empty')?>.</p>
+<? endif; ?>
+<script type="text/javascript">
+    $(document).ready(function checkItemStatusReady() {
+        $('.list-unstyled-cart .availabilityItem').each(function(){
+            checkItemStatus($(this));
+        });
+    });
+</script>

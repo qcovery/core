@@ -1,0 +1,153 @@
+.daia-loading{
+  font-weight: bold;
+}
+
+.daia-loading::before{
+  content: url(../images/ajax-loader.gif);
+}
+
+.delimiter{
+  border-top: 1px dashed #000000;
+  color: #FFFFFF;
+  background-color: #FFFFFF;
+  height: 1px;
+  margin-bottom: 2px;
+  margin-top: 2px;
+}
+
+.doi {
+  font-size: 0px;
+}
+
+.delimiter{
+  border: none;
+  border-top: 1px dashed #E00060;
+  color: #FFFFFF;
+  background-color: #FFFFFF;
+  height: 1px;
+  margin-bottom: 2px;
+  margin-top: 2px;
+}
+
+.daia_action {
+  /* font-weight: bold; */
+  display: block;
+}
+
+.daia_action a {
+  /* color: #ffffff !important; */
+}
+
+.result .daia_action a {
+  color: #3c8cd2 !important;
+  font-weight: bold;
+}
+
+.daia_green {
+  /*
+  background-color: #76BE5B;
+  font-weight: bold;
+  color: #fff;
+  border-radius: 3px;
+  padding: 3px;
+  display: inline-block;
+  */
+
+  /* border: 2px solid #76BE5B; */
+  background-color: transparent;
+  /* font-weight: bold; */
+  color: #000000;
+  /* border-radius: 7px; */
+  /* padding: 3px; */
+  display: block;
+}
+
+
+.result .daia_green {
+  color: #000000;
+}
+
+.daia_orange {
+  /*
+  background-color: #EB8E12;
+  font-weight: bold;
+  color: #fff;
+  border-radius: 3px;
+  padding: 3px;
+  display: inline-block;
+  */
+
+  /* border: 2px solid #EB8E12; */
+  /* background-color: #ffffff; */
+  /* font-weight: bold; */
+  color: #EB8E12;
+  /* border-radius: 7px; */
+  /* padding: 3px; */
+  display: block;
+  /* padding: 5px; */
+  /* margin-top: 5px; */
+}
+
+.daia_red {
+  color: #FF0000;
+  /* font-weight: bold; */
+}
+
+.article_access_level,
+.fid_article_access_level,
+.fid_homepage_access_level,
+.fid_issue_access_level,
+.fid_volume_access_level,
+.homepage_access_level,
+.ill_access_level,
+.issue_access_level,
+.check_ill_access_level,
+.oa_article_access_level,
+.print_access_level,
+.uncertain_article_access_level,
+.uncertain_homepage_access_level,
+.uncertain_issue_access_level,
+.uncertain_volume_access_level,
+.unknown_access_level,
+.volume_access_level {
+  font-weight: bold;
+}
+
+/*
+.article_access_level:after,
+.homepage_access_level:after,
+.issue_access_level:after,
+.oa_article_access_level:after,
+.print_access_level:after,
+.volume_access_level:after {
+  content: url("../images/checkmark_green.png");
+  margin-left: 5px;
+}
+
+.proxy_article_access_level:after,
+.proxy_homepage_access_level:after,
+.proxy_issue_access_level:after,
+.proxy_volume_access_level:after {
+  content: url("../images/checkmark_green.png");
+  margin-left: 5px;
+}
+
+.ill_access_level:after,
+.check_ill_access_level:after,
+.uncertain_article_access_level:after,
+.uncertain_homepage_access_level:after,
+.uncertain_issue_access_level:after,
+.uncertain_volume_access_level:after {
+  content: url("../images/checkmark_orange.png");
+  margin-left: 5px;
+}
+
+.unknown_access_level:after {
+  content: url("../images/questionmark_orange.png");
+  margin-left: 5px;
+}
+*/
+
+.daia-label {
+    font-weight: bolder;
+}

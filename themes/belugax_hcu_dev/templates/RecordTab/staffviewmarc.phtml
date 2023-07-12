@@ -1,0 +1,67 @@
+<div id="belugax-staff-view">
+    <div id="belugax-staff-view-title" class="uk-align-right">
+        <a uk-toggle="target: .belugax-staff-view-toggle" type="button">
+            <?=$this->translate('Staff View')?>
+            <i class="bel-pfeil-u01 belugax-staff-view-toggle" aria-hidden="true"></i>
+            <i class="bel-pfeil-o01 belugax-staff-view-toggle" aria-hidden="true" hidden></i>
+        </a>
+    </div>
+    <div id="belugax-staff-view-content" class="belugax-staff-view-toggle" hidden>
+        <? if ($xml = $this->driver->getXML('marc21')): ?>
+            <?
+                $doc = new DomDocument();
+                $doc->formatOutput = true;
+                $doc->loadXML($xml);
+
+                $config = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/staffviewmarc.ini'), true);
+                $removeFields = [];
+                if (isset($config['Fields']['removeFields'])) {
+                    $removeFields = $config['Fields']['removeFields'];
+                }
+
+                $removeNodes = [];
+                foreach ($doc->getElementsByTagName('datafield') as $dataFieldNode) {
+                    foreach ($removeFields as $removeField => $removeSubfields) {
+                        if ($dataFieldNode->getAttribute('tag') == $removeField) {
+                            $removeSubfields = explode(',', $removeSubfields);
+                            if (sizeof($removeSubfields) == 1 && $removeSubfields[0] == '') {
+                                $removeNodes[] = $dataFieldNode;
+                            } else {
+                                foreach ($dataFieldNode->childNodes as $dataSubfieldNode) {
+                                    foreach ($removeSubfields as $removeSubfield) {
+                                        if ($dataSubfieldNode->nodeType === 1) {
+                                            if ($dataSubfieldNode->getAttribute('code') == $removeSubfield) {
+                                                $removeNodes[] = $dataSubfieldNode;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach ($removeNodes as $removeNode) {
+                    $removeNode->parentNode->removeChild($removeNode);
+                }
+
+                $xml = $doc->saveXml();
+            ?>
+            <?=\VuFind\XSLT\Processor::process('record-marc.xsl', $xml)?>
+        <? endif; ?>
+
+        <span style="font-weight: bold;">Indexfelder</span>
+        <table class="citation table table-striped">
+            <?php foreach ($this->driver->getRawData() as $field => $values): ?>
+                <tr>
+                    <th style="width:25%"><?=$this->escapeHtml($field)?></th>
+                    <td>
+                        <?php foreach ((array)$values as $value): ?>
+                            <?=$this->escapeHtml(is_array($value) ? print_r($value, true) : $value)?><br />
+                        <?php endforeach; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
+</div>

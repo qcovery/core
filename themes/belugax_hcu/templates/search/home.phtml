@@ -1,0 +1,122 @@
+<?php
+  // Set page title.
+  $this->headTitle($this->translate('Search Home'));
+
+  // Disable top search box -- this page has a special layout.
+  $this->layout()->searchbox = false;
+
+  // Set default value if necessary:
+  if (!isset($this->searchClassId)) {
+    $this->searchClassId = 'Solr';
+  }
+
+  // Load search actions and settings (if any):
+  $options = $this->searchOptions($this->searchClassId);
+  $basicSearch = $options->getSearchAction();
+  $advSearch = $options->getAdvancedSearchAction();
+
+  $this->layout()->breadcrumbs = false;
+?>
+
+<div class="searchHomeContent">
+  <?php
+  $ilsStatusScript = <<<JS
+$(document).ready(function() {
+  $.ajax({
+      dataType: 'json',
+      method: 'GET',
+      data: {'offlineModeMsg':'ils_offline_home_message'},
+      url: VuFind.path + '/AJAX/JSON?method=getIlsStatus',
+      success: function(response) {
+          $('.searchHomeContent').prepend(response.data);
+      }
+  });
+});
+JS;
+  ?>
+  <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $ilsStatusScript, 'SET'); ?>
+  <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, '$("#searchForm_lookfor").focus();', 'SET'); ?>
+</div>
+
+<?php $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
+<?php $tabs = $tabConfig['tabs']; ?>
+
+<?php if (!empty($this->configreader()->getConfigData('Home'))): ?>
+    <?php foreach ($this->configreader()->getConfigData('Home') as $source): ?>
+        <?php if (is_a($source, 'Laminas\Config\Config')): ?>
+            <?php $catalogs[] = $source; ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+<div id="beluga-home-content" class="uk-grid-stack">
+    <div class="belugax-search-home">
+        <div class="container">
+
+            <div class="belugax-search-ph">
+
+                <div class="searchbox-spotlight">
+                    <h1><?=$this->transEsc('What are you looking for?')?></h1>
+
+                    <div class="belugax-search-input-ph">
+
+                        <div class="belugax-head-ph">
+                        </div>
+
+                        <?=$this->context($this)->renderInContext("search/searchbox.phtml", ['ignoreHiddenFilterMemory' => true])?>
+                    </div>
+
+                    <ul class="belugax-search-aside-ph">
+                        <li><a href="/vufind/Search/Advanced" class="belugax-low-link" rel="nofollow"><?=$this->transEsc('Advanced Search')?></a></li>
+                        <li><a href="/vufind/Search/History" class="belugax-low-link" rel="nofollow"><?=$this->transEsc('Search History')?></a></li>
+                    </ul>
+
+                </div>
+
+                <div class="uk-width-1-1 uk-text-center uk-margin-medium-top">
+                    <span class="search_home_header"><?=$this->transEsc('search_home_header')?></span>
+                </div>
+
+                <div>
+                    <span class="search_home_text"><?=$this->transEsc('search_home_text')?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="belugx-ph-content">
+        <div class="container">
+            <nav class="">
+                <div class="">
+                    <? $notificationConfig = parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/config/vufind/notification.ini'), true); ?>
+                    <? if(!empty($notificationConfig['Global'])): ?>
+                        <? if (!empty($notificationConfig['Global']['error_notification'])): ?>
+                            <div id="belugax-notification"><?=$this->transEsc($notificationConfig['Global']['error_notification']);?></div>
+                        <? elseif (!empty($notificationConfig['Global']['ip_notification'])): ?>
+                            <?
+                            $ip = '';
+                            if(isset($_SERVER['REMOTE_ADDR'])) {
+                                $ip = $_SERVER['REMOTE_ADDR'];
+                            }
+                            ?>
+                            <?
+	                            $inIpRange = false;
+	                            foreach ($notificationConfig['Global']['ip_notification'] as $ipRange) {
+		                            if (strpos($ip, $ipRange) > -1) {
+			                            $inIpRange = true;
+		                            }
+	                            }
+                            ?>
+                            <? if (!$inIpRange) { ?>
+                                <div id="belugax-notification"><?=$this->translate($notificationConfig['Global']['ip_notification_message'])?></div>
+                            <? } ?>
+                        <? endif; ?>
+                    <? endif; ?>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+</div>
+
