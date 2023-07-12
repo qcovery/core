@@ -36,7 +36,7 @@
 				  <? elseif (!isset($record['driver']) || !is_object($record['driver'])): ?>
 					<?=$this->escapeHtml(trim($record['title'], '/:'))?>
 				  <? else: ?>
-					<a href="<?=$this->recordLink()->getUrl($record['driver'])?>"><?=$this->escapeHtml(trim($record['title'], '/:'))?></a>
+					<a href="<?=$this->recordLinker()->getUrl($record['driver'])?>"><?=$this->escapeHtml(trim($record['title'], '/:'))?></a>
 				  <? endif; ?>
 				</td>
 				<td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount'] / 100.00) : ''?></td>

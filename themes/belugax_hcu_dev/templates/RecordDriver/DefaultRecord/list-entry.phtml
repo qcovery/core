@@ -10,7 +10,7 @@ if (isset($this->list) && is_object($this->list)) {
     $user_id = $this->user ? $this->user->id : null;
 }
 
-$coverDetails = $this->record($this->driver)->getCoverDetails('result-list', 'medium', $this->recordLink()->getUrl($this->driver));
+$coverDetails = $this->record($this->driver)->getCoverDetails('result-list', 'medium', $this->recordLinker()->getUrl($this->driver));
 $cover = $coverDetails['html'];
 $thumbnail = false;
 $thumbnailAlignment = $this->record($this->driver)->getThumbnailAlignment('result');

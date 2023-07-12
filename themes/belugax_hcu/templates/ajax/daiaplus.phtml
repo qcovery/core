@@ -148,7 +148,7 @@ foreach ($cumulatedResults as $storage => $cumulatedResult) {
                 }
             } else {
                 /* if ($label != 'bestellt') {
-                    echo '<a class="' . $daiaResult['daiaplus']['status_class'] . '" href="' . $this->recordLink()->getUrl($this->driver) . $ppn . '">' . $status = $this->transEsc('Temporarily not available') . '</a><br/>';
+                    echo '<a class="' . $daiaResult['daiaplus']['status_class'] . '" href="' . $this->recordLinker()->getUrl($this->driver) . $ppn . '">' . $status = $this->transEsc('Temporarily not available') . '</a><br/>';
                 } */
             }
         }
@@ -194,7 +194,7 @@ foreach ($cumulatedResults as $storage => $cumulatedResult) {
 
         if ($list) {
             if ($daiaResult['daiaplus']['list_more_link']) {
-                echo '<a href="' . $this->recordLink()->getUrl($this->driver) . $ppn . '#availability">' . $this->transEsc('additional_copies') . '...</a>';
+                echo '<a href="' . $this->recordLinker()->getUrl($this->driver) . $ppn . '#availability">' . $this->transEsc('additional_copies') . '...</a>';
             }
         } else {
             if ($daiaResult['daiaplus']['queue'] != '') {

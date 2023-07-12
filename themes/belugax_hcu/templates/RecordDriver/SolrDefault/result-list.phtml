@@ -1,5 +1,5 @@
 <?php
-  $coverDetails = $this->record($this->driver)->getCoverDetails('result-list', 'medium', $this->recordLink()->getUrl($this->driver));
+  $coverDetails = $this->record($this->driver)->getCoverDetails('result-list', 'medium', $this->recordLinker()->getUrl($this->driver));
   $cover = $coverDetails['html'];
   $thumbnail = false;
   $thumbnailAlignment = $this->record($this->driver)->getThumbnailAlignment('result');
@@ -40,14 +40,14 @@
           $i = 0;
           foreach ($dedupData as $source => $current) {
             if (++$i == 1) {
-              ?><span class="currentSource"><a href="<?=$this->recordLink()->getUrl($this->driver)?>"><?=$this->transEsc("source_$source", [], $source)?></a></span><?
+              ?><span class="currentSource"><a href="<?=$this->recordLinker()->getUrl($this->driver)?>"><?=$this->transEsc("source_$source", [], $source)?></a></span><?
             } else {
               if ($i == 2) {
                 ?> <span class="otherSources">(<?=$this->transEsc('Other Sources')?>: <?
               } else {
                 ?>, <?
               }
-              ?><a href="<?=$this->recordLink()->getUrl($current['id'])?>"><?=$this->transEsc("source_$source", [], $source)?></a><?
+              ?><a href="<?=$this->recordLinker()->getUrl($current['id'])?>"><?=$this->transEsc("source_$source", [], $source)?></a><?
             }
           }
           if ($i > 1) {
@@ -91,7 +91,7 @@
                   ?>
                   <? if ($this->permission()->allowDisplay('feature.Favorites')): ?>
                       <? /* Add to favorites */ ?>
-                      <a href="<?=$this->recordLink()->getActionUrl($this->driver, 'Save')?>" data-lightbox class="save-record result-link-label" data-id="<?=$this->escapeHtmlAttr($this->driver->getUniqueId()) ?>"><i class="result-link-icon <?=$saveIcon?>" aria-hidden="true" title="<?=$this->transEsc('Save title')?>" data-uk-tooltip></i></a>
+                      <a href="<?=$this->recordLinker()->getActionUrl($this->driver, 'Save')?>" data-lightbox class="save-record result-link-label" data-id="<?=$this->escapeHtmlAttr($this->driver->getUniqueId()) ?>"><i class="result-link-icon <?=$saveIcon?>" aria-hidden="true" title="<?=$this->transEsc('Save title')?>" data-uk-tooltip></i></a>
                   <? elseif ($block = $this->permission()->getAlternateContent('feature.Favorites')): ?>
                       <?=$block?>
                   <? endif; ?>
@@ -113,7 +113,7 @@
           <div class="hierarchyTreeLink">
             <input type="hidden" value="<?=$this->escapeHtmlAttr($hierarchyID)?>" class="hiddenHierarchyId" />
             <i class="result-link-icon bel-orgaform" aria-hidden="true"></i>
-            <a class="hierarchyTreeLinkText result-link-label" data-lightbox href="<?=$this->recordLink()->getTabUrl($this->driver, 'HierarchyTree')?>?hierarchy=<?=urlencode($hierarchyID)?>#tabnav" title="<?=$this->transEsc('hierarchy_tree')?>" data-lightbox-href="<?=$this->recordLink()->getTabUrl($this->driver, 'AjaxTab')?>?hierarchy=<?=urlencode($hierarchyID)?>" data-lightbox-post="tab=hierarchytree">
+            <a class="hierarchyTreeLinkText result-link-label" data-lightbox href="<?=$this->recordLinker()->getTabUrl($this->driver, 'HierarchyTree')?>?hierarchy=<?=urlencode($hierarchyID)?>#tabnav" title="<?=$this->transEsc('hierarchy_tree')?>" data-lightbox-href="<?=$this->recordLinker()->getTabUrl($this->driver, 'AjaxTab')?>?hierarchy=<?=urlencode($hierarchyID)?>" data-lightbox-post="tab=hierarchytree">
               <?=$this->transEsc('hierarchy_view_context')?><? if (count($trees) > 1): ?>: <?=$this->escapeHtml($hierarchyTitle)?><? endif; ?>
             </a>
           </div>

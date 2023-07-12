@@ -9,12 +9,12 @@
 
   // Add RDF header link if applicable:
   if ($this->export()->recordSupportsFormat($this->driver, 'RDF')) {
-    $this->headLink()->appendAlternate($this->recordLink()->getActionUrl($this->driver, 'RDF'), 'application/rdf+xml', 'RDF Representation');
+    $this->headLink()->appendAlternate($this->recordLinker()->getActionUrl($this->driver, 'RDF'), 'application/rdf+xml', 'RDF Representation');
   }
 
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = '<li>' . $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '', '</li> ') .
-    '<li class="active">' . $this->recordLink()->getBreadcrumb($this->driver) . '</li> ';
+    '<li class="active">' . $this->recordLinker()->getBreadcrumbHtml($this->driver) . '</li> ';
   $this->layout()->title = $this->driver->getShortTitle();
 ?>
 
@@ -32,9 +32,9 @@
           <div class="belugax-item-nav">
               <? if ($this->scrollData['previousRecord']): ?>
                   <? if ($this->scrollData['firstRecord']): ?>
-                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['firstRecord'])?>" class="button-red" title="<?=$this->transEsc('First Search Result')?>" rel="nofollow"><i class="bel-pfeil-r01"></i></a>
+                      <a href="<?=$this->recordLinker()->getUrl($this->scrollData['firstRecord'])?>" class="button-red" title="<?=$this->transEsc('First Search Result')?>" rel="nofollow"><i class="bel-pfeil-r01"></i></a>
                   <? endif; ?>
-                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['previousRecord'])?>" class="button-red" title="<?=$this->transEsc('Previous Search Result')?>" rel="nofollow"><i class="bel-pfeil-r01"></i></a>
+                      <a href="<?=$this->recordLinker()->getUrl($this->scrollData['previousRecord'])?>" class="button-red" title="<?=$this->transEsc('Previous Search Result')?>" rel="nofollow"><i class="bel-pfeil-r01"></i></a>
               <? else: ?>
                   <? if ($this->scrollData['firstRecord']): ?>
                       <a href="#" class="button-red"><i class="bel-pfeil-r01"></i></a>
@@ -42,9 +42,9 @@
                   <a href="#" class="button-red"><i class="bel-pfeil-r01"></i></a>
               <? endif; ?>
               <? if ($this->scrollData['nextRecord']): ?>
-                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['nextRecord'])?>" class="button-red" title="<?=$this->transEsc('Next Search Result')?>" rel="nofollow"><i class="bel-pfeil-l01"></i></a>
+                      <a href="<?=$this->recordLinker()->getUrl($this->scrollData['nextRecord'])?>" class="button-red" title="<?=$this->transEsc('Next Search Result')?>" rel="nofollow"><i class="bel-pfeil-l01"></i></a>
                   <? if ($this->scrollData['lastRecord']): ?>
-                      <a href="<?=$this->recordLink()->getUrl($this->scrollData['lastRecord'])?>" class="button-red" title="<?=$this->transEsc('Last Search Result')?>" rel="nofollow"><i class="bel-pfeil-l01"></i></a>
+                      <a href="<?=$this->recordLinker()->getUrl($this->scrollData['lastRecord'])?>" class="button-red" title="<?=$this->transEsc('Last Search Result')?>" rel="nofollow"><i class="bel-pfeil-l01"></i></a>
                   <? endif; ?>
               <? else: ?>
                   <a href="#" class="button-red"><i class="bel-pfeil-l01"></i></a>
