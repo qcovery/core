@@ -27,7 +27,7 @@
 #-----------------------------------------------------------------------------------
 #
 
-"@parent_yaml": "../../../../local/config/vufind/freeaccesscheck.yaml"
+"@parent_yaml": "freeaccesscheck.yaml"
 
 ShortTitle:
   category: title

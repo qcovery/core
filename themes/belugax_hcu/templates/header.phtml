@@ -19,8 +19,8 @@
                 <? $cart = $this->cart(); if ($cart->isActive()): ?>
                     <li id="cartSummary">
                         <a id="cartItems" data-lightbox title="<?=$this->transEsc('View Book Bag')?>" href="<?=$this->url('cart-home')?>">
-                            <i class="bel-stern02" aria-hidden="true"></i> <?=$this->transEsc('items')?> (<strong><?//=count($cart->getItems())?></strong>)
-                            <span class="full<?//=!$cart->isFull() ? ' hidden' : '' ?>">(<?=$this->transEsc('bookbag_full') ?>)</span>
+                            <i class="bel-stern02" aria-hidden="true"></i> <?=$this->transEsc('items')?> (<strong><?=count($cart->getItems())?></strong>)
+                            <span class="full<?=!$cart->isFull() ? ' hidden' : '' ?>">(<?=$this->transEsc('bookbag_full') ?>)</span>
                         </a>
                     </li>
                 <? endif; ?>
