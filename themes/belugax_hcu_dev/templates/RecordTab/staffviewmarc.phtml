@@ -7,7 +7,7 @@
         </a>
     </div>
     <div id="belugax-staff-view-content" class="belugax-staff-view-toggle" hidden>
-        <? if ($xml = $this->driver->getXML('marc21')): ?>
+        <? if (false): ?> <!-- $xml = $this->driver->getXML('marc21') -->
             <?
                 $doc = new DomDocument();
                 $doc->formatOutput = true;

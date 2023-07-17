@@ -14,7 +14,7 @@
 
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = '<li>' . $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '', '</li> ') .
-    '<li class="active">' . $this->recordLinker()->getBreadcrumbHtml($this->driver) . '</li> ';
+    '<li class="active">' . /*$this->recordLinker()->getBreadcrumbHtml($this->driver) . */'</li> ';
   $this->layout()->title = $this->driver->getShortTitle();
 ?>
 
