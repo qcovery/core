@@ -13,6 +13,7 @@
 [submodule "module/Findex"]
 	path = module/Findex
 	url = git@github.com:qcovery/Findex.git
+	branch = vufind9
 [submodule "module/DependentWorks"]
 	path = module/DependentWorks
 	url = git@github.com:qcovery/DependentWorks.git
