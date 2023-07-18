@@ -25,7 +25,7 @@ $coreFieldCategories = ['title2', 'person', 'description', 'publication', 'right
           <?=$this->record($this->driver)->getToolbar()?>
           <?
           $QRCode = $this->record($this->driver)->getQRCode("core");
-          $coverDetails = null; //$this->record($this->driver)->getCoverDetails('core', 'medium', $this->record($this->driver)->getThumbnail('large'));
+          $coverDetails = $this->record($this->driver)->getCoverDetails('core', 'medium', $this->record($this->driver)->getThumbnail('large'));
           $cover = $coverDetails['html'];
           $preview = $this->record($this->driver)->getPreviews();
           ?>
