@@ -17,7 +17,7 @@
 #    - { function: 'adjustScore', score: 200} # DAIA also supports the function adjustScore, requiring a score parameter with an integer
 
 # Change to system-specific folder structure
-#"@parent_yaml": "../../../../../../../dev.hcu.beluga-core.de/config/vufind/availabilityplus-resolver-DAIA.yaml"
+#"@parent_yaml": "../../../config/vufind/availabilityplus-resolver-DAIA.yaml"
 Signatur:
   descripton: 'Entfernung des Standortkürzels vor dem Doppelpunkt'
   reason: 'Signaturen sollen für Nutzer*innen ohne Standortkürzel angezeigt werden'
