@@ -1,5 +1,5 @@
 # Change to system-specific folder structure
-"@parent_yaml": "../../../../../../../dev.hcu.beluga-core.de/config/vufind/availabilityplus.yaml"
+#"@parent_yaml": "../../../../../../../dev.hcu.beluga-core.de/config/vufind/availabilityplus.yaml"
 
 # Listing of data to be read from marc bibliographic data
 #
