@@ -11,6 +11,7 @@ return array(
         'belugax_hcu.js',
         'dependentworks.js',
         'lib/autocomplete.js',
+        'missing.js',
     ],
     'mixins' => [
         'resultfeedback',
