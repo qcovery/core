@@ -107,7 +107,7 @@
             $this->lookfor = '';
         }
     } else {
-        if (is_array($keywords)) {
+        if (isset($keywords) && is_array($keywords)) {
             foreach ($keywords as $identifier => $type) {
                 $this->lookfor = str_replace($type . ":", $identifier . " ", $this->lookfor);
             }
