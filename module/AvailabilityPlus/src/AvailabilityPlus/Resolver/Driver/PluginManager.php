@@ -21,6 +21,7 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'DAIAJournal' => 'AvailabilityPlus\Resolver\Driver\DAIAJournal',
         'DAIAHsH' => 'AvailabilityPlus\Resolver\Driver\DAIAHsH',
         'DAIAKSF' => 'AvailabilityPlus\Resolver\Driver\DAIAKSF',
+        'DAIAParent' => 'AvailabilityPlus\Resolver\Driver\DAIAParent',
         'FulltextFinder' => 'AvailabilityPlus\Resolver\Driver\FulltextFinder',
         'JournalsOnlinePrint' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrint',
         'JournalsOnlinePrintElectronic' => 'AvailabilityPlus\Resolver\Driver\JournalsOnlinePrintElectronic',
