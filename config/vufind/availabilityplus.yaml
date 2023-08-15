@@ -394,6 +394,34 @@ DAIA:
     a:
       - [name, id]
       - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+DAIAParent:
+  category: resolver
+  view-method: ajax/link-daia.phtml
+  mandatory-field: id
+  773:
+    conditions:
+      - [field, w, '\(DE-627\)([0-9xX]+)']
+    w:
+      - [name, id]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+  800:
+    conditions:
+      - [field, w, '\(DE-627\)([0-9xX]+)']
+    w:
+      - [name, id]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+  810:
+    conditions:
+      - [field, w, '\(DE-627\)([0-9xX]+)']
+    w:
+      - [name, id]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
+  830:
+    conditions:
+      - [field, w, '\(DE-627\)([0-9xX]+)']
+    w:
+      - [name, id]
+      - [replace, '\(DE-627\)([0-9xX]+)', 'ppn:$1']
 Unpaywall:
   category: resolver
   view-method: ajax/link-unpaywall.phtml
