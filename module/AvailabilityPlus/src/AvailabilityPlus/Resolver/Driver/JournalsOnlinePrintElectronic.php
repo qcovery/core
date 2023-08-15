@@ -23,6 +23,7 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
             if(!empty($result->AccessURL)) {
                 $level = '';
                 $label = '';
+                $score = 0;
                 $url = $result->AccessURL->__toString();
                 if(!in_array($url, $urls)) {
                     switch ($result['state']) {
@@ -33,14 +34,16 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
                             if($result['state'] != 0) {
                                 $level = "LicensedAccess link_external";
                                 $label = "LicensedAccess";
+                                $score = $score + 10;
                             }
                             $level .= " ".$result->AccessLevel;
                             $label .= "_".$result->AccessLevel;
+                            if($result->AccessLevel != 'article') $score = $score + 5;
                             $urls[] = $url;
                             break;
                     }
                     if(!empty($level)) {
-                        $record['score'] = 0;
+                        $record['score'] = $score;
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
