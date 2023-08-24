@@ -12,7 +12,7 @@
 <?php if (empty($selectedLibrary['show-library']) || $selectedLibrary['show-library'] != 'no' || count($libraryList) > 1): ?>
       <div id="LibraryData">
           <div class="" uk-grid>
-              <?php if (!empty($selectedLibrary['logo'])): ?>
+              <?php if (!empty($selectedLibrary['website']) && !empty($selectedLibrary['logo'])): ?>
               <div class="uk-width-3-4">
                   <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
                       <img id="infoimage" src="/vufind/themes/libraries/images/library_icons/<?=$selectedLibrary['logo'] ?>" height="40" alt="Library Logo" /><br/>
@@ -27,11 +27,11 @@
                   </div>
               <?php endif; ?>
               <div class="uk-width-1-1 uk-margin-remove-top uk-margin-bottom">
-              <?php if (!empty($selectedLibrary['website'])): ?>
+              <?php if (!empty($selectedLibrary['website']) && !empty($selectedLibrary['fullname'])): ?>
                   <a href="<?=$selectedLibrary['website'] ?>" target="_blank">
                       <div class="uk-margin-top"><?=$this->transEsc($selectedLibrary['fullname']) ?></div>
                   </a>
-              <?php else: ?>
+              <?php elseif (!empty($selectedLibrary['fullname'])): ?>
                   <strong><?=$this->transEsc($selectedLibrary['fullname']) ?></strong>
               <?php endif; ?>
               </div>
@@ -41,9 +41,11 @@
       <div class="facet-group" id="side-panel-library">
           <button class="title collapsed" data-toggle="collapse" href="#side-collapse-library"><?=$this->transEsc("Library")?></button>
           <div id="side-collapse-library" class="collapse out in">
+              <?php if (!empty($selectedLibrary['code'])): ?>
               <div id="library-list" data-query='<?=json_encode($this->results->getUrlQuery()->getParams().'&library='.$selectedLibrary['code']) ?>' data-searchlink='<?=$searchLink ?>' data-searchclass='<?=$this->searchClassId ?>'>
                   <a href="" class="facet facetAND library-item"><span class="badge library-item-count"></span><span class="text library-item-text"></span></a>
               </div>
+              <?php endif; ?>
           </div>
       </div>
       <div class="facet-group" id="side-panel-location">

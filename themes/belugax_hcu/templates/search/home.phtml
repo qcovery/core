@@ -38,8 +38,8 @@ JS;
   <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, '$("#searchForm_lookfor").focus();', 'SET'); ?>
 </div>
 
-<?php $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
-<?php $tabs = $tabConfig['tabs']; ?>
+<?php //$tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
+<?php //$tabs = $tabConfig['tabs']; ?>
 
 <?php if (!empty($this->configreader()->getConfigData('Home'))): ?>
     <?php foreach ($this->configreader()->getConfigData('Home') as $source): ?>

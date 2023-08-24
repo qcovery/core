@@ -54,7 +54,7 @@ if ($mediatype == 'Journal' && $list) {
                 echo '<span class="daia_action">'.$this->translate($result->daia_action->label).'</span>';
             }
         }
-        if(!$list){
+        if(!isset($list) || !$list){
             if(!empty($result->queue)) {
                 echo '<div class="service_queue">'.$result->queue->length.' '.$this->translate($result->queue->label).'</div>';
             }
@@ -67,7 +67,7 @@ if ($mediatype == 'Journal' && $list) {
                 echo $result->chronology.'</div>';
             }
         }
-        if(!empty($result)) {
+        if(!empty($result) && isset($list)) {
             if($list && count($data->document[0]->item) > 1 && !empty($result->storage)) {
 
                 if($this->source == 'Search2') {

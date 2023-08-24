@@ -26,7 +26,7 @@
       </div>
     </div>
     <?php if ($this->facet['type'] == 'date'): ?>
-      <div class="slider-container"><input type="text" class="hidden" id="<?=$safeBaseId?><?=$this->escapeHtml($this->facet['type'])?>Slider" aria-label="<?=$this->transEsc('slider_label', ['%%title%%' => $this->translate($this->cluster['label'])])?>"></div>
+      <?php /* VuFind 9 <div class="slider-container"><input type="text" class="hidden" id="<?=$safeBaseId?><?=$this->escapeHtml($this->facet['type'])?>Slider" aria-label="<?=$this->transEsc('slider_label', ['%%title%%' => $this->translate($this->cluster['label'])])?>"></div>*/?>
     <?php endif; ?>
     <input class="btn btn-default" type="submit" value="<?=$this->transEscAttr('Set')?>">
   </form>
