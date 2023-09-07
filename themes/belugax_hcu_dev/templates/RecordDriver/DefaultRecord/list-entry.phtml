@@ -38,7 +38,7 @@ if ($cover):
     <div class="media-body">
         <div class="result-body">
             <div>
-                <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>">
+                <a href="<?=$this->recordLinker()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>">
                     <? if(!empty($this->driver->getShortTitle()[0][0]) && $this->driver->getShortTitle()[0][0] != $this->transEsc('Title not available')) { ?>
                         <?=$this->record($this->driver)->getTitleHtml()?> <? if (!empty($this->driver->getTitleSection()[0][0])) { ?> ; <?=$this->driver->getTitleSection()[0][0]?> <? } ?>
                     <? } else { ?>
@@ -180,9 +180,7 @@ if ($cover):
             <? if ($this->cart()->isActiveInSearch() && $this->params->getOptions()->supportsCart() && $this->cart()->isActive()): ?>
                 <div class="belugax-result-badge">
                     <? $cartId = $this->source . '|' . $this->id; ?>
-                    <? if ($cart): ?>
-                        <?=($cart->contains($cartId)) ? '<i class="bel-stern01">' : '<i>' ?></i>
-                    <? endif; ?>
+                    <?=($this->cart()->contains($cartId)) ? '<i class="bel-stern01">' : '<i>' ?></i>
                 </div>
             <? endif; ?>
 
