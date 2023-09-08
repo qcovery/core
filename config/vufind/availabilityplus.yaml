@@ -355,6 +355,11 @@ JournalsOnlinePrintElectronic:
       - [name, issue]
     h:
       - [name, pages]
+  '024':
+    conditions:
+      - [field, 2, 'doi']
+    a:
+      - [name, doi]
 JournalsOnlinePrintPrint:
   category: resolver
   view-method: ajax/link-jop-print.phtml
