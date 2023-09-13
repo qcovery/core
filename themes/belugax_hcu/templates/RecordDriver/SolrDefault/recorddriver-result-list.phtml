@@ -7,7 +7,7 @@ if ($this->params) {
 
 <?php $resultList = $this->solrDetails()->getResultListLine($this->driver); ?>
       <div>
-        <a href="<?=$this->recordLinker()->getUrl($this->driver)?>" class="title getFull" data-view="<?=$listViewOptions?>" data-lightbox-ignore>
+        <a href="<?=$this->recordLinker->getUrl($this->driver)?>" class="title getFull" data-view="<?=$listViewOptions?>" data-lightbox-ignore>
         <?=$resultList['title'][0] ?>
     <?php if(!empty($resultList['subtitle'][0])): ?>
         : <?=$resultList['subtitle'][0] ?>
