@@ -13645,7 +13645,7 @@ h3.belugax-sidebar-headline i {
         margin: 0 15px !important;
     }
     
-    .template-dir-myresearch .mainbody, .template-dir-record .mainbody {
+    .template-dir-myresearch .mainbody, .template-dir-record .mainbody, .template-dir-holds .mainbody {
         margin: 0px !important;
         padding: 0px !important;
     }
@@ -13685,7 +13685,8 @@ h3.belugax-sidebar-headline i {
     border: 1px solid #fff;
 }
 
-.template-dir-myresearch .sidebar .belugax-item-nav {
+.template-dir-myresearch .sidebar .belugax-item-nav,
+.template-dir-holds .sidebar .belugax-item-nav {
     padding: 0px;
 }
 
@@ -14103,32 +14104,38 @@ button.badge {
 }
 
 .template-dir-myresearch .mainbody,
-.template-dir-record .mainbody {
+.template-dir-record .mainbody,
+.template-dir-holds .mainbody {
     padding: 0 20px 0 20px;
     border-radius: 10px;
     background: #fff;
     margin-left: -15px;
 }
 
-.template-dir-myresearch .belugax-item-nav {
+.template-dir-myresearch .belugax-item-nav,
+.template-dir-holds .belugax-item-nav {
     text-align: left;
     padding-left: 0px;
     padding-right: 0px;
 }
 
-.template-dir-myresearch .sidebar a {
+.template-dir-myresearch .sidebar a,
+.template-dir-holds .sidebar a {
     color: #000 !important;
 }
 
-.template-dir-myresearch .sidebar a:hover {
+.template-dir-myresearch .sidebar a:hover,
+.template-dir-holds .sidebar a:hover {
     color: #000 !important;
 }
 
-.template-dir-myresearch .sidebar a.active {
+.template-dir-myresearch .sidebar a.active,
+.template-dir-holds .sidebar a.active {
     color: #e4e4e4 !important;
 }
 
-.template-dir-myresearch .sidebar a.active:hover {
+.template-dir-myresearch .sidebar a.active:hover,
+.template-dir-holds .sidebar a.active:hover {
     color: #e4e4e4 !important;
 }
 
