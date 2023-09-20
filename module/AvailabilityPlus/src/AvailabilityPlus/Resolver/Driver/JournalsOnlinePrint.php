@@ -4,6 +4,9 @@ namespace AvailabilityPlus\Resolver\Driver;
 
 class JournalsOnlinePrint extends AvailabilityPlusResolver
 {
+    protected $urlParams;
+
+    protected $doi;
     /**
      * Get Resolver Url
      *
@@ -15,6 +18,8 @@ class JournalsOnlinePrint extends AvailabilityPlusResolver
      */
     public function getResolverUrl($openUrl)
     {
+	parse_str($openUrl, $this->urlParams);
+	$this->doi = $this->urlParams['doi'];
         $url = $this->baseUrl.$openUrl.$this->additionalParams;
         if(strpos($url, "&pid=client_ip=dynamic") !== false) {
             $ip = $_SERVER['REMOTE_ADDR'];
