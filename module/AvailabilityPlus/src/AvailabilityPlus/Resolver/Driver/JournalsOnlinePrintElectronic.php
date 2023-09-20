@@ -30,15 +30,15 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
                 if(!in_array($url, $urls)) {
                     switch ($result['state']) {
                         case 0:
+                            $freeAccess = true;
                             $level = "FreeAccess link_external";
                             $label = "FreeAccess";
-			    $freeAccess = true;
                         case 2:
+                            $licensedAccess = true;
                             if($result['state'] != 0) {
                                 $level = "LicensedAccess link_external";
                                 $label = "LicensedAccess";
                                 $score = $score + 10;
-				$licensedAccess = true;
                             }
                             $level .= " ".$result->AccessLevel;
                             $label .= "_".$result->AccessLevel;
