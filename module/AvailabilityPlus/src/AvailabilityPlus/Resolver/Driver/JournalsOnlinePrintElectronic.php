@@ -24,17 +24,21 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
                 $level = '';
                 $label = '';
                 $score = 0;
+		$freeAccess = false;
+		$licensedAccess = false;
                 $url = $result->AccessURL->__toString();
                 if(!in_array($url, $urls)) {
                     switch ($result['state']) {
                         case 0:
                             $level = "FreeAccess link_external";
                             $label = "FreeAccess";
+			    $freeAccess = true;
                         case 2:
                             if($result['state'] != 0) {
                                 $level = "LicensedAccess link_external";
                                 $label = "LicensedAccess";
                                 $score = $score + 10;
+				$licensedAccess = true;
                             }
                             $level .= " ".$result->AccessLevel;
                             $label .= "_".$result->AccessLevel;
@@ -52,6 +56,23 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
                 }
             }
         }
+
+	if(!empty($this->doi)) {
+		if($freeAccess) {
+        	        $record['score'] = 0 - 1;
+	                $record['level'] = "FreeAccess link_external";
+                	$record['label'] = "FreeAccess";
+	                $record['url'] = 'https://dx.doi.org/'.$this->doi;
+        	        $records[] = $record;
+		} else if($licensedAccess) {
+	                $record['score'] = 10 - 1;
+                	$record['level'] = "LicensedAccess link_external";
+        	        $record['label'] = "LicensedAccess";
+	                $record['url'] = 'https://dx.doi.org/'.$this->doi;
+	                $records[] = $record;
+		}
+	}
+
         $response['data'] = $data_org;
         $this->parsed_data = $records;
         $this->applyCustomChanges();
