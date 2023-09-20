@@ -18,14 +18,14 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
     {
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
+        $freeAccess = false;
+        $licensedAccess = false;
         $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
         foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
             if(!empty($result->AccessURL)) {
                 $level = '';
                 $label = '';
                 $score = 0;
-		$freeAccess = false;
-		$licensedAccess = false;
                 $url = $result->AccessURL->__toString();
                 if(!in_array($url, $urls)) {
                     switch ($result['state']) {
