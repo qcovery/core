@@ -14,7 +14,7 @@ function displayItemStatus(results, item) {
         } else {
             if (typeof(result.html) != 'undefined') {
                 item.find('.status').append(result.html);
-                item.find('.status').append("<span class='aplus_debug' style='display:none;'><pre>"+JSON.stringify(result, null, 2)+"</pre></span>");
+                if(itemStatusDebug != 1 ) item.find('.status').append("<span class='aplus_debug' style='display:none;'><pre>"+JSON.stringify(result, null, 2)+"</pre></span>");
             }
         }
     });
