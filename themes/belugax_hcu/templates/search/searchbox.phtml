@@ -33,7 +33,7 @@
     $searchType = $this->searchType;
 
     if ($this->lookfor === '') {
-        if ($_GET['lookfor'])  {
+        if (!empty($_GET['lookfor']))  {
             $this->lookfor = $_GET['lookfor'];
             if (isset($keywords) && is_array($keywords)) {
                 foreach ($keywords as $identifier => $type) {
