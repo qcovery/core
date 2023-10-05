@@ -541,9 +541,10 @@ Location:
     DismaxHandler: edismax
 
 Newitems:
-  DismaxMunge:
-    - [preg_replace, "/\\*:\\*/", "*"]
-    - [preg_replace, "/^(.*)$/", "370@$1"]
-  DismaxFields:
-    - selektneu_str_mv^1
-  DismaxHandler: edismax
+  CustomMunge:
+    selektneu_str_mv:
+      - [preg_replace, '/[ "]/', '']
+      - [preg_replace, "/^(.*)$/", "370@$0*"]
+  QueryFields:
+    selektneu_str_mv:
+      - [selektneu_str_mv, ~]
