@@ -419,6 +419,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     private function getResolverResponse($resolver) {
+        $start_date_time = date("Y-m-d H:i:s");
+        $curTime = microtime(true);
         $check_type = 'Resolver';
         $resolverType = $resolver;
         if (!$this->resolverManager->has($resolverType)) {
@@ -461,6 +463,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, '', $resolver_url, false, $check_type);
         }
 
+        $response['start'] = $start_date_time;
+        $response['end'] = date("Y-m-d H:i:s");
+        $timeConsumed = round(microtime(true) - $curTime,3)*1000;
+        $response['duration_in_miliseconds'] = $timeConsumed;
         $responses[] = $response;
 
         return $responses;
