@@ -23,3 +23,4 @@ The VuFind community maintains a detailed [wiki](http://vufind.org/wiki) contain
 Contributing
 ------------
 See our [developers handbook](https://vufind.org/wiki/development) for more information.
+  
