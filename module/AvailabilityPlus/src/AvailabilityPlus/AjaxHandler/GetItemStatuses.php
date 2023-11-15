@@ -95,6 +95,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
         $this->list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
         $this->debug = $params->fromPost('debug', $params->fromQuery('debug', ''));
+
+        $solrData = $params->fromPost('full', $params->fromQuery('full', ''));
+        $solrData = json_decode(base64_decode($solrData), true);
+
         $this->language = 'en';
         if(!empty($params->fromPost('language', $params->fromQuery('language', '')))) $this->language = $params->fromPost('language', $params->fromQuery('language', ''));
         if (!empty($ids) && !empty($this->source)) {
@@ -103,7 +107,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $this->checks = [];
                 $check_mode = 'continue';
                 try {
-                    $this->driver = $this->recordLoader->load($id, $this->source);
+                    //$this->driver = $this->recordLoader->load($id, $this->source);
+                    $this->driver = $this->recordLoader->load($id, $this->source, false, null, true, $solrData);
+
                     $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
                     if(empty($mediatype)) {
                         $formats = $this->driver->getFormats();

@@ -1,4 +1,9 @@
-<div class="availabilityItem" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->driver->getSourceIdentifier(); ?>" data-language="<?=$this->layout()->userLang; ?>">
+<?php
+    // solr data for transfer to prevent further solr requests
+    $solrData = $this->driver->formatSolrData();
+?>
+
+<div class="availabilityItem" data-full="<?=$solrData?>" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->driver->getSourceIdentifier(); ?>" data-language="<?=$this->layout()->userLang; ?>">
     <span class="status ajax-availability hidden">
         <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
     </span>

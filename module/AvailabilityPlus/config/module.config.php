@@ -113,10 +113,12 @@ return array (
     'factories' =>
     array (
       'AvailabilityPlus\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\ServiceManager\\AbstractPluginManagerFactory',
+      'AvailabilityPlus\\Record\\Loader' => 'VuFind\\Record\\LoaderFactory',
     ),
     'aliases' =>
     array (
       'VuFind\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\Resolver\\Driver\\PluginManager',
+      'VuFind\\Record\\Loader' => 'AvailabilityPlus\\Record\\Loader',
     ),
   ),
 );

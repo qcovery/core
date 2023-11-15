@@ -64,11 +64,12 @@ function runItemAjaxForQueue() {
 		itemStatusMediatype = item.attr('data-mediatype');
         itemLanguage = item.attr('data-language');
 		itemStatusDebug = item.attr('data-debug');
+        itemFullData = item.attr('data-full');
         $.ajax({
             url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
-            method: 'get',
-            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype, language:itemLanguage, debug:itemStatusDebug}
+            method: 'post',
+            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype, language:itemLanguage, debug:itemStatusDebug, full:itemFullData}
         })
             .done(function checkItemStatusDone(response) {
                 for (let j = 0; j < response.data.statuses.length; j++) {
