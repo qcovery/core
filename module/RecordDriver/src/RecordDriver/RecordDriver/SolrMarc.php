@@ -624,7 +624,7 @@ class SolrMarc extends SolrDefault
          * e. g. isCollection() needs some hierarchy fields
          */
         $data = [
-            'fullrecord' => $rawData['fullrecord'] ?? null,
+            'fullrecord_marcxml' => $rawData['fullrecord'] ?? null,
             'format' => $rawData['format'] ?? null,
             'title' => $rawData['title'] ?? null,
             'title_short' => $rawData['title_short'] ?? null,
