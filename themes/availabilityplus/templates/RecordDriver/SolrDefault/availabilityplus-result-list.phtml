@@ -1,6 +1,6 @@
 <?php
     // solr data for transfer to prevent further solr requests
-    $solrData = $this->driver->formatSolrData();
+    $solrData = $this->driver->tryMethod('formatSolrData');
 ?>
 
 <div class="availabilityItem" data-full="<?=$solrData?>" data-id="<?=$this->driver->getUniqueID();?>" data-list="1" data-src="<?=$this->driver->getSourceIdentifier(); ?>" data-language="<?=$this->layout()->userLang; ?>">
