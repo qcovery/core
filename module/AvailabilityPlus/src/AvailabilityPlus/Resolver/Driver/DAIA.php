@@ -148,17 +148,7 @@ class DAIA extends AvailabilityPlusResolver
                                         $record->storage->label = 'unknown_location';
                                     }
                                     if(!empty($item->label)) $record->callnumber = $item->label;
-                                    if(!empty($service_content->limitation[0]->id)) {
-                                        $limitation = str_replace(' ','', substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1));
-                                        $record->daia_hint->level = $limitation;
-                                        $record->daia_hint->label = $service_content->service.$limitation;
-                                        $record->score += 5;
-                                    } elseif(!empty($service_content->limitation[0]->content)) {
-                                        $limitation = str_replace(' ','',$service_content->limitation[0]->content);
-                                        $record->daia_hint->level = $limitation;
-                                        $record->daia_hint->label = $service_content->service.$limitation;
-                                        $record->score += 5;
-                                    } elseif(!empty($service_content->expected)) {
+                                    if(!empty($service_content->expected)) {
                                         $record->daia_hint->level = "daia_orange";
                                         $date = date_create($service_content->expected);
                                         $record->daia_hint->label = 'on_loan_until';
@@ -168,7 +158,17 @@ class DAIA extends AvailabilityPlusResolver
                                         $record->daia_hint->level = "daia_orange";
                                         $record->daia_hint->label = 'on_loan';
                                         $record->score += 20;
-                                    }  else {
+                                    } elseif(!empty($service_content->limitation[0]->id)) {
+                                        $limitation = str_replace(' ','', substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1));
+                                        $record->daia_hint->level = $limitation;
+                                        $record->daia_hint->label = $service_content->service.$limitation;
+                                        $record->score += 5;
+                                    } elseif(!empty($service_content->limitation[0]->content)) {
+                                        $limitation = str_replace(' ','',$service_content->limitation[0]->content);
+                                        $record->daia_hint->level = $limitation;
+                                        $record->daia_hint->label = $service_content->service.$limitation;
+                                        $record->score += 5;
+                                    } else {
                                         $record->daia_hint->level = "daia_green";
                                         $record->daia_hint->label = $service_content->service;
                                     }
