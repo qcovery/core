@@ -1,0 +1,20 @@
+<?php
+  $transParams = [
+    '%%start%%' => $this->localizedNumber($this->results->getStartRecord()),
+    '%%end%%' => $this->localizedNumber($this->results->getEndRecord()),
+    '%%total%%' => $this->localizedNumber($this->recordTotal),
+  ];
+
+  $showingResults = $this->translate('showing_results_of_for_html', $transParams);
+?>
+<?php // Use search-heading if it's set, but append only if it's not empty to avoid extra whitespace: ?>
+<?php if ($this->slot('search-heading')->isset()): ?>
+  <?php if ($heading = $this->slot('search-heading')->get()): ?>
+    <?php $showingResults .= " $heading"; ?>
+  <?php endif; ?>
+<?php elseif ($this->params->getSearchType() == 'basic'):
+  $showingResults = $this->translate('showing_results_of_for_html', $transParams);
+endif; ?>
+
+<?php $this->layout()->srmessage = $showingResults; ?>
+<?=$showingResults; ?>

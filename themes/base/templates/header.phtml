@@ -1,0 +1,128 @@
+<?php $account = $this->auth()->getManager(); ?>
+<div class="banner container navbar">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-collapse" aria-hidden="true">
+      <i class="bel-menu"></i>
+    </button>
+    <a class="navbar-brand lang-<?=$this->layout()->userLang ?>" href="<?=$this->url('home')?>">voyage of discovery</a>
+  </div>
+  <?php if (!isset($this->layout()->renderingError)): ?>
+    <div class="collapse navbar-collapse" id="header-collapse">
+      <nav>
+        <ul class="nav navbar-nav navbar-right flip">
+          <li id="uisettings-contrast">
+            <?php
+              $contrast = 'high';
+                if ($this->uisettings()->isHighContrast()) {
+                  $contrast = 'normal';
+                }
+            ?>
+            <a href="#" class="uisettings-contrast uisettings-contrast-<?=$contrast?>" data-uisettings-contrast="<?=$contrast?>"><i class="bel-kontrast" aria-hidden="true"></i> <?=$this->transEsc('Contrast')?></a>
+          </li>
+          <?php if ($this->feedback()->tabEnabled()): ?>
+            <li>
+              <a class="icon-link" id="feedbackLink" data-lightbox href="<?=$this->url('feedback-home') ?>">
+                <i class="bel-brief02" aria-hidden="true"></i>
+                <span class="icon-link__label"><?=$this->transEsc("Feedback")?></span>
+              </a>
+            </li>
+          <?php endif; ?>
+          <?php $cart = $this->cart(); if ($cart->isActive()): ?>
+            <li id="cartSummary">
+              <a id="cartItems" class="icon-link" data-lightbox title="<?=$this->transEscAttr('View Book Bag')?>" href="<?=$this->url('cart-home')?>">
+                <i class="bel-stern02" aria-hidden="true"></i>
+                <span class="icon-link__label">
+                  <span class="sr-only"><?=$this->transEsc('Book Bag')?>:</span>
+                  <span role="status"><strong><?=count($cart->getItems())?></strong> <?=$this->transEsc('items')?></span>
+                <span class="full<?=!$cart->isFull() ? ' hidden' : '' ?>">(<?=$this->transEsc('bookbag_full') ?>)</span>
+                </span>
+              </a>
+            </li>
+          <?php endif; ?>
+          <?php if (is_object($account) && $account->loginEnabled()): // hide login/logout if unavailable ?>
+            <?php if ($account->isLoggedIn()): ?>
+              <li class="logoutOptions<?php if ($account->dropdownEnabled()): ?> with-dropdown<?php endif ?>">
+                <a href="<?=$this->url('myresearch-home', [], ['query' => ['redirect' => 0]])?>" class="icon-link">
+                  <span id="account-icon" class="icon-link__icon"><i class="bel-nutzer07" aria-hidden="true"></i></span>
+                  <span class="icon-link__label"><?=$this->transEsc("Your Account")?></span>
+                </a>
+            </li>
+            <?php if($account->dropdownEnabled()): ?>
+                <li id="login-dropdown" class="dropdown">
+                  <a href="#" data-toggle="dropdown"><i class="bel-pfeil-u01"></i></a>
+                <div class="dropdown-menu">
+                  <?=$this->render('myresearch/menu'); ?>
+                </div>
+              </li>
+            <?php endif; ?>
+              <li class="logoutOptions">
+                <a href="<?=$this->url('myresearch-logout')?>" class="logout icon-link">
+                  <i class="bel-ausgang" aria-hidden="true"></i>
+                  <span class="icon-link__label"><?=$this->transEsc("Log Out")?></span>
+                </a>
+            </li>
+            <li id="loginOptions"<?php if($account->isLoggedIn()): ?> class="hidden"<?php endif ?>>
+              <?php if ($account->getSessionInitiator($this->serverUrl($this->url('myresearch-home')))): ?>
+                  <a href="<?=$this->url('myresearch-userlogin')?>" class="icon-link">
+                    <i class="bel-eingang" aria-hidden="true"></i>
+                    <span class="icon-link__label"><?=$this->transEsc("Institutional Login")?></span>
+                  </a>
+              <?php else: ?>
+                  <a href="<?=$this->url('myresearch-userlogin')?>" class="icon-link" data-lightbox>
+                    <i class="bel-eingang" aria-hidden="true"></i>
+                    <span class="icon-link__label"><?=$this->transEsc("Login")?></span>
+                  </a>
+              <?php endif; ?>
+            </li>
+          <?php endif; ?>
+          <?php endif; ?>
+
+          <?php if (isset($this->layout()->themeOptions) && count($this->layout()->themeOptions) > 1): ?>
+            <li class="theme dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="bel-zahnrad" aria-hidden="true"></i> <?=$this->transEsc("Theme")?> <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <?php foreach ($this->layout()->themeOptions as $current): ?>
+                  <li<?=$current['selected'] ? ' class="active"' : ''?>>
+                    <a href="<?=$this->escapeHtmlAttr($this->url()->addQueryParameters(['ui' => $current['name']])) ?>" rel="nofollow">
+                      <?=$this->transEsc($current['desc']) ?>
+                    </a>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            </li>
+          <?php endif; ?>
+
+          <?php if (isset($this->layout()->allLangs) && count($this->layout()->allLangs) > 1): ?>
+            <li class="language dropdown">
+              <form method="post" name="langForm" id="langForm">
+                <input type="hidden" name="mylang"/>
+              </form>
+              <i class="bel-welt languageSelect" aria-hidden="true"></i>
+              <?php foreach ($this->layout()->allLangs as $langCode => $langName): ?>
+                <?php
+                    $highlight  = '';
+                    if ($this->layout()->userLang != $langCode) {
+                        $highlight  = 'languageHighlight';
+                    }
+                ?>
+                <a href="#" class="<?=$highlight?>" onClick="document.langForm.mylang.value='<?=$langCode?>';document.langForm.submit()"><?=mb_strtoupper($this->displayLanguageOption($langCode))?></a>
+                  <?php if ($langCode != array_key_last($this->layout()->allLangs)): ?> <span class="languageSelect">|</span> <?php endif; ?>
+              <?php endforeach; ?>
+            </li>
+          <?php endif; ?>
+
+          <li>
+            <a href="/vufind/Help/Home?topic=search" data-lightbox=""><i class="bel-hilfe01"></i><?= $this->transEsc("Help") ?></a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  <?php endif; ?>
+</div>
+<?php if ($this->layout()->searchbox !== false): ?>
+  <div class="search container navbar">
+    <div class="nav searchbox hidden-print" role="search">
+      <?=$this->layout()->searchbox ?>
+    </div>
+  </div>
+<?php endif; ?>

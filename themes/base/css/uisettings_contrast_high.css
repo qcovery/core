@@ -1,0 +1,252 @@
+/*----------------------------------------------------------------------
+global structure & normalize
+----------------------------------------------------------------------*/
+
+body {
+    color: var(--white);
+    background: var(--black);
+    }
+
+
+/*----------------------------------------------------------------------
+colors
+----------------------------------------------------------------------*/
+
+:root {
+	--black: #000000;
+    --darkgrey: #222222;
+    --lightgrey: #CCCCCC;
+    --foggrey: #E0E0E0;
+    --light: #222222;
+    --white: #FFFFFF;
+    --activestate: #EDD3B4;
+    --hoverstate: #EDD3B4;
+    --focusstate: #EDD3B4;
+    }
+    
+    
+/*----------------------------------------------------------------------
+others
+----------------------------------------------------------------------*/
+  
+input[type=button],
+input[type=submit],
+button,
+.btn-default,
+.search-filter-toggle,
+.btn-group .btn,
+.search-controls .btn,
+select {
+    color: var(--black);
+    }
+
+input[type=button]:hover,
+input[type=submit]:hover,
+button:hover,
+.btn-default:hover,
+.search-filter-toggle:hover,
+.btn-group .btn:hover,
+.search-controls .btn:hover,
+select:hover {
+    color: var(--black);
+    background: var(--focusstate);
+    }
+
+header {
+    background: var(--white);
+    }
+
+header .nav-tabs {
+    border-bottom: 1px solid var(--lightgrey);
+    }
+
+header .nav-tabs li {
+    margin: 0 0 -1px 3px;
+    }
+    
+header .nav-tabs li.active a {
+    color: var(--white);
+    }
+
+header .nav-tabs li a:hover {
+    border: 1px solid var(--hoverstate);
+    color: var(--hoverstate);
+    }
+
+.search-home-columnset article,
+.search-home-columnset article:hover {
+    background: var(--darkgrey);
+    box-shadow: 0 0 0 1px var(--white);
+    }
+
+.search.container.navbar {
+    background: var(--black);
+    border-bottom: 1px solid var(--white);
+    }
+
+.template-name-advanced .main {
+    background: var(--black);
+    }
+
+.template-name-results .search-controls-showing {
+    background: transparent;
+    }
+
+.template-name-results .facet-group button.title,
+.template-name-results .facet-group button.title:hover,
+.search-controls select {
+	color: var(--black);
+	}
+
+.template-name-results .facet-group .badge {
+    color: var(--white);
+    }
+
+.template-name-results .result:hover,
+.facet-group .facet:hover {
+    background: var(--darkgrey);
+    }
+
+.facet-group button.more-btn,
+.facet-group button.less-btn,
+.facet-group .all-facets {
+    color: var(--hoverstate);
+    }
+
+.template-name-results .is-result-details .responsive-table {
+    background: var(--light);
+    }
+
+.template-name-results .media-left img,
+.template-name-view .media-left img,
+.carousel-item img {
+    background: var(--white);
+    border-radius: 8px;
+    }
+
+.template-name-results .result,
+.mainbody .nav-tabs li,
+.facet-group .collapse.in,
+.not-found-contact,
+.sidebar .availabilityItem {
+    background: var(--darkgrey);    
+    }
+
+.record-tabs li.active a,
+.template-name-view .result-table-toggle-active {
+    background: var(--darkgrey) !important;
+    }
+
+.template-name-view .media-body,
+.sidebar nav,
+.sidebar .search-sort,
+.pagination li,
+.fidrom-footer,
+.action-toolbar,
+.sidebar .search-result-limit,
+.template-name-advanced .adv-group,
+.template-name-advanced #advSearchForm fieldset,
+.template-name-advanced #groupPlaceHolder,
+.template-name-advanced #advSearchForm legend,
+.template-name-advanced .facet-group,
+.template-name-history .mainbody,
+.template-name-advanced .sidebar,
+.browsing-column,
+.fid-copyright {
+    background: var(--darkgrey);
+    }
+
+.bulkActionButtons button,
+.template-name-results .is-result-details .result-table-toggle {
+    background: transparent;
+    border: 1px solid var(--white);
+    }
+
+.bulkActionButtons button:hover,
+.template-name-results .is-result-details .result-table-toggle:hover {
+    text-decoration: underline;
+    border: 1px solid var(--hoverstate);
+    }
+
+.template-name-results .result-table-toggle-active {
+    color: var(--black) !important;
+    }
+
+.solr-adv-facet select {
+    background: var(--hoverstate);
+    }
+
+.modal-body .lightbox-scroll {
+    background: var(--black);
+    }
+
+.modal-body .btn-group .btn.active {
+    background: var(--black);
+    color: var(--white);
+    }
+
+.bib-select-list a {
+    color: var(--white);
+    background: var(--black);
+    }
+
+.button-quick-filter {
+    background: var(--darkgrey);
+    }
+
+footer {
+    background: var(--black);
+    }
+
+.footer-menu li,
+.legal-menu li,
+.footer-menu li a,
+.legal-menu li a {
+    color: var(--white);
+    }
+
+.fid-footer-art-inner form:hover {
+    background: var(--black);
+    }
+
+.fid-footer-art-inner form:hover textarea {
+    color: var(--white);
+    }
+
+.fid-footer-art-inner form:hover button {
+    background: center 45px no-repeat transparent;
+    color: var(--white);
+    width: 70px;
+    }
+
+.sponsor-note {
+    margin: 30px 0 0 0;
+    }
+
+.sponsor-note a {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 3px 3px 0 0;
+    }
+
+@media only screen and (max-width: 1080px) { 
+
+    .template-name-results .cart-add,
+    .template-name-results .cart-remove,
+    .template-name-results .save-record {
+        background: var(--back);
+        color: var(--activestate);
+        }
+}
+
+@media only screen and (max-width: 800px) {
+
+    header .nav-tabs {
+        border-bottom: 0 none;
+        }
+    
+    header .nav-tabs li {
+        margin: 5px 0 0 0;
+        }
+
+}

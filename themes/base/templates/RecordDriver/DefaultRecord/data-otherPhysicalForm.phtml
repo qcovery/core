@@ -1,0 +1,10 @@
+<?php foreach ($data as $entry): ?>
+    <?php if ($entry['label']):?>
+        <?= $entry['label']?>:
+    <?php endif; ?>
+    <?php if ($entry['link']):?>
+        <a href="<?=$this->recordLinker()->getUrl($entry['link'])?>"><?=$entry['value']?></a>
+    <?php else:?>
+        <?=$entry['value']?>
+    <?php endif; ?>
+<?php endforeach; ?>
