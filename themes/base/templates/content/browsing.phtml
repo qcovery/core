@@ -1,0 +1,149 @@
+<?php
+    function loadClassification($type) {
+        return parse_ini_file(realpath(getenv('VUFIND_LOCAL_DIR') . '/languages/classification/' . $type . '/de.ini'));
+    }
+
+    function getThematicClassification() {
+        $tree = [];
+        foreach (loadClassification('thematic') as $key => $value) {
+            $structured = str_split($key, 2);
+            // 00 is similar to no value set
+            if ($structured[1] == '00') {
+                unset($structured[1]);
+            }
+            if ($structured[2] == '00') {
+                unset($structured[2]);
+            }
+
+            // check if first level exists
+			if (!array_key_exists(0, $structured)) {
+				// string is not well-formed
+				continue;
+			}
+
+			// build tree structure
+			if (!array_key_exists($structured[0], $tree)) {
+				$tree[$structured[0]] = ['children' => [], 'link' => '', 'text' => null];
+			}
+			if (array_key_exists(1, $structured) && !array_key_exists($structured[1], $tree[$structured[0]]['children'])) {
+				$tree[$structured[0]]['children'][$structured[1]] = ['children' => [], 'link' => '', 'text' => null];
+			}
+			if (array_key_exists(2, $structured) && !array_key_exists($structured[3], $tree[$structured[0]]['children'][$structured[1]]['children'])) {
+				$tree[$structured[0]]['children'][$structured[1]]['children'][$structured[2]] = ['link' => '', 'text' => null];
+			}
+
+			// set value and label
+			if (array_key_exists(1, $structured) && array_key_exists(2, $structured)) {
+				$tree[$structured[0]]['children'][$structured[1]]['children'][$structured[2]]['link'] = $key . ' ' . $value;
+				$tree[$structured[0]]['children'][$structured[1]]['children'][$structured[2]]['text'] = $value;
+			} else if (array_key_exists(1, $structured)) {
+				$tree[$structured[0]]['children'][$structured[1]]['link'] = $key . ' ' . $value;
+				$tree[$structured[0]]['children'][$structured[1]]['text'] = $value;
+			} else {
+				$tree[$structured[0]]['link'] = $key . ' ' . $value;
+				$tree[$structured[0]]['text'] = $value;
+			}
+		}
+        return $tree;
+    }
+
+    function getTemporalClassification() {
+	    $tree = [];
+	    foreach (loadClassification('temporal') as $key => $value) {
+            $onlyLabel = preg_replace('/\sz\d{2}-?(z\d{2})?$/', '', $value);
+		    $structured = str_split($key, 2);
+		    // 00 is similar to no value set
+		    if ($structured[1] == '00') {
+			    unset($structured[1]);
+		    }
+
+		    // check if first level exists
+		    if (!array_key_exists(0, $structured)) {
+			    // string is not well-formed
+			    continue;
+		    }
+
+		    // build tree structure
+		    if (!array_key_exists($structured[0], $tree)) {
+			    $tree[$structured[0]] = ['children' => [], 'link' => '', 'text' => null];
+		    }
+		    if (array_key_exists(1, $structured) && !array_key_exists($structured[1], $tree[$structured[0]]['children'])) {
+			    $tree[$structured[0]]['children'][$structured[1]] = ['children' => [], 'link' => '', 'text' => null];
+		    }
+
+		    // set value and label
+		    if (array_key_exists(1, $structured)) {
+			    $tree[$structured[0]]['children'][$structured[1]]['link'] = trim(str_replace($onlyLabel, '', $value)) . ' ' . $onlyLabel;
+			    $tree[$structured[0]]['children'][$structured[1]]['text'] = $onlyLabel;
+		    } else {
+			    $tree[$structured[0]]['link'] = trim(str_replace($onlyLabel, '', $value)) . ' ' . $onlyLabel;
+			    $tree[$structured[0]]['text'] = $onlyLabel;
+		    }
+	    }
+	    return $tree;
+    }
+?>
+
+<?php
+$this->headScript()->appendFile('vendor/jsTree/jstree.min.js');
+$script = <<<JS
+$(document).ready(function() {
+    ['#jstree-thematic', '#jstree-temporal'].forEach(function (treeId) {
+        let tree = $(treeId);
+        tree.jstree();
+        tree.on('changed.jstree', function(e, data) {
+            window.location.href = '/vufind/Search/Results?lookfor=' + data.node.data.link;
+        });
+    });
+});
+JS;
+echo $this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $script, 'SET');
+?>
+
+<div class="is-content-area">
+    <h1>Browsing</h1>
+    <section class="is-browsing">
+	    <div class="browsing-column">
+		    <h2>Systematik Themen</h2>
+		    <div id="jstree-thematic">
+		        <ul>
+		        <?php foreach (getThematicClassification() as $entry): ?>
+		            <li data-link="<?=$entry['link']?>">
+		                <?= $entry['text']?>
+		                <ul>
+		                <?php foreach ($entry['children'] as $entry2): ?>
+		                    <li data-link="<?=$entry2['link']?>">
+			                    <?= $entry2['text']?>
+		                        <ul>
+		                        <?php foreach ($entry2['children'] as $entry3): ?>
+		                            <li data-link="<?=$entry3['link']?>"><?= $entry3['text']?></li>
+		                        <?php endforeach; ?>
+		                        </ul>
+		                    </li>
+		                <?php endforeach; ?>
+		                </ul>
+		            </li>
+		        <?php endforeach; ?>
+		        </ul>
+		    </div>
+	    </div>
+	
+	    <div class="browsing-column">
+		    <h2>Systematik Zeit</h2>
+		    <div id="jstree-temporal">
+		        <ul>
+					<?php foreach (getTemporalClassification() as $entry): ?>
+		                <li data-link="<?=$entry['link']?>">
+							<?= $entry['text']?>
+		                    <ul>
+								<?php foreach ($entry['children'] as $entry2): ?>
+		                            <li data-link="<?=$entry2['link']?>"><?= $entry2['text']?></li>
+								<?php endforeach; ?>
+		                    </ul>
+		                </li>
+					<?php endforeach; ?>
+		        </ul>
+		    </div>
+	    </div>
+    </section>
+</div>

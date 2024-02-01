@@ -1,9 +1,10 @@
 <?php
 return array(
-    'extends' => 'belugax',
+    'extends' => 'base',
     'favicon' => 'favicon.ico',
     'css' => [
         'daiaplus.css',
+        'belugax_hcu.css',
     ],
     'js' => [
         'popper.min.js',

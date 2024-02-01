@@ -4,6 +4,17 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
+:root {
+    --black: #003063;
+    --darkgrey: #787878;
+    --lightgrey: #CCCCCC;
+    --foggrey: #E0E0E0;
+    --light: #EFEFEF;
+    --white: #FFFFFF;
+    --activestate: #3c8cd2;
+    --hoverstate: #2972b2;
+    --focusstate: #2972b2;
+}
 
 /* lato-regular - latin */
 @font-face {
@@ -4961,7 +4972,7 @@ a.label:focus {
     background-color: #77120f
 }
 
-.badge {
+.facet-group .badge {
     display: inline-block;
     min-width: 10px;
     padding: 5px 5px;
@@ -11605,7 +11616,7 @@ body.rtl .modal-loading {
     padding: 0
 }
 
-header .container.navbar {
+.banner.container.navbar {
     padding: 20px 0;
     margin-bottom: 0
 }
@@ -12129,7 +12140,7 @@ a.facet {
     color: #fff !important
 }
 
-.facet-group .title {
+.facet-group button.title {
     padding: 10px 20px;
     font-weight: 700;
     width: 100%;
@@ -13253,7 +13264,7 @@ h1.belugax-headline-ph {
 
 @media (min-width:768px) {
     
-    .belugax-search-input-follow input[type="text"] {
+    #searchForm_lookfor {
         width: 58%
     }
     
@@ -14495,4 +14506,211 @@ th.tablesorter-headerDesc::after {
 
 .JournalVolumes {
     font-weight: bold;
+}
+
+/* Base template adaptation */
+header {
+    padding: 0;
+}
+
+.navbar-header {
+    width: auto;
+}
+
+.navbar-collapse li {
+    display: unset;
+}
+
+input.helpTooltipLink,
+input.helpTooltipLink:hover {
+    display: inherit;
+    padding: inherit;
+    border: inherit;
+    font-weight: inherit;
+    background: inherit;
+    color: inherit;
+}
+
+.footer-container {
+    text-align: initial;
+}
+
+.footer-column li {
+    display: list-item;
+}
+
+.footer-column li a,
+.footer-column li a:hover {
+    border: none;
+}
+
+.modal-backdrop {
+    z-index: initial;
+}
+
+#modal .modal-content {
+    background: var(--white);
+}
+
+@media (min-width:768px) {
+    #modal .modal-content {
+        margin: 0;
+        max-width: 100%;
+    }
+}
+
+.modal .control-label,
+.modal .form-control {
+    display: block;
+    width: 100%;
+}
+
+#searchForm_lookfor,
+#content input#searchForm_lookfor {
+    border-radius: 2px;
+    box-shadow: none;
+}
+
+@media only screen and (max-width: 1480px) {
+    #content {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.template-name-home .breadcrumbs,
+.template-name-results .mainbody .nav-tabs,
+.template-name-results .breadcrumbs,
+.template-name-content .breadcrumbs,
+.template-name-advanced .breadcrumbs,
+.template-name-history .breadcrumbs {
+    display: block;
+    margin-bottom: 20px;
+}
+
+.mainbody .nav-tabs li {
+    background: unset;
+    border: none;
+    padding: 0;
+}
+
+.mainbody .nav-tabs li a {
+    border-radius: 2px;
+}
+
+.template-name-home #content {
+    max-width: unset;
+}
+
+.template-name-results .result,
+.template-name-results .result:first-child {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    padding: 10px 20px;
+}
+
+.template-name-results .result .record-number {
+    display: none;
+}
+
+.template-name-results .media-body {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.pagination li span {
+    display: inline;
+    border: none;
+    padding: 0;
+}
+
+.not-found-contact {
+    border: none;
+}
+
+.template-name-results .sidebar.right,
+.template-name-view .sidebar.right,
+.template-dir-myresearch .sidebar.right,
+.template-dir-holds .sidebar.right,
+.template-name-history .sidebar.right,
+.template-dir-admin .sidebar.right {
+    margin: 0;
+    width: 25%;
+}
+
+.template-name-view .media-body tr {
+    border-bottom: initial;
+}
+
+.template-name-advanced .main {
+    background: unset;
+}
+
+.template-name-advanced h2.pull-left {
+    display: block;
+}
+
+@media (min-width:768px) {
+    .template-name-advanced #content {
+        width: 750px;
+    }
+
+    .template-name-advanced .mainbody.left {
+        float: left;
+    }
+    .template-name-advanced .sidebar.right {
+        float: right;
+    }
+}
+
+@media (min-width:992px) {
+    .template-name-advanced #content {
+        width: 970px;
+    }
+}
+
+@media (min-width:1200px) {
+    .template-name-advanced #content {
+        width: 1080px;
+    }
+}
+
+@media (min-width:1400px) {
+    .template-name-advanced #content {
+        width: 1240px;
+    }
+}
+
+@media (min-width:1600px) {
+    .template-name-advanced #content {
+        width: 1440px;
+    }
+}
+
+.adv-term-remove {
+    margin-top: 5px;
+}
+
+.adv-term-remove::after {
+    content: none;
+}
+
+.template-name-advanced .sidebar,
+.adv-group,
+#groupPlaceHolder,
+#advSearchForm legend,
+#advSearchForm fieldset {
+    box-shadow: none;
+}
+
+/* Belugino fix */
+.template-name-results .belugino-icon-cover {
+    margin-top: 5px;
+}
+
+[class^="bel-"], [class*=" bel-"],
+.facet-group button.title.collapsed::after {
+    line-height: 22px;
+    font-size: 22px;
 }

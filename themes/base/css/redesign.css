@@ -1,0 +1,115 @@
+
+.navbar-brand {
+	display: inline-block;
+	font-size: 0;
+	width: 180px;
+	height: 60px;
+	}
+
+
+/*----------------------------------------------------------------------
+Browsing
+----------------------------------------------------------------------*/
+
+.is-browsing {
+	display: -ms-flexbox;
+	display: flex;
+	flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	margin: 0 -30px 0 0;
+	}
+	
+.browsing-column {
+	width: calc(50% - 30px);
+	margin: 0 30px 0 0;
+	padding: 0 0 15px 0;
+	background: var(--white);
+	box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+	border-radius: 3px;
+	}	
+
+#content .is-content-area .browsing-column h2 {
+	margin: 20px;
+	}
+
+.is-content-area .browsing-column ul {
+	list-style: none;
+	margin: 0 0 0 15px;
+	}
+
+.is-content-area .browsing-column li {
+	padding: 5px 10px 5px 5px;
+	}
+
+/* jsTree */
+.jstree-icon {
+	font-family: 'belugino';
+	font-style: initial;
+	padding-right: .1em;
+	text-decoration: none;
+	}
+
+.jstree-ocl {
+	display: inline-block;
+	padding: 0px 10px 0px 0px;
+	width: 25px;
+	vertical-align: middle;
+	}
+
+.jstree-closed > .jstree-ocl,
+.jstree-open > .jstree-ocl {
+	cursor: pointer;
+	}
+
+.jstree-closed > .jstree-ocl::after,
+.jstree-open > .jstree-ocl::after {
+	content: '\e928';
+	display: inline-block;
+	transition: .2s;
+	font-size: 28px;
+	border: 1px solid var(--lightgrey);
+	border-radius: 25px;
+	}
+
+.jstree-closed > .jstree-ocl:hover::after,
+.jstree-open > .jstree-ocl:hover::after {
+	border: 1px solid var(--hoverstate);
+	color: var(--hoverstate);
+	}
+
+.jstree-open > .jstree-ocl::after {
+	transform: rotate(90deg);
+	transition: .2s;
+	}
+
+.modal-body #paia-availability table {
+	width: 100%;
+	margin-top: 30px;
+	border-top: 1px solid var(--lightgrey);
+	}
+
+.modal-body #paia-availability th {
+	font-size: 130%;
+	line-height: 100%;
+	font-weight: 700;
+	text-align: left;
+	padding: 30px 0 15px 0;
+	}
+
+
+/*----------------------------------------------------------------------
+Tablet
+----------------------------------------------------------------------*/
+
+@media only screen and (max-width: 1024px) {
+
+	.is-browsing {
+		margin: 0;
+		}
+		
+	.browsing-column {
+		width: 100%;
+		margin: 0 0 30px 0;
+		}	
+
+}
