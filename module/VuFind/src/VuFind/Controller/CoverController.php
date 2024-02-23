@@ -124,6 +124,8 @@ class CoverController extends \Laminas\Mvc\Controller\AbstractActionController
     {
         $this->sessionSettings->disableWrite(); // avoid session write timing bug
 
+        /*
+        Removed code due to security warning on 20.02.2024
         // Special case: proxy a full URL:
         $url = $this->params()->fromQuery('proxy');
         if (!empty($url)) {
@@ -138,6 +140,7 @@ class CoverController extends \Laminas\Mvc\Controller\AbstractActionController
                 // to display an image unavailable graphic.
             }
         }
+        */
 
         // Default case -- use image loader:
         $this->loader->loadImage($this->getImageParams());
