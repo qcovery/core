@@ -14754,6 +14754,7 @@ input.helpTooltipLink:hover {
 }
 
 [class^="bel-"], [class*=" bel-"],
+.facet-group button.title::after,
 .facet-group button.title.collapsed::after {
     line-height: 22px;
     font-size: 22px;
