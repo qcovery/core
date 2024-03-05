@@ -14517,6 +14517,26 @@ header {
     width: auto;
 }
 
+.navbar-brand {
+    width: auto;
+}
+
+.navbar-toggle:hover {
+    background: transparent;
+    color: inherit;
+}
+
+.navbar-toggle i {
+    line-height: 1;
+}
+
+.navbar-collapse nav {
+    background: unset;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+}
+
 .navbar-collapse li {
     display: unset;
 }
@@ -14619,6 +14639,19 @@ input.helpTooltipLink:hover {
     flex-grow: 1;
 }
 
+.template-name-results .result-links {
+    text-align: right;
+}
+
+.template-name-results .cart-add, .template-name-results .cart-remove, .template-name-results .save-record,
+.template-name-results .cart-add:hover, .template-name-results .cart-remove:hover, .template-name-results .save-record:hover {
+    border: none;
+}
+
+.result a {
+    text-decoration: none;
+}
+
 .pagination li span {
     display: inline;
     border: none;
@@ -14629,14 +14662,25 @@ input.helpTooltipLink:hover {
     border: none;
 }
 
-.template-name-results .sidebar.right,
-.template-name-view .sidebar.right,
-.template-dir-myresearch .sidebar.right,
-.template-dir-holds .sidebar.right,
-.template-name-history .sidebar.right,
-.template-dir-admin .sidebar.right {
-    margin: 0;
-    width: 25%;
+@media (min-width:768px) {
+    .template-name-results .mainbody,
+    .template-name-view .mainbody,
+    .template-dir-myresearch .mainbody,
+    .template-dir-holds .mainbody,
+    .template-name-history .mainbody,
+    .template-dir-admin .mainbody {
+        width: 75%;
+    }
+
+    .template-name-results .sidebar.right,
+    .template-name-view .sidebar.right,
+    .template-dir-myresearch .sidebar.right,
+    .template-dir-holds .sidebar.right,
+    .template-name-history .sidebar.right,
+    .template-dir-admin .sidebar.right {
+        margin: 0;
+        width: 25%;
+    }
 }
 
 .template-name-view .media-body tr {
