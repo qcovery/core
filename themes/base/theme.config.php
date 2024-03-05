@@ -4,10 +4,13 @@ return [
     'css' => [
         'compiled.css',
         'belugino.css',
+        'jquery.qtip.min.css',
 	    'base.css',
         'redesign.css',
     ],
     'js' => [
+        'jquery.tablesorter.min.js',
+        'jquery.qtip.min.js',
         'base.js',
     ],
     'helpers' => [
