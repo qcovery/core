@@ -14748,6 +14748,15 @@ input.helpTooltipLink:hover {
     box-shadow: none;
 }
 
+.record .media-body h3 {
+    font-size: 1.5rem;
+    line-height: 1.4;
+}
+
+.media-body table th {
+    font-weight: bold;
+}
+
 /* Belugino fix */
 .template-name-results .belugino-icon-cover {
     margin-top: 5px;
@@ -14756,6 +14765,6 @@ input.helpTooltipLink:hover {
 [class^="bel-"], [class*=" bel-"],
 .facet-group button.title::after,
 .facet-group button.title.collapsed::after {
-    line-height: 22px;
     font-size: 22px;
+    line-height: 1;
 }

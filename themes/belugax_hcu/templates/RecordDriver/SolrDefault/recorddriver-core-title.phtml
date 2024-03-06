@@ -38,11 +38,11 @@
     <p id="short_summary">
     <?=$this->truncate($summary, 300) ?>
     <?php if(strlen($summary) > 300): ?>
-        <br /><a href="" class="showSummary"><?=$this->transEsc('Full description')?><i class="bel-pfeil-u01"></i></a>
+        <br /><a href="" id="showSummaryLink"><?=$this->transEsc('Full description')?><i class="bel-pfeil-u01"></i></a>
         </p>
         <p id="long_summary" style="display:none">
             <?=$summary ?>
-            <a href="" class="hideSummary"><?=$this->transEsc('Full description')?><i class="bel-pfeil-o01"></i></a>
+            <a href="" id="hideSummaryLink"><?=$this->transEsc('Full description')?><i class="bel-pfeil-o01"></i></a>
         </p>
     <?php else: ?>
         </p>
