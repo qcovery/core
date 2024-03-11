@@ -11884,7 +11884,7 @@ body.rtl .modal-loading {
     color: #cccfcf;
 }
 
-.record .media #belugax-staff-view-content .table-striped:last-child {
+.record .media #staffview-content .table-striped:last-child {
     color: #181f1d;
 }
 
@@ -13441,8 +13441,8 @@ h1.belugax-headline-ph {
     display: none
 }
 
-#belugax-staff-view-content th,
-#belugax-staff-view-content strong {
+#staffview-content th,
+#staffview-content strong {
     color: #C62828
 }
 
@@ -14383,7 +14383,7 @@ th.tablesorter-headerDesc::after {
     color: #3c8cd2;
 }
 
-#belugax-staff-view-title a {
+#staffview-header a {
     color: #cccfcf !important;
 }
 
@@ -14755,6 +14755,13 @@ input.helpTooltipLink:hover {
 
 .media-body table th {
     font-weight: bold;
+}
+
+.staff-view--marc .marc__tag {
+    width: 15%;
+}
+.staff-view--marc .marc__ind {
+    width: 5%;
 }
 
 /* Belugino fix */

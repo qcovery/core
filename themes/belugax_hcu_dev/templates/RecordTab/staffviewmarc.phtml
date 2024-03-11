@@ -1,12 +1,11 @@
-<div id="belugax-staff-view">
-    <div id="belugax-staff-view-title" class="uk-align-right">
-        <a uk-toggle="target: .belugax-staff-view-toggle" type="button">
+<div id="staff-view">
+    <div id="staffview-header" class="uk-align-right">
+        <a id="staffview-toggle" type="button">
             <?=$this->translate('Staff View')?>
-            <i class="bel-pfeil-u01 belugax-staff-view-toggle" aria-hidden="true"></i>
-            <i class="bel-pfeil-o01 belugax-staff-view-toggle" aria-hidden="true" hidden></i>
+            <i class="bel-pfeil-u01" aria-hidden="true"></i>
         </a>
     </div>
-    <div id="belugax-staff-view-content" class="belugax-staff-view-toggle" hidden>
+    <div id="staffview-content" class="hidden">
         <? if ($xml = $this->driver->getRawMarcData()): ?>
             <?
                 $doc = new DomDocument();
