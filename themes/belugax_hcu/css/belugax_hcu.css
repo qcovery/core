@@ -14541,6 +14541,11 @@ header {
     display: unset;
 }
 
+.navbar-collapse li.language,
+#helpForm strong {
+    font-weight: normal;
+}
+
 input.helpTooltipLink,
 input.helpTooltipLink:hover {
     display: inherit;
