@@ -43,6 +43,7 @@ class FeedbackController extends BasicFeedbackController
         $view->email = $this->params()->fromPost('email');
         $view->comments = $this->params()->fromPost('comments');
         $view->category = $this->params()->fromPost('category');
+        $view->url = $this->params()->fromPost('url');
 		$config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('config');
 
 		// use a simple captcha
@@ -96,7 +97,10 @@ class FeedbackController extends BasicFeedbackController
             $email_message = empty($view->name) ? '' : 'Name: ' . $view->name . "\n";
             $email_message .= 'Email: ' . $view->email . "\n";
             $email_message .= 'Category: ' . $view->category . "\n";
-            $email_message .= 'Comments: ' . $view->comments . "\n\n";
+            $email_message .= 'Comments: ' . $view->comments . "\n";
+            if ($view->url) {
+                $email_message .= 'Url: ' . $view->url . "\n\n";
+            }
 
             // This sets up the email to be sent
             // Attempt to send the email and show an appropriate flash message:
