@@ -28,6 +28,7 @@
 namespace Libraries;
 
 use VuFind\Search\Memory;
+use Zend\Mvc\I18n\Translator;
 use Zend\Session\Container as SessionContainer;
 use Zend\Config\Config;
 
@@ -85,14 +86,22 @@ class Libraries
     protected $externalLinkData;
 
     /**
+     * Translator
+     *
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
      * Constructor
      *
      * @param Config        $config                Configuration of Libraries
      * @param Memory        $searchMemory          Query object to use to update
      */
-    public function __construct(Config $config, Memory $searchMemory = null)
+    public function __construct(Config $config, Memory $searchMemory = null, Translator $translator = null)
     {
         $this->searchMemory = $searchMemory;
+        $this->translator = $translator;
         $this->includedLibraries = array();
         $this->excludedLibraries = array();
         $this->defaultLibraries = array();
@@ -412,6 +421,10 @@ class Libraries
             $locations = $this->locations[$this->selectedLibrary['code']];
             foreach ($locationFacets as $facetKey => $facetValue) {
                 foreach ($locations as $key => $value) {
+                    if ($this->translator) {
+                        $value = $this->translator->translate($value);
+                    }
+
                     if (in_array($key, ['code', 'solr-field', 'filter-prefix'])) {
                         continue;
                     }
