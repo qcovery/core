@@ -14688,6 +14688,14 @@ input.helpTooltipLink:hover {
     }
 }
 
+.facet-group .facet:hover {
+    background: inherit;
+}
+
+.facet-group .facet:hover .text {
+    text-decoration: underline;
+}
+
 .template-name-view .media-body tr {
     border-bottom: initial;
 }
