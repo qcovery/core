@@ -5,9 +5,10 @@
         if (isset($marcData['link']['data'][0])) {
             $link = $marcData['link']['data'][0];
         }
-        $linkName = '';
         if (isset($marcData['linkname']['data'][0])) {
             $linkName = $marcData['linkname']['data'][0];
+        } else {
+            $linkName = $this->transEsc('Link aufrufen');;
         }
         $icon = '';
         if (isset($marcData['ILN']['data'][0]) && $marcData['ILN']['data'][0] == '370') {

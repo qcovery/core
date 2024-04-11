@@ -27,7 +27,7 @@
 #-----------------------------------------------------------------------------------
 #
 
-"@parent_yaml": "freeaccesscheck.yaml"
+#"@parent_yaml": "freeaccesscheck.yaml"
 
 ShortTitle:
   category: title
@@ -545,8 +545,8 @@ Urls:
     y:
     - [ name, linkname ]
   856:
-    conditions:
-    - [field, y, !C]
+    #conditions:
+    #- [field, y, !C]
     u:
     - [name, link]
     y:
