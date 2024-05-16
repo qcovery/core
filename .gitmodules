@@ -19,3 +19,6 @@
 [submodule "module/ExtendedFacets"]
 	path = module/ExtendedFacets
 	url = git@github.com:qcovery/ExtendedFacets.git
+[submodule "module/ExtendedFeedback"]
+	path = module/ExtendedFeedback
+	url = git@github.com:qcovery/ExtendedFeedback.git
