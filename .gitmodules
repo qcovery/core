@@ -28,3 +28,6 @@
 [submodule "module/Findex"]
 	path = module/Findex
 	url = git@github.com:qcovery/Findex.git
+[submodule "module/HeadTitle"]
+	path = module/HeadTitle
+	url = git@github.com:qcovery/HeadTitle.git
