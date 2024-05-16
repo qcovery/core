@@ -31,3 +31,6 @@
 [submodule "module/HeadTitle"]
 	path = module/HeadTitle
 	url = git@github.com:qcovery/HeadTitle.git
+[submodule "module/HelpTooltips"]
+	path = module/HelpTooltips
+	url = git@github.com:qcovery/HelpTooltips.git
