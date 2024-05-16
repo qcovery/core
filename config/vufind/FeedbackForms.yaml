@@ -1,0 +1,261 @@
+---
+# Listing of configured forms.
+#
+# Configured forms are listed in the top level 'forms' array and can accessed via the URL:
+# /Feedback/Form/<form-id>
+#
+# The main Feedback form (id: FeedbackSite) can be accessed with a shorter URL /Feedback
+#
+# Form supports the following options:
+#
+#   enabled (boolean) Is the form enabled? (default = true)
+#   useCaptcha (boolean) Should the form use Captcha validation? Requires the "feedback"
+#                        option to be turned on in the config.ini [Captcha] form setting.
+#                        (default = true, if Captcha turned on for feedback overall).
+#   reportReferrer (boolean) Should the form report the page from which it was invoked
+#   reportUserAgent (boolean) Should the form report the browser's user agent string
+#   title (string) Form title (translation key)
+#   onlyForLoggedUsers (boolean) Require the user to be logged in to see the form
+#                                (default = false)
+#   emailSubject (string) Email subject (translation key). (default = email_subject
+#                         value from config.ini [Feedback] section, or 'VuFind Feedback')
+#                         The subject may contain placeholders (for example %%receiver%%)
+#                         that are replaced with submitted form values.
+#   emailFrom (address in email envelope, separate from user's email)
+#     name (string)  Sender name (default = sender_name setting from config.ini
+#                    [Feedback] section)
+#     email (string) Sender email (default = sender_email setting from
+#                    config.ini [Feedback] section)
+#   recipient
+#     name (string)  Recipient name (default = recipient_name setting from config.ini
+#                    [Feedback] section)
+#     email (string) Recipient email address (default = recipient_email setting from
+#                    config.ini [Feedback] section)
+#
+#   Multiple recipients can be configured using a list:
+#
+#   recipient:
+#     - name: Recipient 1
+#       email: recipient1@email
+#     - name: Recipient 2
+#       email: recipient2@email
+#
+#   response (string) Reponse after form submit (translation key)
+#   senderInfoRequired (boolean)  Require sender to fill out name and email fields - deprecated
+#   senderEmailRequired (boolean) Require sender to fill out email field
+#   senderNameRequired (boolean)  Require sender to fill out name field
+#
+#   primaryHandler (string)   Handlers to process form data - default is 'email', available
+#                             options are: 'email', 'database'. When this handler fails, the
+#                             whole feedback send action fails. You can add your own handler
+#                             by implementing \VuFind\Form\Handler\HandlerInterface, and adding
+#                             it to module config under key:
+#                               'vufind' -> 'plugin_manager' -> 'form_handler'
+#                             Example:
+#                               primaryHandler: database
+#   secondaryHandlers (array) Additional handlers could be defined here. They can fail silently,
+#                             but could be useful as safety/notify handlers.
+#                             Example:
+#                               secondaryHandlers:
+#                                 - email
+#
+#   help
+#     pre (string)  Help text displayed at the beginning of the form (translation key).
+#     post (string) Help text displayed at the end of the form (translation key)
+#
+#     Help texts may contain HTML-formatting.
+#
+#   prefillFields (array) Fields that could be prefilled by passing parameter to form URL. Could be
+#                         used only with hidden, text and textarea types.
+#                         Example:
+#                           prefillFields:
+#                             - siteCode
+#                          With configured field 'siteCode' enables prefilling the field with
+#                          /Feedback/Form/FeedbackSite?siteCode=website
+#
+#   fields (array) List of form elements with the following options:
+#
+#     name (string)        Element name (see below for reserved element names)
+#     label (string)       Element label (translation key)
+#     required (boolean)   Is the element required? (for checkbox elements this means that
+#                          all options have to be selected.)
+#     requireOne (boolean) Require at least one checkbox option to be selected.
+#     settings (array)     HTML attributes as key-value pairs, for example:
+#       - class: "custom-css-class another-class"
+#                          or
+#       - [class, "custom-css-class another-class"]
+#     type (string)        Element type (text|textarea|date|email|url|select|radio|checkbox|hidden)
+#
+#     help (string)        Element help text (translation key) that is displayed before the element.
+#                          To include HTML formatting, use a translation key ending
+#                          in '_html' here, and define markup in the language files.
+#
+#       or
+#
+#     help (array)
+#      pre (string)      Like above.
+#      post (string)     Like above but the help text is displayed after the element.
+#
+#
+#     Additional settings for date element:
+#
+#     format             Date format to use in the resulting message  (default is
+#                        displayDateFormat in config.ini). Format of the actual field
+#                        displayed on the form is controlled by user's browser.
+#     minValue           Minimum acceptable date. A string that PHP's strtotime can
+#                        parse (e.g. 'now' or '2021-09-09').
+#     maxValue           Maximum acceptable date. A string that PHP's strtotime can
+#                        parse (e.g. 'now' or '2021-09-09').
+#
+#     Additional settings for select, radio and checkbox elements:
+#
+#     options (array) List of select values (translation keys)
+#                     or a list of options with 'value' and 'label' (translation) keys.
+#                       Examples:
+#                         options:
+#                           - option-1
+#                           - option-2
+#
+#                         or
+#
+#                         options:
+#                           - value: value-1
+#                             label: label-1
+#                           - value: value-2
+#                             label: label-2
+#
+#     Alternative settings for select elements:
+#
+#     optionGroups (array) List of option groups with keys:
+#       label (string) Group label (translation key)
+#       options (array) List of select values (see above)
+#
+#     placeholder (string) Placeholder label (translation key). Used to instruct or force
+#       (when combined with 'required' attribute) the user to make a selection from the
+#       options-list. Only select elements with 'options' are supported.
+#       For text, textarea, email and url elements, a placeholder text (translation key)
+#       can be configured by adding a HTML-attribute via 'settings', for example:
+#       settings:
+#         - [placeholder, Please select...]
+#
+#
+# Reserved element names:
+#
+# - name       Sender name. You can add the field to fields configuration to define
+#              its position on the form.
+# - email      Sender email. You can add the field to fields configuration to define
+#              its position on the form.
+# - referrer   Used for browser's referrer information when reportReferrer is
+#              enabled.
+# - useragent  Used for reporting browser's user agent string when reportUserAgent is
+#              enabled.
+# - submit     Form submit button.
+#
+#-----------------------------------------------------------------------------------
+
+forms:
+
+  # Main Feedback form
+
+  FeedbackSite:
+    title: feedback_title
+    enabled: true
+    useCaptcha: true
+    reportReferrer: false
+    reportUserAgent: true
+    #emailFrom:
+    #  name: Your Library - Site Feedback
+    #recipient:
+    #  name: Your Library
+    #  email: feedback@myuniversity.edu
+    primaryHandler: email
+    onlyForLoggedUsers: false
+    #emailSubject: VuFind Feedback
+    response: feedback_response
+    senderEmailRequired: false
+    senderNameRequired: false
+
+    #help:
+    #  pre: feedback_help_pre
+    #  post: feedback_help_post
+
+    fields:
+      - name: message
+        type: textarea
+        label: Comments
+        required: true
+        settings:
+        # help: message_help
+
+  # Example for an acquisition request form
+
+  AcquisitionRequest:
+    enabled: false
+    title: Acquisition Request
+    onlyForLoggedUsers: false
+    emailSubject: Acquisition Request
+    response: feedback_response
+    primaryHandler: email
+
+    recipient:
+      name: Your Library
+      email: feedback@myuniversity.edu
+
+    help:
+      pre: acquisition_request_info_pre
+      post: acquisition_request_info_post
+
+    fields:
+      - name: receiver
+        type: select
+        label: acquisition_request_receiver
+        required: true,
+        options:
+          - Feedback
+          - bar
+
+      - name: receiver2
+        type: select
+        label: acquisition_request_receiver
+        required: true,
+        optionGroups:
+          - label: Library 1
+            options:
+              - Branch 1
+              - Branch 2
+              - Branch 3
+
+          - label: Library 2
+            options:
+              - Branch 1
+              - Branch 2
+
+      - name: title
+        type: text
+        label: Title
+        required: true
+
+      - name: author
+        type: text
+        label: Author
+        required: true
+
+      - name: format
+        type: text
+        label: Format
+        required: true
+
+      - name: last_interest_date
+        type: date
+        label: Last interest date
+        required: false
+        min: now
+        max: 'now + 1 year'
+
+      - name: boolean
+        type: radio
+        label: feedback_help_label
+        required: true
+        options:
+          - Yes
+          - No

@@ -1,15 +1,24 @@
-@import "vendor/bootstrap";
+/* #SCSS> */
 $fa-font-path: "../../bootstrap3/css/fonts";
-@import "vendor/font-awesome/font-awesome";
-@import "vendor/bootstrap-accessibility/bootstrap-accessibility";
-@import "vendor/a11y";
+@import "vendor/bootstrap";
+/* <#SCSS */
+/* #LESS>
+@import "vendor/bootstrap/bootstrap";
 
+<#LESS */
+@import "variables";
+@import "vendor/font-awesome/font-awesome";
+
+@import "components/accessibility";
 @import "components/variables";
 
 @import "components/advanced-search";
 @import "components/alphabrowse";
 @import "components/autocomplete";
 @import "components/channels";
+@import "components/cookie-consent";
+@import "components/devtools";
+@import "components/form";
 @import "components/icons";
 @import "components/js-tree";
 @import "components/lightbox";
@@ -24,8 +33,10 @@ $fa-font-path: "../../bootstrap3/css/fonts";
  * Notes
  * = As of 4.0, code styles aren't enforced, but
  *   preferred styles are outlined here: http://codeguide.co/#css
+ *
  * = The preferred method for writing code is to put generic and mobile styles first
  *   and surround desktop styling with media min-width queries.
+ *
  * = Bootstrap 3 breakpoints: <768px, >=768px, >=992px, >=1200px
  *                                xs,      sm,      md,       lg
  * = Breakpoint of <=530px also used to target phones specifically
@@ -35,6 +46,10 @@ html { font-size: 14px; } // Root font size from Bootstrap, allows consistent us
 a,
 label { cursor: pointer; }
 .alert.alert-info a { text-decoration: underline; }
+.alert-default {
+    border-color: $well-border;
+    background-color: $well-bg;
+}
 
 // Improve contrast
 .btn.disabled:active,
@@ -42,6 +57,50 @@ label { cursor: pointer; }
 .btn.disabled:hover { color: #000; }
 .list-unstyled { margin: 0; }
 .icon-bar { background-color: #888; }
+
+// Icons vs. Underline fix
+.btn {
+  text-decoration: none;
+}
+.btn-link {
+  @extend .icon-link;
+
+  &.pull-left,
+  &.pull-right {
+    display: flex;
+  }
+}
+.nav > li > a {
+  @extend .icon-link;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    /* borrowed from a11y accessibility */
+    color: $dropdown-bg;
+    text-decoration: none;
+    background-color: #333;
+    outline: dotted 1px #000;
+  }
+}
+.nav .dropdown-toggle {
+  padding-right: 8px;
+
+  .icon {
+    margin-left: 4px;
+    margin-right: 0;
+  }
+
+  body.rtl & {
+    padding-left: 8px;
+    padding-right: 10px;
+
+    .icon {
+      margin-left: 0;
+      margin-right: 4px;
+    }
+  }
+}
 
 // Normalize highlighting
 .highlight,
@@ -89,6 +148,14 @@ h3 { font-size: 16px; }
   #modal .form-control { max-width: none; }
 }
 
+button.dropdown-toggle {
+  @include button-variant($btn-default-color, $btn-default-bg, $btn-default-border);
+  appearance: none;
+  padding: 15px;
+  border: 0;
+  color: $brand-primary;
+}
+
 /* ------ Layout ------ */
 footer {
   @extend .container;
@@ -114,16 +181,31 @@ footer {
     float: right;
     padding-left: 1rem;
   }
+  .mainbody.solo {
+    width: auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
+.flex { display: flex; }
+.rtl .flex { flex-direction: row-reverse; }
+.flex-col { flex: 0 1 100%; }
+.flex-none { flex: none; }
 
 /* ------ Form Errors ------ */
 .has-error {margin-bottom: 0;}
 .sms-error { @extend .has-error; }
 .help-block.with-errors {
   margin: 0;
-  padding-top: $padding-base-vertical;
+  &:first-child {
+    padding-top: $padding-base-vertical;
+  }
   padding-bottom: $padding-base-vertical;
   &:empty {padding: 0;}
+
+  ul.list-unstyled {
+    margin: 0;
+  }
 }
 
 /* ------ Admin ------ */
@@ -182,10 +264,23 @@ footer {
 }
 
 /* ------ Cart ------ */
-.cart-controls .checkbox {
-  line-height: 2.5rem;
-  padding-right: 1rem;
+.cart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
 }
+.cart-controls .checkbox {
+  padding-right: 1rem;
+  padding-bottom: 0.25rem;
+}
+.cart-controls .toolbar-btn {
+  @extend .toolbar-btn;
+  @extend .icon-link;
+
+  margin: 0;
+}
+
 .nav .btn-bookbag-toggle { float: left; }
 .nav .btn-bookbag-toggle a {
   display: block;
@@ -208,49 +303,88 @@ footer {
   white-space: pre;
 }
 
-/* ------ Facets ------ */
-.date-fields {
-  display: flex;
-
-  .date-from { padding-right: .25rem; }
-  .date-to   { padding-left:  .25rem; }
-}
-.top-facets {
-  margin-left: -.5rem;
-  margin-right: -.5rem;
-}
-.top-facets .facet,
-.top-facets .narrow-toggle,
-.top-facets > strong {
-  display: inline-block;
-  padding: .25rem .5rem;
-  white-space: nowrap;
-}
-.top-facets .narrow-toggle { text-decoration: underline; }
-@media (min-width: 768px) {
-  .author-facets { display: flex; }
-  .author-list { flex: 0 1 100%; }
-}
-
 /* ------ MyResearch ------ */
 .form-login .btn-link ~ .btn-link { padding-left: 0; } // Login link spacing
-.myresearch-menu a {
-  display: block;
-  padding: 10px 15px;
-  &:hover,
-  &:focus { background-color: $nav-link-hover-bg; }
+.myresearch-menu {
+  a {
+    display: inline-flex;
+    gap: 0.375rem;
+    width: 100%;
+    padding: 10px 15px;
+    line-height: 1.15;
 
-  .badge { float: right; }
-}
-.myresearch-menu a.active {
-  background-color: $brand-primary;
-  color: #fff;
+    &:hover {
+      background-color: $gray-lighter;
+      outline: dotted 1px #000;
+    }
+    &:focus {
+      background-color: $nav-link-hover-bg;
+    }
+    &.user-list-link i {
+      margin-left: 0.5rem;
+    }
+    &.active {
+      background-color: $brand-primary;
+      color: #fff;
+    }
 
-  .badge {
-    background-color: #fff;
-    color: $gray-darker;
+    .icon-link__icon {
+      width: 1rem;
+      text-align: center;
+    }
+
+    .icon-link__label {
+      flex: 1 1 0%;
+    }
+  }
+
+  .status {
+    display: flex;
+    gap: 2px;
+    flex: none;
+    .badge {
+      border-radius: 2px;
+      border: 1px solid; /* color inherited from bootstrap */
+      height: 20px;
+
+      &.account-none {
+        color: $gray-dark;
+        background-color: $gray-lighter;
+      }
+      &.account-info {
+        color: $state-success-text;
+        background-color: $state-success-bg;
+      }
+      &.account-warning {
+        color: $state-warning-text;
+        background-color: $state-warning-bg;
+      }
+      &.account-alert {
+        color: $state-danger-text;
+        background-color: $state-danger-bg;
+      }
+    }
+  }
+
+  .active .status .badge {
+    color: #fff;
+    background-color: transparent;
+    border: 1px solid #fff;
   }
 }
+
+.logoutOptions.with-dropdown a { padding-right: .5rem; }
+#login-dropdown a {
+  margin-right: .5rem;
+  padding-left: .5rem;
+  padding-right: .5rem;
+}
+#login-dropdown .dropdown-menu { width: 250px; }
+#login-dropdown .dropdown-menu h4 { display: none; }
+#login-dropdown .dropdown-menu .myresearch-menu { display: none; }
+#login-dropdown .dropdown-menu .account-menu { display: block; }
+
+/* --- PubDateVis --- */
 .list-edit-container { @include clearfix(); }
 
 /* ------ PubDateVis ------ */
@@ -334,4 +468,60 @@ div.holding-details {
 div.holding-notes {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+}
+
+.odbrand {
+  padding: 7px;
+}
+
+.oauth2-prompt {
+  ul {
+    margin-top: 1rem;
+  }
+  .oauth2-ils-selection {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    form {
+      margin-top: 1rem;
+    }
+  }
+}
+
+/* --- Cookie Consent --- */
+.disable--interaction #cc-main .cm-wrapper::before,
+.show--preferences #cc-main .cc--anim.pm-wrapper::before {
+  opacity: $modal-backdrop-opacity;
+}
+
+#cc-main {
+  z-index: $zindex-cookie-consent !important;
+
+  a {
+    &:hover {
+      color: $link-hover-color;
+      text-decoration: $link-hover-decoration;
+      background-size: 0%;
+    }
+  }
+
+  .cc--anim .cm__close,
+  .cc--anim .cm__btn,
+  .pm__btn {
+    transition: none;
+  }
+  .cm--bar .cm__btn, .pm__btn {
+    font-size: 14px;
+  }
+  .cm--bar .cm__btn {
+    flex: none;
+  }
+
+  .pm__section--expandable .pm__section-arrow {
+    background: none;
+  }
+
+  .pm__section--toggle {
+    background: transparent;
+  }
 }

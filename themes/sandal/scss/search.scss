@@ -4,12 +4,13 @@
 }
 .list-group-item.title { color: $dark-gray; }
 .bulkActionButtons {
+  margin-bottom: 0;
   label {
     font-weight: 500;
     color: $mid-gray;
   }
 }
-.search-header.search-header { padding-top: 0; } // Duplicate to increase specificity
+.search-header.search-header { padding: 0; } // Duplicate to increase specificity
 .search-stats > h2 { margin: 0; } // No results padding
 
 .author-facets { font-size: $reduced-font-size; }
@@ -17,9 +18,8 @@
 .result {
   margin-left: -1rem;
   margin-right: -1rem;
-  padding-top: 1rem;
-  padding-left: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
+  padding-right: 0;
   border-bottom: 1px solid $moon-gray;
   font-size: $reduced-font-size;
 
@@ -112,7 +112,6 @@
 
 .grid-result .grid-checkbox label { width: 100%; }
 @media (min-width: 768px) {
-  .result { padding-right: 1rem; }
   .result-body { width: 75%; }
   .result-links {
     width: 25%;
@@ -120,12 +119,9 @@
   }
   .result-link-icon,
   .result .cart-link-icon {
-    margin-right: .2rem;
-    padding: 0;
     font-size: inherit;
     color: $gray-darker;
   }
-  .result-link-icon { margin-right: 0; }
   .result-link-label,
   .result .cart-link-label { display: inline; }
 }
@@ -259,8 +255,63 @@
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
-.combined-search-container {
-  @include full-width();
+.template-dir-combined.template-name-results {
+    .bulkActionButtons {
+        max-width: 1170px;
+        margin: auto;
+    }
+    .main .container {
+        width: 100%;
+    }
+}
 
-  .result { margin-right: 0; }
+/* ------ CURRENT FILTERS ------ */
+.active-filters {
+  button {
+    background: $list-group-active-bg;
+  }
+  .dropdown {
+    .filters-term {
+      color: #000;
+    }
+    a:hover {
+      background-color: transparent;
+    }
+  }
+}
+
+.reset-filters-btn {
+  font-weight: bold;
+  color: #fff;
+  background-color: rgba(255,255,255,.1);
+  border-radius: 4px;
+}
+.active-filters .reset-filters-btn:hover {
+  color: #fff;
+  background-color: rgba(255,255,255,.2);
+}
+.active-filters .filters .filter-value,
+.search-filter-dropdown .btn,
+.search-filter-dropdown .btn:focus {
+  color: $dark-gray;
+  background-color: $header-light;
+}
+.active-filters .filters .filter-value {
+  border-radius: 2px;
+}
+.active-filters .search-filter-remove {
+  color: $mid-gray;
+}
+.search-filter-dropdown .btn {
+  box-shadow: 0 3px 3px rgba(0,0,0,.3);
+
+  &::after {
+    display: inline-block;
+    width: 1rem;
+    margin-right: -0.5rem;
+  }
+}
+.search-filter-dropdown .btn:active {
+  box-shadow: none;
+  background-color: $light-silver;
 }

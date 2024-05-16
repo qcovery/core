@@ -1,6 +1,6 @@
 <?php
 // TODO: fold this logic into record driver methods at some point:
-$marc = $this->driver->tryMethod('getMarcRecord');
+$marc = $this->driver->tryMethod('getMarcReader');
 if (is_object($marc)) {
     $marcPhdField = $marc->getField('502');
     $marcProceedingsField = $marc->getField('711');
@@ -63,16 +63,12 @@ if (is_array($series)) {
     }
 }
 
-$author = $this->driver->tryMethod('getPrimaryAuthor');
-if (!empty($author)) {
-    echo 'AU  - ' . "$author\r\n";
+foreach ($this->driver->tryMethod('getPrimaryAuthors', [], []) as $current) {
+    echo 'AU  - ' . "$current\r\n";
 }
 
-$secondaryAuthors = $this->driver->tryMethod('getSecondaryAuthors');
-if (is_array($secondaryAuthors)) {
-    foreach ($secondaryAuthors as $current) {
-        echo 'A2  - ' . "$current\r\n";
-    }
+foreach ($this->driver->tryMethod('getSecondaryAuthors', [], []) as $current) {
+    echo 'A2  - ' . "$current\r\n";
 }
 
 $pubPlaces = $this->driver->tryMethod('getPlacesOfPublication');
@@ -157,6 +153,9 @@ foreach ($this->record($this->driver)->getUrlList() as $url) {
     echo 'UR  - ' . "$url\r\n";
 }
 
+if ($doi = $this->driver->tryMethod('getCleanDOI')) {
+    echo "DO  - $doi\r\n";
+}
+
 // End of Record:
 echo "ER  -\r\n\r\n";
-?>

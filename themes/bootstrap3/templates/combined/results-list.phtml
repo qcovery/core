@@ -10,7 +10,10 @@
 ?>
 <?php if (isset($currentSearch['more_link']) && $currentSearch['more_link']): ?>
   <div class="pull-right flip">
-    <a href="<?=$moreUrl?>" class="btn btn-link"><i class="fa fa-gears" aria-hidden="true"></i> <?=$this->transEsc('More options')?></a>
+    <a href="<?=$moreUrl?>" class="btn btn-link icon-link">
+      <?=$this->icon('options', 'icon-link__icon') ?>
+      <span class="icon-link__label"><?=$this->transEsc('More options')?></span>
+    </a>
   </div>
   <h2><a href="<?=$moreUrl?>"><?=$this->transEsc($currentSearch['label'])?></a></h2>
 <?php else: ?>
@@ -19,15 +22,27 @@
 <?php if (isset($currentSearch['sublabel'])): ?>
   <p><i><?=$this->transEsc($currentSearch['sublabel'])?></i></p>
 <?php endif; ?>
+
+<?php $permission = $currentSearch['permission'] ?? null ?>
+<?php if (isset($permission) && !$this->permission()->allowDisplay($permission)): ?>
+  <?php if ($block = $this->permission()->getAlternateContent($permission)): ?>
+    <?=$block?>
+  <?php endif; ?>
+  <?php return; // if permission is denied, don't render the rest of the template! ?>
+<?php endif; ?>
+
 <div class="clearfix">
   <div class="pull-left flip help-block">
     <?php if ($recordTotal > 0): ?>
       <?php foreach (($top = $results->getRecommendations('top')) as $current): ?>
         <?=$this->recommend($current)?>
       <?php endforeach; ?>
-      <?=$this->context()->renderInContext('search/controls/showing.phtml',
-                                          ['lookfor' => $lookfor, 'recordTotal' => $recordTotal,
-                                           'params' => $params, 'results' => $results]) ?>
+      <?=
+        $this->context()->renderInContext(
+            'search/controls/showing.phtml',
+            compact('lookfor', 'recordTotal', 'params', 'results')
+        );
+      ?>
     <?php else: ?>
       <h3><?=$this->transEsc('nohit_heading')?></h3>
     <?php endif; ?>
@@ -37,11 +52,7 @@
 
 <?php if ($recordTotal < 1): ?>
   <p class="alert alert-danger">
-    <?php if (isset($view->overrideEmptyMessage)): ?>
-      <?=$view->overrideEmptyMessage?>
-    <?php else: ?>
-      <?=$this->translate('nohit_lookfor_html', ['%%lookfor%%' => $this->escapeHtml($lookfor)]) ?>
-    <?php endif; ?>
+    <?=$this->slot('empty-message')->get($this->translate('nohit_lookfor_html', ['%%lookfor%%' => $this->escapeHtml($lookfor)])); ?>
   </p>
   <?php if (isset($view->parseError)): ?>
     <p class="alert alert-danger"><?=$this->transEsc('nohit_parse_error')?></p>
@@ -61,11 +72,17 @@
     $viewParams = [
       'results' => $results,
       'params' => $params,
-      'showCheckboxes' => $this->showCartControls || $this->showBulkOptions
+      'showCheckboxes' => $this->showCartControls || $this->showBulkOptions,
+      'excludeResultIds' => true, // Don't add id attributes to results to avoid duplicates
     ];
   ?>
   <?=$this->render('search/list-' . $viewType . '.phtml', $viewParams)?>
   <?php if (isset($currentSearch['more_link']) && $currentSearch['more_link']): ?>
-    <p><a href="<?=$moreUrl?>"><?=$this->transEsc($currentSearch['more_link'])?> <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></p>
+    <p>
+      <a class="icon-link" href="<?=$moreUrl?>">
+        <span class="icon-link__label"><?=$this->transEsc($currentSearch['more_link'])?></span>
+        <?=$this->icon('more', 'icon-link__icon') ?>
+      </a>
+    </p>
   <?php endif; ?>
 <?php endif; ?>

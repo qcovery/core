@@ -68,15 +68,10 @@ public class LccnTools
         Set result = new LinkedHashSet();
 
         // Loop through relevant fields and normalize everything:
-        Set<String> lccns = SolrIndexer.instance().getFieldList(record, fieldSpec);
-        Iterator<String> lccnIter = lccns.iterator();
-        if (lccns != null) {
-            String current;
-            while(lccnIter.hasNext()) {
-                current = getNormalizedLCCN(lccnIter.next());
-                if (current != null && current.length() > 0) {
-                    result.add(current);
-                }
+        for (String raw : SolrIndexer.instance().getFieldList(record, fieldSpec)) {
+            String current = getNormalizedLCCN(raw);
+            if (current != null && current.length() > 0) {
+                result.add(current);
             }
         }
 
@@ -103,18 +98,13 @@ public class LccnTools
      * @param prefix
      * @return Normalized LCCN
      */
-    public String getFirstNormalizedLCCN(SolrIndexer indexer, 
+    public String getFirstNormalizedLCCN(SolrIndexer indexer,
         Record record, String fieldSpec, String prefix) {
         // Loop through relevant fields in search of first valid LCCN:
-        Set<String> lccns = SolrIndexer.instance().getFieldList(record, fieldSpec);
-        Iterator<String> lccnIter = lccns.iterator();
-        if (lccns != null) {
-            String current;
-            while(lccnIter.hasNext()) {
-                current = getNormalizedLCCN(lccnIter.next());
-                if (current != null && current.length() > 0) {
-                    return prefix + current;
-                }
+        for (String raw : SolrIndexer.instance().getFieldList(record, fieldSpec)) {
+            String current = getNormalizedLCCN(raw);
+            if (current != null && current.length() > 0) {
+                return prefix + current;
             }
         }
 

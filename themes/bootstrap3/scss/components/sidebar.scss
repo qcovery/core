@@ -3,82 +3,112 @@
   margin-bottom: 1rem;
   padding-left: 0;
 
-  .facet,
-  .title {
-    display: block;
-    padding: 8px 15px;
-    line-height: 1.5rem;
-    width: 100%;
-    text-align: left;
-    background-color: transparent;
-
-    .badge,
-    .status {
-      float: right;
-
-      body.rtl & { float: left; }
-    }
-    .badge {
-      max-height: 19px;
-      line-height: 1.1rem;
-    }
-  }
-  .facet { border-bottom: 1px solid $list-group-border; }
-  .title {
-    padding-right: 8px;
-    border: 1px solid $list-group-border;
-    font-weight: bold;
-  }
-
   [data-toggle="collapse"] {
     cursor: pointer;
-
-    &::after {
-      content: '\25B2';
-      float: right;
-
-      body.rtl & { float: left; }
-    }
   }
-  .collapsed::after {content: '\25BC';}
 
   .collapse,
   .collapsing,
   & > .facet {
+    position: relative;
     border-left: 1px solid $list-group-border;
     border-right: 1px solid $list-group-border;
   }
   & > .facet:first-child { border-top: 1px solid $list-group-border; }
-
-  .facetOR .text {
-    display: inline-block;
-    padding-left: 0.5rem;
-    text-indent: -0.5rem;
-  }
-
-  .excludable {
-    display: flex;
-    flex-direction: row-reverse;
-    padding-right: 0;
-
-    .badge { flex-shrink: 0; }
-    .text { flex-grow: 1; }
-    .exclude {
-      flex-basis: 2rem;
-      flex-shrink: 0;
-      text-align: center;
-    }
-
-    body.rtl & {
-      padding-left: 0;
-      padding-right: 15px;
-    }
-  }
 }
 
+.facet,
+.facet-group .title,
+.facet-load-indicator,
+.facet-load-failed {
+  padding: .5rem;
+  line-height: 1.5rem;
+  background-color: transparent;
+}
+.facet,
+.facet-group .title {
+  display: flex;
+  align-items: center;
+
+  .text, .hierarchical-facet-anchor {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  .badge {
+    flex-shrink: 0;
+    max-height: 19px;
+    line-height: 1.2;
+    vertical-align: baseline;
+  }
+
+  .exclude {
+    flex-shrink: 0;
+    text-align: center;
+    padding-left: 0.5rem;
+  }
+}
+.facet-group .facet,
+.facet-load-indicator,
+.facet-load-failed {
+  border-bottom: 1px solid $list-group-border;
+}
+.facet-group .title {
+  display: flex;
+  width: 100%;
+  padding-right: 8px;
+  border: 1px solid $list-group-border;
+  font-weight: bold;
+  text-align: inherit;
+}
+.facet-group .facet-title {
+  flex: 1 1 0%;
+}
+.facet-group .facet-title-icon {
+  flex: none;
+}
+.facet-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.4);
+}
+.facet-loading-overlay-label {
+  padding: 1px .5rem;
+  color: #fff;
+  background-color: #000;
+}
+
+.top-facets-contents {
+  margin: 2px 0;
+}
+.top-facets .facet,
+.top-facets > strong {
+  display: inline-block;
+  width: auto;
+  padding: 2px 0;
+  border: 0;
+  white-space: nowrap;
+}
+.top-facet-inner {
+  display: inline-block;
+  padding: .25rem;
+  border: 1px solid $list-group-border;
+}
+
+.checkboxFilter {
+  padding-bottom: 0.5rem;
+}
 .checkbox-filter {
-  display: block;
-  padding-bottom: 1rem;
+  display: flex;
+  width: 100%;
   font-weight: bold;
   color: $text-color;
 }
@@ -93,12 +123,9 @@
   background-color: $list-group-active-bg;
   color: #fff;
 
-  .jstree-icon,
   a { color: #fff; }
 }
-.facet.active .badge,
-.jstree-node.active .badge,
-.jstree-node.active .badge .fa {
+.facet.active .badge {
   background-color: #fff;
   color: $brand-primary;
 }
@@ -120,27 +147,35 @@
 }
 
 .full-facet-list { margin-top: 1rem; }
-.full-facet-list .active .fa {
+.full-facet-list .active .fa.fa-times {
   float: right;
   margin-top: .25rem;
-  margin-right: 0.5rem;
   margin-left: 0.5rem;
 }
-body.rtl .full-facet-list .active .fa { float: left; }
+body.rtl .full-facet-list .active .fa.fa-times { float: left; }
 
-.jstree-node {
-  .facet {
-    padding: 0;
-    border: none;
-  }
+.truncate-done {
+  overflow: clip;
 }
-.jstree-facet {
-  .jstree-anchor {
-    padding: 0;
-  }
-  .list-group-item {
-    padding-right: 0;
-    border: 0;
-    border-bottom: 1px solid $list-group-border;
-  }
+.more-less-btn-wrapper .fa {
+  line-height: inherit;
+}
+.more-less-btn-wrapper .facet {
+  display: block;
+  width: 100%;
+}
+
+.facet-range-form {
+  width: 100%;
+}
+.date-fields {
+  display: flex;
+
+  .date-from, .date-to { flex: 0 1 100%; }
+  .date-from { padding-right: .25rem; }
+  .date-to   { padding-left:  .25rem; }
+}
+@media (min-width: 768px) {
+  .author-facets { display: flex; }
+  .author-list { flex: 0 1 100%; }
 }

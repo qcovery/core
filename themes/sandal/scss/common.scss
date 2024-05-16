@@ -1,14 +1,15 @@
 /* ------ Border radius changes ------ */
-$list-group-border-radius: 0 !default;
-$border-radius-large: 0 !default; // modal
+$list-group-border-radius: 0;
+$border-radius-large: 0; // modal
 
 /* ------ Common element changes ------ */
-h1, h2, h3, h4 {
-  margin: 0;
-  margin-bottom: 1rem;
-
-  .help-block & { margin: 0; }
+.help-block {
+  h1,
+  h2,
+  h3,
+  h4 { margin: 0; }
 }
+
 .highlight,
 mark { background-color: $highlighter-color; }
 table { font-size: $reduced-font-size; }
@@ -56,7 +57,9 @@ select.form-control {
 .breadcrumb a { color: $dark-gray; }
 .breadcrumb .active { color: $near-black; }
 
-.nav > li > a { color: $brand-primary; }
+.nav > li > a {
+  color: $brand-primary;
+}
 .navbar-collapse,
 .navbar-form { box-shadow: none; }
 
@@ -86,8 +89,8 @@ select.form-control {
 .alert-success,
 .alert-success:hover {
   color: $dark-green;
-  background-color: $light-green;
-  a { color: $white; }
+  background-color: $washed-green;
+  a { color: $green; }
 }
 .alert-danger,
 .alert-danger:hover {
@@ -98,8 +101,8 @@ select.form-control {
 
 .label { font-weight: 400; }
 
-$pagination-border: transparent !default;
-$pagination-hover-border: transparent !default;
+$pagination-border: transparent;
+$pagination-hover-border: transparent;
 .pagination {
   @include clearfix();
   display: table;

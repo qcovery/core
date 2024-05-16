@@ -1,8 +1,9 @@
 /*exported addGroup, addSearch, deleteGroup, deleteSearch */
 var nextGroup = 0;
 var groupLength = [];
+var deleteGroup, deleteSearch;
 
-function addSearch(group, _fieldValues) {
+function addSearch(group, _fieldValues, isUser = false) {
   var fieldValues = _fieldValues || {};
   // Build the new search
   var inputID = group + '_' + groupLength[group];
@@ -18,7 +19,11 @@ function addSearch(group, _fieldValues) {
     .attr('id', 'search_type' + inputID)
     .attr('name', 'type' + group + '[]');
   $newSearch.find('.adv-term-remove')
-    .attr('onClick', 'return deleteSearch(' + group + ',' + groupLength[group] + ')');
+    .data('group', group)
+    .data('groupLength', groupLength[group])
+    .click(function deleteSearchHandler() {
+      return deleteSearch($(this).data('group'), $(this).data('groupLength'));
+    });
   // Preset Values
   if (typeof fieldValues.term !== "undefined") {
     $newSearch.find('input.form-control').val(fieldValues.term);
@@ -48,10 +53,15 @@ function addSearch(group, _fieldValues) {
     $('#group' + group + ' .adv-term-remove').removeClass('hidden');
   }
   groupLength[group]++;
+
+  if (isUser) {
+    $newSearch.find('input.form-control').focus();
+  }
+
   return false;
 }
 
-function deleteSearch(group, sindex) {
+deleteSearch = function _deleteSearch(group, sindex) {
   for (var i = sindex; i < groupLength[group] - 1; i++) {
     var $search0 = $('#search' + group + '_' + i);
     var $search1 = $('#search' + group + '_' + (i + 1));
@@ -62,30 +72,43 @@ function deleteSearch(group, sindex) {
   }
   if (groupLength[group] > 1) {
     groupLength[group]--;
-    $('#search' + group + '_' + groupLength[group]).remove();
+    var toRemove = $('#search' + group + '_' + groupLength[group]);
+    var parent = toRemove.parent();
+    toRemove.remove();
+    if (parent.length) {
+      parent.find('.adv-search input.form-control').focus();
+    }
     if (groupLength[group] === 1) {
       $('#group' + group + ' .adv-term-remove').addClass('hidden'); // Hide x
     }
   }
   return false;
-}
+};
 
-function addGroup(_firstTerm, _firstField, _join) {
+function addGroup(_firstTerm, _firstField, _join, isUser = false) {
   var firstTerm = _firstTerm || '';
   var firstField = _firstField || '';
   var join = _join || '';
 
   var $newGroup = $($('#new_group_template').html());
+  $newGroup.find('.adv-group-label') // update label
+    .attr('for', 'search_lookfor' + nextGroup + '_0');
   $newGroup.attr('id', 'group' + nextGroup);
   $newGroup.find('.search_place_holder')
     .attr('id', 'group' + nextGroup + 'Holder')
     .removeClass('hidden');
   $newGroup.find('.add_search_link')
     .attr('id', 'add_search_link_' + nextGroup)
-    .attr('onClick', 'return addSearch(' + nextGroup + ')')
+    .data('nextGroup', nextGroup)
+    .click(function addSearchHandler() {
+      return addSearch($(this).data('nextGroup'), {}, true);
+    })
     .removeClass('hidden');
   $newGroup.find('.adv-group-close')
-    .attr('onClick', 'return deleteGroup(' + nextGroup + ')');
+    .data('nextGroup', nextGroup)
+    .click(function deleteGroupHandler() {
+      return deleteGroup($(this).data('nextGroup'));
+    });
   $newGroup.find('select.form-control')
     .attr('id', 'search_bool' + nextGroup)
     .attr('name', 'bool' + nextGroup + '[]');
@@ -98,17 +121,20 @@ function addGroup(_firstTerm, _firstField, _join) {
   $('#groupPlaceHolder').before($newGroup);
   // Populate
   groupLength[nextGroup] = 0;
-  addSearch(nextGroup, {term: firstTerm, field: firstField});
+  addSearch(nextGroup, {term: firstTerm, field: firstField}, isUser);
   // Show join menu
   if (nextGroup > 0) {
     $('#groupJoin').removeClass('hidden');
     // Show x
     $('.adv-group-close').removeClass('hidden');
   }
+
+  $newGroup.children('input.form-control').first().focus();
+
   return nextGroup++;
 }
 
-function deleteGroup(group) {
+deleteGroup = function _deleteGroup(group) {
   // Find the group and remove it
   $("#group" + group).remove();
   // If the last group was removed, add an empty group
@@ -119,12 +145,16 @@ function deleteGroup(group) {
     $('.adv-group .adv-group-close').addClass('hidden'); // Hide x
   }
   return false;
-}
+};
 
 $(document).ready(function advSearchReady() {
   $('.clear-btn').click(function clearBtnClick() {
     $('input[type="text"]').val('');
-    $("option:selected").removeAttr("selected");
-    $("#illustrated_-1").click();
+    $('input[type="checkbox"],input[type="radio"]').each(function onEachCheckbox() {
+      var checked = $(this).data('checked-by-default');
+      checked = (checked == null) ? false : checked;
+      $(this).prop("checked", checked);
+    });
+    $("option:selected").prop("selected", false);
   });
 });

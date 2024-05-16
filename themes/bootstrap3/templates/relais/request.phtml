@@ -1,7 +1,7 @@
 <h2><?=$this->transEsc('relais_request')?></h2>
 
 <div id="requestMessage">
-  <i class="fa fa-spinner fa-spin"></i>
+  <?=$this->icon('spinner') ?>
   <?=$this->transEsc('relais_checking')?>
 </div>
 
@@ -10,5 +10,5 @@
 <?php
   $this->headScript()->appendFile('relais.js');
   $activateRelais = "$(document).ready(function () { VuFind.relais.addItem('$oclc', '$failLink'); });\n";
-  echo $this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, $activateRelais, 'SET')
+  echo $this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $activateRelais, 'SET')
 ?>

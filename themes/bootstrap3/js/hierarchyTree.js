@@ -1,6 +1,6 @@
 /*global VuFind */
 
-var hierarchyID, recordID, htmlID, hierarchyContext, hierarchySettings;
+var hierarchyID, recordID, hierarchySource, htmlID, hierarchyContext, hierarchySettings;
 
 /* Utility functions */
 function htmlEncodeId(id) {
@@ -15,7 +15,7 @@ function html_entity_decode(string) {
   var tmp_str = string.toString();
 
   for (var symbol in hash_map) {
-    if (hash_map.hasOwnProperty(symbol)) {
+    if (Object.prototype.hasOwnProperty.call(hash_map, symbol)) {
       var entity = hash_map[symbol];
       tmp_str = tmp_str.split(entity).join(symbol);
     }
@@ -27,11 +27,11 @@ function html_entity_decode(string) {
 
 function getRecord(id) {
   $.ajax({
-    url: VuFind.path + '/Hierarchy/GetRecord?' + $.param({id: id}),
+    url: VuFind.path + '/Hierarchy/GetRecord?' + $.param({id: id, hierarchySource: hierarchySource}),
     dataType: 'html'
   })
     .done(function getRecordDone(response) {
-      $('#tree-preview').html(html_entity_decode(response));
+      $('#tree-preview').html(VuFind.updateCspNonce(html_entity_decode(response)));
       // Remove the old path highlighting
       $('#hierarchyTree a').removeClass("jstree-highlight");
       // Add Current path highlighting
@@ -75,6 +75,7 @@ function doTreeSearch() {
       url: VuFind.path + '/Hierarchy/SearchTree?' + $.param({
         lookfor: keyword,
         hierarchyID: hierarchyID,
+        hierarchySource: hierarchySource,
         type: $("#treeSearchType").val()
       }) + "&format=true"
     })
@@ -128,7 +129,7 @@ function buildJSONNodes(xml) {
     jsonNode.push({
       id: htmlEncodeId(id.text()),
       text: name.text(),
-      li_attr: { recordid: id.text() },
+      li_attr: { "data-recordid": id.text() },
       a_attr: {
         href: name.attr('href'),
         title: name.text()
@@ -147,6 +148,7 @@ function buildTreeWithXml(cb) {
       hierarchyID: hierarchyID,
       id: recordID,
       context: hierarchyContext,
+      hierarchySource: hierarchySource,
       mode: 'Tree'
     }
   })
@@ -160,6 +162,9 @@ $(document).ready(function hierarchyTreeReady() {
   // Code for the search button
   hierarchyID = $("#hierarchyTree").find(".hiddenHierarchyId")[0].value;
   recordID = $("#hierarchyTree").find(".hiddenRecordId")[0].value;
+  hierarchySource = $("#hierarchyTree").find(".hiddenHierarchySource");
+  hierarchySource = hierarchySource.length ? hierarchySource[0].value : 'Solr';
+
   htmlID = htmlEncodeId(recordID);
   hierarchyContext = $("#hierarchyTree").find(".hiddenContext")[0].value;
   var inLightbox = $("#hierarchyTree").parents("#modal").length > 0;
@@ -185,7 +190,7 @@ $(document).ready(function hierarchyTreeReady() {
   $("#hierarchyLoading").removeClass('hide');
 
   $("#hierarchyTree")
-    .bind("ready.jstree", function jsTreeReady(/*event, data*/) {
+    .on("ready.jstree", function jsTreeReady(/*event, data*/) {
       $("#hierarchyLoading").addClass('hide');
       var tree = $("#hierarchyTree").jstree(true);
       tree.select_node(htmlID);
@@ -195,11 +200,11 @@ $(document).ready(function hierarchyTreeReady() {
         getRecord(recordID);
       }
 
-      $("#hierarchyTree").bind('select_node.jstree', function jsTreeSelect(e, resp) {
+      $("#hierarchyTree").on('select_node.jstree', function jsTreeSelect(e, resp) {
         if (inLightbox || hierarchyContext === "Record") {
           window.location.href = resp.node.a_attr.href;
         } else {
-          getRecord(resp.node.li_attr.recordid);
+          getRecord(resp.node.li_attr["data-recordid"]);
         }
       });
 
@@ -219,7 +224,8 @@ $(document).ready(function hierarchyTreeReady() {
             url: VuFind.path + '/Hierarchy/GetTreeJSON',
             data: {
               hierarchyID: hierarchyID,
-              id: recordID
+              id: recordID,
+              hierarchySource: hierarchySource
             },
             statusCode: {
               200: function jsTree200Status(json /*, status, request*/) {
@@ -228,7 +234,9 @@ $(document).ready(function hierarchyTreeReady() {
               204: function jsTree204Status(/*json, status, request*/) { // No Content
                 buildTreeWithXml(cb);
               },
-              503: function jsTree503Status(/*json, status, request*/) { // Service Unavailable
+              503: function jsTree503Status(json /*, status, request*/) { // Service Unavailable
+                var response = JSON.parse(json.responseText);
+                console.error("JSON tree unavailable; message: " + (typeof response.error.message === "string" ? response.error.message : json.responseText));
                 buildTreeWithXml(cb);
               }
             }
@@ -237,10 +245,10 @@ $(document).ready(function hierarchyTreeReady() {
       },
       types: {
         record: {
-          icon: 'fa fa-file-o'
+          icon: VuFind.path + "/themes/bootstrap3/images/hierarchy-file.svg"
         },
         collection: {
-          icon: 'fa fa-folder'
+          icon: VuFind.path + "/themes/bootstrap3/images/hierarchy-folder.svg"
         }
       }
     });

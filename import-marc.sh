@@ -45,7 +45,6 @@ fi
 # Xmx and Xms set the heap size for the Java Virtual Machine
 # You may also want to add the following:
 # -XX:+UseParallelGC
-# -XX:+AggressiveOpts
 ##################################################
 if [ -z "$INDEX_OPTIONS" ]
 then
@@ -103,6 +102,19 @@ then
 fi
 
 ##################################################
+# Set log4j config file if not already provided
+##################################################
+if [ -z "$LOG4J_CONFIG" ]
+then
+  if [ -f "$VUFIND_LOCAL_DIR/import/log4j.properties" ]
+  then
+    LOG4J_CONFIG="$VUFIND_LOCAL_DIR/import/log4j.properties"
+  else
+    LOG4J_CONFIG="$VUFIND_HOME/import/log4j.properties"
+  fi
+fi
+
+##################################################
 # Set Command Options
 ##################################################
 for i in $VUFIND_HOME/import/solrmarc_core_*.jar; do JAR_FILE="$i"; done
@@ -124,10 +136,29 @@ MARC_PATH=`cd $MARC_PATH && pwd`
 MARC_FILE=`basename $1`
 
 #####################################################
+# Set up SolrJ symlinks for performance (searching
+# all the Solr .jar files slows things down; this
+# helps by pointing to only the necessary ones)
+#####################################################
+if [ -z "$SOLRJ_DIR" ]
+then
+  SOLRJ_DIR="$VUFIND_HOME/solr/vendor/.solrj"
+fi
+
+if [ ! -d "$SOLRJ_DIR" ]
+then
+  mkdir -p $SOLRJ_DIR
+  for file in $VUFIND_HOME/solr/vendor/server/solr-webapp/webapp/WEB-INF/lib/solr*.jar $VUFIND_HOME/solr/vendor/server/solr-webapp/webapp/WEB-INF/lib/http*.jar
+  do
+    ln -s $file $SOLRJ_DIR/`basename $file`
+  done
+fi
+
+#####################################################
 # Execute Importer
 #####################################################
 
-RUN_CMD="$JAVA $INDEX_OPTIONS -Duser.timezone=UTC $EXTRA_SOLRMARC_SETTINGS -jar $JAR_FILE $PROPERTIES_FILE -solrj $VUFIND_HOME/solr/vendor/dist/solrj-lib $MARC_PATH/$MARC_FILE"
+RUN_CMD="$JAVA $INDEX_OPTIONS -Duser.timezone=UTC -Dlog4j.configuration=file://$LOG4J_CONFIG $EXTRA_SOLRMARC_SETTINGS -jar $JAR_FILE $PROPERTIES_FILE -solrj $SOLRJ_DIR -lib_local "$VUFIND_HOME/import/lib_local\;$VUFIND_HOME/solr/vendor/modules/analysis-extras/lib" $MARC_PATH/$MARC_FILE"
 echo "Now Importing $1 ..."
 # solrmarc writes log messages to stderr, write RUN_CMD to the same place
 echo "`date '+%h %d, %H:%M:%S'` $RUN_CMD" >&2

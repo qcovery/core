@@ -17,7 +17,11 @@
 #   Home of the Solr indexes and configurations.
 #
 # SOLR_PORT
-#   Network port for Solr. Defaults to 8080.
+#   Network port for Solr. Defaults to 8983.
+#
+# SOLR_SECURITY_MANAGER_ENABLED
+#   Whether or not to enable the Java security manager (incompatible with
+#   AlphaBrowse handler). Defaults to false.
 #
 # JAVA_HOME
 #   Home of Java installation (not directly used by this script, but passed along to
@@ -74,7 +78,12 @@ fi
 
 if [ -z "$SOLR_PORT" ]
 then
-  SOLR_PORT="8080"
+  SOLR_PORT="8983"
+fi
+
+if [ -z "$SOLR_SECURITY_MANAGER_ENABLED" ]
+then
+  export SOLR_SECURITY_MANAGER_ENABLED="false"
 fi
 
 if [ -z "$SOLR_ADDITIONAL_START_OPTIONS" ]

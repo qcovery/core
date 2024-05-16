@@ -34,8 +34,8 @@ $(document).ready(function() {
 });
 JS;
   ?>
-  <?=$this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, $ilsStatusScript, 'SET'); ?>
-  <?=$this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, '$("#searchForm_lookfor").focus();', 'SET'); ?>
+  <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $ilsStatusScript, 'SET'); ?>
+  <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, '$("#searchForm_lookfor").focus();', 'SET'); ?>
 </div>
 
 <? $tabConfig = $this->searchTabs()->getTabConfig($searchClassId, $lookfor, $searchIndex, $searchType, $hiddenFilters); ?>
@@ -43,7 +43,7 @@ JS;
 
 <? if (!empty($this->configreader()->getConfigData('Home'))): ?>
     <? foreach ($this->configreader()->getConfigData('Home') as $source): ?>
-        <? if (is_a($source, 'Zend\Config\Config')): ?>
+        <? if (is_a($source, 'Laminas\Config\Config')): ?>
             <? $catalogs[] = $source; ?>
         <? endif; ?>
     <? endforeach; ?>

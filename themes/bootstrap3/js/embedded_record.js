@@ -1,7 +1,7 @@
-/*global checkSaveStatuses, registerAjaxCommentRecord, registerTabEvents, syn_get_widget, VuFind */
+/*global registerAjaxCommentRecord, registerTabEvents, syn_get_widget, VuFind */
 VuFind.register('embedded', function embedded() {
   var _STORAGEKEY = 'vufind_search_open';
-  var _SEPERATOR = ':::';
+  var _SEPARATOR = ':::';
   var _DELIM = ',';
   var _STATUS = {};
 
@@ -11,7 +11,7 @@ VuFind.register('embedded', function embedded() {
     for (str in _STATUS) {
       if ({}.hasOwnProperty.call(_STATUS, str)) {
         if (_STATUS[str]) {
-          str += _SEPERATOR + _STATUS[str];
+          str += _SEPARATOR + _STATUS[str];
         }
         storage.push(str);
       }
@@ -54,9 +54,7 @@ VuFind.register('embedded', function embedded() {
       urlroot = source.charAt(0).toUpperCase() + source.slice(1).toLowerCase() + 'Record';
     }
     if (!$tab.hasClass('loaded')) {
-      $('#' + tabid + '-content').html(
-        '<i class="fa fa-spinner fa-spin"></i> ' + VuFind.translate('loading') + '...'
-      );
+      $('#' + tabid + '-content').html(VuFind.loading());
       var tab = tabid.split('_');
       tab = tab[0];
       $.ajax({
@@ -66,7 +64,7 @@ VuFind.register('embedded', function embedded() {
         success: function ajaxTabSuccess(data) {
           var html = data.trim();
           if (html.length > 0) {
-            $('#' + tabid + '-content').html(html);
+            $('#' + tabid + '-content').html(VuFind.updateCspNonce(html));
             registerTabEvents();
           } else {
             $('#' + tabid + '-content').html(VuFind.translate('collection_empty'));
@@ -105,8 +103,7 @@ VuFind.register('embedded', function embedded() {
       longNode = $('<div class="long-view collapse"></div>');
       // Add loading status
       shortNode
-        .before('<div class="loading hidden"><i class="fa fa-spin fa-spinner"></i> '
-                + VuFind.translate('loading') + '...</div>')
+        .before('<div class="loading hidden">' + VuFind.loading() + '</div>')
         .before(longNode);
       longNode.on('show.bs.collapse', function embeddedExpand() {
         $link.addClass('expanded');
@@ -137,7 +134,7 @@ VuFind.register('embedded', function embedded() {
           }),
           success: function getRecordDetailsSuccess(response) {
             // Insert tabs html
-            longNode.html(response.data.html);
+            longNode.html(VuFind.updateCspNonce(response.data.html));
             // Hide loading
             loadingNode.addClass('hidden');
             longNode.collapse('show');
@@ -160,9 +157,7 @@ VuFind.register('embedded', function embedded() {
             });
             longNode.find('[id^=usercomment]').find('input[type=submit]').unbind('click').click(
               function embeddedComments() {
-                return registerAjaxCommentRecord(
-                  longNode.find('[id^=usercomment]').find('input[type=submit]').closest('form')
-                );
+                return registerAjaxCommentRecord(longNode);
               }
             );
             longNode.find('[data-background]').each(function setupEmbeddedBackgroundTabs(index, el) {
@@ -170,8 +165,8 @@ VuFind.register('embedded', function embedded() {
             });
             // Add events to record toolbar
             VuFind.lightbox.bind(longNode);
-            if (typeof checkSaveStatuses == 'function') {
-              checkSaveStatuses(longNode);
+            if (typeof VuFind.saveStatuses.init === 'function') {
+              VuFind.saveStatuses.init(longNode);
             }
           }
         });
@@ -206,12 +201,9 @@ VuFind.register('embedded', function embedded() {
     var result;
     var i;
     var j;
-    if (!storage) {
-      return;
-    }
     hiddenIds = $('.hiddenId');
     for (i = 0; i < items.length; i++) {
-      parts = items[i].split(_SEPERATOR);
+      parts = items[i].split(_SEPARATOR);
       _STATUS[parts[0]] = parts[1] || null;
       result = null;
       for (j = 0; j < hiddenIds.length; j++) {
@@ -234,7 +226,7 @@ VuFind.register('embedded', function embedded() {
   }
 
   function init() {
-    $('.getFull').click(function linkToggle() { return toggleDataView(this); });
+    $('.getFull').on('click', function linkToggle() { return toggleDataView(this); });
     loadStorage();
   }
 
