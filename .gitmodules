@@ -16,3 +16,6 @@
 [submodule "module/DismaxMunge"]
 	path = module/DismaxMunge
 	url = git@github.com:qcovery/DismaxMunge.git
+[submodule "module/ExtendedFacets"]
+	path = module/ExtendedFacets
+	url = git@github.com:qcovery/ExtendedFacets.git
