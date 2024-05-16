@@ -40,3 +40,6 @@
 [submodule "module/LimitBatch"]
 	path = module/LimitBatch
 	url = git@github.com:qcovery/LimitBatch.git
+[submodule "module/PAIAplus"]
+	path = module/PAIAplus
+	url = git@github.com:qcovery/PAIAplus.git
