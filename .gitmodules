@@ -10,3 +10,6 @@
 [submodule "module/Delivery"]
 	path = module/Delivery
 	url = git@github.com:qcovery/Delivery.git
+[submodule "module/DependentWorks"]
+	path = module/DependentWorks
+	url = git@github.com:qcovery/DependentWorks.git
