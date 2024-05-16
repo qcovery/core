@@ -25,3 +25,6 @@
 [submodule "module/FacetPrefix"]
 	path = module/FacetPrefix
 	url = git@github.com:qcovery/FacetPrefix.git
+[submodule "module/Findex"]
+	path = module/Findex
+	url = git@github.com:qcovery/Findex.git
