@@ -4,3 +4,6 @@
 [submodule "module/BelugaConfig"]
 	path = module/BelugaConfig
 	url = git@github.com:qcovery/BelugaConfig.git
+[submodule "module/DAIAplus"]
+	path = module/DAIAplus
+	url = git@github.com:qcovery/DAIAplus.git
