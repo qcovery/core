@@ -43,3 +43,6 @@
 [submodule "module/PAIAplus"]
 	path = module/PAIAplus
 	url = git@github.com:qcovery/PAIAplus.git
+[submodule "module/RecordDriver"]
+	path = module/RecordDriver
+	url = git@github.com:qcovery/RecordDriver.git
