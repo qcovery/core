@@ -7,3 +7,6 @@
 [submodule "module/DAIAplus"]
 	path = module/DAIAplus
 	url = git@github.com:qcovery/DAIAplus.git
+[submodule "module/Delivery"]
+	path = module/Delivery
+	url = git@github.com:qcovery/Delivery.git
