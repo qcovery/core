@@ -46,3 +46,6 @@
 [submodule "module/RecordDriver"]
 	path = module/RecordDriver
 	url = git@github.com:qcovery/RecordDriver.git
+[submodule "module/ResultFeedback"]
+	path = module/ResultFeedback
+	url = git@github.com:qcovery/ResultFeedback.git
