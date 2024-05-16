@@ -52,3 +52,6 @@
 [submodule "module/RVK"]
 	path = module/RVK
 	url = git@github.com:qcovery/RVK.git
+[submodule "module/SearchKeys"]
+	path = module/SearchKeys
+	url = git@github.com:qcovery/SearchKeys.git
