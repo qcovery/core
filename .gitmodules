@@ -13,3 +13,6 @@
 [submodule "module/DependentWorks"]
 	path = module/DependentWorks
 	url = git@github.com:qcovery/DependentWorks.git
+[submodule "module/DismaxMunge"]
+	path = module/DismaxMunge
+	url = git@github.com:qcovery/DismaxMunge.git
