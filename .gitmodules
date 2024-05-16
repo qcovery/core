@@ -22,3 +22,6 @@
 [submodule "module/ExtendedFeedback"]
 	path = module/ExtendedFeedback
 	url = git@github.com:qcovery/ExtendedFeedback.git
+[submodule "module/FacetPrefix"]
+	path = module/FacetPrefix
+	url = git@github.com:qcovery/FacetPrefix.git
