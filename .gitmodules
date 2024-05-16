@@ -37,3 +37,6 @@
 [submodule "module/Libraries"]
 	path = module/Libraries
 	url = git@github.com:qcovery/Libraries.git
+[submodule "module/LimitBatch"]
+	path = module/LimitBatch
+	url = git@github.com:qcovery/LimitBatch.git
