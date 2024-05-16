@@ -1,3 +1,6 @@
 [submodule "module/AutocompleteTerms"]
 	path = module/AutocompleteTerms
 	url = git@github.com:qcovery/AutocompleteTerms.git
+[submodule "module/BelugaConfig"]
+	path = module/BelugaConfig
+	url = git@github.com:qcovery/BelugaConfig.git
