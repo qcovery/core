@@ -55,3 +55,6 @@
 [submodule "module/SearchKeys"]
 	path = module/SearchKeys
 	url = git@github.com:qcovery/SearchKeys.git
+[submodule "module/UISettings"]
+	path = module/UISettings
+	url = git@github.com:qcovery/UISettings.git
