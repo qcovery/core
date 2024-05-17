@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Feature;
 
 use VuFindSearch\ParamBag;
@@ -47,7 +48,7 @@ interface SimilarInterface
      * @param string   $id     Id of record to compare with
      * @param ParamBag $params Search backend parameters
      *
-     * @return RecordCollectionInterface
+     * @return \VuFindSearch\Response\RecordCollectionInterface
      */
     public function similar($id, ParamBag $params = null);
 }

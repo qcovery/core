@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cover loader factory.
  *
@@ -25,10 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Cover;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Cover loader factory.
@@ -53,27 +58,32 @@ class LoaderFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $cacheDir = $container->get('VuFind\Cache\Manager')
+        $cacheDir = $container->get(\VuFind\Cache\Manager::class)
             ->getCache('cover')->getOptions()->getCacheDir();
-        $config = $container->get('VuFind\Config\PluginManager')->get('config');
+        $config = $container->get(\VuFind\Config\PluginManager::class)
+            ->get('config');
         $loader = new $requestedName(
             $config,
-            $container->get('VuFind\Content\Covers\PluginManager'),
-            $container->get('VuFindTheme\ThemeInfo'),
-            $container->get('VuFindHttp\HttpService'),
+            $container->get(\VuFind\Content\Covers\PluginManager::class),
+            $container->get(\VuFindTheme\ThemeInfo::class),
+            $container->get(\VuFindHttp\HttpService::class),
             $cacheDir
         );
         // Add cover generator if enabled:
         if ($config->Content->makeDynamicCovers ?? false) {
-            $loader->setCoverGenerator($container->get('VuFind\Cover\Generator'));
+            $loader->setCoverGenerator(
+                $container->get(\VuFind\Cover\Generator::class)
+            );
         }
         return $loader;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Table Definition for user_card
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Db\Table;
 
+use Laminas\Db\Adapter\Adapter;
 use VuFind\Db\Row\RowGateway;
-use Zend\Db\Adapter\Adapter;
 
 /**
  * Table Definition for user_card
@@ -46,12 +48,16 @@ class UserCard extends Gateway
      *
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
-     * @param array         $cfg     Zend Framework configuration
+     * @param array         $cfg     Laminas configuration
      * @param RowGateway    $rowObj  Row prototype object (null for default)
      * @param string        $table   Name of database table to interface with
      */
-    public function __construct(Adapter $adapter, PluginManager $tm, $cfg,
-        RowGateway $rowObj = null, $table = 'user_card'
+    public function __construct(
+        Adapter $adapter,
+        PluginManager $tm,
+        $cfg,
+        ?RowGateway $rowObj = null,
+        $table = 'user_card'
     ) {
         parent::__construct($adapter, $tm, $cfg, $rowObj, $table);
     }

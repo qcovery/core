@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cover router factory.
  *
@@ -25,10 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Cover;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Cover router factory.
@@ -53,16 +58,25 @@ class RouterFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $base = $container->get('ControllerPluginManager')->get('url')
-            ->fromRoute('cover-show');
-        return new $requestedName($base);
+        // Try to get the base URL from the controller plugin; fail over to
+        // the view helper if that doesn't work.
+        try {
+            $base = $container->get('ControllerPluginManager')->get('url')
+                ->fromRoute('cover-show');
+        } catch (\Exception $e) {
+            $base = ($container->get('ViewRenderer')->plugin('url'))('cover-show');
+        }
+        $coverLoader = $container->get(\VuFind\Cover\Loader::class);
+        return new $requestedName($base, $coverLoader);
     }
 }

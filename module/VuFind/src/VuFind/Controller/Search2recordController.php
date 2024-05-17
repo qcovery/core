@@ -26,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Controller;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Search2 Record Controller
@@ -48,7 +49,7 @@ class Search2recordController extends AbstractRecord
      */
     public function __construct(ServiceLocatorInterface $sm)
     {
-        $this->searchClassId = 'Search2';
+        $this->sourceId = 'Search2';
         $this->fallbackDefaultTab = 'Description';
         parent::__construct($sm);
     }
@@ -60,7 +61,7 @@ class Search2recordController extends AbstractRecord
      */
     protected function resultScrollerActive()
     {
-        $config = $this->serviceLocator->get('VuFind\Config')
+        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
             ->get('Search2');
         return isset($config->Record->next_prev_navigation)
             && $config->Record->next_prev_navigation;

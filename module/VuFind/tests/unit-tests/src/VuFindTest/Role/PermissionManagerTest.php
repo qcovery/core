@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PermissionManager Test Class
  *
@@ -21,10 +22,11 @@
  *
  * @category VuFind
  * @package  Tests
- * @author   Oliver Goldschmidt <@o.goldschmidt@tuhh.de>
+ * @author   Oliver Goldschmidt <o.goldschmidt@tuhh.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Role;
 
 use VuFind\Role\PermissionManager;
@@ -34,11 +36,11 @@ use VuFind\Role\PermissionManager;
  *
  * @category VuFind
  * @package  Tests
- * @author   Oliver Goldschmidt <@o.goldschmidt@tuhh.de>
+ * @author   Oliver Goldschmidt <o.goldschmidt@tuhh.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class PermissionManagerTest extends \VuFindTest\Unit\TestCase
+class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Sample configuration with varios config options.
@@ -47,16 +49,16 @@ class PermissionManagerTest extends \VuFindTest\Unit\TestCase
      */
     protected $permissionConfig = [
         'permission.all' => [
-            'permission' => "everyone"
+            'permission' => "everyone",
         ],
         'permission.nobody' => [
-            'permission' => "nobody"
+            'permission' => "nobody",
         ],
         'permission.empty' => [
         ],
         'permission.array' => [
-            'permission' => ['everyoneArray', 'everyoneArray2']
-        ]
+            'permission' => ['everyoneArray', 'everyoneArray2'],
+        ],
     ];
 
     /**
@@ -103,7 +105,7 @@ class PermissionManagerTest extends \VuFindTest\Unit\TestCase
     public function testGrantedPermission()
     {
         $pm = new PermissionManager($this->permissionConfig);
-        $mockAuth = $this->getMockBuilder('ZfcRbac\Service\AuthorizationService')
+        $mockAuth = $this->getMockBuilder(\LmcRbacMvc\Service\AuthorizationService::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockAuth->expects($this->any())->method('isGranted')
@@ -121,7 +123,7 @@ class PermissionManagerTest extends \VuFindTest\Unit\TestCase
     public function testDeniedPermission()
     {
         $pm = new PermissionManager($this->permissionConfig);
-        $mockAuth = $this->getMockBuilder('ZfcRbac\Service\AuthorizationService')
+        $mockAuth = $this->getMockBuilder(\LmcRbacMvc\Service\AuthorizationService::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockAuth->expects($this->any())->method('isGranted')

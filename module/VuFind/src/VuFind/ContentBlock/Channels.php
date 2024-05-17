@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Channels content block.
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
+
 namespace VuFind\ContentBlock;
 
+use Laminas\Http\PhpEnvironment\Request;
 use VuFind\ChannelProvider\ChannelLoader;
-use Zend\Http\PhpEnvironment\Request;
 
 /**
  * Channels content block.

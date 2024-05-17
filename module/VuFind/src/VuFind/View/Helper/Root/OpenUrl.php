@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OpenUrl view helper
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 use VuFind\Resolver\Driver\PluginManager;
@@ -38,7 +40,7 @@ use VuFind\Resolver\Driver\PluginManager;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class OpenUrl extends \Zend\View\Helper\AbstractHelper
+class OpenUrl extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * Context helper
@@ -50,7 +52,7 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
     /**
      * VuFind OpenURL configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -85,13 +87,16 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
     /**
      * Constructor
      *
-     * @param Context             $context       Context helper
-     * @param array               $openUrlRules  VuFind OpenURL rules
-     * @param PluginManager       $pluginManager Resolver plugin manager
-     * @param \Zend\Config\Config $config        VuFind OpenURL config
+     * @param Context                $context       Context helper
+     * @param array                  $openUrlRules  VuFind OpenURL rules
+     * @param PluginManager          $pluginManager Resolver plugin manager
+     * @param \Laminas\Config\Config $config        VuFind OpenURL config
      */
-    public function __construct(Context $context, $openUrlRules,
-        PluginManager $pluginManager, $config = null
+    public function __construct(
+        Context $context,
+        $openUrlRules,
+        PluginManager $pluginManager,
+        $config = null
     ) {
         $this->context = $context;
         $this->openUrlRules = $openUrlRules;
@@ -124,7 +129,7 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
      *
      * @return void
      */
-    protected function addImageBasedParams($imagebased, & $params)
+    protected function addImageBasedParams($imagebased, &$params)
     {
         $params['openUrlImageBasedMode'] = $this->getImageBasedLinkingMode();
         $params['openUrlImageBasedSrc'] = null;
@@ -175,18 +180,18 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
         if (null !== $this->config && isset($this->config->url)) {
             // Trim off any parameters (for legacy compatibility -- default config
             // used to include extraneous parameters):
-            list($base) = explode('?', $this->config->url);
+            [$base] = explode('?', $this->config->url);
         } else {
             $base = false;
         }
 
         $embed = (isset($this->config->embed) && !empty($this->config->embed));
 
-        $embedAutoLoad = isset($this->config->embed_auto_load)
-            ? $this->config->embed_auto_load : false;
+        $embedAutoLoad = $this->config->embed_auto_load ?? false;
         // ini values 'true'/'false' are provided via ini reader as 1/0
         // only check embedAutoLoad for area if the current area passed checkContext
-        if (!($embedAutoLoad === "1" || $embedAutoLoad === "0")
+        if (
+            !($embedAutoLoad === "1" || $embedAutoLoad === "0")
             && !empty($this->area)
         ) {
             // embedAutoLoad is neither true nor false, so check if it contains an
@@ -204,8 +209,7 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
         }
 
         // instantiate the resolver plugin to get a proper resolver link
-        $resolver = isset($this->config->resolver)
-            ? $this->config->resolver : 'other';
+        $resolver = $this->config->resolver ?? 'other';
         $openurl = $this->recordDriver->getOpenUrl();
         if ($this->resolverPluginManager->has($resolver)) {
             $resolverObj = new \VuFind\Resolver\Connection(
@@ -230,14 +234,13 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
             'openUrlGraphicHeight' => empty($this->config->graphic_height)
                 ? false : $this->config->graphic_height,
             'openUrlEmbed' => $embed,
-            'openUrlEmbedAutoLoad' => $embedAutoLoad
+            'openUrlEmbedAutoLoad' => $embedAutoLoad,
         ];
         $this->addImageBasedParams($imagebased, $params);
 
         // Render the subtemplate:
-        return $this->context->__invoke($this->getView())->renderInContext(
-            'Helpers/openurl.phtml', $params
-        );
+        return ($this->context)($this->getView())
+            ->renderInContext('Helpers/openurl.phtml', $params);
     }
 
     /**
@@ -248,7 +251,8 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
      */
     public function getImageBasedLinkingMode()
     {
-        if ($this->imageBasedLinkingIsActive()
+        if (
+            $this->imageBasedLinkingIsActive()
             && isset($this->config->image_based_linking_mode)
         ) {
             return $this->config->image_based_linking_mode;
@@ -276,7 +280,8 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
         // check first if OpenURLs are enabled for this RecordDriver
         // check second if OpenURLs are enabled for this context
         // check last if any rules apply
-        if (!$this->recordDriver->getOpenUrl()
+        if (
+            !$this->recordDriver->getOpenUrl()
             || !$this->checkContext()
             || !$this->checkIfRulesApply()
         ) {
@@ -322,7 +327,8 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
             return true;
         }
         foreach ($this->openUrlRules as $rules) {
-            if (!$this->checkExcludedRecordsRules($rules)
+            if (
+                !$this->checkExcludedRecordsRules($rules)
                 && $this->checkSupportedRecordsRules($rules)
             ) {
                 return true;
@@ -407,14 +413,16 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
                     // and still have something left behind, then the match fails
                     // as long as SOME non-empty value was provided.
                     $requiredValues = array_diff($value, ['*']);
-                    if (!count(array_diff($requiredValues, $recordValue))
+                    if (
+                        !count(array_diff($requiredValues, $recordValue))
                         && $this->hasNonEmptyValue($recordValue)
                     ) {
                         $ruleMatchCounter++;
                     }
                 } else {
                     $valueCount = count($value);
-                    if ($valueCount == count($recordValue)
+                    if (
+                        $valueCount == count($recordValue)
                         && $valueCount == count(
                             array_intersect($value, $recordValue)
                         )
@@ -442,7 +450,8 @@ class OpenUrl extends \Zend\View\Helper\AbstractHelper
         // check each rule - first rule-match
         foreach ($ruleset as $rule) {
             // skip this rule if it's not relevant for the current RecordDriver
-            if (isset($rule['recorddriver'])
+            if (
+                isset($rule['recorddriver'])
                 && !($this->recordDriver instanceof $rule['recorddriver'])
             ) {
                 continue;

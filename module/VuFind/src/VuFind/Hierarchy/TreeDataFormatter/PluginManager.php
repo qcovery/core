@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hierarchy tree data formatter plugin manager
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Hierarchy\TreeDataFormatter;
 
 /**
@@ -44,8 +46,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'json' => 'VuFind\Hierarchy\TreeDataFormatter\Json',
-        'xml' => 'VuFind\Hierarchy\TreeDataFormatter\Xml',
+        'json' => Json::class,
+        'xml' => Xml::class,
     ];
 
     /**
@@ -54,10 +56,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Hierarchy\TreeDataFormatter\Json' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Hierarchy\TreeDataFormatter\Xml' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
+        Json::class => AbstractBaseFactory::class,
+        Xml::class => AbstractBaseFactory::class,
     ];
 
     /**
@@ -68,6 +68,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Hierarchy\TreeDataFormatter\AbstractBase';
+        return AbstractBase::class;
     }
 }

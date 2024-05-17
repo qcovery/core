@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CAS authentication module.
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Auth;
 
 use VuFind\Exception\Auth as AuthException;
@@ -107,7 +109,7 @@ class CAS extends AbstractBase
     /**
      * Attempt to authenticate the current user.  Throws exception if login fails.
      *
-     * @param \Zend\Http\PhpEnvironment\Request $request Request object containing
+     * @param \Laminas\Http\PhpEnvironment\Request $request Request object containing
      * account credentials.
      *
      * @throws AuthException
@@ -136,14 +138,16 @@ class CAS extends AbstractBase
         // Has the user configured attributes to use for populating the user table?
         $attribsToCheck = [
             "cat_username", "cat_password", "email", "lastname", "firstname",
-            "college", "major", "home_library"
+            "college", "major", "home_library",
         ];
         $catPassword = null;
         foreach ($attribsToCheck as $attribute) {
             if (isset($cas->$attribute)) {
                 $value = $casauth->getAttribute($cas->$attribute);
-                if ($attribute != 'cat_password') {
-                    $user->$attribute = ($value === null) ? '' : $value;
+                if ($attribute == 'email') {
+                    $user->updateEmail($value);
+                } elseif ($attribute != 'cat_password') {
+                    $user->$attribute = $value ?? '';
                 } else {
                     $catPassword = $value;
                 }
@@ -203,7 +207,8 @@ class CAS extends AbstractBase
     public function isExpired()
     {
         $config = $this->getConfig();
-        if (isset($config->CAS->username)
+        if (
+            isset($config->CAS->username)
             && isset($config->CAS->logout)
         ) {
             $casauth = $this->setupCAS();
@@ -226,7 +231,8 @@ class CAS extends AbstractBase
     {
         // If single log-out is enabled, use a special URL:
         $config = $this->getConfig();
-        if (isset($config->CAS->logout)
+        if (
+            isset($config->CAS->logout)
             && !empty($config->CAS->logout)
         ) {
             $url = $config->CAS->logout . '?service=' . urlencode($url);
@@ -278,13 +284,19 @@ class CAS extends AbstractBase
         // client can only be called once.
         if (!$this->phpCASSetup) {
             $cas = $this->getConfig()->CAS;
-            if (isset($cas->log)
+            if (
+                isset($cas->log)
                 && !empty($cas->log) && isset($cas->debug) && ($cas->debug)
             ) {
                 $casauth->setDebug($cas->log);
             }
+            $protocol = constant($cas->protocol ?? 'SAML_VERSION_1_1');
             $casauth->client(
-                SAML_VERSION_1_1, $cas->server, (int)$cas->port, $cas->context, false
+                $protocol,
+                $cas->server,
+                (int)$cas->port,
+                $cas->context,
+                false
             );
             if (isset($cas->CACert) && !empty($cas->CACert)) {
                 $casauth->setCasServerCACert($cas->CACert);

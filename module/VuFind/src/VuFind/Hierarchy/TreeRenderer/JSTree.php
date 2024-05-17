@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hierarchy Tree Renderer for the JS_Tree plugin
  *
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Hierarchy\TreeRenderer;
+
+use Laminas\Mvc\Controller\Plugin\Url as UrlPlugin;
 
 /**
  * Hierarchy Tree Renderer
@@ -38,15 +42,14 @@ namespace VuFind\Hierarchy\TreeRenderer;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
-class JSTree extends AbstractBase
-    implements \VuFind\I18n\Translator\TranslatorAwareInterface
+class JSTree extends AbstractBase implements \VuFind\I18n\Translator\TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
     /**
      * Router plugin
      *
-     * @var \Zend\Mvc\Controller\Plugin\Url
+     * @var UrlPlugin
      */
     protected $router = null;
 
@@ -60,14 +63,13 @@ class JSTree extends AbstractBase
     /**
      * Constructor
      *
-     * @param \Zend\Mvc\Controller\Plugin\Url $router             Router plugin for
+     * @param UrlPlugin $router             Router plugin for
      * urls
-     * @param bool                            $collectionsEnabled Whether the
-     * collections functionality is enabled
+     * @param bool      $collectionsEnabled Whether the collections functionality is
+     * enabled
      */
-    public function __construct(\Zend\Mvc\Controller\Plugin\Url $router,
-        $collectionsEnabled
-    ) {
+    public function __construct(UrlPlugin $router, $collectionsEnabled)
+    {
         $this->router = $router;
         $this->collectionsEnabled = $collectionsEnabled;
     }
@@ -89,13 +91,16 @@ class JSTree extends AbstractBase
 
         if ($hierarchyID) {
             // Specific Hierarchy Supplied
-            if (in_array($hierarchyID, $inHierarchies)
+            if (
+                in_array($hierarchyID, $inHierarchies)
                 && $this->getDataSource()->supports($hierarchyID)
             ) {
                 return [
                     $hierarchyID => $this->getHierarchyName(
-                        $hierarchyID, $inHierarchies, $inHierarchiesTitle
-                    )
+                        $hierarchyID,
+                        $inHierarchies,
+                        $inHierarchiesTitle
+                    ),
                 ];
             }
         } else {
@@ -142,7 +147,10 @@ class JSTree extends AbstractBase
                 }
             } else {
                 return $this->transformCollectionXML(
-                    $context, $mode, $hierarchyID, $recordID
+                    $context,
+                    $mode,
+                    $hierarchyID,
+                    $recordID
                 );
             }
         }
@@ -179,22 +187,22 @@ class JSTree extends AbstractBase
      */
     protected function buildNodeArray($node, $context, $hierarchyID)
     {
-        $escaper = new \Zend\Escaper\Escaper('utf-8');
+        $escaper = new \Laminas\Escaper\Escaper('utf-8');
         $ret = [
             'id' => preg_replace('/\W/', '-', $node->id),
             'text' => $escaper->escapeHtml($node->title),
             'li_attr' => [
-                'recordid' => $node->id
+                'data-recordid' => $node->id,
             ],
             'a_attr' => [
                 'href' => $this->getContextualUrl($node, $context),
-                'title' => $node->title
+                'title' => $node->title,
             ],
-            'type' => $node->type
+            'type' => $node->type,
         ];
         if (isset($node->children)) {
             $ret['children'] = [];
-            for ($i = 0;$i < count($node->children);$i++) {
+            for ($i = 0; $i < count($node->children); $i++) {
                 $ret['children'][$i] = $this
                     ->buildNodeArray($node->children[$i], $context, $hierarchyID);
             }
@@ -242,16 +250,37 @@ class JSTree extends AbstractBase
         if (!isset($cache[$route])) {
             $params = [
                 'id' => '__record_id__',
-                'tab' => 'HierarchyTree'
+                'tab' => 'HierarchyTree',
             ];
             $options = [
                 'query' => [
-                    'recordID' => '__record_id__'
-                ]
+                    'recordID' => '__record_id__',
+                ],
             ];
-            $cache[$route] = $this->router->fromRoute($route, $params, $options);
+            $cache[$route] = $this->router->fromRoute(
+                $this->getRouteNameFromDataSource($route),
+                $params,
+                $options
+            );
         }
-        return str_replace('__record_id__', $id, $cache[$route]);
+        return str_replace('__record_id__', urlencode($id), $cache[$route]);
+    }
+
+    /**
+     * Get route name from data source.
+     *
+     * @param string $route Route
+     *
+     * @return string
+     */
+    protected function getRouteNameFromDataSource($route)
+    {
+        if ($route === 'collection') {
+            return $this->getDataSource()->getCollectionRoute();
+        } elseif ($route === 'record') {
+            return $this->getDataSource()->getRecordRoute();
+        }
+        return $route;
     }
 
     /**
@@ -266,7 +295,7 @@ class JSTree extends AbstractBase
      */
     protected function jsonToHTML($node, $context, $hierarchyID, $recordID = false)
     {
-        $escaper = new \Zend\Escaper\Escaper('utf-8');
+        $escaper = new \Laminas\Escaper\Escaper('utf-8');
 
         $name = strlen($node->title) > 100
             ? substr($node->title, 0, 100) . '...'
@@ -293,7 +322,10 @@ class JSTree extends AbstractBase
             $html .= '<ul class="fa-ul">';
             foreach ($node->children as $child) {
                 $html .= $this->jsonToHTML(
-                    $child, $context, $hierarchyID, $recordID
+                    $child,
+                    $context,
+                    $hierarchyID,
+                    $recordID
                 );
             }
             $html .= '</ul>';
@@ -312,14 +344,19 @@ class JSTree extends AbstractBase
      * @return string A HTML List
      */
     protected function transformCollectionXML(
-        $context, $mode, $hierarchyID, $recordID
+        $context,
+        $mode,
+        $hierarchyID,
+        $recordID
     ) {
         $record = $this->getRecordDriver();
         $inHierarchies = $record->getHierarchyTopID();
         $inHierarchiesTitle = $record->getHierarchyTopTitle();
 
         $hierarchyTitle = $this->getHierarchyName(
-            $hierarchyID, $inHierarchies, $inHierarchiesTitle
+            $hierarchyID,
+            $inHierarchies,
+            $inHierarchiesTitle
         );
 
         // Set up parameters for XSL transformation
@@ -329,7 +366,7 @@ class JSTree extends AbstractBase
             'collectionTitle' => $hierarchyTitle,
             'baseURL' => rtrim($this->router->fromRoute('home'), '/'),
             'context' => $context,
-            'recordID' => $recordID
+            'recordID' => $recordID,
         ];
 
         // Transform the XML

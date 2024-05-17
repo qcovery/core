@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Action Helper - Permission Checker
  *
@@ -25,14 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Controller\Plugin;
 
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use VuFind\Exception\Forbidden as ForbiddenException;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\Role\PermissionDeniedManager;
 use VuFind\Role\PermissionManager;
-use Zend\Log\LoggerAwareInterface;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 /**
  * VuFind Action Helper - Permission Checker
@@ -43,7 +45,8 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-class Permission extends AbstractPlugin implements LoggerAwareInterface,
+class Permission extends AbstractPlugin implements
+    LoggerAwareInterface,
     TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
@@ -77,12 +80,27 @@ class Permission extends AbstractPlugin implements LoggerAwareInterface,
      * @param PermissionDeniedManager $pdm  Permission Denied Manager
      * @param \VuFind\Auth\Manager    $auth Auth manager
      */
-    public function __construct(PermissionManager $pm, PermissionDeniedManager $pdm,
+    public function __construct(
+        PermissionManager $pm,
+        PermissionDeniedManager $pdm,
         \VuFind\Auth\Manager $auth
     ) {
         $this->permissionManager = $pm;
         $this->permissionDeniedManager = $pdm;
         $this->authManager = $auth;
+    }
+
+    /**
+     * Check if a permission is authorized, returning a boolean value without
+     * applying any additional behavior.
+     *
+     * @param string $permission Permission to check
+     *
+     * @return bool
+     */
+    public function isAuthorized($permission)
+    {
+        return $this->permissionManager->isAuthorized($permission);
     }
 
     /**
@@ -97,12 +115,15 @@ class Permission extends AbstractPlugin implements LoggerAwareInterface,
      *
      * @return mixed
      */
-    public function check($permission, $defaultBehavior = null,
+    public function check(
+        $permission,
+        $defaultBehavior = null,
         $passIfUndefined = false
     ) {
         // If no permission rule is defined and we're only checking defined
         // permissions, bail out now....
-        if (!$this->permissionManager->permissionRuleExists($permission)
+        if (
+            !$this->permissionManager->permissionRuleExists($permission)
             && $passIfUndefined
         ) {
             return null;
@@ -111,44 +132,46 @@ class Permission extends AbstractPlugin implements LoggerAwareInterface,
         // Make sure the current user has permission to access the module:
         if ($this->permissionManager->isAuthorized($permission) !== true) {
             $dl = $this->permissionDeniedManager->getDeniedControllerBehavior(
-                $permission, $defaultBehavior
+                $permission,
+                $defaultBehavior
             );
             if ($dl === false) {
                 return null;
             }
             $exceptionDescription = $dl['exceptionMessage'] ?? 'Access denied.';
             switch (strtolower($dl['action'])) {
-            case 'promptlogin':
-                // If the user is already logged in, but we're getting a "prompt
-                // login" denied permission requirement, there is probably a
-                // configuration error somewhere; throw an exception rather than
-                // triggering an infinite login redirection loop.
-                if ($this->authManager->isLoggedIn()) {
-                    throw new ForbiddenException(
-                        'Trying to prompt login due to denied ' . $permission
-                        . ' permission, but a user is already logged in; '
-                        . 'possible configuration problem in permissions.ini.'
+                case 'promptlogin':
+                    // If the user is already logged in, but we're getting a "prompt
+                    // login" denied permission requirement, there is probably a
+                    // configuration error somewhere; throw an exception rather than
+                    // triggering an infinite login redirection loop.
+                    if ($this->authManager->isLoggedIn()) {
+                        throw new ForbiddenException(
+                            'Trying to prompt login due to denied ' . $permission
+                            . ' permission, but a user is already logged in; '
+                            . 'possible configuration problem in permissions.ini.'
+                        );
+                    }
+                    $msg = empty($dl['value']) ? null : $dl['value'];
+                    return $this->getController()->forceLogin($msg, [], false);
+                case 'showmessage':
+                    return $this->getController()->redirect()->toRoute(
+                        'error-permissiondenied',
+                        [],
+                        ['query' => ['msg' => $dl['value']]]
                     );
-                }
-                $msg = empty($dl['value']) ? null : $dl['value'];
-                return $this->getController()->forceLogin($msg, [], false);
-            case 'showmessage':
-                return $this->getController()->redirect()->toRoute(
-                    'error-permissiondenied', [],
-                    ['query' => ['msg' => $dl['value']]]
-                );
-            case 'exception':
-                $exceptionClass
-                    = (isset($dl['value']) && class_exists($dl['value']))
-                    ? $dl['value'] : 'VuFind\Exception\Forbidden';
-                $exception = new $exceptionClass($exceptionDescription);
-                if ($exception instanceof \Exception) {
-                    throw $exception;
-                }
-                $this->logError("Permission configuration problem.");
-                throw new \Exception("$exceptionClass is not an exception!");
-            default:
-                throw new ForbiddenException($exceptionDescription);
+                case 'exception':
+                    $exceptionClass
+                        = (isset($dl['value']) && class_exists($dl['value']))
+                        ? $dl['value'] : 'VuFind\Exception\Forbidden';
+                    $exception = new $exceptionClass($exceptionDescription);
+                    if ($exception instanceof \Exception) {
+                        throw $exception;
+                    }
+                    $this->logError("Permission configuration problem.");
+                    throw new \Exception("$exceptionClass is not an exception!");
+                default:
+                    throw new ForbiddenException($exceptionDescription);
             }
         }
         return null;

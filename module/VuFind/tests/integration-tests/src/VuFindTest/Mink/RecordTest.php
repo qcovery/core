@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mink test class for basic record functionality.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\Mink;
 
 /**
@@ -35,8 +37,9 @@ namespace VuFindTest\Mink;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
+ * @retry    4
  */
-class RecordTest extends \VuFindTest\Unit\MinkTestCase
+class RecordTest extends \VuFindTest\Integration\MinkTestCase
 {
     /**
      * Test record tabs for a particular ID.
@@ -54,12 +57,14 @@ class RecordTest extends \VuFindTest\Unit\MinkTestCase
         $session = $this->getMinkSession();
         $session->visit($url);
         $page = $session->getPage();
-        $staffViewTab = $this->findCss($page, '.record-tabs .details');
+        $staffViewTab = $this->findCss($page, '.record-tabs .details a');
         $this->assertEquals('Staff View', $staffViewTab->getText());
         $staffViewTab->click();
-        $this->snooze();
-        $this->assertEquals($url . '#details', $session->getCurrentUrl());
-        $staffViewTable = $this->findCss($page, '.record-tabs .details-tab table.citation');
+        $this->assertEqualsWithTimeout(
+            $url . '#details',
+            [$session, 'getCurrentUrl']
+        );
+        $staffViewTable = $this->findCss($page, '.record-tabs .details-tab table.staff-view--marc');
         $this->assertEquals('LEADER', substr($staffViewTable->getText(), 0, 6));
     }
 
@@ -81,17 +86,15 @@ class RecordTest extends \VuFindTest\Unit\MinkTestCase
         $session = $this->getMinkSession();
         $session->visit($url);
         $page = $session->getPage();
-        $this->snooze();
-        $staffViewTable = $this->findCss($page, '.record-tabs .details-tab table.citation');
+        $staffViewTable = $this->findCss($page, '.record-tabs .details-tab table.staff-view--marc');
         $this->assertEquals('LEADER', substr($staffViewTable->getText(), 0, 6));
         $page = $session->getPage();
-        $staffViewTab = $this->findCss($page, '.record-tabs .holdings');
+        $staffViewTab = $this->findCss($page, '.record-tabs .holdings a');
         $this->assertEquals('Holdings', $staffViewTab->getText());
         $staffViewTab->click();
-        $this->snooze();
         $holdingsTabHeader = $this->findCss($page, '.record-tabs .holdings-tab h3');
         $this->assertEquals('3rd Floor Main Library', $holdingsTabHeader->getText());
-        list($baseUrl) = explode('#', $url);
+        [$baseUrl] = explode('#', $url);
         $this->assertEquals($baseUrl, $session->getCurrentUrl());
     }
 
@@ -126,11 +129,12 @@ class RecordTest extends \VuFindTest\Unit\MinkTestCase
      */
     public function testRecordTabsOnPlusId()
     {
-        // Skip encoding on this one, because Zend Framework doesn't URL encode
+        // Skip encoding on this one, because Laminas doesn't URL encode
         // plus signs in route segments!
         $this->tryRecordTabsOnId('theplus+andtheminus-', false);
         $this->tryLoadingTabHashAndReturningToDefault(
-            'theplus+andtheminus-', false
+            'theplus+andtheminus-',
+            false
         );
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Record ID list (support class for Loader)
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Record;
 
 use VuFind\RecordDriver\AbstractBase as Record;
@@ -73,10 +75,10 @@ class SourceAndIdList
             if (!is_array($details)) {
                 $parts = explode('|', $details, 2);
                 $ids[$i] = $details = [
-                    'source' => $parts[0], 'id' => $parts[1]
+                    'source' => $parts[0], 'id' => $parts[1],
                 ];
             }
-            $this->bySource[$details['source']][$details['id']] = $i;
+            $this->bySource[$details['source']][$details['id']][] = $i;
         }
         $this->ids = $ids;
     }
@@ -104,13 +106,13 @@ class SourceAndIdList
 
     /**
      * If the provided record driver corresponds with an ID in the list, return
-     * the associated position in the list. Otherwise, return false.
+     * the associated positions in the list. Otherwise, return an empty array.
      *
      * @param Record $record Record
      *
-     * @return int|bool
+     * @return int[]
      */
-    public function getRecordPosition(Record $record)
+    public function getRecordPositions(Record $record)
     {
         $id = $record->getUniqueId();
         $source = $record->getSourceIdentifier();
@@ -128,6 +130,6 @@ class SourceAndIdList
         if (isset($this->bySource[$source][$id])) {
             return $this->bySource[$source][$id];
         }
-        return false;
+        return [];
     }
 }

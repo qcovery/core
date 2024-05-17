@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Action Helper - New Items Support Methods
  *
@@ -25,14 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Controller\Plugin;
 
-use Zend\Config\Config;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Zend\Mvc\Plugin\FlashMessenger\FlashMessenger;
+use Laminas\Config\Config;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 
 /**
- * Zend action helper to perform new items-related actions
+ * Action helper to perform new items-related actions
  *
  * @category VuFind
  * @package  Controller_Plugins
@@ -149,7 +151,7 @@ class NewItems extends AbstractPlugin
      */
     public function getMethod()
     {
-        return isset($this->config->method) ? $this->config->method : 'ils';
+        return $this->config->method ?? 'ils';
     }
 
     /**

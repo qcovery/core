@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ReDi Link Resolver Driver
  *
@@ -27,10 +28,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
+
 namespace VuFind\Resolver\Driver;
 
 use DOMDocument;
-use Zend\Dom\DOMXPath;
+use Laminas\Dom\DOMXPath;
 
 /**
  * ReDi Link Resolver Driver
@@ -47,7 +49,7 @@ class Redi extends AbstractBase
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $httpClient;
 
@@ -61,10 +63,10 @@ class Redi extends AbstractBase
     /**
      * Constructor
      *
-     * @param string            $baseUrl    Base URL for link resolver
-     * @param \Zend\Http\Client $httpClient HTTP client
+     * @param string               $baseUrl    Base URL for link resolver
+     * @param \Laminas\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient)
+    public function __construct($baseUrl, \Laminas\Http\Client $httpClient)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
@@ -81,7 +83,7 @@ class Redi extends AbstractBase
      */
     public function fetchLinks($openURL)
     {
-        $url = $this->baseUrl . '?' . $openURL;
+        $url = $this->getResolverUrl($openURL);
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
     }
@@ -142,7 +144,9 @@ class Redi extends AbstractBase
                     'title' => $doiTerm->item($i)->textContent
                         . $doiDefinition->item($i)->textContent,
                     'href' => $href,
-                    'service_type' => 'getFullTxt',
+                    'access' => 'unknown',
+                    'coverage' => null,
+                    'service_type' => 'getDOI',
                 ];
             }
         }
@@ -221,7 +225,8 @@ class Redi extends AbstractBase
                     . ($i + 1) . "]/p/sup";
                 if ($xpath->evaluate("count({$expression})") == 1) {
                     $itemInfo = $this->parseRediInfo(
-                        $xml, $xpath->query($expression)->item(0)->textContent
+                        $xml,
+                        $xpath->query($expression)->item(0)->textContent
                     );
                 }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Holds trait (for subclasses of AbstractRecord)
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Controller;
 
 /**
@@ -58,7 +60,7 @@ trait HoldsTrait
             'Holds',
             [
                 'id' => $driver->getUniqueID(),
-                'patron' => $patron
+                'patron' => $patron,
             ]
         );
         if (!$checkHolds) {
@@ -74,7 +76,9 @@ trait HoldsTrait
 
         // Block invalid requests:
         $validRequest = $catalog->checkRequestIsValid(
-            $driver->getUniqueID(), $gatheredDetails, $patron
+            $driver->getUniqueID(),
+            $gatheredDetails,
+            $patron
         );
         if ((is_array($validRequest) && !$validRequest['valid']) || !$validRequest) {
             $this->flashMessenger()->addErrorMessage(
@@ -86,9 +90,12 @@ trait HoldsTrait
 
         // Send various values to the view so we can build the form:
         $requestGroups = $catalog->checkCapability(
-            'getRequestGroups', [$driver->getUniqueID(), $patron, $gatheredDetails]
+            'getRequestGroups',
+            [$driver->getUniqueID(), $patron, $gatheredDetails]
         ) ? $catalog->getRequestGroups(
-            $driver->getUniqueID(), $patron, $gatheredDetails
+            $driver->getUniqueID(),
+            $patron,
+            $gatheredDetails
         ) : [];
         $extraHoldFields = isset($checkHolds['extraHoldFields'])
             ? explode(":", $checkHolds['extraHoldFields']) : [];
@@ -100,7 +107,8 @@ trait HoldsTrait
                     || count($requestGroups) > 1));
 
         $pickupDetails = $gatheredDetails;
-        if (!$requestGroupNeeded && !empty($requestGroups)
+        if (
+            !$requestGroupNeeded && !empty($requestGroups)
             && count($requestGroups) == 1
         ) {
             // Request group selection is not required, but we have a single request
@@ -109,27 +117,73 @@ trait HoldsTrait
         }
         $pickup = $catalog->getPickUpLocations($patron, $pickupDetails);
 
+        // Check that there are pick up locations to choose from if the field is
+        // required:
+        if (in_array('pickUpLocation', $extraHoldFields) && !$pickup) {
+            $this->flashMessenger()
+                ->addErrorMessage('No pickup locations available');
+            return $this->redirectToRecord('#top');
+        }
+
+        $proxiedUsers = [];
+        if (
+            in_array('proxiedUsers', $extraHoldFields)
+            && $catalog->checkCapability(
+                'getProxiedUsers',
+                [$driver->getUniqueID(), $patron, $gatheredDetails]
+            )
+        ) {
+            $proxiedUsers = $catalog->getProxiedUsers($patron);
+        }
+
         // Process form submissions if necessary:
         if (null !== $this->params()->fromPost('placeHold')) {
-            // If the form contained a pickup location or request group, make sure
-            // they are valid:
+            // If the form contained a pickup location, request group, start date or
+            // required by date, make sure they are valid:
             $validGroup = $this->holds()->validateRequestGroupInput(
-                $gatheredDetails, $extraHoldFields, $requestGroups
+                $gatheredDetails,
+                $extraHoldFields,
+                $requestGroups
             );
             $validPickup = $validGroup && $this->holds()->validatePickUpInput(
-                $gatheredDetails['pickUpLocation'], $extraHoldFields, $pickup
+                $gatheredDetails['pickUpLocation'] ?? null,
+                $extraHoldFields,
+                $pickup
+            );
+            $dateValidationResults = $this->holds()->validateDates(
+                $gatheredDetails['startDate'] ?? null,
+                $gatheredDetails['requiredBy'] ?? null,
+                $extraHoldFields
             );
             if (!$validGroup) {
                 $this->flashMessenger()
-                    ->addMessage('hold_invalid_request_group', 'error');
-            } elseif (!$validPickup) {
-                $this->flashMessenger()->addMessage('hold_invalid_pickup', 'error');
-            } else {
+                    ->addErrorMessage('hold_invalid_request_group');
+            }
+            if (!$validPickup) {
+                $this->flashMessenger()->addErrorMessage('hold_invalid_pickup');
+            }
+            foreach ($dateValidationResults['errors'] as $msg) {
+                $this->flashMessenger()->addErrorMessage($msg);
+            }
+            if ($validGroup && $validPickup && !$dateValidationResults['errors']) {
                 // If we made it this far, we're ready to place the hold;
                 // if successful, we will redirect and can stop here.
 
-                // Add Patron Data to Submitted Data
-                $holdDetails = $gatheredDetails + ['patron' => $patron];
+                // Pass start date to the driver only if it's in the future:
+                if (
+                    !empty($gatheredDetails['startDate'])
+                    && $dateValidationResults['startDateTS'] < strtotime('+1 day')
+                ) {
+                    $gatheredDetails['startDate'] = '';
+                    $dateValidationResults['startDateTS'] = 0;
+                }
+
+                // Add patron data and converted dates to submitted data
+                $holdDetails = $gatheredDetails + [
+                    'patron' => $patron,
+                    'startDateTS' => $dateValidationResults['startDateTS'],
+                    'requiredByTS' => $dateValidationResults['requiredByTS'],
+                ];
 
                 // Attempt to place the hold:
                 $function = (string)$checkHolds['function'];
@@ -139,12 +193,18 @@ trait HoldsTrait
                 if (isset($results['success']) && $results['success'] == true) {
                     $msg = [
                         'html' => true,
-                        'msg' => 'hold_place_success_html',
+                        'msg' => empty($gatheredDetails['proxiedUser'])
+                            ? 'hold_place_success_html'
+                            : 'proxy_hold_place_success_html',
                         'tokens' => [
-                            '%%url%%' => $this->url()->fromRoute('myresearch-holds')
+                            '%%url%%' => $this->url()->fromRoute('holds-list'),
                         ],
                     ];
                     $this->flashMessenger()->addMessage($msg, 'success');
+                    if (!empty($results['warningMessage'])) {
+                        $this->flashMessenger()
+                            ->addWarningMessage($results['warningMessage']);
+                    }
                     return $this->redirectToRecord('#top');
                 } else {
                     // Failure: use flash messenger to display messages, stay on
@@ -161,12 +221,22 @@ trait HoldsTrait
             }
         }
 
+        // Set default start date to today:
+        $dateConverter = $this->serviceLocator->get(\VuFind\Date\Converter::class);
+        $defaultStartDate = $dateConverter->convertToDisplayDate('U', time());
+
         // Find and format the default required date:
-        $defaultRequired = $this->holds()->getDefaultRequiredDate(
-            $checkHolds, $catalog, $patron, $gatheredDetails
+        $defaultRequiredTS = $this->holds()->getDefaultRequiredDate(
+            $checkHolds,
+            $catalog,
+            $patron,
+            $gatheredDetails
         );
-        $defaultRequired = $this->serviceLocator->get('VuFind\Date\Converter')
-            ->convertToDisplayDate("U", $defaultRequired);
+        $defaultRequiredDate = $defaultRequiredTS
+            ? $dateConverter->convertToDisplayDate(
+                'U',
+                $defaultRequiredTS
+            ) : '';
         try {
             $defaultPickup
                 = $catalog->getDefaultPickUpLocation($patron, $gatheredDetails);
@@ -181,19 +251,28 @@ trait HoldsTrait
             $defaultRequestGroup = false;
         }
 
+        $config = $this->getConfig();
+        $homeLibrary = ($config->Account->set_home_library ?? true)
+            ? $this->getUser()->home_library : '';
+        // helpText is only for backward compatibility:
+        $helpText = $helpTextHtml = $checkHolds['helpText'];
+
         $view = $this->createViewModel(
-            [
-                'gatheredDetails' => $gatheredDetails,
-                'pickup' => $pickup,
-                'defaultPickup' => $defaultPickup,
-                'homeLibrary' => $this->getUser()->home_library,
-                'extraHoldFields' => $extraHoldFields,
-                'defaultRequiredDate' => $defaultRequired,
-                'requestGroups' => $requestGroups,
-                'defaultRequestGroup' => $defaultRequestGroup,
-                'requestGroupNeeded' => $requestGroupNeeded,
-                'helpText' => $checkHolds['helpText'] ?? null
-            ]
+            compact(
+                'gatheredDetails',
+                'pickup',
+                'defaultPickup',
+                'homeLibrary',
+                'extraHoldFields',
+                'defaultStartDate',
+                'defaultRequiredDate',
+                'requestGroups',
+                'defaultRequestGroup',
+                'requestGroupNeeded',
+                'proxiedUsers',
+                'helpText',
+                'helpTextHtml'
+            )
         );
         $view->setTemplate('record/hold');
         return $view;

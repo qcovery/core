@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Dynamic Book Cover Generator
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/configuration:external_content Wiki
  */
+
 namespace VuFind\Cover;
 
 use VuFind\Cover\Layer\LayerInterface;
@@ -106,7 +108,9 @@ class Generator
      * @param LayerManager $lm         Layer manager
      * @param array        $settings   Overwrite styles
      */
-    public function __construct(ThemeInfo $themeTools, LayerManager $lm,
+    public function __construct(
+        ThemeInfo $themeTools,
+        LayerManager $lm,
         array $settings = []
     ) {
         $this->themeTools = $themeTools;
@@ -135,7 +139,7 @@ class Generator
         if (count($parts) < 2) {
             $settings['width'] = $settings['height'] = $parts[0];
         } else {
-            list($settings['width'], $settings['height']) = $parts;
+            [$settings['width'], $settings['height']] = $parts;
         }
 
         // Store the results as an object:

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cart view helper Test Class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\View\Helper\Root;
 
 /**
@@ -46,7 +48,7 @@ class CartTest extends \PHPUnit\Framework\TestCase
     public function testCart()
     {
         // Create a mock cart object:
-        $cart = $this->getMockBuilder('VuFind\Cart')
+        $cart = $this->getMockBuilder(\VuFind\Cart::class)
             ->disableOriginalConstructor()
             ->getMock();
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Search memory factory.
  *
@@ -25,11 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Search;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-use Zend\Session\Container;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Laminas\Session\Container;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Search memory factory.
@@ -54,17 +59,27 @@ class MemoryFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
+        $sessionManager = $container->get(\Laminas\Session\SessionManager::class);
         $session = new Container(
-            'Search', $container->get('Zend\Session\SessionManager')
+            'Search',
+            $sessionManager
         );
-        return new $requestedName($session);
+        return new $requestedName(
+            $session,
+            $sessionManager->getId(),
+            $container->get('Request'),
+            $container->get(\VuFind\Db\Table\PluginManager::class)->get('Search'),
+            $container->get(\VuFind\Search\Results\PluginManager::class)
+        );
     }
 }

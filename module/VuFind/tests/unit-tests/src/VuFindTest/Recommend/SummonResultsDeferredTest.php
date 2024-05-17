@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SummonResultsDeferred recommendation module Test Class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Recommend;
 
 /**
@@ -47,12 +49,13 @@ class SummonResultsDeferredTest extends \VuFindTest\Unit\RecommendDeferredTestCa
     {
         $results = $this->getMockResults();
         $params = $results->getParams();
-        $options = $this->getMockBuilder('VuFind\Search\Solr\Options')
+        $options = $this->getMockBuilder(\VuFind\Search\Solr\Options::class)
             ->disableOriginalConstructor()->getMock();
-        $options->expects($this->once())->method('getLabelForBasicHandler')->with($this->equalTo('bar'))->will($this->returnValue('baz'));
+        $options->expects($this->once())->method('getLabelForBasicHandler')
+            ->with($this->equalTo('bar'))->will($this->returnValue('baz'));
         $params->expects($this->once())->method('getOptions')->will($this->returnValue($options));
         $params->expects($this->once())->method('getSearchHandler')->will($this->returnValue('bar'));
-        $mod = $this->getRecommend('VuFind\Recommend\SummonResultsDeferred', '', null, $results);
+        $mod = $this->getRecommend(\VuFind\Recommend\SummonResultsDeferred::class, '', null, $results);
         $this->assertEquals(
             'mod=SummonResults&params=lookfor%3A&lookfor=foo&typeLabel=baz',
             $mod->getUrlParams()

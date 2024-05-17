@@ -26,15 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\Primo;
 
 use VuFindSearch\Backend\AbstractBackend;
-
 use VuFindSearch\Backend\Exception\BackendException;
-
 use VuFindSearch\ParamBag;
 use VuFindSearch\Query\AbstractQuery;
-
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
 use VuFindSearch\Response\RecordCollectionInterface;
 
@@ -72,7 +70,8 @@ class Backend extends AbstractBackend
      *
      * @return void
      */
-    public function __construct(Connector $connector,
+    public function __construct(
+        Connector $connector,
         RecordCollectionFactoryInterface $factory = null
     ) {
         if (null !== $factory) {
@@ -91,7 +90,10 @@ class Backend extends AbstractBackend
      *
      * @return RecordCollectionInterface
      */
-    public function search(AbstractQuery $query, $offset, $limit,
+    public function search(
+        AbstractQuery $query,
+        $offset,
+        $limit,
         ParamBag $params = null
     ) {
         $baseParams = $this->getQueryBuilder()->build($query);
@@ -105,7 +107,8 @@ class Backend extends AbstractBackend
         $primoQuery = $this->paramBagToPrimoQuery($baseParams);
         try {
             $response = $this->connector->query(
-                $this->connector->getInstitutionCode(), $primoQuery['query'],
+                $this->connector->getInstitutionCode(),
+                $primoQuery['query'],
                 $primoQuery
             );
         } catch (\Exception $e) {
@@ -136,7 +139,9 @@ class Backend extends AbstractBackend
         try {
             $response   = $this->connector
                 ->getRecord(
-                    $id, $this->connector->getInstitutionCode(), $onCampus
+                    $id,
+                    $this->connector->getInstitutionCode(),
+                    $onCampus
                 );
         } catch (\Exception $e) {
             throw new BackendException(
@@ -233,16 +238,19 @@ class Backend extends AbstractBackend
         // Most parameters need to be flattened from array format, but a few
         // should remain as arrays:
         $arraySettings = [
-            'query', 'facets', 'filterList', 'groupFilters', 'rangeFilters'
+            'query', 'facets', 'filterList', 'groupFilters', 'rangeFilters',
         ];
         foreach ($params as $key => $param) {
             $options[$key] = in_array($key, $arraySettings) ? $param : $param[0];
         }
 
-        // Use special facet pcAvailabilty if it has been set
-        if (isset($params['filterList']['pcAvailability'])) {
+        // Use special pcAvailability filter if it has been set:
+        if ($values = $params['filterList']['pcAvailability']['values'] ?? []) {
+            $value = reset($values);
+            // Note that '' is treated as true for the simple case with no value
+            $options['pcAvailability']
+                = !in_array($value, [false, 0, '0', 'false'], true);
             unset($options['filterList']['pcAvailability']);
-            $options['pcAvailability'] = true;
         }
 
         return $options;

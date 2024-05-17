@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AJAX handler to get list of comments for a record as HTML.
  *
@@ -25,11 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\View\Renderer\RendererInterface;
 use VuFind\Record\Loader;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\View\Renderer\RendererInterface;
 
 /**
  * AJAX handler to get list of comments for a record as HTML.
@@ -59,7 +61,7 @@ class GetRecordCommentsAsHTML extends AbstractBase
     /**
      * Constructor
      *
-     * @param Connection        $loader   Record loader
+     * @param Loader            $loader   Record loader
      * @param RendererInterface $renderer View renderer
      */
     public function __construct(Loader $loader, RendererInterface $renderer)

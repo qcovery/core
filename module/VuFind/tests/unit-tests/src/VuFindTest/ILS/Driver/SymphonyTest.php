@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS driver test
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\ILS\Driver;
 
 use VuFind\ILS\Driver\Symphony;
@@ -38,7 +40,7 @@ use VuFind\ILS\Driver\Symphony;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-class SymphonyTest extends \VuFindTest\Unit\TestCase
+class SymphonyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Driver object
@@ -52,9 +54,9 @@ class SymphonyTest extends \VuFindTest\Unit\TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
-        $loader = $this->getMockBuilder('VuFind\Record\Loader')
+        $loader = $this->getMockBuilder(\VuFind\Record\Loader::class)
             ->disableOriginalConstructor()->getMock();
 
         $this->driver = new Symphony($loader);
@@ -77,6 +79,6 @@ class SymphonyTest extends \VuFindTest\Unit\TestCase
         );
         $this->driver->init();
         $pickup = @$this->driver->getPickUpLocations();
-        $this->assertTrue(empty($pickup));
+        $this->assertEmpty($pickup);
     }
 }

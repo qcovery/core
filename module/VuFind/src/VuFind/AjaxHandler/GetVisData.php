@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Get Visualization Data" AJAX handler
  *
@@ -27,12 +28,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\Stdlib\Parameters;
 use VuFind\Search\Solr\Results;
 use VuFind\Session\Settings as SessionSettings;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\Stdlib\Parameters;
 
 /**
  * "Get Visualization Data" AJAX handler
@@ -148,7 +150,7 @@ class GetVisData extends AbstractBase
         }
         $paramsObj->getOptions()->disableHighlighting();
         $paramsObj->getOptions()->spellcheckEnabled(false);
-        $filters = $paramsObj->getFilters();
+        $filters = $paramsObj->getRawFilters();
         $rawDateFacets = $params->fromQuery('facetFields');
         $dateFacets = empty($rawDateFacets) ? [] : explode(':', $rawDateFacets);
         $fields = $this->processDateFacets($filters, $dateFacets);

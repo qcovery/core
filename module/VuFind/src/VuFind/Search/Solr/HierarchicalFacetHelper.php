@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Facet Helper
  *
@@ -25,9 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\Solr;
 
+use VuFind\I18n\HasSorterInterface;
+use VuFind\I18n\HasSorterTrait;
 use VuFind\I18n\TranslatableString;
+use VuFind\I18n\Translator\TranslatorAwareInterface;
+use VuFind\I18n\Translator\TranslatorAwareTrait;
+use VuFind\Search\Base\HierarchicalFacetHelperInterface;
 use VuFind\Search\UrlQueryHelper;
 
 /**
@@ -39,23 +46,55 @@ use VuFind\Search\UrlQueryHelper;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class HierarchicalFacetHelper
+class HierarchicalFacetHelper implements
+    HierarchicalFacetHelperInterface,
+    TranslatorAwareInterface,
+    HasSorterInterface
 {
+    use TranslatorAwareTrait;
+    use HasSorterTrait;
+
     /**
      * Helper method for building hierarchical facets:
      * Sort a facet list according to the given sort order
      *
-     * @param array $facetList Facet list returned from Solr
-     * @param bool  $topLevel  Whether to sort only top level
+     * @param array          $facetList Facet list returned from Solr
+     * @param boolean|string $order     Sort order:
+     * - true|top  sort top level alphabetically and the rest by count
+     * - false|all sort all levels alphabetically
+     * - count     sort all levels by count
      *
      * @return void
      */
-    public function sortFacetList(&$facetList, $topLevel)
+    public function sortFacetList(&$facetList, $order = null)
     {
+        // We need a boolean flag indicating whether or not to sort only the top
+        // level of the hierarchy. If we received a string configuration option,
+        // we should set the flag accordingly (boolean values of $order are
+        // supported for backward compatibility).
+        $topLevel = $order ?? 'count';
+        if (is_string($topLevel)) {
+            switch (strtolower(trim($topLevel))) {
+                case 'top':
+                    $topLevel = true;
+                    break;
+                case 'all':
+                    $topLevel = false;
+                    break;
+                case '':
+                case 'count':
+                    // At present, we assume the incoming list is already sorted by
+                    // count, so no further action is needed. If in future we need
+                    // to support re-sorting an arbitrary list, rather than simply
+                    // operating on raw Solr values, we may need to implement logic.
+                    return;
+            }
+        }
+
         // Parse level from each facet value so that the sort function
         // can run faster
         foreach ($facetList as &$facetItem) {
-            list($facetItem['level']) = explode('/', $facetItem['value'], 2);
+            [$facetItem['level']] = explode('/', $facetItem['value'], 2);
             if (!is_numeric($facetItem['level'])) {
                 $facetItem['level'] = 0;
             }
@@ -70,7 +109,7 @@ class HierarchicalFacetHelper
                 $bText = $b['displayText'] == $b['value']
                     ? $this->formatDisplayText($b['displayText'])
                     : $b['displayText'];
-                return strcasecmp($aText, $bText);
+                return $this->getSorter()->compare($aText, $bText);
             }
             return $a['level'] == $b['level']
                 ? $b['count'] - $a['count']
@@ -94,14 +133,20 @@ class HierarchicalFacetHelper
      * converting-a-flat-array-with-parent-ids-to-a-nested-tree/
      * Based on this example
      */
-    public function buildFacetArray($facet, $facetList, $urlHelper = false,
+    public function buildFacetArray(
+        $facet,
+        $facetList,
+        $urlHelper = false,
         $escape = true
     ) {
         // Create a keyed (for conversion to hierarchical) array of facet data
         $keyedList = [];
         foreach ($facetList as $item) {
             $keyedList[$item['value']] = $this->createFacetItem(
-                $facet, $item, $urlHelper, $escape
+                $facet,
+                $item,
+                $urlHelper,
+                $escape
             );
         }
 
@@ -139,7 +184,8 @@ class HierarchicalFacetHelper
             $results[] = $facetItem;
             if ($children) {
                 $results = array_merge(
-                    $results, $this->flattenFacetHierarchy($children)
+                    $results,
+                    $this->flattenFacetHierarchy($children)
                 );
             }
         }
@@ -149,15 +195,20 @@ class HierarchicalFacetHelper
     /**
      * Format a facet display text for displaying
      *
-     * @param string $displayText Display text
-     * @param bool   $allLevels   Whether to display all levels or only
-     * the current one
-     * @param string $separator   Separator string displayed between levels
+     * @param string       $displayText Display text
+     * @param bool         $allLevels   Whether to display all levels or only the
+     * current one
+     * @param string       $separator   Separator string displayed between levels
+     * @param string|false $domain      Translation domain for default translations
+     * of a multilevel string or false to omit translation
      *
      * @return TranslatableString Formatted text
      */
     public function formatDisplayText(
-        $displayText, $allLevels = false, $separator = '/'
+        $displayText,
+        $allLevels = false,
+        $separator = '/',
+        $domain = false
     ) {
         $originalText = $displayText;
         $parts = explode('/', $displayText);
@@ -167,10 +218,76 @@ class HierarchicalFacetHelper
             } else {
                 array_shift($parts);
                 array_pop($parts);
-                $displayText = implode($separator, $parts);
+
+                if (false !== $domain) {
+                    $translatedParts = [];
+                    foreach ($parts as $part) {
+                        $translatedParts[] = $this->translate([$domain, $part]);
+                    }
+                    $displayText = new TranslatableString(
+                        implode($separator, $parts),
+                        implode($separator, $translatedParts)
+                    );
+                } else {
+                    $displayText = implode($separator, $parts);
+                }
             }
         }
         return new TranslatableString($originalText, $displayText);
+    }
+
+    /**
+     * Format a filter string in parts suitable for displaying or translation
+     *
+     * @param string $filter Filter value
+     *
+     * @return array
+     */
+    public function getFilterStringParts($filter)
+    {
+        $parts = explode('/', $filter);
+        if (count($parts) <= 1 || !is_numeric($parts[0])) {
+            return [new TranslatableString($filter, $filter)];
+        }
+        $result = [];
+        for ($level = 0; $level <= $parts[0]; $level++) {
+            $str = $level . '/' . implode('/', array_slice($parts, 1, $level + 1))
+                . '/';
+            $result[] = new TranslatableString($str, $parts[$level + 1]);
+        }
+        return $result;
+    }
+
+    /**
+     * Check if the given value is the deepest level in the facet list.
+     *
+     * Takes into account lists with multiple top levels.
+     *
+     * @param array  $facetList Facet list
+     * @param string $value     Facet value
+     *
+     * @return bool
+     */
+    public function isDeepestFacetLevel($facetList, $value)
+    {
+        $parts = explode('/', $value);
+        $level = array_shift($parts);
+        if (!is_numeric($level)) {
+            // Not a properly formatted hierarchical facet value
+            return true;
+        }
+        $path = implode('/', array_slice($parts, 0, $level + 1));
+        foreach ($facetList as $current) {
+            $parts = explode('/', $current);
+            $currentLevel = array_shift($parts);
+            if (is_numeric($currentLevel) && $currentLevel > $level) {
+                // Check if parent is same
+                if ($path === implode('/', array_slice($parts, 0, $level + 1))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -191,11 +308,15 @@ class HierarchicalFacetHelper
         if ($urlHelper !== false) {
             if ($item['isApplied']) {
                 $href = $urlHelper->removeFacet(
-                    $facet, $item['value'], $item['operator']
+                    $facet,
+                    $item['value'],
+                    $item['operator']
                 )->getParams($escape);
             } else {
                 $href = $urlHelper->addFacet(
-                    $facet, $item['value'], $item['operator']
+                    $facet,
+                    $item['value'],
+                    $item['operator']
                 )->getParams($escape);
             }
             $exclude = $urlHelper->addFacet($facet, $item['value'], 'NOT')
@@ -209,7 +330,9 @@ class HierarchicalFacetHelper
                 ->getDisplayString();
         }
 
-        list($level, $value) = explode('/', $item['value'], 2);
+        $parts = explode('/', $item['value'], 2);
+        $level = $parts[0];
+        $value = $parts[1] ?? $item['value'];
         if (!is_numeric($level)) {
             $level = 0;
         }

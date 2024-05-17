@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Permission Manager
  *
@@ -26,9 +27,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/ Wiki
  */
+
 namespace VuFind\Role;
 
-use ZfcRbac\Service\AuthorizationServiceAwareTrait;
+use LmcRbacMvc\Service\AuthorizationServiceAwareTrait;
 
 /**
  * Permission Manager
@@ -100,7 +102,8 @@ class PermissionManager
             if ($value['permission'] == $context) {
                 return true;
             }
-            if (is_array($value['permission'])
+            if (
+                is_array($value['permission'])
                 && in_array($context, $value['permission'])
             ) {
                 return true;

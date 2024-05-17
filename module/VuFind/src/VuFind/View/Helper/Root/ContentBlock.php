@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ContentBlock view helper
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 /**
@@ -36,8 +38,10 @@ namespace VuFind\View\Helper\Root;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class ContentBlock extends AbstractClassBasedTemplateRenderer
+class ContentBlock extends \Laminas\View\Helper\AbstractHelper
 {
+    use ClassBasedTemplateRendererTrait;
+
     /**
      * Render the output of a ContentBlock plugin.
      *

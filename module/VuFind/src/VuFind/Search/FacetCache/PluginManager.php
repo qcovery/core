@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Facet cache plugin manager
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\Search\FacetCache;
 
 /**
@@ -44,9 +46,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'search2' => 'VuFind\Search\Search2\FacetCache',
-        'solr' => 'VuFind\Search\Solr\FacetCache',
-        'summon' => 'VuFind\Search\Summon\FacetCache',
+        'search2' => \VuFind\Search\Search2\FacetCache::class,
+        'solr' => \VuFind\Search\Solr\FacetCache::class,
+        'summon' => \VuFind\Search\Summon\FacetCache::class,
     ];
 
     /**
@@ -55,9 +57,12 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Search\Search2\FacetCache' => 'VuFind\Search\Solr\FacetCacheFactory',
-        'VuFind\Search\Solr\FacetCache' => 'VuFind\Search\Solr\FacetCacheFactory',
-        'VuFind\Search\Summon\FacetCache' => 'VuFind\Search\Base\FacetCacheFactory',
+        \VuFind\Search\Search2\FacetCache::class =>
+            \VuFind\Search\Solr\FacetCacheFactory::class,
+        \VuFind\Search\Solr\FacetCache::class =>
+            \VuFind\Search\Solr\FacetCacheFactory::class,
+        \VuFind\Search\Summon\FacetCache::class =>
+            \VuFind\Search\Base\FacetCacheFactory::class,
     ];
 
     /**
@@ -68,6 +73,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Search\Base\FacetCache';
+        return \VuFind\Search\Base\FacetCache::class;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mink test class for visualization view.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\Mink;
 
 /**
@@ -35,36 +37,66 @@ namespace VuFindTest\Mink;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
+ * @retry    4
  */
-class VisualizationTest extends \VuFindTest\Unit\MinkTestCase
+class VisualizationTest extends \VuFindTest\Integration\MinkTestCase
 {
     /**
-     * Test that combined results work in mixed AJAX/non-AJAX mode.
+     * Config overrides for visual facets.
+     *
+     * @var array
+     */
+    protected $visualConfig = [
+        'searches' => [
+            'General' => [
+                'default_top_recommend' => ['VisualFacets'],
+            ],
+            'Views' => ['list' => 'List', 'visual' => 'Visual'],
+        ],
+    ];
+
+    /**
+     * Run the basic visualization test procedure; this allows us to do the same
+     * checks in multiple configuration contexts.
      *
      * @return void
      */
-    public function testVisualization()
+    protected function doVisualizationCheck(): void
     {
-        $this->changeConfigs(
-            [
-                'searches' => [
-                    'General' => [
-                        'default_top_recommend' => ['VisualFacets'],
-                    ],
-                    'Views' => ['list' => 'List', 'visual' => 'Visual'],
-                ]
-            ]
-        );
         $session = $this->getMinkSession();
         $session->visit(
             $this->getVuFindUrl()
             . '/Search/Results?filter[]=building%3A"journals.mrc"&view=visual'
         );
         $page = $session->getPage();
-        $this->snooze();
+        $this->waitForPageLoad($page);
         $text = $this->findCss($page, '#visualResults')->getText();
         // Confirm that some content has been dynamically loaded into the
         // visualization area:
-        $this->assertContains('A - General Works', $text);
+        $this->assertStringContainsString('A - General Works', $text);
+    }
+
+    /**
+     * Test that visualization results display correctly.
+     *
+     * @return void
+     */
+    public function testVisualization(): void
+    {
+        $this->changeConfigs($this->visualConfig);
+        $this->doVisualizationCheck();
+    }
+
+    /**
+     * Test that visualization results display correctly even when no other
+     * recommendation modules are active.
+     *
+     * @return void
+     */
+    public function testVisualizationWithoutSideFacets(): void
+    {
+        // ONLY set up visual facets, while removing all other configs!
+        $this->changeConfigs($this->visualConfig, ['searches']);
+        $this->doVisualizationCheck();
     }
 }

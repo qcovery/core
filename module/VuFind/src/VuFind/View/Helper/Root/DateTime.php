@@ -1,4 +1,5 @@
 <?php
+
 /**
  * View helper for formatting dates and times.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 /**
@@ -36,7 +38,7 @@ namespace VuFind\View\Helper\Root;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class DateTime extends \Zend\View\Helper\AbstractHelper
+class DateTime extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * Date converter
@@ -86,7 +88,7 @@ class DateTime extends \Zend\View\Helper\AbstractHelper
         $replace = [
             $this->view->translate("date_month_placeholder"),
             $this->view->translate("date_day_placeholder"),
-            $this->view->translate("date_year_placeholder")
+            $this->view->translate("date_year_placeholder"),
         ];
 
         return str_replace($search, $replace, $dueDateHelpString);

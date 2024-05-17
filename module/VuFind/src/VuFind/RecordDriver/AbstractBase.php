@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract base record model.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\RecordDriver;
 
 use VuFind\XSLT\Import\VuFind as ArticleStripper;
@@ -40,19 +42,14 @@ use VuFind\XSLT\Import\VuFind as ArticleStripper;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
+abstract class AbstractBase implements
+    \VuFind\Db\Table\DbTableAwareInterface,
     \VuFind\I18n\Translator\TranslatorAwareInterface,
     \VuFindSearch\Response\RecordInterface
 {
     use \VuFind\Db\Table\DbTableAwareTrait;
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
-
-    /**
-     * Used for identifying search backends
-     *
-     * @var string
-     */
-    protected $sourceIdentifier = 'Solr';
+    use \VuFindSearch\Response\RecordTrait;
 
     /**
      * For storing extra data with record
@@ -64,14 +61,14 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     /**
      * Main VuFind configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $mainConfig;
 
     /**
      * Record-specific configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $recordConfig;
 
@@ -83,17 +80,24 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     protected $fields = [];
 
     /**
+     * Cache for rating data
+     *
+     * @var array
+     */
+    protected $ratingCache = [];
+
+    /**
      * Constructor
      *
-     * @param \Zend\Config\Config $mainConfig   VuFind main configuration (omit for
-     * built-in defaults)
-     * @param \Zend\Config\Config $recordConfig Record-specific configuration file
+     * @param \Laminas\Config\Config $mainConfig   VuFind main configuration (omit
+     * for built-in defaults)
+     * @param \Laminas\Config\Config $recordConfig Record-specific configuration file
      * (omit to use $mainConfig as $recordConfig)
      */
     public function __construct($mainConfig = null, $recordConfig = null)
     {
         $this->mainConfig = $mainConfig;
-        $this->recordConfig = (null === $recordConfig) ? $mainConfig : $recordConfig;
+        $this->recordConfig = $recordConfig ?? $mainConfig;
     }
 
     /**
@@ -147,7 +151,8 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $table = $this->getDbTable('Comments');
         return $table->getForResource(
-            $this->getUniqueId(), $this->getSourceIdentifier()
+            $this->getUniqueId(),
+            $this->getSourceIdentifier()
         );
     }
 
@@ -175,14 +180,21 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      *
      * @return array
      */
-    public function getTags($list_id = null, $user_id = null, $sort = 'count',
+    public function getTags(
+        $list_id = null,
+        $user_id = null,
+        $sort = 'count',
         $ownerId = null
     ) {
         $tags = $this->getDbTable('Tags');
         return $tags->getForResource(
             $this->getUniqueId(),
             $this->getSourceIdentifier(),
-            0, $list_id, $user_id, $sort, $ownerId
+            0,
+            $list_id,
+            $user_id,
+            $sort,
+            $ownerId
         );
     }
 
@@ -198,7 +210,8 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $resources = $this->getDbTable('Resource');
         $resource = $resources->findResource(
-            $this->getUniqueId(), $this->getSourceIdentifier()
+            $this->getUniqueId(),
+            $this->getSourceIdentifier()
         );
         foreach ($tags as $tag) {
             $resource->addTag($tag, $user);
@@ -217,11 +230,82 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $resources = $this->getDbTable('Resource');
         $resource = $resources->findResource(
-            $this->getUniqueId(), $this->getSourceIdentifier()
+            $this->getUniqueId(),
+            $this->getSourceIdentifier()
         );
         foreach ($tags as $tag) {
             $resource->deleteTag($tag, $user);
         }
+    }
+
+    /**
+     * Get rating information for this record.
+     *
+     * Returns an array with the following keys:
+     *
+     * rating - average rating (0-100)
+     * count  - count of ratings
+     *
+     * @param ?int $userId User ID, or null for all users
+     *
+     * @return array
+     */
+    public function getRatingData(?int $userId = null)
+    {
+        // Cache data since comments list may ask for same information repeatedly:
+        $cacheKey = $userId ?? '-';
+        if (!isset($this->ratingCache[$cacheKey])) {
+            $table = $this->getDbTable('Ratings');
+            $this->ratingCache[$cacheKey] = $table->getForResource(
+                $this->getUniqueId(),
+                $this->getSourceIdentifier(),
+                $userId
+            );
+        }
+        return $this->ratingCache[$cacheKey];
+    }
+
+    /**
+     * Get rating breakdown for this record.
+     *
+     * Returns an array with the following keys:
+     *
+     * rating - average rating (0-100)
+     * count  - count of ratings
+     * groups - grouped counts
+     *
+     * @param array $groups Group definition (key => [min, max])
+     *
+     * @return array
+     */
+    public function getRatingBreakdown(array $groups)
+    {
+        return $this->getDbTable('Ratings')->getCountsForResource(
+            $this->getUniqueId(),
+            $this->getSourceIdentifier(),
+            $groups
+        );
+    }
+
+    /**
+     * Add or update user's rating for the record.
+     *
+     * @param int  $userId ID of the user posting the rating
+     * @param ?int $rating The user-provided rating, or null to clear any existing
+     * rating
+     *
+     * @return void
+     */
+    public function addOrUpdateRating(int $userId, ?int $rating): void
+    {
+        // Clear rating cache:
+        $this->ratingCache = [];
+        $resources = $this->getDbTable('Resource');
+        $resource = $resources->findResource(
+            $this->getUniqueId(),
+            $this->getSourceIdentifier()
+        );
+        $resource->addOrUpdateRating($userId, $rating);
     }
 
     /**
@@ -236,7 +320,10 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $db = $this->getDbTable('UserResource');
         $data = $db->getSavedData(
-            $this->getUniqueId(), $this->getSourceIdentifier(), $list_id, $user_id
+            $this->getUniqueId(),
+            $this->getSourceIdentifier(),
+            $list_id,
+            $user_id
         );
         $notes = [];
         foreach ($data as $current) {
@@ -258,42 +345,10 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $table = $this->getDbTable('UserList');
         return $table->getListsContainingResource(
-            $this->getUniqueId(), $this->getSourceIdentifier(), $user_id
+            $this->getUniqueId(),
+            $this->getSourceIdentifier(),
+            $user_id
         );
-    }
-
-    /**
-     * Get the source value used to identify resources of this type in the database.
-     *
-     * @return string
-     *
-     * @deprecated Obsolete as of VuFind 3.0; use getSourceIdentifier() instead.
-     */
-    public function getResourceSource()
-    {
-        return $this->getSourceIdentifier();
-    }
-
-    /**
-     * Set the source backend identifier.
-     *
-     * @param string $identifier Backend identifier
-     *
-     * @return void
-     */
-    public function setSourceIdentifier($identifier)
-    {
-        $this->sourceIdentifier = $identifier;
-    }
-
-    /**
-     * Return the source backend identifier.
-     *
-     * @return string
-     */
-    public function getSourceIdentifier()
-    {
-        return $this->sourceIdentifier;
     }
 
     /**
@@ -327,6 +382,16 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     }
 
     /**
+     * Check if rating the record is allowed.
+     *
+     * @return bool
+     */
+    public function isRatingAllowed(): bool
+    {
+        return !empty($this->recordConfig->Social->rating);
+    }
+
+    /**
      * Store a piece of supplemental information in the record driver.
      *
      * @param string $key Name of stored information
@@ -346,26 +411,21 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      */
     public function getCitationFormats()
     {
+        $formatSetting = $this->mainConfig->Record->citation_formats ?? true;
+
         // Default behavior: use all supported options.
-        if (!isset($this->mainConfig->Record->citation_formats)
-            || $this->mainConfig->Record->citation_formats === true
-            || $this->mainConfig->Record->citation_formats === 'true'
-        ) {
+        if ($formatSetting === true || $formatSetting === 'true') {
             return $this->getSupportedCitationFormats();
         }
 
         // Citations disabled:
-        if ($this->mainConfig->Record->citation_formats === false
-            || $this->mainConfig->Record->citation_formats === 'false'
-        ) {
+        if ($formatSetting === false || $formatSetting === 'false') {
             return [];
         }
 
-        // Whitelist:
-        $whitelist = array_map(
-            'trim', explode(',', $this->mainConfig->Record->citation_formats)
-        );
-        return array_intersect($whitelist, $this->getSupportedCitationFormats());
+        // Filter based on include list:
+        $allowed = array_map('trim', explode(',', $formatSetting));
+        return array_intersect($allowed, $this->getSupportedCitationFormats());
     }
 
     /**
@@ -389,7 +449,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      */
     public function getExtraDetail($key)
     {
-        return isset($this->extraDetails[$key]) ? $this->extraDetails[$key] : null;
+        return $this->extraDetails[$key] ?? null;
     }
 
     /**

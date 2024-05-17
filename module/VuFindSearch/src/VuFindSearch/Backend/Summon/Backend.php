@@ -26,21 +26,17 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\Summon;
 
-use SerialsSolutions\Summon\Zend2 as Connector;
+use SerialsSolutions\Summon\Laminas as Connector;
 use SerialsSolutions_Summon_Exception as SummonException;
 use SerialsSolutions_Summon_Query as SummonQuery;
-
 use VuFindSearch\Backend\AbstractBackend;
-
 use VuFindSearch\Backend\Exception\BackendException;
-
 use VuFindSearch\Feature\RetrieveBatchInterface;
-
 use VuFindSearch\ParamBag;
 use VuFindSearch\Query\AbstractQuery;
-
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
 use VuFindSearch\Response\RecordCollectionInterface;
 
@@ -78,7 +74,8 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
      *
      * @return void
      */
-    public function __construct(Connector $connector,
+    public function __construct(
+        Connector $connector,
         RecordCollectionFactoryInterface $factory = null
     ) {
         if (null !== $factory) {
@@ -98,7 +95,10 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
      *
      * @return RecordCollectionInterface
      */
-    public function search(AbstractQuery $query, $offset, $limit,
+    public function search(
+        AbstractQuery $query,
+        $offset,
+        $limit,
         ParamBag $params = null
     ) {
         $baseParams = $this->getQueryBuilder()->build($query);
@@ -173,7 +173,7 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
                 [
                     'idsToFetch' => $currentPage,
                     'pageNumber' => 1,
-                    'pageSize' => $pageSize
+                    'pageSize' => $pageSize,
                 ]
             );
             try {

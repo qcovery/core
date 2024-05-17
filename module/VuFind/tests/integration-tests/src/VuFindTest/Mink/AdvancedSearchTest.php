@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mink test class to test advanced search.
  *
@@ -25,9 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\Mink;
 
 use Behat\Mink\Element\Element;
+use Behat\Mink\Session;
 
 /**
  * Mink test class to test advanced search.
@@ -37,28 +40,43 @@ use Behat\Mink\Element\Element;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
+ * @retry    4
  */
-class AdvancedSearchTest extends \VuFindTest\Unit\MinkTestCase
+class AdvancedSearchTest extends \VuFindTest\Integration\MinkTestCase
 {
+    /**
+     * Go to the advanced search page.
+     *
+     * @param Session $session Mink session
+     *
+     * @return Element
+     */
+    protected function goToAdvancedSearch(Session $session): Element
+    {
+        $path = '/Search/Advanced';
+        $session->visit($this->getVuFindUrl() . $path);
+        $page = $session->getPage();
+        $this->waitForPageLoad($page);
+        return $page;
+    }
+
     /**
      * Test persistent
      *
      * @return void
      */
-    public function testPersistent()
+    public function testPersistent(): void
     {
-        // Go to the advanced search page
         $session = $this->getMinkSession();
-        $path = '/Search/Advanced';
-        $session->visit($this->getVuFindUrl() . $path);
-        $page = $session->getPage();
+        $page = $this->goToAdvancedSearch($session);
         // Submit empty search form
         $this->findCss($page, '[type=submit]')->press();
         // Test edit search
         $links = $page->findAll('css', '.adv_search_links a');
         $isAdv = false;
         foreach ($links as $link) {
-            if ($this->checkVisibility($link)
+            if (
+                $this->checkVisibility($link)
                 && $link->getHtml() == 'Edit this Advanced Search'
             ) {
                 $isAdv = true;
@@ -79,7 +97,8 @@ class AdvancedSearchTest extends \VuFindTest\Unit\MinkTestCase
     {
         $links = $page->findAll('css', '.adv_search_links a');
         foreach ($links as $link) {
-            if ($this->checkVisibility($link)
+            if (
+                $this->checkVisibility($link)
                 && $link->getHtml() == 'Edit this Advanced Search'
             ) {
                 $link->click();
@@ -93,22 +112,17 @@ class AdvancedSearchTest extends \VuFindTest\Unit\MinkTestCase
      *
      * @return void
      */
-    public function testAdvancedSearch()
+    public function testAdvancedSearchForm()
     {
-        // Go to the advanced search page
         $session = $this->getMinkSession();
-        $path = '/Search/Advanced';
-        $session->visit($this->getVuFindUrl() . $path);
-        $page = $session->getPage();
+        $page = $this->goToAdvancedSearch($session);
 
         // Add a group
         $session->executeScript("addGroup()");
-        $this->snooze();
         $this->findCss($page, '#group1');
 
         // Add a search term
         $session->executeScript("addSearch(0)"); // add_search_link_0 click
-        $this->snooze();
         $this->findCss($page, '#search0_3');
         // No visible x next to lonely search term
         $this->findCss($page, '#search1_0 .adv-term-remove.hidden');
@@ -132,7 +146,8 @@ class AdvancedSearchTest extends \VuFindTest\Unit\MinkTestCase
 
         // Check for proper search
         $this->assertEquals(
-            '(All Fields:bride AND Title:tomb AND All Fields:garbage AND Year of Publication:1883) AND (All Fields:miller)',
+            '(All Fields:bride AND Title:tomb AND All Fields:garbage AND Year of Publication:1883) AND '
+            . '(All Fields:miller)',
             $this->findCss($page, '.adv_search_terms strong')->getHtml()
         );
 
@@ -168,5 +183,142 @@ class AdvancedSearchTest extends \VuFindTest\Unit\MinkTestCase
         // Test edit search (modified search is restored properly)
         $this->editAdvancedSearch($page);
         $this->assertEquals('miller', $this->findCss($page, '#search_lookfor0_0')->getValue());
+
+        // Clear test
+        $multiSel = $this->findCss($page, '#limit_callnumber-first');
+        $multiSel->selectOption('~callnumber-first:"A - General Works"', true);
+        $multiSel->selectOption('~callnumber-first:"D - World History"', true);
+        $this->assertCount(2, $multiSel->getValue());
+
+        $this->findCss($page, '.adv-submit .clear-btn')->press();
+        $this->assertEquals('', $this->findCss($page, '#search_lookfor0_0')->getValue());
+        $this->assertCount(0, $multiSel->getValue());
+    }
+
+    /**
+     * Test that the advanced search form works correctly with a NOT group combined
+     * with another group.
+     *
+     * @return void
+     */
+    public function testAdvancedMultiGroupSearchWithNotOperator()
+    {
+        $session = $this->getMinkSession();
+        $page = $this->goToAdvancedSearch($session);
+
+        // Add a group
+        $session->executeScript("addGroup()");
+        $this->findCss($page, '#group1');
+
+        // Enter search criteria
+        $this->findCss($page, '#search_lookfor0_0')->setValue('building:"journals.mrc"');
+        $this->findCss($page, '#search_type1_0')->selectOption('Title');
+        $this->findCss($page, '#search_lookfor1_0')->setValue('rational');
+        $this->findCss($page, '#search_bool1')->selectOption('NOT');
+
+        // Submit search form
+        $this->findCss($page, '[type=submit]')->press();
+
+        // Check for proper search and result count
+        $this->assertEquals(
+            '(All Fields:building:"journals.mrc") NOT ((Title:rational))',
+            $this->findCss($page, '.adv_search_terms strong')->getHtml()
+        );
+        $this->assertMatchesRegularExpression(
+            '/Showing 1 - 7 results of 7, query time: .*/',
+            trim($this->findCss($page, '.search-stats')->getText())
+        );
+    }
+
+    /**
+     * Test that a pure NOT search gives us results.
+     *
+     * @return void
+     */
+    public function testAdvancedSingleGroupSearchWithNotOperator()
+    {
+        $session = $this->getMinkSession();
+        $page = $this->goToAdvancedSearch($session);
+
+        // Enter search criteria
+        $this->findCss($page, '#search_type0_0')->selectOption('Title');
+        $this->findCss($page, '#search_lookfor0_0')->setValue('rational');
+        $this->findCss($page, '#search_bool0')->selectOption('NOT');
+
+        // Submit search form
+        $this->findCss($page, '[type=submit]')->press();
+
+        // Check for proper search and result count
+        $this->assertEquals(
+            '() NOT ((Title:rational))',
+            $this->findCss($page, '.adv_search_terms strong')->getHtml()
+        );
+        preg_match(
+            '/Showing \d+ - \d+ results of (\d+), query time: .*/',
+            trim($this->findCss($page, '.search-stats')->getText()),
+            $matches
+        );
+        $this->assertTrue($matches[1] > 0);
+    }
+
+    /**
+     * Test default limit sorting
+     *
+     * @return void
+     */
+    public function testDefaultLimitSorting(): void
+    {
+        $session = $this->getMinkSession();
+        $page = $this->goToAdvancedSearch($session);
+        // By default, everything is sorted alphabetically:
+        $this->assertEquals(
+            'Article Book Book Chapter Conference Proceeding eBook Electronic Journal Microfilm Serial',
+            $this->findCss($page, "#limit_format")->getText()
+        );
+        // Change the language:
+        $this->clickCss($page, '.language.dropdown');
+        $this->clickCss($page, '.language.dropdown li:not(.active) a');
+        $this->waitForPageLoad($page);
+        // Still sorted alphabetically, even though in a different language:
+        $this->assertEquals(
+            'Artikel Buch Buchkapitel E-Book Elektronisch Mikrofilm Schriftenreihe Tagungsbericht Zeitschrift',
+            $this->findCss($page, "#limit_format")->getText()
+        );
+    }
+
+    /**
+     * Test limit sorting with order override
+     *
+     * @return void
+     */
+    public function testLimitSortingWithOrderOverride(): void
+    {
+        $this->changeConfigs(
+            [
+                'facets' => [
+                    'Advanced_Settings' => [
+                        'limitOrderOverride' => [
+                            'format' => 'Book::eBook',
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $session = $this->getMinkSession();
+        $page = $this->goToAdvancedSearch($session);
+        // By default, everything is sorted alphabetically:
+        $this->assertEquals(
+            'Book eBook Article Book Chapter Conference Proceeding Electronic Journal Microfilm Serial',
+            $this->findCss($page, "#limit_format")->getText()
+        );
+        // Change the language:
+        $this->clickCss($page, '.language.dropdown');
+        $this->clickCss($page, '.language.dropdown li:not(.active) a');
+        $this->waitForPageLoad($page);
+        // Still sorted alphabetically, even though in a different language:
+        $this->assertEquals(
+            'Buch E-Book Artikel Buchkapitel Elektronisch Mikrofilm Schriftenreihe Tagungsbericht Zeitschrift',
+            $this->findCss($page, "#limit_format")->getText()
+        );
     }
 }

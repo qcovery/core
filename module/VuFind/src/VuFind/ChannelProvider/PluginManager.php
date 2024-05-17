@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Channel provider plugin manager
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ChannelProvider;
 
 /**
@@ -44,14 +46,14 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'alphabrowse' => 'VuFind\ChannelProvider\AlphaBrowse',
-        'facets' => 'VuFind\ChannelProvider\Facets',
-        'listitems' => 'VuFind\ChannelProvider\ListItems',
-        'newilsitems' => 'VuFind\ChannelProvider\NewILSItems',
-        'random' => 'VuFind\ChannelProvider\Random',
-        'recentlyreturned' => 'VuFind\ChannelProvider\RecentlyReturned',
-        'similaritems' => 'VuFind\ChannelProvider\SimilarItems',
-        'trendingilsitems' => 'VuFind\ChannelProvider\TrendingILSItems',
+        'alphabrowse' => AlphaBrowse::class,
+        'facets' => Facets::class,
+        'listitems' => ListItems::class,
+        'newilsitems' => NewILSItems::class,
+        'random' => Random::class,
+        'recentlyreturned' => RecentlyReturned::class,
+        'similaritems' => SimilarItems::class,
+        'trendingilsitems' => TrendingILSItems::class,
     ];
 
     /**
@@ -60,22 +62,14 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\ChannelProvider\AlphaBrowse' =>
-            'VuFind\ChannelProvider\Factory::getAlphaBrowse',
-        'VuFind\ChannelProvider\Facets' =>
-            'VuFind\ChannelProvider\Factory::getFacets',
-        'VuFind\ChannelProvider\ListItems' =>
-            'VuFind\ChannelProvider\Factory::getListItems',
-        'VuFind\ChannelProvider\NewILSItems' =>
-            'VuFind\ChannelProvider\AbstractILSChannelProviderFactory',
-        'VuFind\ChannelProvider\Random' =>
-            'VuFind\ChannelProvider\Factory::getRandom',
-        'VuFind\ChannelProvider\RecentlyReturned' =>
-            'VuFind\ChannelProvider\AbstractILSChannelProviderFactory',
-        'VuFind\ChannelProvider\SimilarItems' =>
-            'VuFind\ChannelProvider\Factory::getSimilarItems',
-        'VuFind\ChannelProvider\TrendingILSItems' =>
-            'VuFind\ChannelProvider\AbstractILSChannelProviderFactory',
+        AlphaBrowse::class => AlphaBrowseFactory::class,
+        Facets::class => FacetsFactory::class,
+        ListItems::class => ListItemsFactory::class,
+        NewILSItems::class => AbstractILSChannelProviderFactory::class,
+        Random::class => RandomFactory::class,
+        RecentlyReturned::class => AbstractILSChannelProviderFactory::class,
+        SimilarItems::class => SimilarItemsFactory::class,
+        TrendingILSItems::class => AbstractILSChannelProviderFactory::class,
     ];
 
     /**
@@ -87,10 +81,11 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @param array $v3config                  If $configOrContainerInstance is a
      * container, this value will be passed to the parent constructor.
      */
-    public function __construct($configOrContainerInstance = null,
+    public function __construct(
+        $configOrContainerInstance = null,
         array $v3config = []
     ) {
-        $this->addInitializer('VuFind\ChannelProvider\RouterInitializer');
+        $this->addInitializer(RouterInitializer::class);
         parent::__construct($configOrContainerInstance, $v3config);
     }
 
@@ -102,6 +97,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\ChannelProvider\ChannelProviderInterface';
+        return ChannelProviderInterface::class;
     }
 }

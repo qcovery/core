@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Row Definition for oai_resumption
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Db\Row;
 
 /**
@@ -35,13 +37,17 @@ namespace VuFind\Db\Row;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
+ *
+ * @property int    $id
+ * @property string $params
+ * @property string $expires
  */
 class OaiResumption extends RowGateway
 {
     /**
      * Constructor
      *
-     * @param \Zend\Db\Adapter\Adapter $adapter Database adapter
+     * @param \Laminas\Db\Adapter\Adapter $adapter Database adapter
      */
     public function __construct($adapter)
     {
@@ -58,7 +64,7 @@ class OaiResumption extends RowGateway
         $parts = explode('&', $this->params);
         $params = [];
         foreach ($parts as $part) {
-            list($key, $value) = explode('=', $part);
+            [$key, $value] = explode('=', $part);
             $key = urldecode($key);
             $value = urldecode($value);
             $params[$key] = $value;

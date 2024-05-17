@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Action Helper - ILL Requests Support Methods
  *
@@ -27,10 +28,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Controller\Plugin;
 
 /**
- * Zend action helper to perform ILL request related actions
+ * Action helper to perform ILL request related actions
  *
  * @category VuFind
  * @package  Controller_Plugins
@@ -57,7 +59,8 @@ class ILLRequests extends AbstractRequestBase
     {
         // Generate form details for cancelling requests if enabled
         if ($cancelStatus) {
-            if ($cancelStatus['function'] == 'getCancelILLRequestsLink'
+            if (
+                $cancelStatus['function'] == 'getCancelILLRequestsLink'
             ) {
                 // Build OPAC URL
                 $ilsDetails['cancel_link']
@@ -121,7 +124,7 @@ class ILLRequests extends AbstractRequestBase
                         'confirm_ill_request_cancel_all_text',
                         [
                             'cancelAll' => 1,
-                            'cancelAllIDS' => $params->fromPost('cancelAllIDS')
+                            'cancelAllIDS' => $params->fromPost('cancelAllIDS'),
                         ]
                     );
                 } else {
@@ -133,7 +136,7 @@ class ILLRequests extends AbstractRequestBase
                         [
                             'cancelSelected' => 1,
                             'cancelSelectedIDS' =>
-                                $params->fromPost('cancelSelectedIDS')
+                                $params->fromPost('cancelSelectedIDS'),
                         ]
                     );
                 }
@@ -141,7 +144,7 @@ class ILLRequests extends AbstractRequestBase
 
             foreach ($details as $info) {
                 // If the user input contains a value not found in the session
-                // whitelist, something has been tampered with -- abort the process.
+                // legal list, something has been tampered with -- abort the process.
                 if (!in_array($info, $this->getSession()->validIds)) {
                     $flashMsg->addMessage('error_inconsistent_parameters', 'error');
                     return [];

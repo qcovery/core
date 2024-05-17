@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AuthorityRecommend Recommendations Module
  *
@@ -26,10 +27,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Recommend;
 
+use Laminas\Stdlib\Parameters;
 use VuFindSearch\Backend\Exception\RequestErrorException;
-use Zend\StdLib\Parameters;
 
 /**
  * AuthorityRecommend Module
@@ -101,6 +103,13 @@ class AuthorityRecommend implements RecommendInterface
     protected $mode = '*';
 
     /**
+     * Header to use in the user interface.
+     *
+     * @var string
+     */
+    protected $header = 'See also';
+
+    /**
      * Constructor
      *
      * @param \VuFind\Search\Results\PluginManager $results Results plugin manager
@@ -126,6 +135,8 @@ class AuthorityRecommend implements RecommendInterface
                     $this->resultLimit = intval($params[$i + 1]);
                 } elseif ($params[$i] == '__mode__') {
                     $this->mode = strtolower($params[$i + 1]);
+                } elseif ($params[$i] == '__header__') {
+                    $this->header = $params[$i + 1];
                 } else {
                     $this->filters[] = $params[$i] . ':' . $params[$i + 1];
                 }
@@ -134,13 +145,14 @@ class AuthorityRecommend implements RecommendInterface
     }
 
     /**
-     * Called at the end of the Search Params objects' initFromRequest() method.
+     * Called before the Search Results object performs its main search
+     * (specifically, in response to \VuFind\Search\SearchRunner::EVENT_CONFIGURED).
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
      * be needed.
      *
      * @param \VuFind\Search\Base\Params $params  Search parameter object
-     * @param \Zend\StdLib\Parameters    $request Parameter object representing user
+     * @param Parameters                 $request Parameter object representing user
      * request.
      *
      * @return void
@@ -212,7 +224,7 @@ class AuthorityRecommend implements RecommendInterface
             'type0' => ['Heading'],
             'bool1' => ['NOT'],
             'lookfor1' => [$this->lookfor],
-            'type1' => ['MainHeading']
+            'type1' => ['MainHeading'],
         ];
 
         // loop through records and assign id and headings to separate arrays defined
@@ -232,7 +244,7 @@ class AuthorityRecommend implements RecommendInterface
         // Build a simple "MainHeading" search.
         $params = [
             'lookfor' => [$this->lookfor],
-            'type' => ['MainHeading']
+            'type' => ['MainHeading'],
         ];
 
         // loop through records and assign id and headings to separate arrays defined
@@ -272,13 +284,19 @@ class AuthorityRecommend implements RecommendInterface
     {
         $this->results = $results;
 
+        // empty searches such as New Items will return blank
+        if ($this->lookfor == null) {
+            return;
+        }
+
         // function will return blank on Advanced Search
         if ($results->getParams()->getSearchType() == 'advanced') {
             return;
         }
 
         // check result limit before proceeding...
-        if ($this->resultLimit > 0
+        if (
+            $this->resultLimit > 0
             && $this->resultLimit < $results->getResultTotal()
         ) {
             return;
@@ -293,6 +311,16 @@ class AuthorityRecommend implements RecommendInterface
         if ($this->isModeActive('seealso')) {
             $this->addSeeAlsoReferences();
         }
+    }
+
+    /**
+     * Get the header to display in the user interface.
+     *
+     * @return string
+     */
+    public function getHeader()
+    {
+        return $this->header;
     }
 
     /**

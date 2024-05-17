@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EuropeanaResultsDeferred recommendation module Test Class
  *
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Recommend;
+
+use VuFind\Recommend\EuropeanaResultsDeferred;
 
 /**
  * EuropeanaResultsDeferred recommendation module Test Class
@@ -45,7 +49,7 @@ class EuropeanaResultsDeferredTest extends \VuFindTest\Unit\RecommendDeferredTes
      */
     public function testStandardOperation()
     {
-        $mod = $this->getRecommend('VuFind\Recommend\EuropeanaResultsDeferred');
+        $mod = $this->getRecommend(EuropeanaResultsDeferred::class);
         $this->assertEquals(
             'mod=EuropeanaResults&params=%3A%3A%3A&lookfor=foo',
             $mod->getUrlParams()

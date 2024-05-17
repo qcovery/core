@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS aware delegator factory
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:session_handlers Wiki
  */
+
 namespace VuFind\RecordDriver;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
+use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * ILS aware delegator factory
@@ -53,18 +55,21 @@ class IlsAwareDelegatorFactory implements DelegatorFactoryInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $name,
-        callable $callback, array $options = null
+    public function __invoke(
+        ContainerInterface $container,
+        $name,
+        callable $callback,
+        array $options = null
     ) {
         $driver = call_user_func($callback);
 
         // Attach the ILS if at least one backend supports it:
         $ilsBackends = $this->getIlsBackends($container);
-        if (!empty($ilsBackends) && $container->has('VuFind\ILS\Connection')) {
+        if (!empty($ilsBackends) && $container->has(\VuFind\ILS\Connection::class)) {
             $driver->attachILS(
-                $container->get('VuFind\ILS\Connection'),
-                $container->get('VuFind\ILS\Logic\Holds'),
-                $container->get('VuFind\ILS\Logic\TitleHolds')
+                $container->get(\VuFind\ILS\Connection::class),
+                $container->get(\VuFind\ILS\Logic\Holds::class),
+                $container->get(\VuFind\ILS\Logic\TitleHolds::class)
             );
             $driver->setIlsBackends($ilsBackends);
         }
@@ -84,7 +89,8 @@ class IlsAwareDelegatorFactory implements DelegatorFactoryInterface
         // Get a list of ILS-compatible backends.
         static $ilsBackends = null;
         if (!is_array($ilsBackends)) {
-            $config = $container->get('VuFind\Config\PluginManager')->get('config');
+            $config = $container->get(\VuFind\Config\PluginManager::class)
+                ->get('config');
             $settings = isset($config->Catalog) ? $config->Catalog->toArray() : [];
 
             // If the setting is missing, default to the default backend; if it

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cover Controller
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Controller;
 
 use VuFind\Cover\CachingProxy;
@@ -40,7 +42,7 @@ use VuFind\Session\Settings as SessionSettings;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-class CoverController extends \Zend\Mvc\Controller\AbstractActionController
+class CoverController extends \Laminas\Mvc\Controller\AbstractActionController
 {
     /**
      * Cover loader
@@ -70,7 +72,9 @@ class CoverController extends \Zend\Mvc\Controller\AbstractActionController
      * @param CachingProxy    $proxy  Proxy loader
      * @param SessionSettings $ss     Session settings
      */
-    public function __construct(Loader $loader, CachingProxy $proxy,
+    public function __construct(
+        Loader $loader,
+        CachingProxy $proxy,
         SessionSettings $ss
     ) {
         $this->loader = $loader;
@@ -86,9 +90,16 @@ class CoverController extends \Zend\Mvc\Controller\AbstractActionController
     protected function getImageParams()
     {
         $params = $this->params();  // shortcut for readability
+        $isbns = null;
+        // Legacy support for "isn", "isbn" param which has been superseded by isbns:
+        foreach (['isbns', 'isbn', 'isn'] as $identification) {
+            if ($isbns = $params()->fromQuery($identification)) {
+                $isbns = (array)$isbns;
+                break;
+            }
+        }
         return [
-            // Legacy support for "isn" param which has been superseded by isbn:
-            'isbn' => $params()->fromQuery('isbn') ?: $params()->fromQuery('isn'),
+            'isbns' => $isbns,
             'size' => $params()->fromQuery('size'),
             'type' => $params()->fromQuery('contenttype'),
             'title' => $params()->fromQuery('title'),
@@ -99,13 +110,15 @@ class CoverController extends \Zend\Mvc\Controller\AbstractActionController
             'upc' => $params()->fromQuery('upc'),
             'recordid' => $params()->fromQuery('recordid'),
             'source' => $params()->fromQuery('source'),
+            'nbn' => $params()->fromQuery('nbn'),
+            'ismn' => $params()->fromQuery('ismn'),
         ];
     }
 
     /**
      * Send image data for display in the view
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     public function showAction()
     {
@@ -137,7 +150,7 @@ class CoverController extends \Zend\Mvc\Controller\AbstractActionController
     /**
      * Return the default 'image not found' information
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     public function unavailableAction()
     {
@@ -153,14 +166,15 @@ class CoverController extends \Zend\Mvc\Controller\AbstractActionController
      * @param string $type  Content type of image (null to access loader)
      * @param string $image Image data (null to access loader)
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     protected function displayImage($type = null, $image = null)
     {
         $response = $this->getResponse();
         $headers = $response->getHeaders();
         $headers->addHeaderLine(
-            'Content-type', $type ?: $this->loader->getContentType()
+            'Content-type',
+            $type ?: $this->loader->getContentType()
         );
 
         // Send proper caching headers so that the user's browser
@@ -169,13 +183,16 @@ class CoverController extends \Zend\Mvc\Controller\AbstractActionController
 
         $coverImageTtl = (60 * 60 * 24 * 14); // 14 days
         $headers->addHeaderLine(
-            'Cache-Control', "maxage=" . $coverImageTtl
+            'Cache-Control',
+            "maxage=" . $coverImageTtl
         );
         $headers->addHeaderLine(
-            'Pragma', 'public'
+            'Pragma',
+            'public'
         );
         $headers->addHeaderLine(
-            'Expires', gmdate('D, d M Y H:i:s', time() + $coverImageTtl) . ' GMT'
+            'Expires',
+            gmdate('D, d M Y H:i:s', time() + $coverImageTtl) . ' GMT'
         );
 
         $response->setContent($image ?: $this->loader->getImage());

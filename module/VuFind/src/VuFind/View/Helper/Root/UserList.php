@@ -1,4 +1,5 @@
 <?php
+
 /**
  * List view helper
  *
@@ -25,9 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Session\Container;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * List view helper
@@ -50,18 +53,18 @@ class UserList extends AbstractHelper
     /**
      * Session container for last list information.
      *
-     * @var \Zend\Session\Container
+     * @var Container
      */
     protected $session;
 
     /**
      * Constructor
      *
-     * @param \Zend\Session\Container $session Session container (must use same
-     * namespace as container provided to \VuFind\Db\Table\UserList)
-     * @param string                  $mode    List mode (enabled or disabled)
+     * @param Container $session Session container (must use same namespace as
+     * container provided to \VuFind\Db\Table\UserList)
+     * @param string    $mode    List mode (enabled or disabled)
      */
-    public function __construct(\Zend\Session\Container $session, $mode = 'enabled')
+    public function __construct(Container $session, $mode = 'enabled')
     {
         $this->mode = $mode;
         $this->session = $session;
@@ -84,6 +87,6 @@ class UserList extends AbstractHelper
      */
     public function lastUsed()
     {
-        return isset($this->session->lastUsed) ? $this->session->lastUsed : null;
+        return $this->session->lastUsed ?? null;
     }
 }

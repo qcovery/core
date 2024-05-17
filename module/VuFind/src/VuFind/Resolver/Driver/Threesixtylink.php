@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 360Link Link Resolver Driver
  *
@@ -27,6 +28,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
+
 namespace VuFind\Resolver\Driver;
 
 use DOMDocument;
@@ -46,17 +48,17 @@ class Threesixtylink extends AbstractBase
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $httpClient;
 
     /**
      * Constructor
      *
-     * @param string            $baseUrl    Base URL for link resolver
-     * @param \Zend\Http\Client $httpClient HTTP client
+     * @param string               $baseUrl    Base URL for link resolver
+     * @param \Laminas\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient)
+    public function __construct($baseUrl, \Laminas\Http\Client $httpClient)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
@@ -106,19 +108,22 @@ class Threesixtylink extends AbstractBase
                 $record = [];
                 // select the deepest link returned
                 $elems = $xpath->query(
-                    ".//ssopenurl:url[@type='article']", $linkGroup
+                    ".//ssopenurl:url[@type='article']",
+                    $linkGroup
                 );
                 if ($elems->length > 0) {
                     $record['linktype'] = 'article';
                 } else {
                     $elems = $xpath->query(
-                        ".//ssopenurl:url[@type='journal']", $linkGroup
+                        ".//ssopenurl:url[@type='journal']",
+                        $linkGroup
                     );
                     if ($elems->length > 0) {
                         $record['linktype'] = 'journal';
                     } else {
                         $elems = $xpath->query(
-                            ".//ssopenurl:url[@type='source']", $linkGroup
+                            ".//ssopenurl:url[@type='source']",
+                            $linkGroup
                         );
                         if ($elems->length > 0) {
                             $record['linktype'] = 'source';
@@ -133,22 +138,26 @@ class Threesixtylink extends AbstractBase
                     $record['service_type'] = 'getHolding';
                 }
                 $elems = $xpath->query(
-                    ".//ssopenurl:holdingData/ssopenurl:providerName", $linkGroup
+                    ".//ssopenurl:holdingData/ssopenurl:providerName",
+                    $linkGroup
                 );
                 $title = $elems->item(0)->textContent;
                 $elems = $xpath->query(
-                    ".//ssopenurl:holdingData/ssopenurl:databaseName", $linkGroup
+                    ".//ssopenurl:holdingData/ssopenurl:databaseName",
+                    $linkGroup
                 );
                 $title .= ' - ' . $elems->item(0)->textContent;
                 $record['title'] = $title;
                 $elems = $xpath->query(
-                    ".//ssopenurl:holdingData/ssopenurl:startDate", $linkGroup
+                    ".//ssopenurl:holdingData/ssopenurl:startDate",
+                    $linkGroup
                 );
                 if ($elems->length > 0) {
                     $record['coverage'] = $elems->item(0)->textContent . ' - ';
                 }
                 $elems = $xpath->query(
-                    ".//ssopenurl:holdingData/ssopenurl:endDate", $linkGroup
+                    ".//ssopenurl:holdingData/ssopenurl:endDate",
+                    $linkGroup
                 );
                 if ($elems->length > 0) {
                     $record['coverage'] .= $elems->item(0)->textContent;

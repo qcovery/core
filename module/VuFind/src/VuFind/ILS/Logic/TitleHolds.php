@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Title Hold Logic Class
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ILS\Logic;
 
 use VuFind\Exception\ILS as ILSException;
@@ -67,7 +69,7 @@ class TitleHolds
     /**
      * VuFind configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -84,10 +86,13 @@ class TitleHolds
      * @param \VuFind\Auth\ILSAuthenticator $ilsAuth ILS authenticator
      * @param ILSConnection                 $ils     A catalog connection
      * @param \VuFind\Crypt\HMAC            $hmac    HMAC generator
-     * @param \Zend\Config\Config           $config  VuFind configuration
+     * @param \Laminas\Config\Config        $config  VuFind configuration
      */
-    public function __construct(\VuFind\Auth\ILSAuthenticator $ilsAuth,
-        ILSConnection $ils, \VuFind\Crypt\HMAC $hmac, \Zend\Config\Config $config
+    public function __construct(
+        \VuFind\Auth\ILSAuthenticator $ilsAuth,
+        ILSConnection $ils,
+        \VuFind\Crypt\HMAC $hmac,
+        \Laminas\Config\Config $config
     ) {
         $this->ilsAuth = $ilsAuth;
         $this->hmac = $hmac;
@@ -155,7 +160,7 @@ class TitleHolds
         static $holdings = [];
 
         if (!isset($holdings[$id])) {
-            $holdings[$id] = $this->catalog->getHolding($id);
+            $holdings[$id] = $this->catalog->getHolding($id)['holdings'];
         }
         return $holdings[$id];
     }
@@ -171,7 +176,8 @@ class TitleHolds
      */
     protected function checkOverrideMode($id, $mode)
     {
-        if (isset($this->config->Catalog->allow_holds_override)
+        if (
+            isset($this->config->Catalog->allow_holds_override)
             && $this->config->Catalog->allow_holds_override
         ) {
             $holdings = $this->getHoldings($id);
@@ -181,7 +187,8 @@ class TitleHolds
             // may eventually want to address other scenarios as well.
             $allDisabled = true;
             foreach ($holdings as $holding) {
-                if (!isset($holding['holdOverride'])
+                if (
+                    !isset($holding['holdOverride'])
                     || 'disabled' != $holding['holdOverride']
                 ) {
                     $allDisabled = false;
@@ -204,13 +211,15 @@ class TitleHolds
     {
         // Get Hold Details
         $checkHolds = $this->catalog->checkFunction(
-            'Holds', compact('id', 'patron')
+            'Holds',
+            compact('id', 'patron')
         );
 
         if (isset($checkHolds['HMACKeys'])) {
             $data = ['id' => $id, 'level' => 'title'];
             $result = $this->catalog->checkRequestIsValid($id, $data, $patron);
-            if ((is_array($result) && $result['valid'])
+            if (
+                (is_array($result) && $result['valid'])
                 || (is_bool($result) && $result)
             ) {
                 return $this->getHoldDetails($data, $checkHolds['HMACKeys']);
@@ -236,12 +245,13 @@ class TitleHolds
 
         $data = [
             'id' => $id,
-            'level' => 'title'
+            'level' => 'title',
         ];
 
         // Are holds allows?
         $checkHolds = $this->catalog->checkFunction(
-            'Holds', compact('id', 'patron')
+            'Holds',
+            compact('id', 'patron')
         );
 
         if ($checkHolds != false) {
@@ -250,7 +260,8 @@ class TitleHolds
             } elseif ($type == 'availability') {
                 $holdings = $this->getHoldings($id);
                 foreach ($holdings as $holding) {
-                    if ($holding['availability']
+                    if (
+                        $holding['availability']
                         && !in_array($holding['location'], $this->hideHoldings)
                     ) {
                         $any_available = true;
@@ -288,6 +299,7 @@ class TitleHolds
         $HMACkey = $this->hmac->generate($HMACKeys, $data);
 
         // Add Params
+        $queryString = [];
         foreach ($data as $key => $param) {
             $needle = in_array($key, $HMACKeys);
             if ($needle) {
@@ -302,7 +314,7 @@ class TitleHolds
         // Build Params
         return [
             'action' => 'Hold', 'record' => $data['id'], 'query' => $queryString,
-            'anchor' => '#tabnav'
+            'anchor' => '#tabnav',
         ];
     }
 }

@@ -28,6 +28,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Backend\Solr;
 
 use VuFindSearch\Backend\Solr\SimilarBuilder;
@@ -42,7 +43,7 @@ use VuFindSearch\Backend\Solr\SimilarBuilder;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
-class SimilarBuilderTest extends \VuFindTest\Unit\TestCase
+class SimilarBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test builder with default params.
@@ -83,16 +84,16 @@ class SimilarBuilderTest extends \VuFindTest\Unit\TestCase
     {
         $config = [
             'MoreLikeThis' => [
-                'count' => 10
-            ]
+                'count' => 10,
+            ],
         ];
-        $sb = new SimilarBuilder(new \Zend\Config\Config($config));
+        $sb = new SimilarBuilder(new \Laminas\Config\Config($config));
         $response = $sb->build('testrecord');
         $rows = $response->get('rows');
         $this->assertEquals(10, $rows[0]);
 
         $config['MoreLikeThis']['useMoreLikeThisHandler'] = true;
-        $sb = new SimilarBuilder(new \Zend\Config\Config($config));
+        $sb = new SimilarBuilder(new \Laminas\Config\Config($config));
         $response = $sb->build('testrecord');
         $rows = $response->get('rows');
         $this->assertEquals(10, $rows[0]);
@@ -106,7 +107,7 @@ class SimilarBuilderTest extends \VuFindTest\Unit\TestCase
         $this->assertEquals(null, $qt);
 
         $config['MoreLikeThis']['params'] = 'qf=title,topic';
-        $sb = new SimilarBuilder(new \Zend\Config\Config($config));
+        $sb = new SimilarBuilder(new \Laminas\Config\Config($config));
         $response = $sb->build('testrecord');
         $q = $response->get('q');
         $this->assertEquals('{!mlt qf=title,topic}testrecord', $q[0]);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Secure session delegator factory
  *
@@ -27,11 +28,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:session_handlers Wiki
  */
+
 namespace VuFind\Session;
 
-use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
-use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Secure session delegator factory
@@ -58,7 +60,9 @@ class SecureDelegatorFactory implements DelegatorFactoryInterface
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(
-        ContainerInterface $container, $name, callable $callback,
+        ContainerInterface $container,
+        $name,
+        callable $callback,
         array $options = null
     ): HandlerInterface {
         /**
@@ -67,7 +71,7 @@ class SecureDelegatorFactory implements DelegatorFactoryInterface
          * @var HandlerInterface $handler
          */
         $handler = call_user_func($callback);
-        $config = $container->get('VuFind\Config\PluginManager');
+        $config = $container->get(\VuFind\Config\PluginManager::class);
         $secure = $config->get('config')->Session->secure ?? false;
         return $secure ? $this->delegate($container, $handler) : $handler;
     }
@@ -81,10 +85,11 @@ class SecureDelegatorFactory implements DelegatorFactoryInterface
      * @return HandlerInterface
      */
     protected function delegate(
-        ContainerInterface $container, HandlerInterface $handler
+        ContainerInterface $container,
+        HandlerInterface $handler
     ): HandlerInterface {
-        $cookieManager = $container->get('VuFind\Cookie\CookieManager');
-        $config = $container->get('ProxyManager\Configuration');
+        $cookieManager = $container->get(\VuFind\Cookie\CookieManager::class);
+        $config = $container->get(\ProxyManager\Configuration::class);
         $factory = new LazyLoadingValueHolderFactory($config);
         $delegator = new SecureDelegator($cookieManager, $handler);
         /**
@@ -93,8 +98,13 @@ class SecureDelegatorFactory implements DelegatorFactoryInterface
          * @var HandlerInterface $handler
          */
         $handler = $factory->createProxy(
-            HandlerInterface::class, function (
-                &$target, $proxy, $method, array $params, &$init
+            HandlerInterface::class,
+            function (
+                &$target,
+                $proxy,
+                $method,
+                array $params,
+                &$init
             ) use ($delegator) {
                 $init = null;
                 $target = $delegator;

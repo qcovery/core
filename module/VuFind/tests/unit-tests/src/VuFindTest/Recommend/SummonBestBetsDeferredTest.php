@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SummonBestBetsDeferred recommendation module Test Class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Recommend;
 
 /**
@@ -47,7 +49,8 @@ class SummonBestBetsDeferredTest extends \VuFindTest\Unit\RecommendDeferredTestC
     {
         $this->assertEquals(
             'mod=SummonBestBets&params=lookfor&lookfor=foo',
-            $this->getRecommend('VuFind\Recommend\SummonBestBetsDeferred')->getUrlParams()
+            $this->getRecommend(\VuFind\Recommend\SummonBestBetsDeferred::class)
+                ->getUrlParams()
         );
     }
 }

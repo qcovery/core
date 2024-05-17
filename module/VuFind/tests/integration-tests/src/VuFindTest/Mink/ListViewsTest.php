@@ -1,4 +1,5 @@
 <?php
+
 /**
  * List views (i.e. tabs/accordion) test class.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://www.vufind.org  Main Page
  */
+
 namespace VuFindTest\Mink;
 
 use Behat\Mink\Element\Element;
@@ -32,37 +34,28 @@ use Behat\Mink\Element\Element;
 /**
  * List views (i.e. tabs/accordion) test class.
  *
+ * Class must be final due to use of "new static()" by LiveDatabaseTrait.
+ *
  * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://www.vufind.org  Main Page
+ * @retry    4
  */
-class ListViewsTest extends \VuFindTest\Unit\MinkTestCase
+final class ListViewsTest extends \VuFindTest\Integration\MinkTestCase
 {
-    use \VuFindTest\Unit\UserCreationTrait;
-
-    /**
-     * Standard setup method.
-     *
-     * @return mixed
-     */
-    public static function setUpBeforeClass()
-    {
-        return static::failIfUsersExist();
-    }
+    use \VuFindTest\Feature\LiveDatabaseTrait;
+    use \VuFindTest\Feature\UserCreationTrait;
 
     /**
      * Standard setup method.
      *
      * @return void
      */
-    public function setUp()
+    public static function setUpBeforeClass(): void
     {
-        // Give up if we're not running in CI:
-        if (!$this->continuousIntegrationRunning()) {
-            return $this->markTestSkipped('Continuous integration not running.');
-        }
+        static::failIfDataExists();
     }
 
     /**
@@ -77,8 +70,8 @@ class ListViewsTest extends \VuFindTest\Unit\MinkTestCase
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('id:testdeweybrowse');
-        $this->findCss($page, '.btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.btn.btn-primary');
+        $this->waitForPageLoad($page);
         return $page;
     }
 
@@ -91,13 +84,18 @@ class ListViewsTest extends \VuFindTest\Unit\MinkTestCase
     protected function gotoRecord()
     {
         $page = $this->gotoSearch();
-        $this->findCss($page, '.result a.title')->click();
-        $this->snooze();
+        $this->clickCss($page, '.result a.title');
+        $this->waitForPageLoad($page);
         return $page;
     }
 
     /**
      * Test that we can save a favorite from tab mode.
+     *
+     * @retryCallback tearDownAfterClass
+     *
+     * @skip_html_validation true
+     * @todo                 Enable HTML validation when the issues are fixed in the upstream code
      *
      * @return void
      */
@@ -111,25 +109,29 @@ class ListViewsTest extends \VuFindTest\Unit\MinkTestCase
         $page = $this->gotoRecord();
 
         // Click save inside the tools tab
-        $this->findCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a')->click();
-        $this->findCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a-content .save-record')->click();
+        $this->clickCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a');
+        $this->clickCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a-content .save-record');
         // Make an account
-        $this->findCss($page, '.modal-body .createAccountLink')->click();
+        $this->clickCss($page, '.modal-body .createAccountLink');
         $this->fillInAccountForm($page);
-        $this->findCss($page, '.modal-body .btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.modal-body .btn.btn-primary');
         $this->findCss($page, '#save_list');
         // Save to list
-        $this->findCss($page, '.modal-body .btn.btn-primary')->click();
-        $this->snooze();
-        $this->findCss($page, '#modal .close')->click();
-        $this->snooze();
+        $this->clickCss($page, '.modal-body .btn.btn-primary');
+        $this->closeLightbox($page);
+        $this->waitForPageLoad($page);
         // Check saved items status
+        $this->clickCss($page, '#information_cd588d8723d65ca0ce9439e79755fa0a');
         $this->findCss($page, '#information_cd588d8723d65ca0ce9439e79755fa0a-content .savedLists ul');
     }
 
     /**
      * Test that we can save a favorite from accordion mode.
+     *
+     * @depends testFavoritesInTabMode
+     *
+     * @skip_html_validation true
+     * @todo                 Enable HTML validation when the issues are fixed in the upstream code
      *
      * @return void
      */
@@ -143,26 +145,23 @@ class ListViewsTest extends \VuFindTest\Unit\MinkTestCase
         $page = $this->gotoRecord();
 
         // Click save inside the tools tab
-        $this->findCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a')->click();
-        $this->findCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a-content .save-record')->click();
-        $this->snooze();
+        $this->clickCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a');
+        $this->clickCss($page, '#tools_cd588d8723d65ca0ce9439e79755fa0a-content .save-record');
         // Login
         $this->fillInLoginForm($page, 'username1', 'test');
         $this->submitLoginForm($page);
         // Make list
-        $this->findCss($page, '#make-list')->click();
-        $this->snooze();
+        $this->clickCss($page, '#make-list');
         $this->findCss($page, '#list_title')->setValue('Test List');
         $this->findCss($page, '#list_desc')->setValue('Just. THE BEST.');
-        $this->findCss($page, '.modal-body .btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.modal-body .btn.btn-primary');
         // Save to list
-        $this->findCss($page, '.modal-body .btn.btn-primary')->click();
-        $this->snooze();
-        $this->findCss($page, '#modal .close')->click();
-        $this->snooze();
+        $this->clickCss($page, '.modal-body .btn.btn-primary');
+        $this->closeLightbox($page);
         // Check saved items status
         // Not visible, but still exists
+        $this->clickCss($page, '#information_cd588d8723d65ca0ce9439e79755fa0a');
+        $this->waitForPageLoad($page);
         $this->findCss($page, '#information_cd588d8723d65ca0ce9439e79755fa0a-content .savedLists ul');
     }
 
@@ -182,26 +181,28 @@ class ListViewsTest extends \VuFindTest\Unit\MinkTestCase
         $this->findCss($page, '.result.embedded');
 
         // Close it
-        $this->findCss($page, '.result a.title')->click();
+        $this->waitForPageLoad($page);
+        $this->clickCss($page, '.result a.title');
         // Did our result stay closed?
+        $this->waitForPageLoad($page);
         $session->reload();
-        $result = $page->find('css', '.result.embedded');
-        $this->assertFalse(is_object($result));
+        $this->unFindCss($page, '.result.embedded');
 
         // Open it
-        $this->findCss($page, '.result a.title')->click();
-        $this->snooze();
+        $this->clickCss($page, '.result a.title');
+        $this->waitForPageLoad($page);
         // Search for anything else
         $session->visit($this->getVuFindUrl() . '/Search/Home');
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('anything else');
-        $this->findCss($page, '.btn.btn-primary')->click();
+        $this->clickCss($page, '.btn.btn-primary');
+        $this->waitForPageLoad($page);
         // Come back
         $page = $this->gotoSearch();
         // Did our result close after not being being in the last search?
         $result = $page->find('css', '.result.embedded');
-        $this->assertFalse(is_object($result));
+        $this->assertIsNotObject($result);
     }
 
     /**
@@ -237,7 +238,7 @@ class ListViewsTest extends \VuFindTest\Unit\MinkTestCase
      *
      * @return void
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::removeUsers(['username1']);
     }

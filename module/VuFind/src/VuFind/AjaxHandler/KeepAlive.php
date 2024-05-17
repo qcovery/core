@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Keep Alive" AJAX handler
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\Session\SessionManager;
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\Session\SessionManager;
 
 /**
  * "Keep Alive" AJAX handler

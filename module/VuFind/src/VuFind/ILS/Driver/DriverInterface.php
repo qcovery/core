@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface for ILS Drivers
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
+
 namespace VuFind\ILS\Driver;
 
 /**
@@ -101,15 +103,16 @@ interface DriverInterface
      * This is responsible for retrieving the holding information of a certain
      * record.
      *
-     * @param string $id     The record id to retrieve the holdings for
-     * @param array  $patron Patron data
+     * @param string $id      The record id to retrieve the holdings for
+     * @param array  $patron  Patron data
+     * @param array  $options Extra options
      *
      * @throws \VuFind\Exception\ILS
      * @return array         On success, an associative array with the following
      * keys: id, availability (boolean), status, location, reserve, callnumber,
      * duedate, number, barcode.
      */
-    public function getHolding($id, array $patron = null);
+    public function getHolding($id, array $patron = null, array $options = []);
 
     /**
      * Get Purchase History

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Summon Record Controller
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Controller;
 
-use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Mvc\MvcEvent;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Summon Record Controller
@@ -49,7 +51,7 @@ class SummonrecordController extends AbstractRecord
     public function __construct(ServiceLocatorInterface $sm)
     {
         // Override some defaults:
-        $this->searchClassId = 'Summon';
+        $this->sourceId = 'Summon';
         $this->fallbackDefaultTab = 'Description';
 
         // Call standard record controller initialization:
@@ -63,7 +65,7 @@ class SummonrecordController extends AbstractRecord
      */
     protected function resultScrollerActive()
     {
-        $config = $this->serviceLocator->get('VuFind\Config\PluginManager')
+        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
             ->get('Summon');
         return isset($config->Record->next_prev_navigation)
             && $config->Record->next_prev_navigation;
@@ -94,7 +96,9 @@ class SummonrecordController extends AbstractRecord
         parent::attachDefaultListeners();
         $events = $this->getEventManager();
         $events->attach(
-            MvcEvent::EVENT_DISPATCH, [$this, 'injectSummonMessage'], 1000
+            MvcEvent::EVENT_DISPATCH,
+            [$this, 'injectSummonMessage'],
+            1000
         );
     }
 }

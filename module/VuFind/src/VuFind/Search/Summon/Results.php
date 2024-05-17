@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Summon Search Results
  *
  * PHP version 7
  *
- * Copyright (C) Villanova University 2011.
+ * Copyright (C) Villanova University 2011, 2022.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\Summon;
+
+use VuFindSearch\Command\SearchCommand;
 
 /**
  * Summon Search Parameters
@@ -67,6 +71,13 @@ class Results extends \VuFind\Search\Base\Results
     protected $topicRecommendations = false;
 
     /**
+     * Search backend identifier.
+     *
+     * @var string
+     */
+    protected $backendId = 'Summon';
+
+    /**
      * Support method for performAndProcessSearch -- perform a search based on the
      * parameters passed to the object.
      *
@@ -78,10 +89,15 @@ class Results extends \VuFind\Search\Base\Results
         $limit  = $this->getParams()->getLimit();
         $offset = $this->getStartRecord() - 1;
         $params = $this->getParams()->getBackendParameters();
-        $collection = $this->getSearchService()->search(
-            'Summon', $query, $offset, $limit, $params
+        $command = new SearchCommand(
+            $this->backendId,
+            $query,
+            $offset,
+            $limit,
+            $params
         );
-
+        $collection = $this->getSearchService()
+            ->invoke($command)->getResult();
         $this->responseFacets = $collection->getFacets();
         $this->resultTotal = $collection->getTotal();
 
@@ -106,7 +122,7 @@ class Results extends \VuFind\Search\Base\Results
                 $this->responseFacets[] = [
                     'fieldName' => $dateFacet,
                     'displayName' => $dateFacet,
-                    'counts' => []
+                    'counts' => [],
                 ];
             }
         }
@@ -202,12 +218,13 @@ class Results extends \VuFind\Search\Base\Results
     protected function formatFacetData($current)
     {
         // We'll need this in the loop below:
-        $filterList = $this->getParams()->getFilters();
+        $filterList = $this->getParams()->getRawFilters();
 
         // Should we translate values for the current facet?
         $field = $current['displayName'];
         $translate = in_array(
-            $field, $this->getOptions()->getTranslatedFacets()
+            $field,
+            $this->getOptions()->getTranslatedFacets()
         );
         if ($translate) {
             $transTextDomain = $this->getOptions()
@@ -267,9 +284,10 @@ class Results extends \VuFind\Search\Base\Results
     {
         $this->suggestions = [];
         foreach ($spelling as $current) {
+            $current = $current['suggestion'];
             if (!isset($this->suggestions[$current['originalQuery']])) {
                 $this->suggestions[$current['originalQuery']] = [
-                    'suggestions' => []
+                    'suggestions' => [],
                 ];
             }
             $this->suggestions[$current['originalQuery']]['suggestions'][]
@@ -341,8 +359,12 @@ class Results extends \VuFind\Search\Base\Results
      *
      * @return array an array with the facet values for each index field
      */
-    public function getPartialFieldFacets($facetfields, $removeFilter = true,
-        $limit = -1, $facetSort = null, $page = null
+    public function getPartialFieldFacets(
+        $facetfields,
+        $removeFilter = true,
+        $limit = -1,
+        $facetSort = null,
+        $page = null
     ) {
         $params = $this->getParams();
         $query  = $params->getQuery();
@@ -367,10 +389,15 @@ class Results extends \VuFind\Search\Base\Results
             }
         }
         $params = $params->getBackendParameters();
-        $collection = $this->getSearchService()->search(
-            'Summon', $query, 0, 0, $params
+        $command = new SearchCommand(
+            $this->backendId,
+            $query,
+            0,
+            0,
+            $params
         );
-
+        $collection = $this->getSearchService()->invoke($command)
+            ->getResult();
         $facets = $collection->getFacets();
         $ret = [];
         foreach ($facets as $data) {
@@ -382,7 +409,7 @@ class Results extends \VuFind\Search\Base\Results
                         'label' => $data['displayName'],
                         'list' => $list,
                     ],
-                    'more' => null
+                    'more' => null,
                 ];
             }
         }

@@ -1,4 +1,5 @@
 <?php
+
 namespace VuFindLocalTemplate\Module\Configuration;
 
 $config = [
@@ -13,34 +14,44 @@ $config = [
     'router' => [
         'routes' => [
             'devtools-deminify' => [
-                'type' => 'Zend\Router\Http\Literal',
+                'type' => 'Laminas\Router\Http\Literal',
                 'options' => [
                     'route'    => '/devtools/deminify',
                     'defaults' => [
                         'controller' => 'DevTools',
                         'action'     => 'Deminify',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'devtools-home' => [
-                'type' => 'Zend\Router\Http\Literal',
+                'type' => 'Laminas\Router\Http\Literal',
                 'options' => [
                     'route'    => '/devtools/home',
                     'defaults' => [
                         'controller' => 'DevTools',
                         'action'     => 'Home',
-                    ]
-                ]
+                    ],
+                ],
+            ],
+            'devtools-icon' => [
+                'type' => 'Laminas\Router\Http\Literal',
+                'options' => [
+                    'route'    => '/devtools/icon',
+                    'defaults' => [
+                        'controller' => 'DevTools',
+                        'action'     => 'Icon',
+                    ],
+                ],
             ],
             'devtools-language' => [
-                'type' => 'Zend\Router\Http\Literal',
+                'type' => 'Laminas\Router\Http\Literal',
                 'options' => [
                     'route'    => '/devtools/language',
                     'defaults' => [
                         'controller' => 'DevTools',
                         'action'     => 'Language',
-                    ]
-                ]
+                    ],
+                ],
             ],
         ],
     ],

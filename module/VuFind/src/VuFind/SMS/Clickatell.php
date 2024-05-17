@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class for text messaging via Clickatell's HTTP API
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\SMS;
 
 use VuFind\Exception\Mail as MailException;
@@ -43,21 +45,21 @@ class Clickatell extends AbstractBase
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $client;
 
     /**
      * Constructor
      *
-     * @param \Zend\Config\Config $config  SMS configuration
-     * @param array               $options Additional options (client may be an HTTP
-     * client object)
+     * @param \Laminas\Config\Config $config  SMS configuration
+     * @param array                  $options Additional options (client may be an
+     * HTTP client object)
      */
-    public function __construct(\Zend\Config\Config $config, $options = [])
+    public function __construct(\Laminas\Config\Config $config, $options = [])
     {
-        parent::__construct($config, $options);
-        $this->client = $options['client'] ?? new \Zend\Http\Client();
+        parent::__construct($config);
+        $this->client = $options['client'] ?? new \Laminas\Http\Client();
     }
 
     /**
@@ -99,7 +101,7 @@ class Clickatell extends AbstractBase
     public function getCarriers()
     {
         return [
-            'Clickatell' => ['name' => 'Clickatell', 'domain' => null]
+            'Clickatell' => ['name' => 'Clickatell', 'domain' => null],
         ];
     }
 
@@ -110,8 +112,7 @@ class Clickatell extends AbstractBase
      */
     protected function getApiUsername()
     {
-        return isset($this->smsConfig->Clickatell->user)
-            ? $this->smsConfig->Clickatell->user : null;
+        return $this->smsConfig->Clickatell->user ?? null;
     }
 
     /**
@@ -121,8 +122,7 @@ class Clickatell extends AbstractBase
      */
     protected function getApiPassword()
     {
-        return isset($this->smsConfig->Clickatell->password)
-            ? $this->smsConfig->Clickatell->password : null;
+        return $this->smsConfig->Clickatell->password ?? null;
     }
 
     /**
@@ -132,8 +132,7 @@ class Clickatell extends AbstractBase
      */
     protected function getApiId()
     {
-        return isset($this->smsConfig->Clickatell->api_id)
-            ? $this->smsConfig->Clickatell->api_id : null;
+        return $this->smsConfig->Clickatell->api_id ?? null;
     }
 
     /**

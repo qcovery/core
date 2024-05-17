@@ -1,6 +1,7 @@
 <?php
+
 /**
- * ZF2 module definition for the VuFind application
+ * Code module for the core of the VuFind application
  *
  * PHP version 7
  *
@@ -25,12 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFind;
 
-use Zend\Mvc\MvcEvent;
+use Laminas\Mvc\MvcEvent;
 
 /**
- * ZF2 module definition for the VuFind application
+ * Code module for the core of the VuFind application
  *
  * @category VuFind
  * @package  Module
@@ -58,12 +60,12 @@ class Module
     public function getAutoloaderConfig()
     {
         return [
-            'Zend\Loader\ClassMapAutoloader' => [
+            'Laminas\Loader\ClassMapAutoloader' => [
                 'classes' => [
-                    'minSO' => __DIR__ . '/src/VuFind/Search/minSO.php'
-                ]
+                    'minSO' => __DIR__ . '/src/VuFind/Search/minSO.php',
+                ],
             ],
-            'Zend\Loader\StandardAutoloader' => [
+            'Laminas\Loader\StandardAutoloader' => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ],

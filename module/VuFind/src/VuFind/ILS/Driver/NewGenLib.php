@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS Driver for NewGenLib
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
+
 namespace VuFind\ILS\Driver;
 
 use PDO;
@@ -84,14 +86,17 @@ class NewGenLib extends AbstractBase
      *
      * @param string $RecordID The record id to retrieve the holdings for
      * @param array  $patron   Patron data
+     * @param array  $options  Extra options (not currently used)
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return array           On success, an associative array with the following
      * keys: id, availability (boolean), status, location, reserve, callnumber,
      * duedate, number, barcode.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getHolding($RecordID, array $patron = null)
+    public function getHolding($RecordID, array $patron = null, array $options = [])
     {
         $holding = $this->getItemStatus($RecordID);
         for ($i = 0; $i < count($holding); $i++) {
@@ -101,10 +106,10 @@ class NewGenLib extends AbstractBase
                 "' and document_library_id='" . $holding[$i]['library_id'] .
                 "' and status='A'";
             try {
-                $sqlStmt2 = $this->_db->prepare($duedateql);
+                $sqlStmt2 = $this->db->prepare($duedateql);
                 $sqlStmt2->execute();
             } catch (PDOException $e1) {
-                throw new ILSException($e1->getMessage());
+                $this->throwAsIlsException($e1);
             }
             $duedate = "";
             while ($rowDD = $sqlStmt2->fetch(PDO::FETCH_ASSOC)) {
@@ -129,7 +134,7 @@ class NewGenLib extends AbstractBase
      *
      * @param array $patron The patron array from patronLogin
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return mixed        Array of the patron's fines on success.
      */
@@ -155,7 +160,7 @@ class NewGenLib extends AbstractBase
             $sqlStmt = $this->db->prepare($mainsql);
             $sqlStmt->execute();
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
         $id = "";
         while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
@@ -170,7 +175,7 @@ class NewGenLib extends AbstractBase
                 $sqlStmt1 = $this->db->prepare($paidamtsql);
                 $sqlStmt1->execute();
             } catch (PDOException $e1) {
-                throw new ILSException($e1->getMessage());
+                $this->throwAsIlsException($e1);
             }
             $paidamt = "";
             $balance = "";
@@ -197,7 +202,7 @@ class NewGenLib extends AbstractBase
      *
      * @param array $patron The patron array from patronLogin
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return array        Array of the patron's holds on success.
      */
@@ -220,7 +225,7 @@ class NewGenLib extends AbstractBase
             $sqlStmt = $this->db->prepare($mainsql);
             $sqlStmt->execute();
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
         while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
             $type = "RECALLED ITEM - Return the item to the library";
@@ -230,7 +235,7 @@ class NewGenLib extends AbstractBase
                 $sqlStmt2 = $this->db->prepare($rIdql);
                 $sqlStmt2->execute();
             } catch (PDOException $e1) {
-                throw new ILSException($e1->getMessage());
+                $this->throwAsIlsException($e1);
             }
             $RecordId = $row['cataloguerecordid'] . "_" . $row['owner_library_id'];
             $duedate = "";
@@ -258,20 +263,20 @@ class NewGenLib extends AbstractBase
             $sqlStmt2 = $this->db->prepare($mainsql2);
             $sqlStmt2->execute();
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
         while ($row2 = $sqlStmt2->fetch(PDO::FETCH_ASSOC)) {
             $location = "";
             $type2 = "";
             switch ($row2['status']) {
-            case 'A':
-                $location = "Checked out - No copy available in the library";
-                $type2 = $row2['queue_no'];
-                break;
-            case 'B':
-                $location = "Item available at the circulation desk";
-                $type2 = "INTIMATED";
-                break;
+                case 'A':
+                    $location = "Checked out - No copy available in the library";
+                    $type2 = $row2['queue_no'];
+                    break;
+                case 'B':
+                    $location = "Item available at the circulation desk";
+                    $type2 = "INTIMATED";
+                    break;
             }
             $RecordId2 = $row2['cataloguerecordid'] . "_" .
                 $row2['owner_library_id'];
@@ -297,6 +302,7 @@ class NewGenLib extends AbstractBase
      */
     public function getMyProfile($patron)
     {
+        $profile = null;
         $catusr = $patron['cat_username'];
         $catpswd = $patron['cat_password'];
         $sql = "select p.patron_id as patron_id,p.user_password as " .
@@ -308,7 +314,7 @@ class NewGenLib extends AbstractBase
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->execute();
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
         while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
             if ($catusr != $row['patron_id'] || $catpswd != $row['user_password']) {
@@ -334,7 +340,7 @@ class NewGenLib extends AbstractBase
      *
      * @param array $patron The patron array from patronLogin
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return array        Array of the patron's transactions on success.
      */
@@ -355,7 +361,7 @@ class NewGenLib extends AbstractBase
             $sqlStmt = $this->db->prepare($mainsql);
             $sqlStmt->execute();
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
         while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
             $countql = "select count(*) as total from cir_transaction c, " .
@@ -366,7 +372,7 @@ class NewGenLib extends AbstractBase
                 $sql = $this->db->prepare($countql);
                 $sql->execute();
             } catch (PDOException $e) {
-                throw new ILSException($e->getMessage());
+                $this->throwAsIlsException($e);
             }
             $RecordId = $row['cataloguerecordid'] . "_" . $row['owner_library_id'];
             $count = "";
@@ -456,7 +462,7 @@ class NewGenLib extends AbstractBase
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->execute([':patronId' => $username, ':password' => $password]);
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
         $row = $sqlStmt->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
@@ -470,7 +476,7 @@ class NewGenLib extends AbstractBase
             'cat_password' => $password,
             'email' => $row['email'],
             'major' => null,
-            'college' => null
+            'college' => null,
         ];
     }
 
@@ -497,6 +503,7 @@ class NewGenLib extends AbstractBase
     public function getNewItems($page, $limit, $daysOld, $fundId = null)
     {
         // Do some initial work in solr so we aren't repeating it inside this loop.
+        $retVal = [];
         $retVal[][] = [];
 
         $offset = ($page - 1) * $limit;
@@ -507,7 +514,7 @@ class NewGenLib extends AbstractBase
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->execute();
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
 
         $results = [];
@@ -565,31 +572,31 @@ class NewGenLib extends AbstractBase
             $sqlSmt = $this->db->prepare($mainsql);
             $sqlSmt->execute();
         } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
         $reserve = 'N';
         while ($row = $sqlSmt->fetch(PDO::FETCH_ASSOC)) {
             switch ($row['status']) {
-            case 'B':
-                $status = "Available";
-                $available = true;
-                $reserve = 'N';
-                break;
-            case 'A':
-                // Instead of relying on status = 'On holds shelf',
-                // I might want to see if:
-                // action.hold_request.current_copy = asset.copy.id
-                // and action.hold_request.capture_time is not null
-                // and I think action.hold_request.fulfillment_time is null
-                $status = "Checked Out";
-                $available = false;
-                $reserve = 'N';
-                break;
-            default:
-                $status = "Not Available";
-                $available = false;
-                $reserve = 'N';
-                break;
+                case 'B':
+                    $status = "Available";
+                    $available = true;
+                    $reserve = 'N';
+                    break;
+                case 'A':
+                    // Instead of relying on status = 'On holds shelf',
+                    // I might want to see if:
+                    // action.hold_request.current_copy = asset.copy.id
+                    // and action.hold_request.capture_time is not null
+                    // and I think action.hold_request.fulfillment_time is null
+                    $status = "Checked Out";
+                    $available = false;
+                    $reserve = 'N';
+                    break;
+                default:
+                    $status = "Not Available";
+                    $available = false;
+                    $reserve = 'N';
+                    break;
             }
             $locationsql = "select location from location where location_id='" .
                 $row['location_id'] . "' and library_id=" . $row['library_id'];
@@ -597,7 +604,7 @@ class NewGenLib extends AbstractBase
                 $sqlSmt1 = $this->db->prepare($locationsql);
                 $sqlSmt1->execute();
             } catch (PDOException $e1) {
-                throw new ILSException($e1->getMessage());
+                $this->throwAsIlsException($e1);
             }
             $location = "";
             while ($rowLoc = $sqlSmt1->fetch(PDO::FETCH_ASSOC)) {

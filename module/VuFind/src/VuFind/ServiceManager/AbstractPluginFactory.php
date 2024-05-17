@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Abstract Plugin Factory
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ServiceManager;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * VuFind Abstract Plugin Factory
@@ -104,7 +106,9 @@ abstract class AbstractPluginFactory implements AbstractFactoryInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         $class = $this->getClassName($requestedName);

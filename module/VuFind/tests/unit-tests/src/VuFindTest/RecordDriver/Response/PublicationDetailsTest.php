@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SolrMarc Record Driver Test Class
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\RecordDriver\Response;
 
 use VuFind\RecordDriver\Response\PublicationDetails;
@@ -41,7 +43,7 @@ use VuFind\RecordDriver\Response\PublicationDetails;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class PublicationDetailsTest extends \VuFindTest\Unit\TestCase
+class PublicationDetailsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test getters

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS driver test
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\ILS\Driver;
 
 use VuFind\ILS\Driver\Sample;
@@ -38,7 +40,7 @@ use VuFind\ILS\Driver\Sample;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-class SampleTest extends \VuFindTest\Unit\TestCase
+class SampleTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Driver object.
@@ -52,7 +54,7 @@ class SampleTest extends \VuFindTest\Unit\TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->driver = new Sample();
         $this->driver->init();

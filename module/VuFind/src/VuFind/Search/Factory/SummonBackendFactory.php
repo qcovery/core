@@ -26,17 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\Factory;
 
-use Interop\Container\ContainerInterface;
-
-use SerialsSolutions\Summon\Zend2 as Connector;
+use Psr\Container\ContainerInterface;
+use SerialsSolutions\Summon\Laminas as Connector;
 use VuFindSearch\Backend\Solr\LuceneSyntaxHelper;
 use VuFindSearch\Backend\Summon\Backend;
 use VuFindSearch\Backend\Summon\QueryBuilder;
 use VuFindSearch\Backend\Summon\Response\RecordCollectionFactory;
-
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Factory for Summon backends.
@@ -47,33 +45,26 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class SummonBackendFactory implements FactoryInterface
+class SummonBackendFactory extends AbstractBackendFactory
 {
     /**
      * Logger.
      *
-     * @var Zend\Log\LoggerInterface
+     * @var \Laminas\Log\LoggerInterface
      */
     protected $logger;
 
     /**
-     * Superior service manager.
-     *
-     * @var ContainerInterface
-     */
-    protected $serviceLocator;
-
-    /**
      * VuFind configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * Summon configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $summonConfig;
 
@@ -90,12 +81,13 @@ class SummonBackendFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $sm, $name, array $options = null)
     {
-        $this->serviceLocator = $sm;
-        $configReader = $this->serviceLocator->get('VuFind\Config\PluginManager');
+        $this->setup($sm);
+        $configReader = $this->serviceLocator
+            ->get(\VuFind\Config\PluginManager::class);
         $this->config = $configReader->get('config');
         $this->summonConfig = $configReader->get('Summon');
-        if ($this->serviceLocator->has('VuFind\Log\Logger')) {
-            $this->logger = $this->serviceLocator->get('VuFind\Log\Logger');
+        if ($this->serviceLocator->has(\VuFind\Log\Logger::class)) {
+            $this->logger = $this->serviceLocator->get(\VuFind\Log\Logger::class);
         }
         $connector = $this->createConnector();
         $backend   = $this->createBackend($connector);
@@ -125,20 +117,17 @@ class SummonBackendFactory implements FactoryInterface
     protected function createConnector()
     {
         // Load credentials:
-        $id = isset($this->config->Summon->apiId)
-            ? $this->config->Summon->apiId : null;
-        $key = isset($this->config->Summon->apiKey)
-            ? $this->config->Summon->apiKey : null;
+        $id = $this->config->Summon->apiId ?? null;
+        $key = $this->config->Summon->apiKey ?? null;
 
-        // Build HTTP client:
-        $client = $this->serviceLocator->get('VuFindHttp\HttpService')
-            ->createClient();
-        $timeout = isset($this->summonConfig->General->timeout)
-            ? $this->summonConfig->General->timeout : 30;
-        $client->setOptions(['timeout' => $timeout]);
-
+        // Create connector:
         $options = ['authedUser' => $this->isAuthed()];
-        $connector = new Connector($id, $key, $options, $client);
+        $connector = new Connector(
+            $id,
+            $key,
+            $options,
+            $this->createHttpClient($this->summonConfig->General->timeout ?? 30)
+        );
         $connector->setLogger($this->logger);
         return $connector;
     }
@@ -150,7 +139,8 @@ class SummonBackendFactory implements FactoryInterface
      */
     protected function isAuthed()
     {
-        return $this->serviceLocator->get('ZfcRbac\Service\AuthorizationService')
+        return $this->serviceLocator
+            ->get(\LmcRbacMvc\Service\AuthorizationService::class)
             ->isGranted('access.SummonExtendedResults');
     }
 
@@ -163,8 +153,7 @@ class SummonBackendFactory implements FactoryInterface
     {
         $builder = new QueryBuilder();
         $caseSensitiveBooleans
-            = isset($this->summonConfig->General->case_sensitive_bools)
-            ? $this->summonConfig->General->case_sensitive_bools : true;
+            = $this->summonConfig->General->case_sensitive_bools ?? true;
         $helper = new LuceneSyntaxHelper($caseSensitiveBooleans);
         $builder->setLuceneHelper($helper);
         return $builder;
@@ -177,9 +166,9 @@ class SummonBackendFactory implements FactoryInterface
      */
     protected function createRecordCollectionFactory()
     {
-        $manager = $this->serviceLocator->get('VuFind\RecordDriver\PluginManager');
-        $stripSnippets = !isset($this->summonConfig->General->snippets)
-            || !$this->summonConfig->General->snippets;
+        $manager = $this->serviceLocator
+            ->get(\VuFind\RecordDriver\PluginManager::class);
+        $stripSnippets = !($this->summonConfig->General->snippets ?? false);
         $callback = function ($data) use ($manager, $stripSnippets) {
             $driver = $manager->get('Summon');
             if ($stripSnippets) {

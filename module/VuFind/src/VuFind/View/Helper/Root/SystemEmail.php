@@ -1,4 +1,5 @@
 <?php
+
 /**
  * System contact email helper.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 /**
@@ -36,7 +38,7 @@ namespace VuFind\View\Helper\Root;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class SystemEmail extends \Zend\View\Helper\AbstractHelper
+class SystemEmail extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * System email

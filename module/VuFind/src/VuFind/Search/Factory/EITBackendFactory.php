@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for EBSCO Integration Toolkit (EIT) backends.
  *
@@ -26,16 +27,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\Factory;
 
-use Interop\Container\ContainerInterface;
-
+use Psr\Container\ContainerInterface;
 use VuFindSearch\Backend\EIT\Backend;
 use VuFindSearch\Backend\EIT\Connector;
 use VuFindSearch\Backend\EIT\QueryBuilder;
 use VuFindSearch\Backend\EIT\Response\XML\RecordCollectionFactory;
-
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Factory for EIT backends.
@@ -47,26 +46,19 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class EITBackendFactory implements FactoryInterface
+class EITBackendFactory extends AbstractBackendFactory
 {
     /**
      * Logger.
      *
-     * @var Zend\Log\LoggerInterface
+     * @var \Laminas\Log\LoggerInterface
      */
     protected $logger;
 
     /**
-     * Superior service manager.
-     *
-     * @var ContainerInterface
-     */
-    protected $serviceLocator;
-
-    /**
      * VuFind configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -83,11 +75,12 @@ class EITBackendFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $sm, $name, array $options = null)
     {
-        $this->serviceLocator = $sm;
-        $this->config = $this->serviceLocator->get('VuFind\Config\PluginManager')
+        $this->setup($sm);
+        $this->config = $this->serviceLocator
+            ->get(\VuFind\Config\PluginManager::class)
             ->get('EIT');
-        if ($this->serviceLocator->has('VuFind\Log\Logger')) {
-            $this->logger = $this->serviceLocator->get('VuFind\Log\Logger');
+        if ($this->serviceLocator->has(\VuFind\Log\Logger::class)) {
+            $this->logger = $this->serviceLocator->get(\VuFind\Log\Logger::class);
         }
         $connector = $this->createConnector();
         $backend   = $this->createBackend($connector);
@@ -116,17 +109,17 @@ class EITBackendFactory implements FactoryInterface
      */
     protected function createConnector()
     {
-        $prof = isset($this->config->General->prof)
-            ? $this->config->General->prof : null;
-        $pwd = isset($this->config->General->pwd)
-            ? $this->config->General->pwd : null;
-        $base = "http://eit.ebscohost.com/Services/SearchService.asmx/Search";
-        $dbs =  isset($this->config->General->dbs)
-            ? $this->config->General->dbs : null;
+        $prof = $this->config->General->prof ?? null;
+        $pwd = $this->config->General->pwd ?? null;
+        $base = $this->config->General->base_url
+            ?? 'https://eit.ebscohost.com/Services/SearchService.asmx/Search';
+        $dbs = $this->config->General->dbs ?? null;
         $connector = new Connector(
             $base,
-            $this->serviceLocator->get('VuFindHttp\HttpService')->createClient(),
-            $prof, $pwd, $dbs
+            $this->createHttpClient(),
+            $prof,
+            $pwd,
+            $dbs
         );
         $connector->setLogger($this->logger);
         return $connector;
@@ -149,7 +142,8 @@ class EITBackendFactory implements FactoryInterface
      */
     protected function createRecordCollectionFactory()
     {
-        $manager = $this->serviceLocator->get('VuFind\RecordDriver\PluginManager');
+        $manager = $this->serviceLocator
+            ->get(\VuFind\RecordDriver\PluginManager::class);
         $callback = function ($data) use ($manager) {
             $driver = $manager->get('EIT');
             $driver->setRawData($data);

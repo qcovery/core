@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS Hold Settings Class
  *
@@ -29,6 +30,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
+
 namespace VuFind\ILS;
 
 /**
@@ -49,17 +51,17 @@ class HoldSettings
     /**
      * ILS configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * Constructor
      *
-     * @param \Zend\Config\Config $config Configuration representing the [Catalog]
+     * @param \Laminas\Config\Config $config Configuration representing the [Catalog]
      * section of config.ini
      */
-    public function __construct(\Zend\Config\Config $config)
+    public function __construct(\Laminas\Config\Config $config)
     {
         $this->config = $config;
     }
@@ -73,7 +75,7 @@ class HoldSettings
      */
     public function getHoldsMode()
     {
-        return isset($this->config->holds_mode) ? $this->config->holds_mode : 'all';
+        return $this->config->holds_mode ?? 'all';
     }
 
     /**
@@ -85,7 +87,6 @@ class HoldSettings
      */
     public function getTitleHoldsMode()
     {
-        return isset($this->config->title_level_holds_mode)
-            ? $this->config->title_level_holds_mode : 'disabled';
+        return $this->config->title_level_holds_mode ?? 'disabled';
     }
 }

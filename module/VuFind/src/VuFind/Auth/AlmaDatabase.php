@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Alma Database authentication class
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) AK Bibliothek Wien für Sozialwissenschaften 2018.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:authentication_handlers Wiki
  */
+
 namespace VuFind\Auth;
 
 use VuFind\Exception\Auth as AuthException;
@@ -88,7 +90,7 @@ class AlmaDatabase extends Database
     /**
      * Create a new user account in Alma AND in the VuFind Database.
      *
-     * @param \Zend\Http\PhpEnvironment\Request $request Request object containing
+     * @param \Laminas\Http\PhpEnvironment\Request $request Request object containing
      *                                                   new account details.
      *
      * @return NULL|\VuFind\Db\Row\User New user row.
@@ -108,7 +110,8 @@ class AlmaDatabase extends Database
         $params = $this->collectParamsFromRequest($request);
 
         // Validate username and password
-        $this->validateUsernameAndPassword($params);
+        $this->validateUsername($params);
+        $this->validatePassword($params);
 
         // Get the user table
         $userTable = $this->getUserTable();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Container for session settings, allowing those settings to be configured
  * "just in case" they are needed, without invoking the heavy weight of
@@ -28,9 +29,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Session;
 
-use Zend\Session\SessionManager;
+use Laminas\Session\SessionManager;
 
 /**
  * Container for session settings, allowing those settings to be configured
@@ -72,6 +74,13 @@ class Settings
 
         // If the session manager is already instantiated, close it!
         if (null !== $this->manager) {
+            // Try to disable writes so that writeClose() below doesn't actually
+            // write anything:
+            $saveHandler = $this->manager->getSaveHandler();
+            if (is_callable([$saveHandler, 'disableWrites'])) {
+                $saveHandler->disableWrites();
+            }
+            // Close the session:
             $this->manager->writeClose();
         }
     }

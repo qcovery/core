@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Cache Manager
  *
@@ -27,16 +28,17 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Cache;
 
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Cache\StorageFactory;
-use Zend\Config\Config;
+use Laminas\Cache\Service\StorageAdapterFactory;
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Config\Config;
 
 /**
  * VuFind Cache Manager
  *
- * Creates file and APC caches
+ * Creates caches based on configuration
  *
  * @category VuFind
  * @package  Cache
@@ -76,20 +78,33 @@ class Manager
     protected $caches = [];
 
     /**
+     * Factory for creating storage adapters.
+     *
+     * @var StorageAdapterFactory
+     */
+    protected $factory;
+
+    /**
      * Constructor
      *
-     * @param Config $config       Main VuFind configuration
-     * @param Config $searchConfig Search configuration
+     * @param Config                $config       Main VuFind configuration
+     * @param Config                $searchConfig Search configuration
+     * @param StorageAdapterFactory $factory      Cache storage adapter factory
      */
-    public function __construct(Config $config, Config $searchConfig)
-    {
-        // $config and $config->Cache are Zend\Config\Config objects
+    public function __construct(
+        Config $config,
+        Config $searchConfig,
+        StorageAdapterFactory $factory
+    ) {
+        $this->factory = $factory;
+
+        // $config and $config->Cache are Laminas\Config\Config objects
         // $cache is created immutable, so get the array, it will be modified
         // downstream.
-        // Zend\Config\Config can be created mutable or cloned and merged, useful
+        // Laminas\Config\Config can be created mutable or cloned and merged, useful
         // for future cache-specific overrides.
-        $cacheConfig = isset($config->Cache) ? $config->Cache : false;
-        $this->defaults = $cacheConfig ? $cacheConfig->toArray() : false;
+        $cacheConfig = $config->Cache ?? false;
+        $this->defaults = $cacheConfig ? $cacheConfig->toArray() : [];
 
         // Get base cache directory.
         $cacheBase = $this->getCacheDir();
@@ -101,20 +116,19 @@ class Manager
         $this->createFileCache('public', $cacheBase . 'public');
 
         // Set up search specs cache based on config settings:
-        $searchCacheType = isset($searchConfig->Cache->type)
-            ? $searchConfig->Cache->type : false;
+        $searchCacheType = $searchConfig->Cache->type ?? false;
         switch ($searchCacheType) {
-        case 'APC':
-            $this->createAPCCache('searchspecs');
-            break;
-        case 'File':
-            $this->createFileCache(
-                'searchspecs', $cacheBase . 'searchspecs'
-            );
-            break;
-        case false:
-            $this->createNoCache('searchspecs');
-            break;
+            case 'File':
+                $this->createFileCache(
+                    'searchspecs',
+                    $cacheBase . 'searchspecs'
+                );
+                break;
+            case false:
+                $this->createNoCache('searchspecs');
+                break;
+            default:
+                throw new \Exception("Unsupported cache setting: $searchCacheType");
         }
     }
 
@@ -123,29 +137,24 @@ class Manager
      *
      * @param string      $name      Name of the requested cache.
      * @param string|null $namespace Optional namespace to use. Defaults to the
-     * value of {@see $name}.
+     * value of $name.
      *
      * @return StorageInterface
      * @throws \Exception
      */
     public function getCache($name, $namespace = null)
     {
-        $namespace = $namespace ?? $name;
+        $namespace ??= $name;
         $key = "$name:$namespace";
 
         if (!isset($this->caches[$key])) {
             if (!isset($this->cacheSettings[$name])) {
                 throw new \Exception('Requested unknown cache: ' . $name);
             }
-            // Special case for "no-cache" caches:
-            if ($this->cacheSettings[$name] === false) {
-                $this->caches[$key]
-                    = new \VuFind\Cache\Storage\Adapter\NoCacheAdapter();
-            } else {
-                $settings = $this->cacheSettings[$name];
-                $settings['adapter']['options']['namespace'] = $namespace;
-                $this->caches[$key] = StorageFactory::factory($settings);
-            }
+            $settings = $this->cacheSettings[$name];
+            $settings['options']['namespace'] = $namespace;
+            $this->caches[$key]
+                = $this->factory->createFromArrayConfiguration($settings);
         }
 
         return $this->caches[$key];
@@ -161,10 +170,10 @@ class Manager
      */
     public function getCacheDir($allowCliOverride = true)
     {
-        if ($this->defaults && isset($this->defaults['cache_dir'])) {
-            // cache_dir setting in config.ini is deprecated
+        if (isset($this->defaults['cache_dir'])) {
+            // cache_dir setting in config.ini is obsolete
             throw new \Exception(
-                'Deprecated cache_dir setting found in config.ini - please use '
+                'Obsolete cache_dir setting found in config.ini - please use '
                 . 'Apache environment variable VUFIND_CACHE_DIR in '
                 . 'httpd-vufind.conf instead.'
             );
@@ -207,7 +216,26 @@ class Manager
     }
 
     /**
-     * Create a new file cache for the given theme name if neccessary. Return
+     * Create a downloader-specific file cache.
+     *
+     * @param string $downloaderName Name of the downloader.
+     * @param array  $opts           Cache options.
+     *
+     * @return string
+     */
+    public function addDownloaderCache($downloaderName, $opts = [])
+    {
+        $cacheName = 'downloader-' . $downloaderName;
+        $this->createFileCache(
+            $cacheName,
+            $this->getCacheDir(),
+            $opts
+        );
+        return $cacheName;
+    }
+
+    /**
+     * Create a new file cache for the given theme name if necessary. Return
      * the name of the cache.
      *
      * @param string $themeName Name of the theme
@@ -233,20 +261,24 @@ class Manager
      */
     protected function createNoCache($cacheName)
     {
-        $this->cacheSettings[$cacheName] = false;
+        $this->cacheSettings[$cacheName] = [
+            'adapter' => \Laminas\Cache\Storage\Adapter\BlackHole::class,
+            'options' => [],
+        ];
     }
 
     /**
      * Add a file cache to the manager and ensure that necessary directory exists.
      *
-     * @param string $cacheName Name of new cache to create
-     * @param string $dirName   Directory to use for storage
+     * @param string $cacheName    Name of new cache to create
+     * @param string $dirName      Directory to use for storage
+     * @param array  $overrideOpts Options to override default values.
      *
      * @return void
      */
-    protected function createFileCache($cacheName, $dirName)
+    protected function createFileCache($cacheName, $dirName, $overrideOpts = [])
     {
-        $opts = $this->defaults;    // copy defaults -- we'll modify them below
+        $opts = array_merge($this->defaults, $overrideOpts);
         if (!is_dir($dirName)) {
             if (isset($opts['umask'])) {
                 // convert umask from string
@@ -278,31 +310,19 @@ class Manager
         if (empty($opts)) {
             $opts = ['cache_dir' => $dirName];
         } elseif (is_array($opts)) {
-            // If cache_dir was set in config.ini, the cache-specific name should
-            // have been appended to the path to create the value $dirName.
+            // If VUFIND_CACHE_DIR was set in the environment, the cache-specific
+            // name should have been appended to it to create the value $dirName.
             $opts['cache_dir'] = $dirName;
         } else {
             // Dryrot
             throw new \Exception('$opts is neither array nor false');
         }
         $this->cacheSettings[$cacheName] = [
-            'adapter' => ['name' => 'filesystem', 'options' => $opts],
-            'plugins' => ['serializer']
-        ];
-    }
-
-    /**
-     * Add an APC cache to the manager.
-     *
-     * @param string $cacheName Name of new cache to create
-     *
-     * @return void
-     */
-    protected function createAPCCache($cacheName)
-    {
-        $this->cacheSettings[$cacheName] = [
-            'adapter' => 'APC',
-            'plugins' => ['serializer']
+            'adapter' => \Laminas\Cache\Storage\Adapter\Filesystem::class,
+            'options' => $opts,
+            'plugins' => [
+                ['name' => 'serializer'],
+            ],
         ];
     }
 }

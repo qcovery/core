@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XSLT importer support methods for sitemaps.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/indexing Wiki
  */
+
 namespace VuFind\XSLT\Import;
 
 /**
@@ -113,7 +115,9 @@ class VuFindSitemap extends VuFind
 
         // Extract the keywords from the XML:
         preg_match_all(
-            '/<meta name="keywords" content="([^"]*)"/ms', $xml, $matches
+            '/<meta name="keywords" content="([^"]*)"/ms',
+            $xml,
+            $matches
         );
         $keywords = [];
         if (isset($matches[1])) {
@@ -150,7 +154,9 @@ class VuFindSitemap extends VuFind
     {
         // Extract the subjects from the HTML:
         preg_match_all(
-            '/<meta name="subject" content="([^"]*)"/ms', $html, $matches
+            '/<meta name="subject" content="([^"]*)"/ms',
+            $html,
+            $matches
         );
         $subjects = [];
         if (isset($matches[1])) {
@@ -161,7 +167,9 @@ class VuFindSitemap extends VuFind
 
         // Extract the link types from the HTML:
         preg_match_all(
-            '/<meta name="category" content="([^"]*)"/ms', $html, $matches
+            '/<meta name="category" content="([^"]*)"/ms',
+            $html,
+            $matches
         );
         $categories = [];
         if (isset($matches[1])) {
@@ -172,7 +180,9 @@ class VuFindSitemap extends VuFind
 
         // Extract the use count from the HTML:
         preg_match_all(
-            '/<meta name="useCount" content="([^"]*)"/ms', $html, $matches
+            '/<meta name="useCount" content="([^"]*)"/ms',
+            $html,
+            $matches
         );
         $useCount = $matches[1][0] ?? 1;
 
@@ -242,14 +252,14 @@ class VuFindSitemap extends VuFind
 
         // Use the appropriate full text parser:
         switch ($parser) {
-        case 'Aperture':
-            $fields = static::getApertureFields($htmlFile);
-            break;
-        case 'Tika':
-            $fields = static::getTikaFields($htmlFile);
-            break;
-        default:
-            throw new \Exception('Unexpected parser: ' . $parser);
+            case 'Aperture':
+                $fields = static::getApertureFields($htmlFile);
+                break;
+            case 'Tika':
+                $fields = static::getTikaFields($htmlFile);
+                break;
+            default:
+                throw new \Exception('Unexpected parser: ' . $parser);
         }
 
         // Clean up HTML file:
@@ -261,7 +271,9 @@ class VuFindSitemap extends VuFind
         // Clean up/normalize full text:
         $fields['fulltext'] = trim(
             preg_replace(
-                '/\s+/', ' ', static::stripBadChars($fields['fulltext'])
+                '/\s+/',
+                ' ',
+                static::stripBadChars($fields['fulltext'])
             )
         );
 

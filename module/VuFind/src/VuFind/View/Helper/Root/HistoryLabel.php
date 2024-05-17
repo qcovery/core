@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Search history label" view helper
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 /**
@@ -36,7 +38,7 @@ namespace VuFind\View\Helper\Root;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class HistoryLabel extends \Zend\View\Helper\AbstractHelper
+class HistoryLabel extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * Label configuration
@@ -74,7 +76,7 @@ class HistoryLabel extends \Zend\View\Helper\AbstractHelper
     public function __invoke($class)
     {
         if (isset($this->config[$class])) {
-            return $this->translator->__invoke($this->config[$class]) . ':';
+            return ($this->translator)($this->config[$class]) . ':';
         }
         return '';
     }

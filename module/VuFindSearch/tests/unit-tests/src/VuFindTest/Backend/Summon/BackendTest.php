@@ -26,16 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\Summon;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-
 use SerialsSolutions_Summon_Exception as SummonException;
 use SerialsSolutions_Summon_Query as SummonQuery;
-
 use VuFindSearch\ParamBag;
-
 use VuFindSearch\Query\Query;
 
 /**
@@ -49,12 +47,14 @@ use VuFindSearch\Query\Query;
  */
 class BackendTest extends TestCase
 {
+    use \VuFindTest\Feature\FixtureTrait;
+
     /**
      * Setup method.
      *
      * @return void
      */
-    protected function setup()
+    protected function setUp(): void
     {
         if (!class_exists('SerialsSolutions_Summon_Exception', true)) {
             $this->markTestIncomplete('Unable to autoload class: SerialsSolutions\Summon\Exception');
@@ -92,15 +92,11 @@ class BackendTest extends TestCase
     {
         $conn = $this->getConnectorMock(['query']);
         $expected1 = new SummonQuery(null, ['idsToFetch' => range(1, 50), 'pageNumber' => 1, 'pageSize' => 50]);
-        $conn->expects($this->at(0))
-            ->method('query')
-            ->with($this->equalTo($expected1))
-            ->will($this->returnValue($this->loadResponse('retrieve1')));
         $expected2 = new SummonQuery(null, ['idsToFetch' => range(51, 60), 'pageNumber' => 1, 'pageSize' => 50]);
-        $conn->expects($this->at(1))
+        $conn->expects($this->exactly(2))
             ->method('query')
-            ->with($this->equalTo($expected2))
-            ->will($this->returnValue($this->loadResponse('retrieve2')));
+            ->withConsecutive([$expected1], [$expected2])
+            ->willReturnOnConsecutiveCalls($this->loadResponse('retrieve1'), $this->loadResponse('retrieve2'));
 
         $back = new Backend($conn);
         $back->setIdentifier('test');
@@ -120,12 +116,12 @@ class BackendTest extends TestCase
      * Test retrieve exception handling.
      *
      * @return void
-     *
-     * @expectedException VuFindSearch\Backend\Exception\BackendException
      */
     public function testRetrieveWrapsSummonException()
     {
-        $fact = $this->createMock('VuFindSearch\Response\RecordCollectionFactoryInterface');
+        $this->expectException(\VuFindSearch\Backend\Exception\BackendException::class);
+
+        $fact = $this->createMock(\VuFindSearch\Response\RecordCollectionFactoryInterface::class);
         $conn = $this->getConnectorMock(['getRecord']);
         $conn->expects($this->once())
             ->method('getRecord')
@@ -172,12 +168,12 @@ class BackendTest extends TestCase
      * Test search exception handling.
      *
      * @return void
-     *
-     * @expectedException VuFindSearch\Backend\Exception\BackendException
      */
     public function testSearchWrapsSummonException()
     {
-        $fact = $this->createMock('VuFindSearch\Response\RecordCollectionFactoryInterface');
+        $this->expectException(\VuFindSearch\Backend\Exception\BackendException::class);
+
+        $fact = $this->createMock(\VuFindSearch\Response\RecordCollectionFactoryInterface::class);
         $conn = $this->getConnectorMock(['query']);
         $conn->expects($this->once())
             ->method('query')
@@ -211,7 +207,7 @@ class BackendTest extends TestCase
      */
     public function testConstructorSetters()
     {
-        $fact = $this->createMock('VuFindSearch\Response\RecordCollectionFactoryInterface');
+        $fact = $this->createMock(\VuFindSearch\Response\RecordCollectionFactoryInterface::class);
         $conn = $this->getConnectorMock();
         $back = new Backend($conn, $fact);
         $this->assertEquals($fact, $back->getRecordCollectionFactory());
@@ -244,11 +240,9 @@ class BackendTest extends TestCase
      */
     protected function loadResponse($fixture)
     {
-        $file = realpath(sprintf('%s/summon/response/%s', PHPUNIT_SEARCH_FIXTURES, $fixture));
-        if (!is_string($file) || !file_exists($file) || !is_readable($file)) {
-            throw new InvalidArgumentException(sprintf('Unable to load fixture file: %s', $fixture));
-        }
-        return unserialize(file_get_contents($file));
+        return unserialize(
+            $this->getFixture("summon/response/$fixture", 'VuFindSearch')
+        );
     }
 
     /**
@@ -260,8 +254,8 @@ class BackendTest extends TestCase
      */
     protected function getConnectorMock(array $mock = [])
     {
-        return $this->getMockBuilder('SerialsSolutions\Summon\Zend2')
-            ->setMethods($mock)
+        return $this->getMockBuilder(\SerialsSolutions\Summon\Laminas::class)
+            ->onlyMethods($mock)
             ->setConstructorArgs(['id', 'key'])
             ->getMock();
     }

@@ -26,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\BrowZine;
 
-use Zend\Http\Client as HttpClient;
+use Laminas\Http\Client as HttpClient;
 
 /**
  * BrowZine connector.
@@ -39,7 +40,7 @@ use Zend\Http\Client as HttpClient;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
-class Connector implements \Zend\Log\LoggerAwareInterface
+class Connector implements \Laminas\Log\LoggerAwareInterface
 {
     use \VuFind\Log\LoggerAwareTrait;
 
@@ -85,6 +86,35 @@ class Connector implements \Zend\Log\LoggerAwareInterface
         $this->client = $client;
         $this->token = $token;
         $this->libraryId = $id;
+    }
+
+    /**
+     * Perform a DOI lookup
+     *
+     * @param string $doi            DOI
+     * @param bool   $includeJournal Include journal data in response?
+     *
+     * @return mixed
+     */
+    public function lookupDoi($doi, $includeJournal = false)
+    {
+        // Documentation says URL encoding of DOI is not necessary.
+        return $this->request(
+            'articles/doi/' . $doi,
+            $includeJournal ? ['include' => 'journal'] : []
+        );
+    }
+
+    /**
+     * Perform an ISSN lookup.
+     *
+     * @param string|array $issns ISSN(s) to look up.
+     *
+     * @return mixed
+     */
+    public function lookupIssns($issns)
+    {
+        return $this->request('search', ['issns' => implode(',', (array)$issns)]);
     }
 
     /**

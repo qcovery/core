@@ -26,15 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\EIT;
 
 use VuFindSearch\Backend\AbstractBackend;
-
 use VuFindSearch\ParamBag;
-
 use VuFindSearch\Query\AbstractQuery;
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
-
 use VuFindSearch\Response\RecordCollectionInterface;
 
 /**
@@ -70,7 +68,8 @@ class Backend extends AbstractBackend
      *
      * @return void
      */
-    public function __construct(Connector $connector,
+    public function __construct(
+        Connector $connector,
         RecordCollectionFactoryInterface $factory
     ) {
         $this->setRecordCollectionFactory($factory);
@@ -87,7 +86,10 @@ class Backend extends AbstractBackend
      *
      * @return RecordCollectionInterface
      */
-    public function search(AbstractQuery $query, $offset, $limit,
+    public function search(
+        AbstractQuery $query,
+        $offset,
+        $limit,
         ParamBag $params = null
     ) {
         if (null === $params) {
@@ -138,8 +140,6 @@ class Backend extends AbstractBackend
      * @param QueryBuilder $queryBuilder Query builder
      *
      * @return void
-     *
-     * @todo Typehint QueryBuilderInterface
      */
     public function setQueryBuilder(QueryBuilder $queryBuilder)
     {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS driver test
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\ILS\Driver;
 
 use VuFind\ILS\Driver\NoILS;
@@ -38,7 +40,7 @@ use VuFind\ILS\Driver\NoILS;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-class NoILSTest extends \VuFindTest\Unit\TestCase
+class NoILSTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Mock record loader
@@ -59,13 +61,13 @@ class NoILSTest extends \VuFindTest\Unit\TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
-        $this->loader = $this->getMockBuilder('VuFind\Record\Loader')
+        $this->loader = $this->getMockBuilder(\VuFind\Record\Loader::class)
             ->setConstructorArgs(
                 [
-                    $this->createMock('VuFindSearch\Service'),
-                    $this->createMock('VuFind\RecordDriver\PluginManager')
+                    $this->createMock(\VuFindSearch\Service::class),
+                    $this->createMock(\VuFind\RecordDriver\PluginManager::class),
                 ]
             )->getMock();
         $this->driver = new NoILS($this->loader);
@@ -103,14 +105,27 @@ class NoILSTest extends \VuFindTest\Unit\TestCase
     }
 
     /**
-     * Test that driver makes holdings visible when in MARC mode.
+     * Test that driver makes holdings visible when in custom mode.
      *
      * @return void
      */
-    public function testMarcHoldingsVisibility()
+    public function testCustomHoldingsVisibility()
     {
-        $this->driver
-            ->setConfig(['settings' => ['useHoldings' => 'marc']]);
+        $this->driver->setConfig(
+            [
+                'settings' => ['useHoldings' => 'custom'],
+                'Holdings' => [
+                    'number' => 0,
+                    'availability' => false,
+                    'status' => 'foo',
+                    'use_unknown_message' => true,
+                    'location' => 'bar',
+                    'reserve' => 'N',
+                    'callnumber' => 'xyzzy',
+                    'barcode' => null,
+                ],
+            ]
+        );
         $this->assertTrue($this->driver->hasHoldings('foo'));
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fake database row to represent a user in privacy mode.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Db\Row;
 
 /**
@@ -41,7 +43,7 @@ class PrivateUser extends User
     /**
      * Session container for account information.
      *
-     * @var \Zend\Session\Container
+     * @var \Laminas\Session\Container
      */
     protected $session = null;
 
@@ -87,11 +89,11 @@ class PrivateUser extends User
     /**
      * Set session container
      *
-     * @param \Zend\Session\Container $session Session container
+     * @param \Laminas\Session\Container $session Session container
      *
      * @return void
      */
-    public function setSession(\Zend\Session\Container $session)
+    public function setSession(\Laminas\Session\Container $session)
     {
         $this->session = $session;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for CommentRecord AJAX handler.
  *
@@ -25,9 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
-use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Factory for CommentRecord AJAX handler.
@@ -38,7 +43,7 @@ use Interop\Container\ContainerInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class CommentRecordFactory implements \Zend\ServiceManager\Factory\FactoryInterface
+class CommentRecordFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
@@ -52,24 +57,29 @@ class CommentRecordFactory implements \Zend\ServiceManager\Factory\FactoryInterf
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
-        $tablePluginManager = $container->get('VuFind\Db\Table\PluginManager');
+        $tablePluginManager = $container->get(\VuFind\Db\Table\PluginManager::class);
         $controllerPluginManager = $container->get('ControllerPluginManager');
-        $capabilities = $container->get('VuFind\Config\AccountCapabilities');
+        $capabilities = $container->get(\VuFind\Config\AccountCapabilities::class);
         return new $requestedName(
-            $tablePluginManager->get('VuFind\Db\Table\Resource'),
-            $controllerPluginManager->get('VuFind\Controller\Plugin\Recaptcha'),
-            $container->get('VuFind\Auth\Manager')->isLoggedIn(),
-            $capabilities->getCommentSetting() !== 'disabled'
+            $tablePluginManager->get(\VuFind\Db\Table\Resource::class),
+            $controllerPluginManager
+                ->get(\VuFind\Controller\Plugin\Captcha::class),
+            $container->get(\VuFind\Auth\Manager::class)->isLoggedIn(),
+            $capabilities->getCommentSetting() !== 'disabled',
+            $container->get(\VuFind\Record\Loader::class),
+            $container->get(\VuFind\Config\AccountCapabilities::class)
         );
     }
 }

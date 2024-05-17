@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AJAX handler to comment on a record.
  *
@@ -25,13 +26,16 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
-use VuFind\Controller\Plugin\Recaptcha;
+use Laminas\Mvc\Controller\Plugin\Params;
+use VuFind\Config\AccountCapabilities;
+use VuFind\Controller\Plugin\Captcha;
 use VuFind\Db\Row\User;
 use VuFind\Db\Table\Resource;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
-use Zend\Mvc\Controller\Plugin\Params;
+use VuFind\Record\Loader as RecordLoader;
 
 /**
  * AJAX handler to comment on a record.
@@ -54,11 +58,11 @@ class CommentRecord extends AbstractBase implements TranslatorAwareInterface
     protected $table;
 
     /**
-     * Recaptcha controller plugin
+     * Captcha controller plugin
      *
-     * @var Recaptcha
+     * @var Captcha
      */
-    protected $recaptcha;
+    protected $captcha;
 
     /**
      * Logged in user (or false)
@@ -75,20 +79,43 @@ class CommentRecord extends AbstractBase implements TranslatorAwareInterface
     protected $enabled;
 
     /**
+     * Record loader
+     *
+     * @var RecordLoader
+     */
+    protected $recordLoader;
+
+    /**
+     * Account capabilities helper
+     *
+     * @var AccountCapabilities
+     */
+    protected $accountCapabilities;
+
+    /**
      * Constructor
      *
-     * @param Resource  $table     Resource database table
-     * @param Recaptcha $recaptcha Recaptcha controller plugin
-     * @param User|bool $user      Logged in user (or false)
-     * @param bool      $enabled   Are comments enabled?
+     * @param Resource            $table   Resource database table
+     * @param Captcha             $captcha Captcha controller plugin
+     * @param User|bool           $user    Logged in user (or false)
+     * @param bool                $enabled Are comments enabled?
+     * @param RecordLoader        $loader  Record loader
+     * @param AccountCapabilities $ac      Account capabilities helper
      */
-    public function __construct(Resource $table, Recaptcha $recaptcha, $user,
-        $enabled = true
+    public function __construct(
+        Resource $table,
+        Captcha $captcha,
+        $user,
+        $enabled,
+        RecordLoader $loader,
+        AccountCapabilities $ac
     ) {
         $this->table = $table;
-        $this->recaptcha = $recaptcha;
+        $this->captcha = $captcha;
         $this->user = $user;
         $this->enabled = $enabled;
+        $this->recordLoader = $loader;
+        $this->accountCapabilities = $ac;
     }
 
     /**
@@ -99,11 +126,11 @@ class CommentRecord extends AbstractBase implements TranslatorAwareInterface
     protected function checkCaptcha()
     {
         // Not enabled? Report success!
-        if (!$this->recaptcha->active('userComments')) {
+        if (!$this->captcha->active('userComments')) {
             return true;
         }
-        $this->recaptcha->setErrorMode('none');
-        return $this->recaptcha->validate();
+        $this->captcha->setErrorMode('none');
+        return $this->captcha->verify();
     }
 
     /**
@@ -139,16 +166,30 @@ class CommentRecord extends AbstractBase implements TranslatorAwareInterface
                 self::STATUS_HTTP_BAD_REQUEST
             );
         }
+        $driver = $this->recordLoader->load($id, $source, false);
 
         if (!$this->checkCaptcha()) {
             return $this->formatResponse(
-                $this->translate('recaptcha_not_passed'),
+                $this->translate('captcha_not_passed'),
                 self::STATUS_HTTP_FORBIDDEN
             );
         }
 
         $resource = $this->table->findResource($id, $source);
         $commentId = $resource->addComment($comment, $this->user);
+
+        $rating = $params->fromPost('rating', '');
+        if (
+            $driver->isRatingAllowed()
+            && ('' !== $rating
+            || $this->accountCapabilities->isRatingRemovalAllowed())
+        ) {
+            $driver->addOrUpdateRating(
+                $this->user->id,
+                '' === $rating ? null : intval($rating)
+            );
+        }
+
         return $this->formatResponse(compact('commentId'));
     }
 }

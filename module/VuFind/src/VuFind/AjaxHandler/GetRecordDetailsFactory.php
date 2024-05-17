@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for GetRecordDetails AJAX handler.
  *
@@ -25,9 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
-use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Factory for GetRecordDetails AJAX handler.
@@ -38,8 +43,7 @@ use Interop\Container\ContainerInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetRecordDetailsFactory
-    implements \Zend\ServiceManager\Factory\FactoryInterface
+class GetRecordDetailsFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Create an object
@@ -53,11 +57,13 @@ class GetRecordDetailsFactory
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
@@ -66,8 +72,8 @@ class GetRecordDetailsFactory
         return new $requestedName(
             $container->get('Config'),
             $container->get('Request'),
-            $container->get('VuFind\Record\Loader'),
-            $container->get('VuFind\RecordTab\PluginManager'),
+            $container->get(\VuFind\Record\Loader::class),
+            $container->get(\VuFind\RecordTab\TabManager::class),
             $container->get('ViewRenderer')
         );
     }

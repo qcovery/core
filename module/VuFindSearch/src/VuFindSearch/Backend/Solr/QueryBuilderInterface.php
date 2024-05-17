@@ -28,6 +28,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\Solr;
 
 use VuFindSearch\ParamBag;
@@ -54,17 +55,6 @@ interface QueryBuilderInterface
      * @return ParamBag
      */
     public function build(AbstractQuery $query);
-
-    /**
-     * Control whether or not the QueryBuilder should create an hl.q parameter
-     * when the main query includes clauses that should not be factored into
-     * highlighting. (Turned off by default).
-     *
-     * @param bool $enable Should highlighting query generation be enabled?
-     *
-     * @return void
-     */
-    public function setCreateHighlightingQuery($enable);
 
     /**
      * Control whether or not the QueryBuilder should create a spellcheck.q

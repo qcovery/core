@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for instantiating Mailer objects
  *
@@ -25,13 +26,17 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Mailer;
 
-use Interop\Container\ContainerInterface;
-use Zend\Mail\Transport\InMemory;
-use Zend\Mail\Transport\Smtp;
-use Zend\Mail\Transport\SmtpOptions;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Mail\Transport\InMemory;
+use Laminas\Mail\Transport\Smtp;
+use Laminas\Mail\Transport\SmtpOptions;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Factory for instantiating Mailer objects
@@ -49,7 +54,7 @@ class Factory implements FactoryInterface
     /**
      * Build the mail transport object.
      *
-     * @param \Zend\Config\Config $config Configuration
+     * @param \Laminas\Config\Config $config Configuration
      *
      * @return InMemory|Smtp
      */
@@ -62,25 +67,30 @@ class Factory implements FactoryInterface
 
         // Create mail transport:
         $settings = [
-            'host' => $config->Mail->host, 'port' => $config->Mail->port
+            'host' => $config->Mail->host, 'port' => $config->Mail->port,
         ];
+        if (isset($config->Mail->name)) {
+            $settings['name'] = $config->Mail->name;
+        }
         if (isset($config->Mail->username) && isset($config->Mail->password)) {
             $settings['connection_class'] = 'login';
             $settings['connection_config'] = [
                 'username' => $config->Mail->username,
-                'password' => $config->Mail->password
+                'password' => $config->Mail->password,
             ];
+            // Set user defined secure connection if provided; otherwise set default
+            // secure connection based on configured port number.
             if (isset($config->Mail->secure)) {
-                // always set user defined secure connection
                 $settings['connection_config']['ssl'] = $config->Mail->secure;
-            } else {
-                // set default secure connection based on configured port
-                if ($settings['port'] == '587') {
-                    $settings['connection_config']['ssl'] = 'tls';
-                } elseif ($settings['port'] == '487') {
-                    $settings['connection_config']['ssl'] = 'ssl';
-                }
+            } elseif ($settings['port'] == '587') {
+                $settings['connection_config']['ssl'] = 'tls';
+            } elseif ($settings['port'] == '487') {
+                $settings['connection_config']['ssl'] = 'ssl';
             }
+        }
+        if (isset($config->Mail->connection_time_limit)) {
+            $settings['connection_time_limit']
+                = $config->Mail->connection_time_limit;
         }
         return new Smtp(new SmtpOptions($settings));
     }
@@ -97,9 +107,11 @@ class Factory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
@@ -107,7 +119,8 @@ class Factory implements FactoryInterface
         }
 
         // Load configurations:
-        $config = $container->get('VuFind\Config\PluginManager')->get('config');
+        $config = $container->get(\VuFind\Config\PluginManager::class)
+            ->get('config');
 
         // Create service:
         $class = new $requestedName($this->getTransport($config));

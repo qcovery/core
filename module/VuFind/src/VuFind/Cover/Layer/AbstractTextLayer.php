@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract cover text layer
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Cover\Layer;
 
 /**
@@ -83,8 +85,16 @@ abstract class AbstractTextLayer extends AbstractLayer
      *
      * @return void
      */
-    protected function drawText($im, $settings, $text, $y, $font, $fontSize, $mcolor,
-        $scolor = false, $align = null
+    protected function drawText(
+        $im,
+        $settings,
+        $text,
+        $y,
+        $font,
+        $fontSize,
+        $mcolor,
+        $scolor = false,
+        $align = null
     ) {
         // In case the text contains non-normalized UTF-8, fix that for proper
         // display:
@@ -99,17 +109,16 @@ abstract class AbstractTextLayer extends AbstractLayer
             $align = 'left';
             $wrapGap = 0; // kill wrap gap to maximize text fit
         }
-        if (null == $align) {
-            $align = $settings->textAlign;
-        }
-        if ($align == 'left') {
-            $x = $wrapGap;
-        }
-        if ($align == 'center') {
-            $x = ($settings->width - $textWidth) / 2;
-        }
-        if ($align == 'right') {
-            $x = $settings->width - ($textWidth + $wrapGap);
+        switch ($align ?? $settings->textAlign) {
+            case 'left':
+                $x = $wrapGap;
+                break;
+            case 'right':
+                $x = $settings->width - ($textWidth + $wrapGap);
+                break;
+            case 'center':
+            default:
+                $x = ($settings->width - $textWidth) / 2;
         }
 
         // Generate 5 lines of text, 4 offset in a border color

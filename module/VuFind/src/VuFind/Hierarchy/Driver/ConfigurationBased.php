@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Configuration-Based Hierarchy Driver
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Hierarchy\Driver;
 
 /**
@@ -54,8 +56,7 @@ class ConfigurationBased extends AbstractBase
      */
     public function showTree()
     {
-        $treeConfigDriver = isset($this->config->HierarchyTree->show)
-            ? $this->config->HierarchyTree->show : false;
+        $treeConfigDriver = $this->config->HierarchyTree->show ?? false;
         return $this->enabled && $treeConfigDriver;
     }
 
@@ -68,9 +69,8 @@ class ConfigurationBased extends AbstractBase
      */
     public function getTreeRendererType()
     {
-        return isset($this->config->HierarchyTree->treeRenderer)
-            ? $this->config->HierarchyTree->treeRenderer
-            : $this->defaultTreeRenderer;
+        return $this->config->HierarchyTree->treeRenderer
+            ?? $this->defaultTreeRenderer;
     }
 
     /**
@@ -80,9 +80,7 @@ class ConfigurationBased extends AbstractBase
      */
     public function getTreeSourceType()
     {
-        return isset($this->config->HierarchyTree->treeSource)
-            ? $this->config->HierarchyTree->treeSource
-            : 'Solr';
+        return $this->config->HierarchyTree->treeSource ?? 'Solr';
     }
 
     /**
@@ -95,8 +93,7 @@ class ConfigurationBased extends AbstractBase
      */
     public function getTreeCacheTime()
     {
-        return isset($this->config->HierarchyTree->solrCacheTime)
-            ? $this->config->HierarchyTree->solrCacheTime : 43200;
+        return $this->config->HierarchyTree->solrCacheTime ?? 43200;
     }
 
     /**
@@ -108,8 +105,7 @@ class ConfigurationBased extends AbstractBase
      */
     public function treeSorting()
     {
-        return isset($this->config->HierarchyTree->sorting)
-            ? $this->config->HierarchyTree->sorting : false;
+        return $this->config->HierarchyTree->sorting ?? false;
     }
 
     /**

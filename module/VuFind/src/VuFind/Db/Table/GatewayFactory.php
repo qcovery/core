@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generic table gateway factory.
  *
@@ -25,9 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Db\Table;
 
-use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Generic table gateway factory.
@@ -38,7 +43,7 @@ use Interop\Container\ContainerInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GatewayFactory implements \Zend\ServiceManager\Factory\FactoryInterface
+class GatewayFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
 {
     /**
      * Return row prototype object (null if unavailable)
@@ -50,7 +55,7 @@ class GatewayFactory implements \Zend\ServiceManager\Factory\FactoryInterface
      */
     protected function getRowPrototype(ContainerInterface $container, $requestedName)
     {
-        $rowManager = $container->get('VuFind\Db\Row\PluginManager');
+        $rowManager = $container->get(\VuFind\Db\Row\PluginManager::class);
         // Map Table class to matching Row class.
         $name = str_replace("\\Table\\", "\\Row\\", $requestedName);
         return $rowManager->has($name) ? $rowManager->get($name) : null;
@@ -68,18 +73,24 @@ class GatewayFactory implements \Zend\ServiceManager\Factory\FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
-        $adapter = $container->get('Zend\Db\Adapter\Adapter');
-        $tm = $container->get('VuFind\Db\Table\PluginManager');
+        $adapter = $container->get(\Laminas\Db\Adapter\Adapter::class);
+        $tm = $container->get(\VuFind\Db\Table\PluginManager::class);
         $config = $container->get('config');
         $rowPrototype = $this->getRowPrototype($container, $requestedName);
         $args = $options ? $options : [];
         return new $requestedName(
-            $adapter, $tm, $config, $rowPrototype, ...$args
+            $adapter,
+            $tm,
+            $config,
+            $rowPrototype,
+            ...$args
         );
     }
 }

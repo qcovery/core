@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for session handling
  *
@@ -27,9 +28,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:session_handlers Wiki
  */
+
 namespace VuFind\Session;
 
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 /**
  * Base class for session handling
@@ -55,19 +57,25 @@ abstract class AbstractBase implements HandlerInterface
     protected $lifetime = 3600;
 
     /**
-     * Session configuration settings
-     *
-     * @var Config
-     */
-    protected $config = null;
-
-    /**
      * Whether writes are disabled, i.e. any changes to the session are not written
      * to the storage
      *
      * @var bool
      */
     protected $writesDisabled = false;
+
+    /**
+     * Constructor
+     *
+     * @param Config $config Session configuration ([Session] section of
+     * config.ini)
+     */
+    public function __construct(Config $config = null)
+    {
+        if (isset($config->lifetime)) {
+            $this->lifetime = $config->lifetime;
+        }
+    }
 
     /**
      * Enable session writing (default)
@@ -90,22 +98,6 @@ abstract class AbstractBase implements HandlerInterface
     }
 
     /**
-     * Set configuration.
-     *
-     * @param Config $config Session configuration ([Session] section of
-     * config.ini)
-     *
-     * @return void
-     */
-    public function setConfig(Config $config)
-    {
-        if (isset($config->lifetime)) {
-            $this->lifetime = $config->lifetime;
-        }
-        $this->config = $config;
-    }
-
-    /**
      * Open function, this works like a constructor in classes and is executed
      * when the session is being opened.
      *
@@ -116,7 +108,7 @@ abstract class AbstractBase implements HandlerInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function open($sess_path, $sess_name)
+    public function open($sess_path, $sess_name): bool
     {
         return true;
     }
@@ -127,7 +119,7 @@ abstract class AbstractBase implements HandlerInterface
      *
      * @return bool
      */
-    public function close()
+    public function close(): bool
     {
         return true;
     }
@@ -140,16 +132,16 @@ abstract class AbstractBase implements HandlerInterface
      *             mechanisms.  If you override this method, be sure to still call
      *             parent::destroy() in addition to any new behavior.
      *
-     * @param string $sess_id The session ID to destroy
+     * @param string $sessId The session ID to destroy
      *
      * @return bool
      */
-    public function destroy($sess_id)
+    public function destroy($sessId): bool
     {
         $searchTable = $this->getTable('Search');
-        $searchTable->destroySession($sess_id);
+        $searchTable->destroySession($sessId);
         $sessionTable = $this->getTable('ExternalSession');
-        $sessionTable->destroySession($sess_id);
+        $sessionTable->destroySession($sessId);
         return true;
     }
 
@@ -157,13 +149,14 @@ abstract class AbstractBase implements HandlerInterface
      * The garbage collector, this is executed when the session garbage collector
      * is executed and takes the max session lifetime as its only parameter.
      *
-     * @param int $sess_maxlifetime Maximum session lifetime.
+     * @param int $sessMaxLifetime Maximum session lifetime.
      *
      * @return bool
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function gc($sess_maxlifetime)
+    #[\ReturnTypeWillChange]
+    public function gc($sessMaxLifetime)
     {
         // how often does this get called (if at all)?
 
@@ -182,26 +175,26 @@ abstract class AbstractBase implements HandlerInterface
     /**
      * Write function that is called when session data is to be saved.
      *
-     * @param string $sess_id The current session ID
-     * @param string $data    The session data to write
+     * @param string $sessId The current session ID
+     * @param string $data   The session data to write
      *
      * @return bool
      */
-    public function write($sess_id, $data)
+    public function write($sessId, $data): bool
     {
         if ($this->writesDisabled) {
             return true;
         }
-        return $this->saveSession($sess_id, $data);
+        return $this->saveSession($sessId, $data);
     }
 
     /**
      * A function that is called internally when session data is to be saved.
      *
-     * @param string $sess_id The current session ID
-     * @param string $data    The session data to write
+     * @param string $sessId The current session ID
+     * @param string $data   The session data to write
      *
      * @return bool
      */
-    abstract protected function saveSession($sess_id, $data);
+    abstract protected function saveSession($sessId, $data): bool;
 }

@@ -26,12 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Connection;
 
+use Laminas\Http\Client\Adapter\Test as TestAdapter;
+use Laminas\Http\Client as HttpClient;
 use VuFind\Connection\WorldCatUtils;
-
-use Zend\Http\Client\Adapter\Test as TestAdapter;
-use Zend\Http\Client as HttpClient;
 
 /**
  * Unit tests for WorldCat utility connector.
@@ -44,6 +44,8 @@ use Zend\Http\Client as HttpClient;
  */
 class WorldCatUtilsTest extends \PHPUnit\Framework\TestCase
 {
+    use \VuFindTest\Feature\FixtureTrait;
+
     /**
      * Test related identities
      *
@@ -53,8 +55,8 @@ class WorldCatUtilsTest extends \PHPUnit\Framework\TestCase
     {
         $client = $this->getClient('identities');
         $ids = $client->getRelatedIdentities('Clemens, Samuel');
-        $this->assertEquals(9, count($ids));
-        $this->assertEquals(34, count($ids['Twain, Mark, 1835-1910']));
+        $this->assertCount(9, $ids);
+        $this->assertCount(34, $ids['Twain, Mark, 1835-1910']);
         $this->assertTrue(in_array('Conjoined twins', $ids['Twain, Mark, 1835-1910']));
     }
 
@@ -82,8 +84,7 @@ class WorldCatUtilsTest extends \PHPUnit\Framework\TestCase
         $client = new HttpClient();
         if (null !== $fixture) {
             $adapter = new TestAdapter();
-            $file = realpath(__DIR__ . '/../../../../fixtures/worldcat/' . $fixture);
-            $adapter->setResponse(file_get_contents($file));
+            $adapter->setResponse($this->getFixture("worldcat/$fixture"));
             $client->setAdapter($adapter);
         }
         return new WorldCatUtils('dummy', $client, $silent);

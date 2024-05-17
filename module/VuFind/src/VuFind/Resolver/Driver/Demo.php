@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Demo Link Resolver Driver
  *
@@ -27,6 +28,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
+
 namespace VuFind\Resolver\Driver;
 
 /**
@@ -82,14 +84,17 @@ class Demo extends AbstractBase
                 'title' => 'Print',
                 'coverage' => 'fake1',
                 'service_type' => 'getHolding',
-                'access' => 'unknown'
+                'access' => 'unknown',
+                'notes' => 'General notes',
             ],
             [
                 'href' => 'https://vufind.org/wiki?' . $data . '#electronic',
                 'title' => 'Electronic',
                 'coverage' => 'fake2',
                 'service_type' => 'getFullTxt',
-                'access' => 'open'
+                'access' => 'open',
+                'authentication' => 'Authentication notes',
+                'notes' => 'General notes',
             ],
         ];
     }

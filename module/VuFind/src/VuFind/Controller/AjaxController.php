@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ajax Controller Module
  *
@@ -25,11 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
+
 namespace VuFind\Controller;
 
+use Laminas\Mvc\Controller\AbstractActionController;
 use VuFind\AjaxHandler\PluginManager;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
-use Zend\Mvc\Controller\AbstractActionController;
 
 /**
  * This controller handles global AJAX functionality
@@ -40,8 +42,7 @@ use Zend\Mvc\Controller\AbstractActionController;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
-class AjaxController extends AbstractActionController
-    implements TranslatorAwareInterface
+class AjaxController extends AbstractActionController implements TranslatorAwareInterface
 {
     use AjaxResponseTrait;
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
@@ -61,17 +62,21 @@ class AjaxController extends AbstractActionController
     /**
      * Make an AJAX call with a JSON-formatted response.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     public function jsonAction()
     {
-        return $this->callAjaxMethod($this->params()->fromQuery('method'));
+        $method = $this->params()->fromQuery('method');
+        if (!$method) {
+            return $this->getAjaxResponse('application/json', ['error' => 'Parameter "method" missing'], 400);
+        }
+        return $this->callAjaxMethod($method);
     }
 
     /**
      * Load a recommendation module via AJAX.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     public function recommendAction()
     {
@@ -83,7 +88,7 @@ class AjaxController extends AbstractActionController
      *
      * A simple OK as text/plain is returned if everything works properly.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     public function systemStatusAction()
     {

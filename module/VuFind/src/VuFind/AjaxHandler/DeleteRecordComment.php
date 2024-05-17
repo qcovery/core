@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AJAX handler to delete a comment on a record.
  *
@@ -25,12 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Mvc\Controller\Plugin\Params;
 use VuFind\Db\Row\User;
 use VuFind\Db\Table\Comments;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
-use Zend\Mvc\Controller\Plugin\Params;
 
 /**
  * AJAX handler to delete a comment on a record.

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mink link resolver test class.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\Mink;
 
 use Behat\Mink\Element\Element;
@@ -37,22 +39,10 @@ use Behat\Mink\Element\Element;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
+ * @retry    4
  */
-class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
+class LinkResolverTest extends \VuFindTest\Integration\MinkTestCase
 {
-    /**
-     * Standard setup method.
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        // Give up if we're not running in CI:
-        if (!$this->continuousIntegrationRunning()) {
-            return $this->markTestSkipped('Continuous integration not running.');
-        }
-    }
-
     /**
      * Get config.ini override settings for testing ILS functions.
      *
@@ -67,7 +57,7 @@ class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
                 'resolver' => 'demo',
                 'embed' => '1',
                 'url' => 'https://vufind.org/wiki',
-            ]
+            ],
         ];
     }
 
@@ -92,7 +82,9 @@ class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
         // Search for a known record:
         $session = $this->getMinkSession();
         $session->visit($this->getVuFindUrl() . '/Record/testsample1');
-        return $session->getPage();
+        $page = $session->getPage();
+        $this->waitForPageLoad($page);
+        return $page;
     }
 
     /**
@@ -107,14 +99,17 @@ class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
     {
         // Click the OpenURL link:
         if ($click) {
-            $this->findCss($page, '.fulltext')->click();
+            $this->clickCss($page, '.fulltext');
         }
-        $this->snooze();
 
         // Confirm that the expected fake demo driver data is there:
+        $this->waitForPageLoad($page);
         $electronic = $this->findCss($page, 'a.access-open');
         $this->assertEquals('Electronic', $electronic->getText());
-        $this->assertEquals('Electronic fake2', $electronic->getParent()->getText());
+        $this->assertEquals(
+            'Electronic fake2 General notes Authentication notes',
+            $electronic->getParent()->getText()
+        );
         $openUrl = 'url_ver=Z39.88-2004&ctx_ver=Z39.88-2004'
             . '&ctx_enc=info%3Aofi%2Fenc%3AUTF-8'
             . '&rfr_id=info%3Asid%2Fvufind.svn.sourceforge.net%3Agenerator'
@@ -130,7 +125,10 @@ class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
 
         $print = $this->findCss($page, 'a.access-unknown');
         $this->assertEquals('Print', $print->getText());
-        $this->assertEquals('Print fake1', $print->getParent()->getText());
+        $this->assertEquals(
+            'Print fake1 General notes',
+            $print->getParent()->getText()
+        );
         $this->assertEquals(
             'https://vufind.org/wiki?' . $openUrl . '#print',
             $print->getAttribute('href')
@@ -157,8 +155,7 @@ class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('id:testsample1');
-        $this->findCss($page, '.btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.btn.btn-primary');
 
         // Verify the OpenURL
         $this->assertOpenUrl($page);
@@ -186,7 +183,7 @@ class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('id:testsample1');
-        $this->findCss($page, '.btn.btn-primary')->click();
+        $this->clickCss($page, '.btn.btn-primary');
 
         // Verify the OpenURL
         $this->assertOpenUrl($page, false /* do not click link */);
@@ -201,7 +198,6 @@ class LinkResolverTest extends \VuFindTest\Unit\MinkTestCase
     {
         // By default, no OpenURL on record page:
         $page = $this->setupRecordPage();
-        $this->snooze();
         $this->assertNull($page->find('css', '.fulltext'));
     }
 

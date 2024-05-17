@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Service Initializer
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ServiceManager;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Initializer\InitializerInterface;
+use Laminas\ServiceManager\Initializer\InitializerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * VuFind Service Initializer
@@ -54,12 +56,13 @@ class ServiceInitializer implements InitializerInterface
         static $enabled = null;
         if (null === $enabled) {
             // Return true if Record Cache is enabled for any data source
-            $cacheConfig = $sm->get('VuFind\Config\PluginManager')
+            $cacheConfig = $sm->get(\VuFind\Config\PluginManager::class)
                 ->get('RecordCache');
             $enabled = false;
             foreach ($cacheConfig as $section) {
                 foreach ($section as $setting) {
-                    if (isset($setting['operatingMode'])
+                    if (
+                        isset($setting['operatingMode'])
                         && $setting['operatingMode'] !== 'disabled'
                     ) {
                         $enabled = true;
@@ -82,22 +85,25 @@ class ServiceInitializer implements InitializerInterface
     public function __invoke(ContainerInterface $sm, $instance)
     {
         if ($instance instanceof \VuFind\Db\Table\DbTableAwareInterface) {
-            $instance->setDbTableManager($sm->get('VuFind\Db\Table\PluginManager'));
+            $instance->setDbTableManager(
+                $sm->get(\VuFind\Db\Table\PluginManager::class)
+            );
         }
-        if ($instance instanceof \Zend\Log\LoggerAwareInterface) {
-            $instance->setLogger($sm->get('VuFind\Log\Logger'));
+        if ($instance instanceof \Laminas\Log\LoggerAwareInterface) {
+            $instance->setLogger($sm->get(\VuFind\Log\Logger::class));
         }
         if ($instance instanceof \VuFind\I18n\Translator\TranslatorAwareInterface) {
-            $instance->setTranslator($sm->get('Zend\Mvc\I18n\Translator'));
+            $instance->setTranslator($sm->get(\Laminas\Mvc\I18n\Translator::class));
         }
         if ($instance instanceof \VuFindHttp\HttpServiceAwareInterface) {
-            $instance->setHttpService($sm->get('VuFindHttp\HttpService'));
+            $instance->setHttpService($sm->get(\VuFindHttp\HttpService::class));
         }
         // Only inject cache if configuration enabled (to save resources):
-        if ($instance instanceof \VuFind\Record\Cache\RecordCacheAwareInterface
+        if (
+            $instance instanceof \VuFind\Record\Cache\RecordCacheAwareInterface
             && $this->isCacheEnabled($sm)
         ) {
-            $instance->setRecordCache($sm->get('VuFind\Record\Cache'));
+            $instance->setRecordCache($sm->get(\VuFind\Record\Cache::class));
         }
         return $instance;
     }

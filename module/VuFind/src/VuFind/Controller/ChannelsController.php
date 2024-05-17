@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Channels Controller
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/indexing:alphabetical_heading_browse Wiki
  */
+
 namespace VuFind\Controller;
 
 use VuFind\ChannelProvider\ChannelLoader;
@@ -62,7 +64,7 @@ class ChannelsController extends AbstractBase
     /**
      * Generates static front page of channels.
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function homeAction()
     {
@@ -76,7 +78,7 @@ class ChannelsController extends AbstractBase
     /**
      * Generates channels for a record.
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function recordAction()
     {
@@ -92,7 +94,7 @@ class ChannelsController extends AbstractBase
     /**
      * Generates channels for a search.
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function searchAction()
     {

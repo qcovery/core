@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Upgrade controller factory.
  *
@@ -25,10 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Controller;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Upgrade controller factory.
@@ -39,7 +43,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class UpgradeControllerFactory implements FactoryInterface
+class UpgradeControllerFactory extends AbstractBaseFactory
 {
     /**
      * Create an object
@@ -53,18 +57,24 @@ class UpgradeControllerFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $cookieManager = $container->get('VuFind\Cookie\CookieManager');
-        $session = new \Zend\Session\Container(
-            'upgrade', $container->get('Zend\Session\SessionManager')
+        $cookieManager = $container->get(\VuFind\Cookie\CookieManager::class);
+        $session = new \Laminas\Session\Container(
+            'upgrade',
+            $container->get(\Laminas\Session\SessionManager::class)
         );
-        return new $requestedName($container, $cookieManager, $session);
+        return $this->applyPermissions(
+            $container,
+            new $requestedName($container, $cookieManager, $session)
+        );
     }
 }

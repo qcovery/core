@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Record loader factory.
  *
@@ -25,10 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Record;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Record loader factory.
@@ -53,19 +58,21 @@ class LoaderFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
         return new $requestedName(
-            $container->get('VuFindSearch\Service'),
-            $container->get('VuFind\RecordDriver\PluginManager'),
-            $container->get('VuFind\Record\Cache'),
-            $container->get('VuFind\Record\FallbackLoader\PluginManager')
+            $container->get(\VuFindSearch\Service::class),
+            $container->get(\VuFind\RecordDriver\PluginManager::class),
+            $container->get(\VuFind\Record\Cache::class),
+            $container->get(\VuFind\Record\FallbackLoader\PluginManager::class)
         );
     }
 }

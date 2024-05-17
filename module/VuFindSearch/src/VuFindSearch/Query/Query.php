@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Query;
 
 /**
@@ -67,7 +68,7 @@ class Query extends AbstractQuery
      * @param string $handler  Name of search handler
      * @param string $operator Operator to apply to query string (null if n/a)
      */
-    public function __construct($string = null, $handler = null, $operator = null)
+    public function __construct($string = '', $handler = null, $operator = null)
     {
         $this->queryHandler = $handler ? $handler : null;
         $this->queryString  = $string;
@@ -75,13 +76,16 @@ class Query extends AbstractQuery
     }
 
     /**
-     * Return search string.
+     * Return search string (optionally applying a normalization callback)
+     *
+     * @param callable $normalizer Function to normalize text strings (null for
+     * no normalization)
      *
      * @return string
      */
-    public function getString()
+    public function getString($normalizer = null)
     {
-        return $this->queryString;
+        return $normalizer ? $normalizer($this->queryString) : $this->queryString;
     }
 
     /**
@@ -111,7 +115,7 @@ class Query extends AbstractQuery
      *
      * @param string $handler Name of handler
      *
-     * @return string
+     * @return void
      */
     public function setHandler($handler)
     {
@@ -133,7 +137,7 @@ class Query extends AbstractQuery
      *
      * @param string $operator Operator
      *
-     * @return string
+     * @return void
      */
     public function setOperator($operator)
     {
@@ -141,19 +145,22 @@ class Query extends AbstractQuery
     }
 
     /**
-     * Does the query contain the specified term?
+     * Does the query contain the specified term? An optional normalizer can be
+     * provided to allow for fuzzier matching.
      *
-     * @param string $needle Term to check
+     * @param string   $needle     Term to check
+     * @param callable $normalizer Function to normalize text strings (null for
+     * no normalization)
      *
      * @return bool
      */
-    public function containsTerm($needle)
+    public function containsTerm($needle, $normalizer = null)
     {
         // Escape characters with special meaning in regular expressions to avoid
         // errors:
-        $needle = preg_quote($needle, '/');
+        $needle = preg_quote($normalizer ? $normalizer($needle) : $needle, '/');
 
-        return (bool)preg_match("/\b$needle\b/u", $this->getString());
+        return (bool)preg_match("/\b$needle\b/u", $this->getString($normalizer));
     }
 
     /**
@@ -169,28 +176,27 @@ class Query extends AbstractQuery
     /**
      * Replace a term.
      *
-     * @param string $from Search term to find
-     * @param string $to   Search term to insert
+     * @param string   $from       Search term to find
+     * @param string   $to         Search term to insert
+     * @param callable $normalizer Function to normalize text strings (null for
+     * no normalization)
      *
      * @return void
      */
-    public function replaceTerm($from, $to)
+    public function replaceTerm($from, $to, $normalizer = null)
     {
         // Escape $from so it is regular expression safe (just in case it
         // includes any weird punctuation -- unlikely but possible):
-        $from = preg_quote($from, '/');
+        $from = preg_quote($normalizer ? $normalizer($from) : $from, '/');
+        $queryString = $this->getString($normalizer);
 
-        // If our "from" pattern contains non-word characters, we can't use word
-        // boundaries for matching.  We want to try to use word boundaries when
-        // possible, however, to avoid the replacement from affecting unexpected
-        // parts of the search query.
-        if (!preg_match('/.*[^\w].*/', $from)) {
-            $pattern = "/\b$from\b/i";
-        } else {
-            $pattern = "/$from/i";
+        // Try to match within word boundaries to prevent the replacement from
+        // affecting unexpected parts of the search query; if that fails to change
+        // anything, try again with a less restricted regular expression. The fall-
+        // back is needed when $from contains punctuation characters such as commas.
+        $this->queryString = preg_replace("/\b$from\b/i", $to, $queryString);
+        if ($queryString === $this->queryString) {
+            $this->queryString = preg_replace("/$from/i", $to, $queryString);
         }
-
-        // Perform the replacement:
-        $this->queryString = preg_replace($pattern, $to, $this->queryString);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AbstractBase for Resolver Driver
  *
@@ -27,6 +28,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
+
 namespace VuFind\Resolver\Driver;
 
 /**
@@ -68,14 +70,17 @@ abstract class AbstractBase implements DriverInterface
      */
     public function getResolverUrl($openURL)
     {
-        return $this->baseUrl . '?' . $openURL;
+        $url = $this->baseUrl;
+        $url .= strpos($url, '?') === false ? '?' : '&';
+        $url .= $openURL;
+        return $url;
     }
 
     /**
      * This controls whether a "More options" link will be shown below the fetched
      * resolver links eventually linking to the resolver page previously being
      * parsed.
-     * This is especially useful for resolver such as the EZB resolver returning
+     * This is especially useful for resolver such as the JOP resolver returning
      * XML which would not be of any immediate use for the user.
      *
      * @return bool

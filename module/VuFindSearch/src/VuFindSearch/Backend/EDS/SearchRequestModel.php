@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EBSCO EDS API Search Model
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\EDS;
 
 /**
@@ -84,7 +86,7 @@ class SearchRequestModel
     /**
      * Expanders to use. Comma separated.
      *
-     * @var string
+     * @var array
      */
     protected $expanders = [];
 
@@ -149,6 +151,7 @@ class SearchRequestModel
         $dates = substr($filter, 17);
         $dates = substr($dates, 0, strlen($dates) - 1);
         $parts = explode(' TO ', $dates, 2);
+        $start = $end = null;
         if (count($parts) == 2) {
             $start = trim($parts[0]);
             $end = trim($parts[1]);
@@ -173,27 +176,27 @@ class SearchRequestModel
     {
         foreach ($parameters as $key => $values) {
             switch ($key) {
-            case 'filters':
-                $cnt = 1;
-                foreach ($values as $filter) {
-                    if (substr($filter, 0, 6) == 'LIMIT|') {
-                        $this->addLimiter(substr($filter, 6));
-                    } elseif (substr($filter, 0, 7) == 'EXPAND:') {
-                        $this->addExpander(substr($filter, 7));
-                    } elseif (substr($filter, 0, 11) == 'SEARCHMODE:') {
-                        $this->searchMode = substr($filter, 11, null);
-                    } elseif (substr($filter, 0, 15) == 'PublicationDate') {
-                        $this->addLimiter($this->formatDateLimiter($filter));
-                    } else {
-                        $this->addFilter("$cnt,$filter");
-                        $cnt++;
+                case 'filters':
+                    $cnt = 1;
+                    foreach ($values as $filter) {
+                        if (substr($filter, 0, 6) == 'LIMIT|') {
+                            $this->addLimiter(substr($filter, 6));
+                        } elseif (substr($filter, 0, 7) == 'EXPAND:') {
+                            $this->addExpander(substr($filter, 7));
+                        } elseif (substr($filter, 0, 11) == 'SEARCHMODE:') {
+                            $this->searchMode = substr($filter, 11, null);
+                        } elseif (substr($filter, 0, 15) == 'PublicationDate') {
+                            $this->addLimiter($this->formatDateLimiter($filter));
+                        } else {
+                            $this->addFilter("$cnt,$filter");
+                            $cnt++;
+                        }
                     }
-                }
-                break;
-            default:
-                if (property_exists($this, $key)) {
-                    $this->$key = $values;
-                }
+                    break;
+                default:
+                    if (property_exists($this, $key)) {
+                        $this->$key = $values;
+                    }
             }
         }
     }
@@ -217,11 +220,25 @@ class SearchRequestModel
     {
         $qs = [];
         if (isset($this->query) && 0 < sizeof($this->query)) {
-            $qs['query-x'] = $this->query;
+            $formatQuery = function ($json) {
+                $query = json_decode($json, true);
+                $queryString = empty($query['bool'])
+                    ? '' : ($query['bool'] . ',');
+                if (!empty($query['field'])) {
+                    $queryString .= $query['field'] . ':';
+                }
+                $queryString .= static::escapeSpecialCharacters($query['term']);
+                return $queryString;
+            };
+            $qs['query-x'] = array_map($formatQuery, $this->query);
         }
 
         if (isset($this->facetFilters) && 0 < sizeof($this->facetFilters)) {
-            $qs['facetfilter'] = $this->facetFilters;
+            $formatFilter = function ($raw) {
+                [$field, $value] = explode(':', $raw, 2);
+                return $field . ':' . static::escapeSpecialCharacters($value);
+            };
+            $qs['facetfilter'] = array_map($formatFilter, $this->facetFilters);
         }
 
         if (isset($this->limiters) && 0 < sizeof($this->limiters)) {
@@ -233,7 +250,7 @@ class SearchRequestModel
         }
 
         if (isset($this->includeFacets)) {
-            $qs['includefacets']  = $this->includeFacets;
+            $qs['includefacets'] = $this->includeFacets;
         }
 
         if (isset($this->sort)) {
@@ -267,6 +284,95 @@ class SearchRequestModel
     }
 
     /**
+     * Converts properties to a search request JSON document to send to the EdsAPI
+     *
+     * @return string
+     */
+    public function convertToSearchRequestJSON()
+    {
+        $json = new \stdClass();
+        $json->SearchCriteria = new \stdClass();
+        $json->RetrievalCriteria = new \stdClass();
+        $json->Actions = null;
+        if (isset($this->query) && 0 < sizeof($this->query)) {
+            $json->SearchCriteria->Queries = [];
+            foreach ($this->query as $queryJson) {
+                $query = json_decode($queryJson, true);
+                $queryObj = new \stdClass();
+                if (!empty($query['bool'])) {
+                    $queryObj->BooleanOperator = $query['bool'];
+                }
+                if (!empty($query['field'])) {
+                    $queryObj->FieldCode = $query['field'];
+                }
+                $queryObj->Term = $query['term'];
+                $json->SearchCriteria->Queries[] = $queryObj;
+            }
+        }
+
+        if (isset($this->facetFilters) && 0 < sizeof($this->facetFilters)) {
+            $json->SearchCriteria->FacetFilters = [];
+            foreach ($this->facetFilters as $currentFilter) {
+                [$id, $filter] = explode(',', $currentFilter, 2);
+                [$field, $value] = explode(':', $filter, 2);
+                $filterObj = new \stdClass();
+                $filterObj->FilterId = $id;
+                $valueObj = new \stdClass();
+                $valueObj->Id = $field;
+                $valueObj->Value = $value;
+                $filterObj->FacetValues = [$valueObj];
+                $json->SearchCriteria->FacetFilters[] = $filterObj;
+            }
+        }
+
+        if (isset($this->limiters) && 0 < sizeof($this->limiters)) {
+            $json->SearchCriteria->Limiters = [];
+            foreach ($this->limiters as $limiter) {
+                [$id, $values] = explode(':', $limiter, 2);
+                $limiterObj = new \stdClass();
+                $limiterObj->Id = $id;
+                $limiterObj->Values = explode(',', $values);
+                $json->SearchCriteria->Limiters[] = $limiterObj;
+            }
+        }
+
+        if (isset($this->actions) && 0 < sizeof($this->actions)) {
+            $json->Actions = $this->actions;
+        }
+
+        $json->SearchCriteria->IncludeFacets = $this->includeFacets ?? 'y';
+
+        if (isset($this->sort)) {
+            $json->SearchCriteria->Sort = $this->sort;
+        }
+
+        if (isset($this->searchMode)) {
+            $json->SearchCriteria->SearchMode = $this->searchMode;
+        }
+
+        if (isset($this->expanders) && 0 < sizeof($this->expanders)) {
+            $json->SearchCriteria->Expanders = $this->expanders;
+        }
+
+        if (isset($this->view)) {
+            $json->RetrievalCriteria->View = $this->view;
+        }
+
+        if (isset($this->resultsPerPage)) {
+            $json->RetrievalCriteria->ResultsPerPage = intval($this->resultsPerPage);
+        }
+
+        if (isset($this->pageNumber)) {
+            $json->RetrievalCriteria->PageNumber = intval($this->pageNumber);
+        }
+
+        $highlightVal = isset($this->highlight) && $this->highlight ? 'y' : 'n';
+        $json->RetrievalCriteria->Highlight = $highlightVal;
+
+        return json_encode($json, JSON_PRETTY_PRINT);
+    }
+
+    /**
      * Verify whether or not a string ends with certain characters
      *
      * @param string $valueToCheck    Value to check the ending characters of
@@ -274,11 +380,10 @@ class SearchRequestModel
      *
      * @return bool
      */
-    protected static function endsWith($valueToCheck, $valueToCheckFor)
-    {
-        if (!isset($valueToCheck)) {
-            return false;
-        }
+    protected static function endsWith(
+        string $valueToCheck,
+        string $valueToCheckFor
+    ): bool {
         return substr($valueToCheck, -strlen($valueToCheckFor)) === $valueToCheckFor;
     }
 

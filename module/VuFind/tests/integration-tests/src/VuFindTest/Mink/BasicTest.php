@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Very simple Mink test class.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\Mink;
 
 /**
@@ -35,8 +37,9 @@ namespace VuFindTest\Mink;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
+ * @retry    4
  */
-class BasicTest extends \VuFindTest\Unit\MinkTestCase
+class BasicTest extends \VuFindTest\Integration\MinkTestCase
 {
     /**
      * Test that the home page is available.
@@ -64,11 +67,13 @@ class BasicTest extends \VuFindTest\Unit\MinkTestCase
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('id:testsample1');
-        $this->findCss($page, '.btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.btn.btn-primary');
+        $this->waitForPageLoad($page);
 
         // Check for sample driver location/call number in output (this will
         // only appear after AJAX returns):
+        $this->unFindCss($page, '.callnumber.ajax-availability');
+        $this->unFindCss($page, '.location.ajax-availability');
         $this->assertEquals(
             'A1234.567',
             $this->findCss($page, '.callnumber')->getText()
@@ -95,9 +100,9 @@ class BasicTest extends \VuFindTest\Unit\MinkTestCase
             $this->findCss($page, 'footer .help-link')->getHTML()
         );
         // Change the language:
-        $this->findCss($page, '.language.dropdown')->click();
-        $this->findCss($page, '.language.dropdown li:not(.active) a')->click();
-        $this->snooze();
+        $this->clickCss($page, '.language.dropdown');
+        $this->clickCss($page, '.language.dropdown li:not(.active) a');
+        $this->waitForPageLoad($page);
         // Check footer help-link
         $this->assertNotEquals(
             'Search Tips',
@@ -116,12 +121,12 @@ class BasicTest extends \VuFindTest\Unit\MinkTestCase
         $session->visit($this->getVuFindUrl() . '/Search/Home');
         $page = $session->getPage();
         // Open Search tips lightbox
-        $this->findCss($page, 'footer .help-link')->click();
-        $this->snooze();
+        $this->clickCss($page, 'footer .help-link');
+        $this->waitForPageLoad($page);
         // Click a jump link
-        $this->findCss($page, '.modal-body .HelpMenu a')->click();
+        $this->clickCss($page, '.modal-body .HelpMenu a');
         // Make sure we're still in the Search Tips
-        $this->snooze();
+        $this->waitForPageLoad($page);
         $this->findCss($page, '.modal-body .HelpMenu');
     }
 }

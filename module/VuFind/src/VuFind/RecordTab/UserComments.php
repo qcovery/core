@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User comments tab
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
+
 namespace VuFind\RecordTab;
 
 /**
@@ -46,32 +48,32 @@ class UserComments extends AbstractBase
     protected $enabled;
 
     /**
-     * Should we use ReCaptcha?
+     * Should we use Captcha?
      *
      * @var bool
      */
-    protected $useRecaptcha;
+    protected $useCaptcha;
 
     /**
      * Constructor
      *
      * @param bool $enabled is this tab enabled?
-     * @param bool $urc     use recaptcha?
+     * @param bool $uc      use captcha?
      */
-    public function __construct($enabled = true, $urc = false)
+    public function __construct($enabled = true, $uc = false)
     {
         $this->enabled = $enabled;
-        $this->useRecaptcha = $urc;
+        $this->useCaptcha = $uc;
     }
 
     /**
-     * Is Recaptcha active?
+     * Is Captcha active?
      *
      * @return bool
      */
-    public function isRecaptchaActive()
+    public function isCaptchaActive()
     {
-        return $this->useRecaptcha;
+        return $this->useCaptcha;
     }
 
     /**

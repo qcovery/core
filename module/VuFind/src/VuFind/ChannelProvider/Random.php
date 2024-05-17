@@ -1,10 +1,11 @@
 <?php
+
 /**
  * "Random items" channel provider.
  *
  * PHP version 7
  *
- * Copyright (C) Villanova University 2016.
+ * Copyright (C) Villanova University 2016, 2022.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -25,12 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ChannelProvider;
 
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\RecordDriver\AbstractBase as RecordDriver;
 use VuFind\Search\Base\Params;
 use VuFind\Search\Base\Results;
+use VuFindSearch\Command\RandomCommand;
 
 /**
  * "Random items" channel provider.
@@ -41,8 +44,7 @@ use VuFind\Search\Base\Results;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class Random extends AbstractChannelProvider
-    implements TranslatorAwareInterface
+class Random extends AbstractChannelProvider implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
@@ -81,8 +83,10 @@ class Random extends AbstractChannelProvider
      * @param \VuFind\Search\Params\PluginManager $paramManager Params manager
      * @param array                               $options      Settings (optional)
      */
-    public function __construct(\VuFindSearch\Service $search,
-        \VuFind\Search\Params\PluginManager $paramManager, array $options = []
+    public function __construct(
+        \VuFindSearch\Service $search,
+        \VuFind\Search\Params\PluginManager $paramManager,
+        array $options = []
     ) {
         $this->searchService = $search;
         $this->paramManager = $paramManager;
@@ -159,9 +163,13 @@ class Random extends AbstractChannelProvider
         ];
         $query = $params->getQuery();
         $paramBag = $params->getBackendParameters();
-        $random = $this->searchService->random(
-            $params->getSearchClassId(), $query, $this->channelSize, $paramBag
-        )->getRecords();
+        $command = new RandomCommand(
+            $params->getSearchClassId(),
+            $query,
+            $this->channelSize,
+            $paramBag
+        );
+        $random = $this->searchService->invoke($command)->getResult()->getRecords();
         $retVal['contents'] = $this->summarizeRecordDrivers($random);
         return $retVal;
     }

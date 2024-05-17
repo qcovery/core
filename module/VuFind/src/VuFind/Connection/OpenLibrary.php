@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Open Library Utilities
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Connection;
 
 /**
@@ -43,16 +45,16 @@ class OpenLibrary
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $client;
 
     /**
      * Constructor
      *
-     * @param \Zend\Http\Client $client HTTP client
+     * @param \Laminas\Http\Client $client HTTP client
      */
-    public function __construct(\Zend\Http\Client $client)
+    public function __construct(\Laminas\Http\Client $client)
     {
         $this->client = $client;
     }
@@ -75,8 +77,14 @@ class OpenLibrary
      * @return array
      */
     public function getSubjects(
-        $subject, $publishedIn, $subjectTypes, $ebooks = true, $details = false,
-        $limit = 5, $offset = null, $publicFullText = true
+        $subject,
+        $publishedIn,
+        $subjectTypes,
+        $ebooks = true,
+        $details = false,
+        $limit = 5,
+        $offset = null,
+        $publicFullText = true
     ) {
         // empty array to hold the result
         $result = [];
@@ -139,7 +147,8 @@ class OpenLibrary
                 $i = 1;
                 foreach ($data['works'] as $work) {
                     if ($i <= $limit) {
-                        if ($publicFullText && (!$work['public_scan']
+                        if (
+                            $publicFullText && (!$work['public_scan']
                             || !$work['has_fulltext'])
                         ) {
                             continue;

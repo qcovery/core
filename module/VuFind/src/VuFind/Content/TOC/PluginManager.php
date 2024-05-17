@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TOC content loader plugin manager
  *
@@ -17,24 +18,25 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   John Jung <jej@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
+ * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Content\TOC;
 
 /**
  * TOC content loader plugin manager
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   John Jung <jej@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
+ * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
 class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
 {
@@ -44,9 +46,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'demo' => 'VuFind\Content\TOC\Demo',
-        'syndetics' => 'VuFind\Content\TOC\Syndetics',
-        'syndeticsplus' => 'VuFind\Content\TOC\SyndeticsPlus',
+        'demo' => Demo::class,
+        'syndetics' => Syndetics::class,
+        'syndeticsplus' => SyndeticsPlus::class,
     ];
 
     /**
@@ -55,10 +57,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Content\TOC\Demo' => 'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Content\TOC\Syndetics' => 'VuFind\Content\AbstractSyndeticsFactory',
-        'VuFind\Content\TOC\SyndeticsPlus' =>
-            'VuFind\Content\AbstractSyndeticsFactory',
+        Demo::class => \Laminas\ServiceManager\Factory\InvokableFactory::class,
+        Syndetics::class => \VuFind\Content\AbstractSyndeticsFactory::class,
+        SyndeticsPlus::class => \VuFind\Content\AbstractSyndeticsFactory::class,
     ];
 
     /**
@@ -69,6 +70,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Content\AbstractBase';
+        return \VuFind\Content\AbstractBase::class;
     }
 }

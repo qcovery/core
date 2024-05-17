@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Alma controller
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) AK Bibliothek Wien für Sozialwissenschaften 2018.
  *
@@ -25,9 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
+
 namespace VuFind\Controller;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Stdlib\RequestInterface;
 
 /**
  * Alma controller, mainly for webhooks.
@@ -50,28 +53,28 @@ class AlmaController extends AbstractBase
     /**
      * Http response
      *
-     * @var \Zend\Http\PhpEnvironment\Response
+     * @var \Laminas\Http\PhpEnvironment\Response
      */
     protected $httpResponse;
 
     /**
      * Http headers
      *
-     * @var \Zend\Http\Headers
+     * @var \Laminas\Http\Headers
      */
     protected $httpHeaders;
 
     /**
      * Configuration from config.ini
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * Alma.ini config
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $configAlma;
 
@@ -83,7 +86,7 @@ class AlmaController extends AbstractBase
     protected $userTable;
 
     /**
-     * Alma Controler constructor.
+     * Alma Controller constructor.
      *
      * @param ServiceLocatorInterface $sm The ServiceLocatorInterface
      */
@@ -100,7 +103,7 @@ class AlmaController extends AbstractBase
     /**
      * Action that is executed when the webhook page is called.
      *
-     * @return \Zend\Http\Response|NULL
+     * @return \Laminas\Http\Response|NULL
      */
     public function webhookAction()
     {
@@ -112,7 +115,8 @@ class AlmaController extends AbstractBase
 
         // Get request body if method is POST and is not empty
         $requestBodyJson = null;
-        if ($request->getContent() != null
+        if (
+            $request->getContent() != null
             && !empty($request->getContent())
             && $requestMethod == 'POST'
         ) {
@@ -121,7 +125,8 @@ class AlmaController extends AbstractBase
             } catch (\VuFind\Exception\Forbidden $ex) {
                 return $this->createJsonResponse(
                     'Access to Alma Webhook is forbidden. ' .
-                    'The message signature is not correct.', 403
+                    'The message signature is not correct.',
+                    403
                 );
             }
             $requestBodyJson = json_decode($request->getContent());
@@ -132,40 +137,42 @@ class AlmaController extends AbstractBase
 
         // Perform webhook action
         switch ($webhookAction) {
+            case 'USER':
+                $accessPermission = 'access.alma.webhook.user';
+                try {
+                    $this->checkPermission($accessPermission);
+                } catch (\VuFind\Exception\Forbidden $ex) {
+                    return $this->createJsonResponse(
+                        'Access to Alma Webhook \'' . $webhookAction .
+                        '\' forbidden. Set permission \'' . $accessPermission .
+                        '\' in \'permissions.ini\'.',
+                        403
+                    );
+                }
 
-        case 'USER':
-            $accessPermission = 'access.alma.webhook.user';
-            try {
-                $this->checkPermission($accessPermission);
-            } catch (\VuFind\Exception\Forbidden $ex) {
-                return $this->createJsonResponse(
-                    'Access to Alma Webhook \'' . $webhookAction . '\' forbidden. ' .
-                    'Set permission \'' . $accessPermission .
-                    '\' in \'permissions.ini\'.', 403
-                );
-            }
-
-            return $this->webhookUser($requestBodyJson);
+                return $this->webhookUser($requestBodyJson);
                 break;
-        case 'JOB_END':
-        case 'NOTIFICATION':
-        case 'LOAN':
-        case 'REQUEST':
-        case 'BIB':
-        case 'ITEM':
-            return $this->webhookNotImplemented($webhookAction);
+            case 'JOB_END':
+            case 'NOTIFICATION':
+            case 'LOAN':
+            case 'REQUEST':
+            case 'BIB':
+            case 'ITEM':
+                return $this->webhookNotImplemented($webhookAction);
                 break;
-        default:
-            $accessPermission = 'access.alma.webhook.challenge';
-            try {
-                $this->checkPermission($accessPermission);
-            } catch (\VuFind\Exception\Forbidden $ex) {
-                return $this->createJsonResponse(
-                    'Access to Alma Webhook challenge forbidden. Set permission \'' .
-                    $accessPermission . '\' in \'permissions.ini\'.', 403
-                );
-            }
-            return $this->webhookChallenge();
+            default:
+                $accessPermission = 'access.alma.webhook.challenge';
+                try {
+                    $this->checkPermission($accessPermission);
+                } catch (\VuFind\Exception\Forbidden $ex) {
+                    return $this->createJsonResponse(
+                        'Access to Alma Webhook challenge forbidden. Set ' .
+                        'permission \'' . $accessPermission .
+                        '\' in \'permissions.ini\'.',
+                        403
+                    );
+                }
+                return $this->webhookChallenge();
                 break;
         }
     }
@@ -175,11 +182,10 @@ class AlmaController extends AbstractBase
      *
      * @param mixed $requestBodyJson A JSON string decode with json_decode()
      *
-     * @return NULL|\Zend\Http\Response
+     * @return NULL|\Laminas\Http\Response
      */
     protected function webhookUser($requestBodyJson)
     {
-
         // Initialize user variable that should hold the user table row
         $user = null;
 
@@ -195,12 +201,13 @@ class AlmaController extends AbstractBase
         if ($method == 'CREATE' || $method == 'UPDATE') {
             // Get username (could e. g. be the barcode)
             $username = null;
-            $userIdentifiers = $requestBodyJson->webhook_user->user->user_identifier
-                               ?? null;
+            $userIdentifiers
+                = $requestBodyJson->webhook_user->user->user_identifier ?? null;
             $idTypeConfig = $this->configAlma->NewUser->idType ?? null;
             foreach ($userIdentifiers as $userIdentifier) {
                 $idTypeHook = $userIdentifier->id_type->value ?? null;
-                if ($idTypeHook != null
+                if (
+                    $idTypeHook != null
                     && $idTypeHook == $idTypeConfig
                     && $username == null
                 ) {
@@ -216,8 +223,8 @@ class AlmaController extends AbstractBase
             $firstname = $requestBodyJson->webhook_user->user->first_name ?? null;
             $lastname = $requestBodyJson->webhook_user->user->last_name ?? null;
 
-            $allEmails = $requestBodyJson->webhook_user->user->contact_info->email
-                         ?? null;
+            $allEmails
+                = $requestBodyJson->webhook_user->user->contact_info->email ?? null;
             $email = null;
             foreach ($allEmails as $currentEmail) {
                 $preferred = $currentEmail->preferred ?? false;
@@ -238,7 +245,7 @@ class AlmaController extends AbstractBase
                 $user->username = $username;
                 $user->firstname = $firstname;
                 $user->lastname = $lastname;
-                $user->email = $email;
+                $user->updateEmail($email);
                 $user->cat_id = $primaryId;
                 $user->cat_username = $username;
 
@@ -250,7 +257,8 @@ class AlmaController extends AbstractBase
                     $jsonResponse = $this->createJsonResponse(
                         'Successfully ' . strtolower($method) .
                         'd user with primary ID \'' . $primaryId .
-                        '\' | username \'' . $username . '\'.', 200
+                        '\' | username \'' . $username . '\'.',
+                        200
                     );
                 } catch (\Exception $ex) {
                     $jsonResponse = $this->createJsonResponse(
@@ -276,7 +284,8 @@ class AlmaController extends AbstractBase
                 if ($rowsAffected == 1) {
                     $jsonResponse = $this->createJsonResponse(
                         'Successfully deleted use with primary ID \'' . $primaryId .
-                        '\' in VuFind.', 200
+                        '\' in VuFind.',
+                        200
                     );
                 } else {
                     $jsonResponse = $this->createJsonResponse(
@@ -284,13 +293,15 @@ class AlmaController extends AbstractBase
                         '\' in VuFind. It is expected that only 1 row of the ' .
                         'VuFind user table is affected by the deletion. But ' .
                         $rowsAffected . ' were affected. Please check the status ' .
-                        'of the user in the VuFind database.', 400
+                        'of the user in the VuFind database.',
+                        400
                     );
                 }
             } else {
                 $jsonResponse = $this->createJsonResponse(
                     'User with primary ID \'' . $primaryId . '\' was not found in ' .
-                    'VuFind database and therefore could not be deleted.', 404
+                    'VuFind database and therefore could not be deleted.',
+                    404
                 );
             }
         }
@@ -302,7 +313,7 @@ class AlmaController extends AbstractBase
      * The webhook challenge. This is used to activate the webhook in Alma. Without
      * activating it, Alma will not send its webhook messages to VuFind.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     protected function webhookChallenge()
     {
@@ -337,9 +348,9 @@ class AlmaController extends AbstractBase
      * Send the "set password email" to a new user that was created in Alma and sent
      * to VuFind via webhook.
      *
-     * @param \VuFind\Db\Row\User $user   A user row object from the VuFind
-     *                                    user table.
-     * @param \Zend\Config\Config $config A config object of config.ini
+     * @param \VuFind\Db\Row\User    $user   A user row object from the VuFind
+     * user table.
+     * @param \Laminas\Config\Config $config A config object of config.ini
      *
      * @return void
      */
@@ -362,18 +373,20 @@ class AlmaController extends AbstractBase
 
                 // Custom template for emails (text-only)
                 $message = $renderer->render(
-                    'Email/new-user-welcome.phtml', [
-                    'library' => $config->Site->title,
-                    'firstname' => $user->firstname,
-                    'lastname' => $user->lastname,
-                    'username' => $user->username,
-                    'url' => $this->getServerUrl('myresearch-verify') . '?hash=' .
-                        $user->verify_hash . '&auth_method=' . $method
+                    'Email/new-user-welcome.phtml',
+                    [
+                        'library' => $config->Site->title,
+                        'firstname' => $user->firstname,
+                        'lastname' => $user->lastname,
+                        'username' => $user->username,
+                        'url' => $this->getServerUrl('myresearch-verify') . '?hash='
+                            . $user->verify_hash . '&auth_method=' . $method,
                     ]
                 );
                 // Send the email
-                $this->serviceLocator->get('VuFind\Mailer\Mailer')->send(
-                    $user->email, $config->Site->email,
+                $this->serviceLocator->get(\VuFind\Mailer\Mailer::class)->send(
+                    $user->email,
+                    $config->Site->email,
                     $this->translate(
                         'new_user_welcome_subject',
                         ['%%library%%' => $config->Site->title]
@@ -398,7 +411,7 @@ class AlmaController extends AbstractBase
      * @param int    $httpStatusCode The HTTP status code that should be sent back
      *                               to Alma
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     protected function createJsonResponse($text, $httpStatusCode)
     {
@@ -417,19 +430,20 @@ class AlmaController extends AbstractBase
      *
      * @param string $webhookType The type of the webhook
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     protected function webhookNotImplemented($webhookType)
     {
         return $this->createJsonResponse(
-            $webhookType . ' Alma Webhook is not (yet) implemented in VuFind.', 400
+            $webhookType . ' Alma Webhook is not (yet) implemented in VuFind.',
+            400
         );
     }
 
     /**
      * Helper function to check access permissions defined in permissions.ini.
      * The function validateAccessPermission() will throw an exception that can be
-     * catched when the permission is denied.
+     * caught when the permission is denied.
      *
      * @param string $accessPermission The permission name from permissions.ini that
      *                                 should be checked.
@@ -449,15 +463,14 @@ class AlmaController extends AbstractBase
      * the 'X-Exl-Signature' in the request header. This is a security measure to
      * be sure that the request comes from Alma.
      *
-     * @param \Zend\Stdlib\RequestInterface $request The request from Alma.
+     * @param RequestInterface $request The request from Alma.
      *
-     * @throws \VuFind\Exception\Forbidden                Throws forbidden exception
-     *                                                     if hash values are not the
-     *                                                     same.
+     * @throws \VuFind\Exception\Forbidden Throws forbidden exception if hash values
+     * are not the same.
      *
      * @return void
      */
-    protected function checkMessageSignature(\Zend\Stdlib\RequestInterface $request)
+    protected function checkMessageSignature(RequestInterface $request)
     {
         // Get request content
         $requestBodyString = $request->getContent();
@@ -494,7 +507,7 @@ class AlmaController extends AbstractBase
                         JSON_UNESCAPED_SLASHES
                 ) . '"'
             );
-            throw new \VuFind\Exception\Forbidden;
+            throw new \VuFind\Exception\Forbidden();
         }
     }
 }

@@ -26,10 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Backend\Solr\Json\Response;
 
 use PHPUnit\Framework\TestCase;
 use VuFindSearch\Backend\Solr\Response\Json\RecordCollection;
+use VuFindSearch\Backend\Solr\Response\Json\Spellcheck;
 use VuFindTest\RecordDriver\TestHarness;
 
 /**
@@ -51,15 +53,30 @@ class RecordCollectionTest extends TestCase
     public function testDefaults()
     {
         $coll = new RecordCollection([]);
-        $this->assertEquals(
-            'VuFindSearch\Backend\Solr\Response\Json\Spellcheck',
-            get_class($coll->getSpellcheck())
-        );
+        $this->assertTrue($coll->getSpellcheck() instanceof Spellcheck);
         $this->assertEquals(0, $coll->getTotal());
-        $this->assertEquals(
-            'VuFindSearch\Backend\Solr\Response\Json\Facets',
-            get_class($coll->getFacets())
-        );
+        $this->assertIsArray($coll->getFacets());
+        $this->assertIsArray($coll->getQueryFacets());
+        $this->assertIsArray($coll->getPivotFacets());
+        $this->assertEquals([], $coll->getGroups());
+        $this->assertEquals([], $coll->getHighlighting());
+        $this->assertEquals(0, $coll->getOffset());
+    }
+
+    /**
+     * Test that the object returns appropriate defaults when given a null response
+     * element.
+     *
+     * @return void
+     */
+    public function testDefaultsWithNullResponse()
+    {
+        $coll = new RecordCollection(['response' => null]);
+        $this->assertTrue($coll->getSpellcheck() instanceof Spellcheck);
+        $this->assertEquals(0, $coll->getTotal());
+        $this->assertIsArray($coll->getFacets());
+        $this->assertIsArray($coll->getQueryFacets());
+        $this->assertIsArray($coll->getPivotFacets());
         $this->assertEquals([], $coll->getGroups());
         $this->assertEquals([], $coll->getHighlighting());
         $this->assertEquals(0, $coll->getOffset());
@@ -74,11 +91,11 @@ class RecordCollectionTest extends TestCase
     {
         $coll = new RecordCollection(
             [
-                'response' => ['numFound' => 10, 'start' => 5]
+                'response' => ['numFound' => 10, 'start' => 5],
             ]
         );
         for ($i = 0; $i < 5; $i++) {
-            $coll->add($this->createMock('VuFindSearch\Response\RecordInterface'));
+            $coll->add($this->createMock(\VuFindSearch\Response\RecordInterface::class));
         }
         $coll->rewind();
         $this->assertEquals(5, $coll->key());
@@ -98,8 +115,8 @@ class RecordCollectionTest extends TestCase
                 'params' => [
                     'spellcheck.q' => 'foo',
                     'q' => 'bar',
-                ]
-            ]
+                ],
+            ],
         ];
         $coll = new RecordCollection($input);
         $this->assertEquals('foo', $coll->getSpellcheck()->getQuery());
@@ -138,12 +155,12 @@ class RecordCollectionTest extends TestCase
                         ],
                     ],
                     ['correctlySpelled', false],
-                ]
-            ]
+                ],
+            ],
         ];
         $coll = new RecordCollection($input);
         $spell = $coll->getSpellcheck();
-        $this->assertEquals(1, count($spell));
+        $this->assertCount(1, $spell);
     }
 
     /**
@@ -187,9 +204,77 @@ class RecordCollectionTest extends TestCase
         $coll->add($r3);
         $coll->shuffle();
         $final = $coll->getRecords();
-        $this->assertEquals(3, count($final));
+        $this->assertCount(3, $final);
         $this->assertTrue(in_array($r1, $final));
         $this->assertTrue(in_array($r2, $final));
         $this->assertTrue(in_array($r3, $final));
+    }
+
+    /**
+     * Test that the object handles offsets properly.
+     *
+     * @return void
+     */
+    public function testAdd()
+    {
+        $coll = new RecordCollection(
+            [
+                'response' => ['numFound' => 10, 'start' => 5],
+            ]
+        );
+        $record = $this->createMock(\VuFindSearch\Response\RecordInterface::class);
+        $coll->add($record);
+        for ($i = 0; $i < 4; $i++) {
+            $coll->add($this->createMock(\VuFindSearch\Response\RecordInterface::class));
+        }
+        $this->assertEquals(5, $coll->count());
+        $coll->add($record);
+        $this->assertEquals(5, $coll->count());
+        $coll->add($record, false);
+        $this->assertEquals(6, $coll->count());
+    }
+
+    /**
+     * Test facet methods.
+     *
+     * @return void
+     */
+    public function testFacets()
+    {
+        $coll = new RecordCollection(
+            [
+                'facet_counts' => [
+                    'facet_fields' => [
+                        'format' => [
+                            ['Book', 123],
+                            ['Journal', 234],
+                            ['Map', 1],
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $facets = $coll->getFacets();
+        $this->assertEquals(
+            [
+                'format' => [
+                    'Book' => 123,
+                    'Journal' => 234,
+                    'Map' => 1,
+                ],
+            ],
+            $facets
+        );
+        unset($facets['format']['Journal']);
+        $coll->setFacets($facets);
+        $this->assertEquals(
+            [
+                'format' => [
+                    'Book' => 123,
+                    'Map' => 1,
+                ],
+            ],
+            $coll->getFacets()
+        );
     }
 }

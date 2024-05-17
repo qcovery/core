@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Channel Provider Router Initializer
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ChannelProvider;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Initializer\InitializerInterface;
+use Laminas\ServiceManager\Initializer\InitializerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Channel Provider Router Initializer
@@ -52,8 +54,10 @@ class RouterInitializer implements InitializerInterface
     public function __invoke(ContainerInterface $container, $instance)
     {
         if ($instance instanceof AbstractChannelProvider) {
-            $instance->setCoverRouter($container->get('VuFind\Cover\Router'));
-            $instance->setRecordRouter($container->get('VuFind\Record\Router'));
+            $instance->setCoverRouter($container->get(\VuFind\Cover\Router::class));
+            $instance->setRecordRouter(
+                $container->get(\VuFind\Record\Router::class)
+            );
         }
         return $instance;
     }

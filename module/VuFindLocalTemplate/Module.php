@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Template for ZF2 module for storing local overrides.
+ * Template for code module for storing local overrides.
  *
  * PHP version 7
  *
@@ -25,13 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development
  */
+
 namespace VuFindLocalTemplate;
 
-use Zend\ModuleManager\ModuleManager;
-use Zend\Mvc\MvcEvent;
+use Laminas\ModuleManager\ModuleManager;
+use Laminas\Mvc\MvcEvent;
 
 /**
- * Template for ZF2 module for storing local overrides.
+ * Template for code module for storing local overrides.
  *
  * @category VuFind
  * @package  Module
@@ -59,7 +61,7 @@ class Module
     public function getAutoloaderConfig()
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            'Laminas\Loader\StandardAutoloader' => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ],

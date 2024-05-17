@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development
  */
+
 namespace VuFindTest\OAI;
 
 use VuFind\OAI\Server;
@@ -39,7 +40,7 @@ use VuFind\OAI\Server;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development
  */
-class ServerTest extends \VuFindTest\Unit\TestCase
+class ServerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test an empty input.
@@ -49,7 +50,9 @@ class ServerTest extends \VuFindTest\Unit\TestCase
     public function testEmptyInput()
     {
         $server = $this->getServer();
-        $this->assertTrue(false !== strpos($server->getResponse(), '<error code="badVerb">Missing Verb Argument</error>'));
+        $this->assertTrue(
+            false !== strpos($server->getResponse(), '<error code="badVerb">Missing Verb Argument</error>')
+        );
     }
 
     /**
@@ -61,7 +64,9 @@ class ServerTest extends \VuFindTest\Unit\TestCase
      *
      * @return Server
      */
-    protected function getServer($config = [], $baseURL = 'http://foo',
+    protected function getServer(
+        $config = [],
+        $baseURL = 'http://foo',
         $params = []
     ) {
         // Force an email into the configuration if missing; this is required by the
@@ -70,14 +75,13 @@ class ServerTest extends \VuFindTest\Unit\TestCase
             $config['Site']['email'] = 'fake@example.com';
         }
 
-        return new Server(
+        $server = new Server(
             $this->getMockResultsManager(),
             $this->getMockRecordLoader(),
-            $this->getMockTableManager(),
-            new \Zend\Config\Config($config),
-            $baseURL,
-            $params
+            $this->getMockTableManager()
         );
+        $server->setRecordFormatter($this->getMockRecordFormatter());
+        return $server;
     }
 
     /**
@@ -87,7 +91,7 @@ class ServerTest extends \VuFindTest\Unit\TestCase
      */
     protected function getMockResultsManager()
     {
-        return $this->getMockBuilder('VuFind\Search\Results\PluginManager')
+        return $this->getMockBuilder(\VuFind\Search\Results\PluginManager::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -99,7 +103,7 @@ class ServerTest extends \VuFindTest\Unit\TestCase
      */
     protected function getMockRecordLoader()
     {
-        return $this->getMockBuilder('VuFind\Record\Loader')
+        return $this->getMockBuilder(\VuFind\Record\Loader::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -111,7 +115,19 @@ class ServerTest extends \VuFindTest\Unit\TestCase
      */
     protected function getMockTableManager()
     {
-        return $this->getMockBuilder('VuFind\Db\Table\PluginManager')
+        return $this->getMockBuilder(\VuFind\Db\Table\PluginManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * Get a mock record formatter
+     *
+     * @return \VuFindApi\Formatter\RecordFormatter
+     */
+    protected function getMockRecordFormatter()
+    {
+        return $this->getMockBuilder(\VuFindApi\Formatter\RecordFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resolver driver plugin manager
  *
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
+
 namespace VuFind\Resolver\Driver;
+
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
  * Resolver driver plugin manager
@@ -44,12 +48,16 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        '360link' => 'VuFind\Resolver\Driver\Threesixtylink',
-        'demo' => 'VuFind\Resolver\Driver\Demo',
-        'ezb' => 'VuFind\Resolver\Driver\Ezb',
-        'sfx' => 'VuFind\Resolver\Driver\Sfx',
-        'redi' => 'VuFind\Resolver\Driver\Redi',
-        'threesixtylink' => 'VuFind\Resolver\Driver\Threesixtylink',
+        '360link' => Threesixtylink::class,
+        'alma' => Alma::class,
+        'demo' => Demo::class,
+        'ezb' => Jop::class,
+        'jop' => Jop::class,
+        'sfx' => Sfx::class,
+        'redi' => Redi::class,
+        'threesixtylink' => Threesixtylink::class,
+        'generic' => Generic::class,
+        'other' => 'generic',
     ];
 
     /**
@@ -58,16 +66,13 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Resolver\Driver\Threesixtylink' =>
-            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
-        'VuFind\Resolver\Driver\Demo' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Resolver\Driver\Ezb' =>
-            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
-        'VuFind\Resolver\Driver\Sfx' =>
-            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
-        'VuFind\Resolver\Driver\Redi' =>
-            'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
+        Alma::class => AlmaFactory::class,
+        Threesixtylink::class => DriverWithHttpClientFactory::class,
+        Demo::class => InvokableFactory::class,
+        Jop::class => JopFactory::class,
+        Sfx::class => DriverWithHttpClientFactory::class,
+        Redi::class => DriverWithHttpClientFactory::class,
+        Generic::class => AbstractBaseFactory::class,
     ];
 
     /**
@@ -79,10 +84,11 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @param array $v3config                  If $configOrContainerInstance is a
      * container, this value will be passed to the parent constructor.
      */
-    public function __construct($configOrContainerInstance = null,
+    public function __construct(
+        $configOrContainerInstance = null,
         array $v3config = []
     ) {
-        $this->addAbstractFactory('VuFind\Resolver\Driver\PluginFactory');
+        $this->addAbstractFactory(PluginFactory::class);
         parent::__construct($configOrContainerInstance, $v3config);
     }
 
@@ -94,6 +100,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Resolver\Driver\DriverInterface';
+        return DriverInterface::class;
     }
 }

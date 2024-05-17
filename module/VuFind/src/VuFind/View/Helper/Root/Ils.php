@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS (integrated library system) view helper
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 /**
@@ -36,7 +38,7 @@ namespace VuFind\View\Helper\Root;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class Ils extends \Zend\View\Helper\AbstractHelper
+class Ils extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * ILS connection

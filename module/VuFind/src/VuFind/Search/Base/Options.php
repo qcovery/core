@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract options search model.
  *
@@ -25,8 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\Base;
 
+use Laminas\Config\Config;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 
 /**
@@ -185,6 +188,27 @@ abstract class Options implements TranslatorAwareInterface
     protected $translatedFacetsTextDomains = [];
 
     /**
+     * Formats for translated facets
+     *
+     * @var array
+     */
+    protected $translatedFacetsFormats = [];
+
+    /**
+     * Hierarchical facets
+     *
+     * @var array
+     */
+    protected $hierarchicalFacets = [];
+
+    /**
+     * Hierarchical facet separators
+     *
+     * @var array
+     */
+    protected $hierarchicalFacetSeparators = [];
+
+    /**
      * Spelling setting
      *
      * @var bool
@@ -225,6 +249,13 @@ abstract class Options implements TranslatorAwareInterface
      * @var bool
      */
     protected $autocompleteEnabled = false;
+
+    /**
+     * Autocomplete auto submit setting
+     *
+     * @var bool
+     */
+    protected $autocompleteAutoSubmit = true;
 
     /**
      * Configuration file to read global settings from
@@ -284,6 +315,19 @@ abstract class Options implements TranslatorAwareInterface
     {
         $this->limitOptions = [$this->defaultLimit];
         $this->setConfigLoader($configLoader);
+
+        $id = $this->getSearchClassId();
+        $facetSettings = $configLoader->get($this->facetsIni);
+        if (isset($facetSettings->AvailableFacetSortOptions[$id])) {
+            $sortArray = $facetSettings->AvailableFacetSortOptions[$id]->toArray();
+            foreach ($sortArray as $facet => $sortOptions) {
+                $this->facetSortOptions[$facet] = [];
+                foreach (explode(',', $sortOptions) as $fieldAndLabel) {
+                    [$field, $label] = explode('=', $fieldAndLabel);
+                    $this->facetSortOptions[$facet][$field] = $label;
+                }
+            }
+        }
     }
 
     /**
@@ -364,8 +408,8 @@ abstract class Options implements TranslatorAwareInterface
      */
     public function getLabelForBasicHandler($handler)
     {
-        return isset($this->basicHandlers[$handler])
-            ? $this->basicHandlers[$handler] : false;
+        $handlers = $this->getBasicHandlers();
+        return $handlers[$handler] ?? false;
     }
 
     /**
@@ -465,13 +509,15 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
-     * Get an array of sort options for facets.
+     * Get an array of sort options for a facet.
+     *
+     * @param string $facet Facet
      *
      * @return array
      */
-    public function getFacetSortOptions()
+    public function getFacetSortOptions($facet = '*')
     {
-        return $this->facetSortOptions;
+        return $this->facetSortOptions[$facet] ?? $this->facetSortOptions['*'] ?? [];
     }
 
     /**
@@ -619,7 +665,8 @@ abstract class Options implements TranslatorAwareInterface
     public function setTranslatedFacets($facets)
     {
         // Reset properties:
-        $this->translatedFacets = $this->translatedFacetsTextDomains = [];
+        $this->translatedFacets = $this->translatedFacetsTextDomains
+            = $this->translatedFacetsFormats = [];
 
         // Fill in new data:
         foreach ($facets as $current) {
@@ -627,6 +674,9 @@ abstract class Options implements TranslatorAwareInterface
             $this->translatedFacets[] = $parts[0];
             if (isset($parts[1])) {
                 $this->translatedFacetsTextDomains[$parts[0]] = $parts[1];
+            }
+            if (isset($parts[2])) {
+                $this->translatedFacetsFormats[$parts[0]] = $parts[2];
             }
         }
     }
@@ -641,8 +691,40 @@ abstract class Options implements TranslatorAwareInterface
      */
     public function getTextDomainForTranslatedFacet($field)
     {
-        return isset($this->translatedFacetsTextDomains[$field])
-            ? $this->translatedFacetsTextDomains[$field] : 'default';
+        return $this->translatedFacetsTextDomains[$field] ?? 'default';
+    }
+
+    /**
+     * Look up the format for use when translating a particular facet
+     * field.
+     *
+     * @param string $field Field name being translated
+     *
+     * @return string
+     */
+    public function getFormatForTranslatedFacet($field)
+    {
+        return $this->translatedFacetsFormats[$field] ?? null;
+    }
+
+    /**
+     * Get hierarchical facet fields.
+     *
+     * @return array
+     */
+    public function getHierarchicalFacets()
+    {
+        return $this->hierarchicalFacets;
+    }
+
+    /**
+     * Get hierarchical facet separators.
+     *
+     * @return array
+     */
+    public function getHierarchicalFacetSeparators()
+    {
+        return $this->hierarchicalFacetSeparators;
     }
 
     /**
@@ -710,6 +792,16 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
+     * Should autocomplete auto submit?
+     *
+     * @return bool
+     */
+    public function autocompleteAutoSubmit()
+    {
+        return $this->autocompleteAutoSubmit;
+    }
+
+    /**
      * Get a string of the listviewOption (full or tab).
      *
      * @return string
@@ -758,6 +850,17 @@ abstract class Options implements TranslatorAwareInterface
      * @return string|bool
      */
     public function getFacetListAction()
+    {
+        return false;
+    }
+
+    /**
+     * Return the route name for the versions search action. Returns false to cover
+     * unimplemented support.
+     *
+     * @return string|bool
+     */
+    public function getVersionsAction()
     {
         return false;
     }
@@ -843,6 +946,24 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
+     * Load all API-related settings from the relevant ini file(s).
+     *
+     * @return array
+     */
+    public function getAPISettings()
+    {
+        // Inherit defaults from searches.ini (if that is not already the
+        // configured search settings file):
+        $defaultConfig = $this->configLoader->get('searches')->API;
+        $defaultSettings = $defaultConfig ? $defaultConfig->toArray() : [];
+        $localIni = $this->getSearchIni();
+        $localConfig = ($localIni !== 'searches')
+            ? $this->configLoader->get($localIni)->API : null;
+        $localSettings = $localConfig ? $localConfig->toArray() : [];
+        return array_merge($defaultSettings, $localSettings);
+    }
+
+    /**
      * Load all recommendation settings from the relevant ini file.  Returns an
      * associative array where the key is the location of the recommendations (top
      * or side) and the value is the settings found in the file (which may be either
@@ -862,7 +983,8 @@ abstract class Options implements TranslatorAwareInterface
         // otherwise:
         $recommend = [];
 
-        if (null !== $handler
+        if (
+            null !== $handler
             && isset($searchSettings->TopRecommendations->$handler)
         ) {
             $recommend['top'] = $searchSettings->TopRecommendations
@@ -873,7 +995,8 @@ abstract class Options implements TranslatorAwareInterface
                 ? $searchSettings->General->default_top_recommend->toArray()
                 : false;
         }
-        if (null !== $handler
+        if (
+            null !== $handler
             && isset($searchSettings->SideRecommendations->$handler)
         ) {
             $recommend['side'] = $searchSettings->SideRecommendations
@@ -884,7 +1007,8 @@ abstract class Options implements TranslatorAwareInterface
                 ? $searchSettings->General->default_side_recommend->toArray()
                 : false;
         }
-        if (null !== $handler
+        if (
+            null !== $handler
             && isset($searchSettings->NoResultsRecommendations->$handler)
         ) {
             $recommend['noresults'] = $searchSettings->NoResultsRecommendations
@@ -908,7 +1032,18 @@ abstract class Options implements TranslatorAwareInterface
     public function getSearchClassId()
     {
         // Parse identifier out of class name of format VuFind\Search\[id]\Options:
-        $class = explode('\\', get_class($this));
+        $className = get_class($this);
+        $class = explode('\\', $className);
+
+        // Special case: if there's an unexpected number of parts, we may be testing
+        // with a mock object; if so, that's okay, but anything else is unexpected.
+        if (count($class) !== 4) {
+            if ('Mock_' === substr($className, 0, 5)) {
+                return 'Mock';
+            }
+            throw new \Exception("Unexpected class name: {$className}");
+        }
+
         return $class[2];
     }
 
@@ -920,5 +1055,59 @@ abstract class Options implements TranslatorAwareInterface
     public function supportsFirstLastNavigation()
     {
         return $this->firstlastNavigation;
+    }
+
+    /**
+     * Does this search backend support scheduled searching?
+     *
+     * @return bool
+     */
+    public function supportsScheduledSearch()
+    {
+        // Unsupported by default!
+        return false;
+    }
+
+    /**
+     * Return the callback used for normalization within this backend.
+     *
+     * @return callable
+     */
+    public function getSpellingNormalizer()
+    {
+        return new \VuFind\Normalizer\DefaultSpellingNormalizer();
+    }
+
+    /**
+     * Configure autocomplete preferences from an .ini file.
+     *
+     * @param Config $searchSettings Object representation of .ini file
+     *
+     * @return void
+     */
+    protected function configureAutocomplete(Config $searchSettings = null)
+    {
+        // Only change settings from current values if they are defined in .ini:
+        $this->autocompleteEnabled = $searchSettings->Autocomplete->enabled
+            ?? $this->autocompleteEnabled;
+        $this->autocompleteAutoSubmit = $searchSettings->Autocomplete->auto_submit
+            ?? $this->autocompleteAutoSubmit;
+    }
+
+    /**
+     * Get advanced search limits that override the natural sorting to
+     * display at the top.
+     *
+     * @param string $limit advanced search limit
+     *
+     * @return array
+     */
+    public function limitOrderOverride($limit)
+    {
+        $facetSettings = $this->configLoader->get($this->getFacetsIni());
+        $limits = $facetSettings->Advanced_Settings->limitOrderOverride ?? null;
+        $delimiter = $facetSettings->Advanced_Settings->limitDelimiter ?? '::';
+        $limitConf = $limits ? $limits->get($limit) : '';
+        return array_map('trim', explode($delimiter, $limitConf ?? ''));
     }
 }

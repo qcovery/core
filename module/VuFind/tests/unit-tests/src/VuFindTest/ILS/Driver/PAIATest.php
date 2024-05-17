@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS driver test
  *
@@ -26,14 +27,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\ILS\Driver;
 
 use InvalidArgumentException;
-
+use Laminas\Http\Client\Adapter\Test as TestAdapter;
+use Laminas\Http\Response as HttpResponse;
 use VuFind\ILS\Driver\PAIA;
-use Zend\Http\Client\Adapter\Test as TestAdapter;
-
-use Zend\Http\Response as HttpResponse;
 
 /**
  * ILS driver test
@@ -46,6 +46,8 @@ use Zend\Http\Response as HttpResponse;
  */
 class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
 {
+    use \VuFindTest\Feature\FixtureTrait;
+
     protected $validConfig = [
         'DAIA' =>
             [
@@ -54,25 +56,26 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
         'PAIA' =>
             [
                 'baseUrl'            => 'http://paia.gbv.de/',
-            ]
+                'grantType'          => 'password',
+            ],
     ];
 
     protected $patron = [
         'id' => '08301001001',
-        'firstname' => 'Nobody',
+        'firstname' => 'Susan Q.',
         'lastname' => 'Nothing',
         'email' => 'nobody@vufind.org',
         'major' => null,
         'college' => null,
-        'name' => ' Nobody Nothing',
+        'name' => ' Susan Q. Nothing',
         'expires' => '9999-12-31',
         'status' => 0,
         'address' => 'No street at all 8, D-21073 Hamburg',
         'type' => [
-            0 => 'de-830:user-type:2'
+            0 => 'de-830:user-type:2',
         ],
         'cat_username' => '08301001001',
-        'cat_password' => 'NOPASSWORD'
+        'cat_password' => 'NOPASSWORD',
     ];
 
     protected $patron_bad = [
@@ -87,10 +90,10 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
         'status' => 9,
         'address' => 'No street at all 8, D-21073 Hamburg',
         'type' => [
-            0 => 'de-830:user-type:2'
+            0 => 'de-830:user-type:2',
         ],
         'cat_username' => '08301001011',
-        'cat_password' => 'NOPASSWORD'
+        'cat_password' => 'NOPASSWORD',
     ];
 
     protected $patron_expired = [
@@ -105,10 +108,10 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
         'status' => 0,
         'address' => 'No street at all 8, D-21073 Hamburg',
         'type' => [
-            0 => 'de-830:user-type:2'
+            0 => 'de-830:user-type:2',
         ],
         'cat_username' => '08301001111',
-        'cat_password' => 'NOPASSWORD'
+        'cat_password' => 'NOPASSWORD',
     ];
 
     protected $feeTestResult = [
@@ -121,10 +124,16 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'createdate' => '06-07-2016',
                 'duedate' => '',
                 'id' => '',
-                'title' => 'Open source licensing : software freedom and intellectual property law ; [open source licensees are free to: use open source software for any purpose, make and distribute copies, create and distribute derivative works, access and use the source code, com / Rosen, Lawrence (c 2005)',
+                'title' => 'Open source licensing : software freedom and intellectual property law ; '
+                    . '[open source licensees are free to: use open source software for any purpose, make and'
+                    . ' distribute copies, create and distribute derivative works, access and use the source code, '
+                    . 'com / Rosen, Lawrence (c 2005)',
                 'feeid' => null,
-                'about' => 'Open source licensing : software freedom and intellectual property law ; [open source licensees are free to: use open source software for any purpose, make and distribute copies, create and distribute derivative works, access and use the source code, com / Rosen, Lawrence (c 2005)',
-                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$28295402'
+                'about' => 'Open source licensing : software freedom and intellectual property law ; '
+                    . '[open source licensees are free to: use open source software for any purpose, make and'
+                    . ' distribute copies, create and distribute derivative works, access and use the source code, '
+                    . 'com / Rosen, Lawrence (c 2005)',
+                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$28295402',
             ],
         1 =>
             [
@@ -135,10 +144,10 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'createdate' => '05-23-2016',
                 'duedate' => '',
                 'id' => '',
-                'title' => 'Zend framework in action / Allen, Rob (2009)',
+                'title' => 'Test framework in action / Allen, Rob (2009)',
                 'feeid' => null,
-                'about' => 'Zend framework in action / Allen, Rob (2009)',
-                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$28323471'
+                'about' => 'Test framework in action / Allen, Rob (2009)',
+                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$28323471',
             ],
         2 =>
             [
@@ -152,7 +161,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'title' => 'Unsere historischen Gärten / Lutze, Margot (1986)',
                 'feeid' => null,
                 'about' => 'Unsere historischen Gärten / Lutze, Margot (1986)',
-                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$24476416'
+                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$24476416',
             ],
         3 =>
             [
@@ -166,7 +175,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'title' => 'Triumphe des Backsteins = Triumphs of brick / (1992)',
                 'feeid' => null,
                 'about' => 'Triumphe des Backsteins = Triumphs of brick / (1992)',
-                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$33204941'
+                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$33204941',
             ],
         4 =>
             [
@@ -180,7 +189,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'title' => 'Lehrbuch der Botanik / Strasburger, Eduard (2008)',
                 'feeid' => null,
                 'about' => 'Lehrbuch der Botanik / Strasburger, Eduard (2008)',
-                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$26461872'
+                'item' => 'http://uri.gbv.de/document/opac-de-830:bar:830$26461872',
             ],
     ];
 
@@ -194,7 +203,8 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'location' => 'Test-Theke',
                 'position' => 0,
                 'available' => true,
-                'title' => 'Praktikum über Entwurf und Manipulation von Datenbanken : SQL/DS (IBM), UDS (Siemens) und MEMODAX / Vossen, Gottfried (1986)',
+                'title' => 'Praktikum über Entwurf und Manipulation von Datenbanken : SQL/DS (IBM), UDS '
+                    . '(Siemens) und MEMODAX / Vossen, Gottfried (1986)',
                 'callnumber' => '34:3409-6983',
                 'create' => '06-17-2016',
                 'expire' => '',
@@ -208,7 +218,10 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'location' => 'Ausleihe',
                 'position' => 0,
                 'available' => false,
-                'title' => 'Open source licensing : software freedom and intellectual property law ; [open source licensees are free to: use open source software for any purpose, make and distribute copies, create and distribute derivative works, access and use the source code, com / Rosen, Lawrence (c 2005)',
+                'title' => 'Open source licensing : software freedom and intellectual property law ; '
+                    . '[open source licensees are free to: use open source software for any purpose, make and'
+                    . ' distribute copies, create and distribute derivative works, access and use the source code, '
+                    . 'com / Rosen, Lawrence (c 2005)',
                 'callnumber' => '28:2829-5402',
                 'create' => '06-15-2016',
                 'duedate' => '06-15-2016',
@@ -248,6 +261,12 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'duedate' => '',
                 'message' => '',
                 'borrowingLocation' => 'Ausleihe',
+                'type' => 'held',
+                'location' => 'Ausleihe',
+                'position' => 0,
+                'available' => false,
+                'create' => '11-15-2013',
+                'cancel_details' => '',
             ],
         1 =>
             [
@@ -255,7 +274,8 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'item_id' => 'http://uri.gbv.de/document/opac-de-830:bar:830$22278001',
                 'renew_details' => '',
                 'id' => 'http://uri.gbv.de/document/opac-de-830:ppn:659228084',
-                'title' => 'Linked Open Library Data : bibliographische Daten und ihre Zugänglichkeit im Web der Daten ; Innovationspreis 2011 / Fürste, Fabian M. (2011)',
+                'title' => 'Linked Open Library Data : bibliographische Daten und ihre Zugänglichkeit im Web der'
+                    . ' Daten ; Innovationspreis 2011 / Fürste, Fabian M. (2011)',
                 'request' => 0,
                 'renew' => 9,
                 'reminder' => 0,
@@ -265,7 +285,13 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'message' => '',
                 'borrowingLocation' => 'Ausleihe',
                 'callnumber' => '22:2227-8001',
-            ]
+                'type' => 'held',
+                'location' => 'Ausleihe',
+                'position' => 0,
+                'available' => false,
+                'create' => '12-22-2011',
+                'cancel_details' => '',
+            ],
     ];
 
     protected $renewTestResult = [
@@ -275,37 +301,40 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'success' => true,
                 'new_date' => "07-18-2016",
                 'item_id' => 0,
-                'sysMessage' => "Successfully renewed"
-            ]
-        ]
+                'sysMessage' => "Successfully renewed",
+            ],
+        ],
     ];
 
     protected $storageRetrievalTestResult = [
         'success' => true,
-        'sysMessage' => 'Successfully requested'
+        'sysMessage' => 'Successfully requested',
     ];
 
     protected $pwchangeTestResult = [
         'success' => true,
-        'status' => "Successfully changed"
+        'status' => "Successfully changed",
     ];
 
     protected $profileTestResult = [
-        'firstname' => "Nobody",
+        'firstname' => "Susan Q.",
         'lastname' => "Nothing",
-        'address1' => null,
+        'address1' => "No street at all 8, D-21073 Hamburg",
         'address2' => null,
         'city' => null,
         'country' => null,
         'zip' => null,
         'phone' => null,
-        'group' => null,
+        'group' => "de-830:user-type:2",
+        'mobile_phone' => null,
         'expires' => "12-31-9999",
         'statuscode' => 0,
-        'canWrite' => true
+        'canWrite' => true,
     ];
 
-    /******************* Test cases ***************/
+    /*******************
+     * Test cases
+     ***************/
     /*
      ok changePassword
      ok checkRequestIsValid
@@ -326,7 +355,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->driver = $this->createConnector();
     }
@@ -340,15 +369,13 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
     {
         $changePasswordTestdata = [
             "patron" => [
-                "cat_username" => "08301001001"
+                "cat_username" => "08301001001",
              ],
              "oldPassword" => "oldsecret",
-             "newPassword" => "newsecret"
+             "newPassword" => "newsecret",
         ];
 
-        $conn = $this->createConnector('changePassword.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('changePassword.json');
         $result = $conn->changePassword($changePasswordTestdata);
         $this->assertEquals($this->pwchangeTestResult, $result);
     }
@@ -360,9 +387,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      */
     public function testFees()
     {
-        $conn = $this->createConnector('fees.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('fees.json');
         $result = $conn->getMyFines($this->patron);
 
         $this->assertEquals($this->feeTestResult, $result);
@@ -375,9 +400,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      */
     public function testHolds()
     {
-        $conn = $this->createConnector('items.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('items.json');
         $result = $conn->getMyHolds($this->patron);
 
         $this->assertEquals($this->holdsTestResult, $result);
@@ -390,9 +413,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      */
     public function testRequests()
     {
-        $conn = $this->createConnector('items.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('items.json');
         $result = $conn->getMyStorageRetrievalRequests($this->patron);
 
         $this->assertEquals($this->requestsTestResult, $result);
@@ -405,9 +426,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      */
     public function testTransactions()
     {
-        $conn = $this->createConnector('items.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('items.json');
         $result = $conn->getMyTransactions($this->patron);
 
         $this->assertEquals($this->transactionsTestResult, $result);
@@ -436,22 +455,34 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
         $conn = $this->createMockConnector('patron.json');
 
         $result = $conn->checkRequestIsValid(
-            'http://paia.gbv.de/', [], $this->patron
+            'http://paia.gbv.de/',
+            [],
+            $this->patron
         );
         $resultStorageRetrieval = $conn->checkStorageRetrievalRequestIsValid(
-            'http://paia.gbv.de/', [], $this->patron
+            'http://paia.gbv.de/',
+            [],
+            $this->patron
         );
         $result_bad = $conn->checkRequestIsValid(
-            'http://paia.gbv.de/', [], $this->patron_bad
+            'http://paia.gbv.de/',
+            [],
+            $this->patron_bad
         );
         $resultStorage_bad = $conn->checkStorageRetrievalRequestIsValid(
-            'http://paia.gbv.de/', [], $this->patron_bad
+            'http://paia.gbv.de/',
+            [],
+            $this->patron_bad
         );
         $result_expired = $conn->checkRequestIsValid(
-            'http://paia.gbv.de/', [], $this->patron_expired
+            'http://paia.gbv.de/',
+            [],
+            $this->patron_expired
         );
         $resultStorage_expired = $conn->checkStorageRetrievalRequestIsValid(
-            'http://paia.gbv.de/', [], $this->patron_expired
+            'http://paia.gbv.de/',
+            [],
+            $this->patron_expired
         );
 
         $this->assertEquals(true, $result);
@@ -469,9 +500,7 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      */
     public function testRenewDetails()
     {
-        $conn = $this->createConnector('');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('');
         $result = $conn->getRenewDetails($this->transactionsTestResult[1]);
 
         $this->assertEquals('', $result);
@@ -487,13 +516,11 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
         $sr_request = [
             "item_id"     => "http://uri.gbv.de/document/opac-de-830:bar:830$24014292",
             "patron" => [
-                "cat_username" => "08301001001"
-            ]
+                "cat_username" => "08301001001",
+            ],
         ];
 
-        $conn = $this->createConnector('storageretrieval.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('storageretrieval.json');
         $result = $conn->placeHold($sr_request);
         $this->assertEquals($this->storageRetrievalTestResult, $result);
     }
@@ -508,13 +535,11 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
         $sr_request = [
             "item_id"     => "http://uri.gbv.de/document/opac-de-830:bar:830$24014292",
             "patron" => [
-                "cat_username" => "08301001001"
-            ]
+                "cat_username" => "08301001001",
+            ],
         ];
 
-        $conn = $this->createConnector('storageretrieval.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('storageretrieval.json');
         $result = $conn->placeStorageRetrievalRequest($sr_request);
         $this->assertEquals($this->storageRetrievalTestResult, $result);
     }
@@ -528,16 +553,14 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
     {
         $renew_request = [
             "details" => [
-                "item"     => "http://uri.gbv.de/document/opac-de-830:bar:830$22061137"
+                "item"     => "http://uri.gbv.de/document/opac-de-830:bar:830$22061137",
             ],
             "patron" => [
-                "cat_username" => "08301001001"
-            ]
+                "cat_username" => "08301001001",
+            ],
         ];
 
-        $conn = $this->createConnector('renew_ok.json');
-        $conn->setConfig($this->validConfig);
-        $conn->init();
+        $conn = $this->createMockConnector('renew_ok.json');
         $result = $conn->renewMyItems($renew_request);
 
         $this->assertEquals($this->renewTestResult, $result);
@@ -553,6 +576,29 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
     }
 
     /**
+     * Create HTTP service for testing.
+     *
+     * @param string $fixture Fixture file
+     *
+     * @return \VuFindHttp\HttpService
+     *
+     * @throws InvalidArgumentException Fixture file does not exist
+     */
+    protected function getHttpService($fixture = null)
+    {
+        $adapter = new TestAdapter();
+        if ($fixture) {
+            $responseObj = HttpResponse::fromString(
+                $this->getFixture("paia/response/$fixture")
+            );
+            $adapter->setResponse($responseObj);
+        }
+        $service = new \VuFindHttp\HttpService();
+        $service->setDefaultAdapter($adapter);
+        return $service;
+    }
+
+    /**
      * Create connector with fixture file.
      *
      * @param string $fixture Fixture file
@@ -563,26 +609,10 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      */
     protected function createConnector($fixture = null)
     {
-        $adapter = new TestAdapter();
-        if ($fixture) {
-            $file = realpath(
-                __DIR__ .
-                '/../../../../../../tests/fixtures/paia/response/' . $fixture
-            );
-            if (!is_string($file) || !file_exists($file) || !is_readable($file)) {
-                throw new InvalidArgumentException(
-                    sprintf('Unable to load fixture file: %s ', $file)
-                );
-            }
-            $response = file_get_contents($file);
-            $responseObj = HttpResponse::fromString($response);
-            $adapter->setResponse($responseObj);
-        }
-        $service = new \VuFindHttp\HttpService();
-        $service->setDefaultAdapter($adapter);
+        $service = $this->getHttpService($fixture);
         $conn = new PAIA(
             new \VuFind\Date\Converter(),
-            new \Zend\Session\SessionManager()
+            new \Laminas\Session\SessionManager()
         );
         $conn->setHttpService($service);
         return $conn;
@@ -599,31 +629,25 @@ class PAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      */
     protected function createMockConnector($fixture = null)
     {
-        $adapter = new TestAdapter();
-        if ($fixture) {
-            $file = realpath(
-                __DIR__ .
-                '/../../../../../../tests/fixtures/paia/response/' . $fixture
-            );
-            if (!is_string($file) || !file_exists($file) || !is_readable($file)) {
-                throw new InvalidArgumentException(
-                    sprintf('Unable to load fixture file: %s ', $file)
-                );
-            }
-            $response = file_get_contents($file);
-            $responseObj = HttpResponse::fromString($response);
-            $adapter->setResponse($responseObj);
-        }
-        $service = new \VuFindHttp\HttpService();
-        $service->setDefaultAdapter($adapter);
-        $conn = $this->getMockBuilder('VuFind\ILS\Driver\PAIA')
-            ->setConstructorArgs([ new \VuFind\Date\Converter(),
-                new \Zend\Session\SessionManager()
-            ])
-            ->setMethods(['getScope'])
+        $service = $this->getHttpService($fixture);
+        $dateConverter = new \VuFind\Date\Converter();
+        $sessionManager = new \Laminas\Session\SessionManager();
+        $conn = $this->getMockBuilder(\VuFind\ILS\Driver\PAIA::class)
+            ->setConstructorArgs([$dateConverter, $sessionManager])
+            ->onlyMethods(['getScope'])
             ->getMock();
         $conn->expects($this->any())->method('getScope')
-            ->will($this->returnValue([ 'write_items' ]));
+            ->will(
+                $this->returnValue(
+                    [
+                    'write_items',
+                    'change_password',
+                    'read_fees',
+                    'read_items',
+                    'read_patron',
+                    ]
+                )
+            );
         $conn->setHttpService($service);
         $conn->setConfig($this->validConfig);
         $conn->init();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Route Generator Class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Route;
 
 /**
@@ -46,26 +48,15 @@ class RouteGenerator
      *
      * @var array
      */
-    protected $nonTabRecordActions;
+    protected static $nonTabRecordActions = [];
 
     /**
-     * Constructor
+     * Cache for already added recordActions which need to be used again
+     * if additional nonTabRecordActions will be added later.
      *
-     * @param array $nonTabRecordActions List of non-tab record actions (null
-     * for default).
+     * @var array
      */
-    public function __construct(array $nonTabRecordActions = null)
-    {
-        if (null === $nonTabRecordActions) {
-            $this->nonTabRecordActions = [
-                'AddComment', 'DeleteComment', 'AddTag', 'DeleteTag', 'Save',
-                'Email', 'SMS', 'Cite', 'Export', 'RDF', 'Hold', 'Home',
-                'StorageRetrievalRequest', 'AjaxTab', 'ILLRequest', 'PDF',
-            ];
-        } else {
-            $this->nonTabRecordActions = $nonTabRecordActions;
-        }
-    }
+    protected static $recordRoutes = [];
 
     /**
      * Add a dynamic route to the configuration.
@@ -77,11 +68,11 @@ class RouteGenerator
      *
      * @return void
      */
-    public function addDynamicRoute(& $config, $routeName, $controller, $action)
+    public function addDynamicRoute(&$config, $routeName, $controller, $action)
     {
-        list($actionName) = explode('/', $action, 2);
+        [$actionName] = explode('/', $action, 2);
         $config['router']['routes'][$routeName] = [
-            'type'    => 'Zend\Router\Http\Segment',
+            'type'    => 'Laminas\Router\Http\Segment',
             'options' => [
                 'route'    => "/$controller/$action",
                 'constraints' => [
@@ -91,8 +82,8 @@ class RouteGenerator
                 'defaults' => [
                     'controller' => $controller,
                     'action'     => $actionName,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -105,13 +96,48 @@ class RouteGenerator
      *
      * @return void
      */
-    public function addDynamicRoutes(& $config, $routes)
+    public function addDynamicRoutes(&$config, $routes)
     {
         // Build library card routes
         foreach ($routes as $controller => $controllerRoutes) {
             foreach ($controllerRoutes as $routeName => $action) {
                 $this->addDynamicRoute($config, $routeName, $controller, $action);
             }
+        }
+    }
+
+    /**
+     * Add non tab record action & re-register all record routes to support it.
+     *
+     * @param array  $config Configuration array to update
+     * @param string $action Action to add
+     *
+     * @return void
+     */
+    public function addNonTabRecordAction(&$config, $action)
+    {
+        self::$nonTabRecordActions[$action] = $action;
+        foreach (self::$recordRoutes as $recordRoute) {
+            $this->addRecordRoute(
+                $config,
+                $recordRoute['routeBase'],
+                $recordRoute['controller']
+            );
+        }
+    }
+
+    /**
+     * Add non tab record actions & re-register all record routes to support it.
+     *
+     * @param array $config  Configuration array to update
+     * @param array $actions Action to add
+     *
+     * @return void
+     */
+    public function addNonTabRecordActions(&$config, $actions)
+    {
+        foreach ($actions as $action) {
+            $this->addNonTabRecordAction($config, $action);
         }
     }
 
@@ -124,27 +150,28 @@ class RouteGenerator
      *
      * @return void
      */
-    public function addRecordRoute(& $config, $routeBase, $controller)
+    public function addRecordRoute(&$config, $routeBase, $controller)
     {
         // catch-all "tab" route:
         $config['router']['routes'][$routeBase] = [
-            'type'    => 'Zend\Router\Http\Segment',
+            'type'    => 'Laminas\Router\Http\Segment',
             'options' => [
                 'route'    => '/' . $controller . '/[:id[/[:tab]]]',
                 'constraints' => [
                     'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                     'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                    'tab'        => '[a-zA-Z][a-zA-Z0-9_-]*',
                 ],
                 'defaults' => [
                     'controller' => $controller,
                     'action'     => 'Home',
-                ]
-            ]
+                ],
+            ],
         ];
         // special non-tab actions that each need their own route:
-        foreach ($this->nonTabRecordActions as $action) {
+        foreach (self::$nonTabRecordActions as $action) {
             $config['router']['routes'][$routeBase . '-' . strtolower($action)] = [
-                'type'    => 'Zend\Router\Http\Segment',
+                'type'    => 'Laminas\Router\Http\Segment',
                 'options' => [
                     'route'    => '/' . $controller . '/[:id]/' . $action,
                     'constraints' => [
@@ -154,10 +181,17 @@ class RouteGenerator
                     'defaults' => [
                         'controller' => $controller,
                         'action'     => $action,
-                    ]
-                ]
+                    ],
+                ],
             ];
         }
+
+        // Store the added route in case we need to add
+        // more nonTabRecordActions later
+        self::$recordRoutes["$controller::$routeBase"] = [
+            'routeBase' => $routeBase,
+            'controller' => $controller,
+        ];
     }
 
     /**
@@ -169,7 +203,7 @@ class RouteGenerator
      *
      * @return void
      */
-    public function addRecordRoutes(& $config, $routes)
+    public function addRecordRoutes(&$config, $routes)
     {
         foreach ($routes as $routeBase => $controller) {
             $this->addRecordRoute($config, $routeBase, $controller);
@@ -184,19 +218,19 @@ class RouteGenerator
      *
      * @return void
      */
-    public function addStaticRoute(& $config, $route)
+    public function addStaticRoute(&$config, $route)
     {
-        list($controller, $action) = explode('/', $route);
+        [$controller, $action] = explode('/', $route);
         $routeName = str_replace('/', '-', strtolower($route));
         $config['router']['routes'][$routeName] = [
-            'type' => 'Zend\Router\Http\Literal',
+            'type' => 'Laminas\Router\Http\Literal',
             'options' => [
                 'route'    => '/' . $route,
                 'defaults' => [
                     'controller' => $controller,
                     'action'     => $action,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -208,7 +242,7 @@ class RouteGenerator
      *
      * @return void
      */
-    public function addStaticRoutes(& $config, $routes)
+    public function addStaticRoutes(&$config, $routes)
     {
         foreach ($routes as $route) {
             $this->addStaticRoute($config, $route);

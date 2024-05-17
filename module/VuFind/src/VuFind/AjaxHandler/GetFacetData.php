@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Get Facet Data" AJAX handler
  *
@@ -25,13 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\Stdlib\Parameters;
 use VuFind\Search\Results\PluginManager as ResultsManager;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use VuFind\Session\Settings as SessionSettings;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\Stdlib\Parameters;
 
 /**
  * "Get Facet Data" AJAX handler
@@ -74,7 +76,9 @@ class GetFacetData extends AbstractBase
      * @param HierarchicalFacetHelper $fh Facet helper
      * @param ResultsManager          $rm Search results manager
      */
-    public function __construct(SessionSettings $ss, HierarchicalFacetHelper $fh,
+    public function __construct(
+        SessionSettings $ss,
+        HierarchicalFacetHelper $fh,
         ResultsManager $rm
     ) {
         $this->sessionSettings = $ss;
@@ -93,29 +97,39 @@ class GetFacetData extends AbstractBase
     {
         $this->disableSessionWrites();  // avoid session write timing bug
 
-        $facet = $params->fromQuery('facetName');
-        $sort = $params->fromQuery('facetSort');
-        $operator = $params->fromQuery('facetOperator');
-        $backend = $params->fromQuery('source', DEFAULT_SEARCH_BACKEND);
+        // Allow both GET and POST variables:
+        $request = $params->fromQuery() + $params->fromPost();
+
+        $facet = $request['facetName'] ?? null;
+        $sort = $request['facetSort'] ?? null;
+        $operator = $request['facetOperator'] ?? null;
+        $backend = $request['source'] ?? DEFAULT_SEARCH_BACKEND;
 
         $results = $this->resultsManager->get($backend);
         $paramsObj = $results->getParams();
         $paramsObj->addFacet($facet, null, $operator === 'OR');
-        $paramsObj->initFromRequest(new Parameters($params->fromQuery()));
+        $paramsObj->initFromRequest(new Parameters($request));
 
         $facets = $results->getFullFieldFacets([$facet], false, -1, 'count');
         if (empty($facets[$facet]['data']['list'])) {
             $facets = [];
         } else {
-            $facetList = $facets[$facet]['data']['list'];
-
-            if (!empty($sort)) {
-                $this->facetHelper->sortFacetList($facetList, $sort == 'top');
+            // Set appropriate query suppression / extra field behavior:
+            $queryHelper = $results->getUrlQuery();
+            $queryHelper->setSuppressQuery(
+                (bool)($request['querySuppressed'] ?? false)
+            );
+            $extraFields = array_filter(explode(',', $request['extraFields'] ?? ''));
+            foreach ($extraFields as $field) {
+                if (isset($request[$field])) {
+                    $queryHelper->setDefaultParameter($field, $request[$field]);
+                }
             }
 
-            $facets = $this->facetHelper->buildFacetArray(
-                $facet, $facetList, $results->getUrlQuery(), false
-            );
+            $facetList = $facets[$facet]['data']['list'];
+            $this->facetHelper->sortFacetList($facetList, $sort);
+            $facets = $this->facetHelper
+                ->buildFacetArray($facet, $facetList, $queryHelper, false);
         }
         return $this->formatResponse(compact('facets'));
     }

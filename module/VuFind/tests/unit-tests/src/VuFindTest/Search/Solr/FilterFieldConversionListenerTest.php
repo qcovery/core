@@ -26,13 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFindTest\Search\Solr;
 
+use Laminas\EventManager\Event;
 use VuFind\Search\Solr\FilterFieldConversionListener;
-
 use VuFindSearch\ParamBag;
-use VuFindTest\Unit\TestCase;
-use Zend\EventManager\Event;
+use VuFindSearch\Service;
 
 /**
  * Unit tests for FilterFieldConversionListener.
@@ -43,8 +43,10 @@ use Zend\EventManager\Event;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class FilterFieldConversionListenerTest extends TestCase
+class FilterFieldConversionListenerTest extends \PHPUnit\Framework\TestCase
 {
+    use \VuFindTest\Feature\MockSearchCommandTrait;
+
     /**
      * Test attaching listener.
      *
@@ -53,7 +55,7 @@ class FilterFieldConversionListenerTest extends TestCase
     public function testAttach()
     {
         $listener = new FilterFieldConversionListener(['foo' => 'bar']);
-        $mock = $this->createMock('Zend\EventManager\SharedEventManagerInterface');
+        $mock = $this->createMock(\Laminas\EventManager\SharedEventManagerInterface::class);
         $mock->expects($this->once())->method('attach')->with(
             $this->equalTo('VuFind\Search'),
             $this->equalTo('pre'),
@@ -79,16 +81,21 @@ class FilterFieldConversionListenerTest extends TestCase
                     "foo\\:value",
                     'baz:value OR foo:value',
                     '(foo:value)',
-                ]
+                ],
             ]
         );
         $listener = new FilterFieldConversionListener(
             ['foo' => 'bar', 'baz' => 'boo']
         );
 
-        $backend = $this->getMockBuilder('VuFindSearch\Backend\Solr\Backend')
+        $backend = $this->getMockBuilder(\VuFindSearch\Backend\Solr\Backend::class)
             ->disableOriginalConstructor()->getMock();
-        $event = new Event('pre', $backend, ['params' => $params]);
+        $command = $this->getMockSearchCommand($params);
+        $event = new Event(
+            Service::EVENT_PRE,
+            $backend,
+            ['params' => $params, 'command' => $command]
+        );
         $listener->onSearchPre($event);
 
         $fq   = $params->get('fq');

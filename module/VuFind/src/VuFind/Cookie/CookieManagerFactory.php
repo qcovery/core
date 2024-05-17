@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Cookie Manager factory.
  *
  * PHP version 7
  *
  * Copyright (C) Villanova University 2018.
+ * Copyright (C) The National Library of Finland 2020.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -22,14 +24,18 @@
  * @category VuFind
  * @package  Cookie
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Cookie;
 
-use Interop\Container\ContainerInterface;
-use Zend\Console\Console;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Cookie Manager factory.
@@ -37,6 +43,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @category VuFind
  * @package  Cookie
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
@@ -54,34 +61,39 @@ class CookieManagerFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $config = $container->get('VuFind\Config\PluginManager')->get('config');
+        $config = $container->get(\VuFind\Config\PluginManager::class)
+            ->get('config');
         $path = '/';
-        if (isset($config->Cookies->limit_by_path)
-            && $config->Cookies->limit_by_path
-        ) {
-            $path = Console::isConsole()
+        if ($config->Cookies->limit_by_path ?? false) {
+            $path = (PHP_SAPI == 'cli')
                 ? '' : $container->get('Request')->getBasePath();
             if (empty($path)) {
                 $path = '/';
             }
         }
-        $secure = isset($config->Cookies->only_secure)
-            ? $config->Cookies->only_secure
-            : false;
-        $domain = isset($config->Cookies->domain)
-            ? $config->Cookies->domain
-            : null;
-        $session_name = isset($config->Cookies->session_name)
-            ? $config->Cookies->session_name
-            : null;
-        return new $requestedName($_COOKIE, $path, $domain, $secure, $session_name);
+        $secure = $config->Cookies->only_secure ?? false;
+        $httpOnly = $config->Cookies->http_only ?? true;
+        $domain = $config->Cookies->domain ?? null;
+        $sessionName = $config->Cookies->session_name ?? null;
+        $sameSite = $config->Cookies->sameSite ?? 'Lax';
+        return new $requestedName(
+            $_COOKIE,
+            $path,
+            $domain,
+            $secure,
+            $sessionName,
+            $httpOnly,
+            $sameSite
+        );
     }
 }

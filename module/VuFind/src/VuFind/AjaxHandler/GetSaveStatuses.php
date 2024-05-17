@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Get Save Statuses" AJAX handler
  *
@@ -25,13 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\Mvc\Controller\Plugin\Url;
 use VuFind\Db\Row\User;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\Session\Settings as SessionSettings;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\Mvc\Controller\Plugin\Url;
 
 /**
  * "Get Save Statuses" AJAX handler

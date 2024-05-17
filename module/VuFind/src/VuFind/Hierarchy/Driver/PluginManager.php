@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hierarchy driver plugin manager
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Hierarchy\Driver;
 
 /**
@@ -44,8 +46,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'default' => 'VuFind\Hierarchy\Driver\HierarchyDefault',
-        'flat' => 'VuFind\Hierarchy\Driver\HierarchyFlat',
+        'default' => HierarchyDefault::class,
+        'flat' => HierarchyFlat::class,
+        'search2' => HierarchySearch2::class,
     ];
 
     /**
@@ -54,10 +57,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Hierarchy\Driver\HierarchyDefault' =>
-            'VuFind\Hierarchy\Driver\ConfigurationBasedFactory',
-        'VuFind\Hierarchy\Driver\HierarchyFlat' =>
-            'VuFind\Hierarchy\Driver\ConfigurationBasedFactory',
+        HierarchyDefault::class => ConfigurationBasedFactory::class,
+        HierarchyFlat::class => ConfigurationBasedFactory::class,
+        HierarchySearch2::class => ConfigurationBasedFactory::class,
     ];
 
     /**
@@ -68,6 +70,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Hierarchy\Driver\AbstractBase';
+        return AbstractBase::class;
     }
 }

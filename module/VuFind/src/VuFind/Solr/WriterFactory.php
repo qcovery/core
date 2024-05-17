@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Solr writer factory.
  *
@@ -25,10 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Solr;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Solr writer factory.
@@ -53,17 +58,21 @@ class WriterFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
+        $changeTracker = $container->get(\VuFind\Db\Table\PluginManager::class)
+            ->get('changetracker');
         return new $requestedName(
-            $container->get('VuFind\Search\BackendManager'),
-            $container->get('VuFind\Db\Table\PluginManager')->get('changetracker')
+            $container->get(\VuFindSearch\Service::class),
+            $changeTracker
         );
     }
 }

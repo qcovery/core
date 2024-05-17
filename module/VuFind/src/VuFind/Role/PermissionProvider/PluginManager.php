@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Permission provider plugin manager
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:related_records_modules Wiki
  */
+
 namespace VuFind\Role\PermissionProvider;
 
 /**
@@ -44,13 +46,13 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'ipRange' => 'VuFind\Role\PermissionProvider\IpRange',
-        'ipRegEx' => 'VuFind\Role\PermissionProvider\IpRegEx',
-        'role' => 'VuFind\Role\PermissionProvider\Role',
-        'serverParam' => 'VuFind\Role\PermissionProvider\ServerParam',
-        'shibboleth' => 'VuFind\Role\PermissionProvider\Shibboleth',
-        'user' => 'VuFind\Role\PermissionProvider\User',
-        'username' => 'VuFind\Role\PermissionProvider\Username',
+        'ipRange' => IpRange::class,
+        'ipRegEx' => IpRegEx::class,
+        'role' => Role::class,
+        'serverParam' => ServerParam::class,
+        'shibboleth' => Shibboleth::class,
+        'user' => User::class,
+        'username' => Username::class,
     ];
 
     /**
@@ -59,20 +61,13 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Role\PermissionProvider\IpRange' =>
-            'VuFind\Role\PermissionProvider\Factory::getIpRange',
-        'VuFind\Role\PermissionProvider\IpRegEx' =>
-            'VuFind\Role\PermissionProvider\Factory::getIpRegEx',
-        'VuFind\Role\PermissionProvider\Role' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Role\PermissionProvider\ServerParam' =>
-            'VuFind\Role\PermissionProvider\Factory::getServerParam',
-        'VuFind\Role\PermissionProvider\Shibboleth' =>
-            'VuFind\Role\PermissionProvider\Factory::getShibboleth',
-        'VuFind\Role\PermissionProvider\User' =>
-            'VuFind\Role\PermissionProvider\Factory::getUser',
-        'VuFind\Role\PermissionProvider\Username' =>
-            'VuFind\Role\PermissionProvider\Factory::getUsername',
+        IpRange::class => IpRangeFactory::class,
+        IpRegEx::class => IpRegExFactory::class,
+        Role::class => \Laminas\ServiceManager\Factory\InvokableFactory::class,
+        ServerParam::class => InjectRequestFactory::class,
+        Shibboleth::class => ShibbolethFactory::class,
+        User::class => InjectAuthorizationServiceFactory::class,
+        Username::class => InjectAuthorizationServiceFactory::class,
     ];
 
     /**
@@ -83,6 +78,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Role\PermissionProvider\PermissionProviderInterface';
+        return PermissionProviderInterface::class;
     }
 }

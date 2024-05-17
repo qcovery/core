@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory to build UrlQueryHelper.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\Factory;
 
 use VuFind\Search\Base\Params;
@@ -41,6 +43,13 @@ use VuFind\Search\UrlQueryHelper;
  */
 class UrlQueryHelperFactory
 {
+    /**
+     * Name of class built by factory.
+     *
+     * @var string
+     */
+    protected $helperClass = UrlQueryHelper::class;
+
     /**
      * Extract default settings from the search parameters.
      *
@@ -115,22 +124,11 @@ class UrlQueryHelperFactory
         if ($params->getPage() != 1) {
             $urlParams['page'] = $params->getPage();
         }
-        $filters = $params->getFilters();
-        if (!empty($filters)) {
-            $urlParams['filter'] = [];
-            foreach ($filters as $field => $values) {
-                foreach ($values as $current) {
-                    $urlParams['filter'][] = $field . ':"' . $current . '"';
-                }
-            }
+        if ($filters = $params->getFiltersAsQueryParams()) {
+            $urlParams['filter'] = $filters;
         }
-        $hiddenFilters = $params->getHiddenFilters();
-        if (!empty($hiddenFilters)) {
-            foreach ($hiddenFilters as $field => $values) {
-                foreach ($values as $current) {
-                    $urlParams['hiddenFilters'][] = $field . ':"' . $current . '"';
-                }
-            }
+        if ($hiddenFilters = $params->getHiddenFiltersAsQueryParams()) {
+            $urlParams['hiddenFilters'] = $hiddenFilters;
         }
         $shards = $params->getSelectedShards();
         if (!empty($shards)) {
@@ -158,7 +156,7 @@ class UrlQueryHelperFactory
     public function fromParams(Params $params, array $config = [])
     {
         $finalConfig = $this->addDefaultsToConfig($params, $config);
-        return new UrlQueryHelper(
+        return new $this->helperClass(
             $this->getUrlParams($params, $finalConfig),
             $params->getQuery(),
             $finalConfig

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SFX Link Resolver Driver
  *
@@ -28,6 +29,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
+
 namespace VuFind\Resolver\Driver;
 
 /**
@@ -44,17 +46,17 @@ class Sfx extends AbstractBase
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $httpClient;
 
     /**
      * Constructor
      *
-     * @param string            $baseUrl    Base URL for link resolver
-     * @param \Zend\Http\Client $httpClient HTTP client
+     * @param string               $baseUrl    Base URL for link resolver
+     * @param \Laminas\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient)
+    public function __construct($baseUrl, \Laminas\Http\Client $httpClient)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
@@ -72,8 +74,9 @@ class Sfx extends AbstractBase
     public function fetchLinks($openURL)
     {
         // Make the call to SFX and load results
-        $url = $this->baseUrl .
-            '?sfx.response_type=multi_obj_detailed_xml&svc.fulltext=yes&' . $openURL;
+        $url = $this->getResolverUrl(
+            'sfx.response_type=multi_obj_detailed_xml&svc.fulltext=yes&' . $openURL
+        );
         $feed = $this->httpClient->setUri($url)->send()->getBody();
         return $feed;
     }

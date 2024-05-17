@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HTTP POST log writer for Slack
  *
@@ -25,12 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Log\Writer;
 
-use Zend\Http\Client;
+use Laminas\Http\Client;
 
 /**
- * This class extends the Zend Logging to send errors to Slack
+ * This class extends the Laminas Logging to send errors to Slack
  *
  * @category VuFind
  * @package  Error_Logging
@@ -67,7 +69,7 @@ class Slack extends Post
         ':warning: ',            // WARN
         ':speech_balloon: ',     // NOTICE
         ':information_source: ', // INFO
-        ':beetle: '              // DEBUG
+        ':beetle: ',              // DEBUG
     ];
 
     /**
@@ -102,7 +104,7 @@ class Slack extends Post
             'channel' => $this->channel,
             'username' => $this->username,
             'text' => $this->messageIcons[$event['priority']]
-                . $this->formatter->format($event) . PHP_EOL
+                . $this->formatter->format($event) . PHP_EOL,
         ];
         return json_encode($data);
     }

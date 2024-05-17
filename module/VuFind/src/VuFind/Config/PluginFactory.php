@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Config Plugin Factory
  *
@@ -25,12 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Config;
 
-use Interop\Container\ContainerInterface;
-use Zend\Config\Config;
-use Zend\Config\Reader\Ini as IniReader;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\Config\Config;
+use Laminas\Config\Reader\Ini as IniReader;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * VuFind Config Plugin Factory
@@ -65,20 +67,16 @@ class PluginFactory implements AbstractFactoryInterface
     /**
      * Load the specified configuration file.
      *
-     * @param string $filename config file name
-     * @param string $path     path relative to VuFind base (optional; defaults
-     * to config/vufind
+     * @param string $filename Config file name
      *
      * @return Config
      */
-    protected function loadConfigFile($filename, $path = 'config/vufind')
+    protected function loadConfigFile(string $filename): Config
     {
         $configs = [];
 
-        $fullpath = Locator::getConfigPath($filename, $path);
-
         // Return empty configuration if file does not exist:
-        if (!file_exists($fullpath)) {
+        if (!file_exists($filename)) {
             return new Config([]);
         }
 
@@ -86,19 +84,19 @@ class PluginFactory implements AbstractFactoryInterface
         // chain of them if the Parent_Config setting is used:
         do {
             $configs[]
-                = new Config($this->iniReader->fromFile($fullpath), true);
+                = new Config($this->iniReader->fromFile($filename), true);
 
             $i = count($configs) - 1;
             if (isset($configs[$i]->Parent_Config->path)) {
-                $fullpath = $configs[$i]->Parent_Config->path;
+                $filename = $configs[$i]->Parent_Config->path;
             } elseif (isset($configs[$i]->Parent_Config->relative_path)) {
-                $fullpath = pathinfo($fullpath, PATHINFO_DIRNAME)
+                $filename = pathinfo($filename, PATHINFO_DIRNAME)
                     . DIRECTORY_SEPARATOR
                     . $configs[$i]->Parent_Config->relative_path;
             } else {
-                $fullpath = false;
+                $filename = false;
             }
-        } while ($fullpath);
+        } while ($filename);
 
         // The last element in the array will be the top of the inheritance tree.
         // Let's establish a baseline:
@@ -109,8 +107,11 @@ class PluginFactory implements AbstractFactoryInterface
         while (null !== ($child = array_pop($configs))) {
             $overrideSections = isset($child->Parent_Config->override_full_sections)
                 ? explode(
-                    ',', str_replace(
-                        ' ', '', $child->Parent_Config->override_full_sections
+                    ',',
+                    str_replace(
+                        ' ',
+                        '',
+                        $child->Parent_Config->override_full_sections
                     )
                 )
                 : [];
@@ -127,17 +128,19 @@ class PluginFactory implements AbstractFactoryInterface
                 if ($section === 'Parent_Config') {
                     continue;
                 }
-                if (in_array($section, $overrideSections)
+                if (
+                    in_array($section, $overrideSections)
                     || !isset($config->$section)
                 ) {
                     $config->$section = $child->$section;
                 } else {
                     foreach (array_keys($contents->toArray()) as $key) {
                         // If a key is defined as key[] in the config file the key
-                        // remains a Zend\Config\Config object. If the current
+                        // remains a Laminas\Config\Config object. If the current
                         // section is not configured as an override section we try to
                         // merge the key[] values instead of overwriting them.
-                        if (is_object($config->$section->$key)
+                        if (
+                            is_object($config->$section->$key)
                             && is_object($child->$section->$key)
                             && $mergeArraySettings
                         ) {
@@ -184,9 +187,14 @@ class PluginFactory implements AbstractFactoryInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
-        return $this->loadConfigFile($requestedName . '.ini');
+        $pathResolver = $container->get(PathResolver::class);
+        return $this->loadConfigFile(
+            $pathResolver->getConfigPath($requestedName . '.ini')
+        );
     }
 }

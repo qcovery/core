@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Action Helper - Renewals Support Methods
  *
@@ -25,12 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Controller\Plugin;
 
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use VuFind\Validator\CsrfInterface;
 
 /**
- * Zend action helper to perform renewal-related actions
+ * Action helper to perform renewal-related actions
  *
  * @category VuFind
  * @package  Controller_Plugins
@@ -72,15 +75,20 @@ class Renewals extends AbstractPlugin
     /**
      * Process renewal requests.
      *
-     * @param \Zend\Stdlib\Parameters $request Request object
-     * @param \VuFind\ILS\Connection  $catalog ILS connection object
-     * @param array                   $patron  Current logged in patron
+     * @param \Laminas\Stdlib\Parameters $request       Request object
+     * @param \VuFind\ILS\Connection     $catalog       ILS connection object
+     * @param array                      $patron        Current logged in patron
+     * @param CsrfInterface              $csrfValidator CSRF validator
      *
      * @return array                  The result of the renewal, an
      * associative array keyed by item ID (empty if no renewals performed)
      */
-    public function processRenewals($request, $catalog, $patron)
-    {
+    public function processRenewals(
+        $request,
+        $catalog,
+        $patron,
+        $csrfValidator = null
+    ) {
         // Pick IDs to renew based on which button was pressed:
         $all = $request->get('renewAll');
         $selected = $request->get('renewSelected');
@@ -99,12 +107,23 @@ class Renewals extends AbstractPlugin
 
         // If there is actually something to renew, attempt the renewal action:
         if (is_array($ids) && !empty($ids)) {
+            if (null !== $csrfValidator) {
+                if (!$csrfValidator->isValid($request->get('csrf'))) {
+                    $flashMsg->addErrorMessage('csrf_validation_failed');
+                    return [];
+                }
+                // After successful token verification, clear list to shrink session
+                // and prevent double submit:
+                $csrfValidator->trimTokenList(0);
+            }
+
             $renewResult = $catalog->renewMyItems(
                 ['details' => $ids, 'patron' => $patron]
             );
             if ($renewResult !== false) {
                 // Assign Blocks to the Template
-                if (isset($renewResult['blocks'])
+                if (
+                    isset($renewResult['blocks'])
                     && is_array($renewResult['blocks'])
                 ) {
                     foreach ($renewResult['blocks'] as $block) {

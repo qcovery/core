@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OpenLibrarySubjects Recommendations Module
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
+
 namespace VuFind\Recommend;
 
 use VuFind\Connection\OpenLibrary;
@@ -44,7 +46,8 @@ use VuFind\Solr\Utils as SolrUtils;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
-class OpenLibrarySubjects implements RecommendInterface,
+class OpenLibrarySubjects implements
+    RecommendInterface,
     \VuFindHttp\HttpServiceAwareInterface
 {
     use \VuFindHttp\HttpServiceAwareTrait;
@@ -133,13 +136,14 @@ class OpenLibrarySubjects implements RecommendInterface,
     }
 
     /**
-     * Called at the end of the Search Params objects' initFromRequest() method.
+     * Called before the Search Results object performs its main search
+     * (specifically, in response to \VuFind\Search\SearchRunner::EVENT_CONFIGURED).
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
      * be needed.
      *
      * @param \VuFind\Search\Base\Params $params  Search parameter object
-     * @param \Zend\StdLib\Parameters    $request Parameter object representing user
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
      * request.
      *
      * @return void
@@ -147,12 +151,14 @@ class OpenLibrarySubjects implements RecommendInterface,
     public function init($params, $request)
     {
         // Get and normalise $requestParam
-        $this->subject =  $request->get($this->requestParam);
+        $this->subject = $request->get($this->requestParam);
 
         // Set up the published date range if it has not already been provided:
         if (empty($this->publishedIn) && $this->pubFilter) {
             $this->publishedIn = $this->getPublishedDates(
-                $this->pubFilter, $params, $request
+                $this->pubFilter,
+                $params,
+                $request
             );
         }
     }
@@ -173,13 +179,19 @@ class OpenLibrarySubjects implements RecommendInterface,
             $result = [];
             $ol = new OpenLibrary($this->httpService->createClient());
             $result = $ol->getSubjects(
-                $this->subject, $this->publishedIn, $this->subjectTypes, true, false,
-                $this->limit, null, true
+                $this->subject,
+                $this->publishedIn,
+                $this->subjectTypes,
+                true,
+                false,
+                $this->limit,
+                null,
+                true
             );
 
             if (!empty($result)) {
                 $this->result = [
-                    'worksArray' => $result, 'subject' => $this->subject
+                    'worksArray' => $result, 'subject' => $this->subject,
                 ];
             }
         }
@@ -192,20 +204,21 @@ class OpenLibrarySubjects implements RecommendInterface,
      * @param string                     $field   Name of filter field to check for
      * date limits
      * @param \VuFind\Search\Params\Base $params  Search parameter object
-     * @param \Zend\StdLib\Parameters    $request Parameter object representing user
-     * request.
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
+     *                                            request.
      *
      * @return string
      */
     protected function getPublishedDates($field, $params, $request)
     {
+        $range = null;
         // Try to extract range details from request parameters or SearchObject:
         $from = $request->get($field . 'from');
         $to = $request->get($field . 'to');
         if (null !== $from && null !== $to) {
             $range = ['from' => $from, 'to' => $to];
         } elseif (is_object($params)) {
-            $currentFilters = $params->getFilters();
+            $currentFilters = $params->getRawFilters();
             if (isset($currentFilters[$field][0])) {
                 $range = SolrUtils::parseRange($currentFilters[$field][0]);
             }

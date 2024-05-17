@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Primo Permission Handler.
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\Primo;
 
-use ZfcRbac\Service\AuthorizationServiceAwareTrait;
+use LmcRbacMvc\Service\AuthorizationServiceAwareTrait;
 
 /**
  * Primo Permission Handler.
@@ -59,14 +61,14 @@ class PrimoPermissionHandler
     /**
      * Constructor.
      *
-     * @param Zend\Config\Config|array $primoPermConfig Primo-Config for
+     * @param Laminas\Config\Config|array $primoPermConfig Primo-Config for
      * Institutions
      *
      * @return void
      */
     public function __construct($primoPermConfig)
     {
-        if ($primoPermConfig instanceof \Zend\Config\Config) {
+        if ($primoPermConfig instanceof \Laminas\Config\Config) {
             $primoPermConfig = $primoPermConfig->toArray();
         }
         $this->primoConfig = is_array($primoPermConfig) ? $primoPermConfig : [];
@@ -132,7 +134,8 @@ class PrimoPermissionHandler
      */
     protected function checkConfig()
     {
-        if (isset($this->primoConfig['institutionCode'])
+        if (
+            isset($this->primoConfig['institutionCode'])
             || isset($this->primoConfig['onCampusRule'])
             || ($this->getDefaultCode() !== false)
         ) {
@@ -156,17 +159,16 @@ class PrimoPermissionHandler
     protected function checkLegacySettings()
     {
         // if we already have settings, ignore the legacy ones
-        if (isset($this->primoConfig['defaultCode'])
+        if (
+            isset($this->primoConfig['defaultCode'])
             || isset($this->primoConfig['onCampusRule'])
         ) {
             return;
         }
 
         // Handle legacy options
-        $codes = isset($this->primoConfig['code'])
-            ? $this->primoConfig['code'] : [];
-        $regex = isset($this->primoConfig['regex'])
-            ? $this->primoConfig['regex'] : [];
+        $codes = $this->primoConfig['code'] ?? [];
+        $regex = $this->primoConfig['regex'] ?? [];
         if (!empty($codes) && !empty($regex)) {
             throw new \Exception(
                 'Legacy [Institutions] settings detected.'
@@ -189,11 +191,13 @@ class PrimoPermissionHandler
 
         // Add additional keys from relevant config sections:
         foreach (['institutionCode', 'onCampusRule'] as $section) {
-            if (isset($this->primoConfig[$section])
+            if (
+                isset($this->primoConfig[$section])
                 && is_array($this->primoConfig[$section])
             ) {
                 $codes = array_merge(
-                    $codes, array_keys($this->primoConfig[$section])
+                    $codes,
+                    array_keys($this->primoConfig[$section])
                 );
             }
         }
@@ -218,7 +222,8 @@ class PrimoPermissionHandler
 
         // walk through the relevant config sections and check if one is granted
         foreach (['institutionCode', 'onCampusRule'] as $section) {
-            if (isset($this->primoConfig[$section])
+            if (
+                isset($this->primoConfig[$section])
                 && is_array($this->primoConfig[$section])
             ) {
                 foreach ($this->primoConfig[$section] as $code => $permRule) {
@@ -251,8 +256,7 @@ class PrimoPermissionHandler
      */
     protected function getDefaultCode()
     {
-        return (isset($this->primoConfig['defaultCode']))
-            ? $this->primoConfig['defaultCode'] : false;
+        return $this->primoConfig['defaultCode'] ?? false;
     }
 
     /**
@@ -281,8 +285,7 @@ class PrimoPermissionHandler
         }
 
         $onCampusRule
-            = isset($this->primoConfig['onCampusRule'][$code])
-            ? $this->primoConfig['onCampusRule'][$code] : false;
+            = $this->primoConfig['onCampusRule'][$code] ?? false;
 
         if (false !== $onCampusRule) {
             return $onCampusRule;

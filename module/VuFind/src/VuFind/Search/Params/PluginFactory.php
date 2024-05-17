@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Search params plugin factory
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\Search\Params;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Search params plugin factory
@@ -60,14 +62,16 @@ class PluginFactory extends \VuFind\ServiceManager\AbstractPluginFactory
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $extras = null
     ) {
         $optionsService = preg_replace('/Params$/', 'Options', $requestedName);
-        $options = $container->get('VuFind\Search\Options\PluginManager')
+        $options = $container->get(\VuFind\Search\Options\PluginManager::class)
             ->get($optionsService);
         $class = $this->getClassName($requestedName);
-        $configLoader = $container->get('VuFind\Config\PluginManager');
+        $configLoader = $container->get(\VuFind\Config\PluginManager::class);
         // Clone the options instance in case caller modifies it:
         return new $class(clone $options, $configLoader, ...($extras ?: []));
     }

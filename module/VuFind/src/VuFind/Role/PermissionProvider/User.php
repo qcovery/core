@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User permission provider for VuFind.
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://www.vufind.org  Main Page
  */
+
 namespace VuFind\Role\PermissionProvider;
 
-use ZfcRbac\Service\AuthorizationService;
+use LmcRbacMvc\Service\AuthorizationService;
 
 /**
  * LDAP permission provider for VuFind.
@@ -39,8 +41,9 @@ use ZfcRbac\Service\AuthorizationService;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://www.vufind.org  Main Page
  */
-class User implements PermissionProviderInterface,
-    \Zend\Log\LoggerAwareInterface
+class User implements
+    PermissionProviderInterface,
+    \Laminas\Log\LoggerAwareInterface
 {
     use \VuFind\Log\LoggerAwareTrait;
 
@@ -72,7 +75,7 @@ class User implements PermissionProviderInterface,
     public function getPermissions($options)
     {
         // If no user is logged in, or the user doesn't match the passed-in
-        // whitelist, we can't grant the permission to any roles.
+        // filter, we can't grant the permission to any roles.
         if (!($user = $this->auth->getIdentity())) {
             return [];
         }
@@ -84,7 +87,7 @@ class User implements PermissionProviderInterface,
                 $this->logError("configuration option '{$option}' invalid");
                 return [];
             } else {
-                list($attribute, $pattern) = $parts;
+                [$attribute, $pattern] = $parts;
 
                 // check user attribute values against the pattern
                 if (! preg_match('/^\/.*\/$/', $pattern)) {

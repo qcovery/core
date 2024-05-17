@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hierarchy Tree Data Source (abstract base)
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Hierarchy\TreeDataSource;
 
 /**
@@ -38,7 +40,7 @@ namespace VuFind\Hierarchy\TreeDataSource;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
-abstract class AbstractBase implements \Zend\Log\LoggerAwareInterface
+abstract class AbstractBase implements \Laminas\Log\LoggerAwareInterface
 {
     use \VuFind\Log\LoggerAwareTrait;
 
@@ -48,6 +50,20 @@ abstract class AbstractBase implements \Zend\Log\LoggerAwareInterface
      * @var \VuFind\Hierarchy\Driver\AbstractBase
      */
     protected $hierarchyDriver = null;
+
+    /**
+     * Collection page route.
+     *
+     * @var string
+     */
+    protected $collectionRoute = 'collection';
+
+    /**
+     * Record page route.
+     *
+     * @var string
+     */
+    protected $recordRoute = 'record';
 
     /**
      * Get the hierarchy driver
@@ -74,6 +90,26 @@ abstract class AbstractBase implements \Zend\Log\LoggerAwareInterface
     {
         $this->hierarchyDriver = $driver;
         return $this;
+    }
+
+    /**
+     * Get collection page route.
+     *
+     * @return string
+     */
+    public function getCollectionRoute()
+    {
+        return $this->collectionRoute;
+    }
+
+    /**
+     * Get recordpage route.
+     *
+     * @return string
+     */
+    public function getRecordRoute()
+    {
+        return $this->recordRoute;
     }
 
     /**

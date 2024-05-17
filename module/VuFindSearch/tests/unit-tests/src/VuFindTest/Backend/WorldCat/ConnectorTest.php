@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Backend\WorldCat;
 
 use VuFindSearch\Backend\WorldCat\Connector;
@@ -49,15 +50,17 @@ class ConnectorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetHoldings()
     {
-        $client = $this->createMock('Zend\Http\Client');
+        $client = $this->createMock(\Laminas\Http\Client::class);
         $connector = new Connector('key', $client);
         $client->expects($this->once())->method('setMethod')
             ->with($this->equalTo('POST'))
             ->will($this->returnValue($client));
+        $expectedUri = 'http://www.worldcat.org/webservices/catalog/content/libraries/baz'
+            . '?wskey=key&servicelevel=full&frbrGrouping=on';
         $client->expects($this->once())->method('setUri')
-            ->with($this->equalTo('http://www.worldcat.org/webservices/catalog/content/libraries/baz?wskey=key&servicelevel=full&frbrGrouping=on'));
+            ->with($this->equalTo($expectedUri));
         $body = '<foo>bar</foo>';
-        $response = $this->createMock('Zend\Http\Response');
+        $response = $this->createMock(\Laminas\Http\Response::class);
         $response->expects($this->once())->method('getBody')
             ->will($this->returnValue($body));
         $response->expects($this->any())->method('isSuccess')
@@ -72,19 +75,21 @@ class ConnectorTest extends \PHPUnit\Framework\TestCase
      * Test "get holdings" HTTP failure
      *
      * @return void
-     *
-     * @expectedException VuFindSearch\Backend\Exception\RequestErrorException
      */
     public function testGetHoldingsHttpFailure()
     {
-        $client = $this->createMock('Zend\Http\Client');
+        $this->expectException(\VuFindSearch\Backend\Exception\RequestErrorException::class);
+
+        $client = $this->createMock(\Laminas\Http\Client::class);
         $connector = new Connector('key', $client);
         $client->expects($this->once())->method('setMethod')
             ->with($this->equalTo('POST'))
             ->will($this->returnValue($client));
-        $response = $this->createMock('Zend\Http\Response');
+        $response = $this->createMock(\Laminas\Http\Response::class);
         $response->expects($this->any())->method('isSuccess')
             ->will($this->returnValue(false));
+        $response->expects($this->once())->method('getStatusCode')
+            ->will($this->returnValue(418));
         $client->expects($this->once())->method('send')
             ->will($this->returnValue($response));
         $connector->getHoldings('baz');
@@ -97,15 +102,16 @@ class ConnectorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRecord()
     {
-        $client = $this->createMock('Zend\Http\Client');
+        $client = $this->createMock(\Laminas\Http\Client::class);
         $connector = new Connector('key', $client);
         $client->expects($this->once())->method('setMethod')
             ->with($this->equalTo('POST'))
             ->will($this->returnValue($client));
+        $expectedUri = 'http://www.worldcat.org/webservices/catalog/content/baz?servicelevel=full&wskey=key';
         $client->expects($this->once())->method('setUri')
-            ->with($this->equalTo('http://www.worldcat.org/webservices/catalog/content/baz?servicelevel=full&wskey=key'));
+            ->with($this->equalTo($expectedUri));
         $body = '<foo>bar</foo>';
-        $response = $this->createMock('Zend\Http\Response');
+        $response = $this->createMock(\Laminas\Http\Response::class);
         $response->expects($this->once())->method('getBody')
             ->will($this->returnValue($body));
         $response->expects($this->any())->method('isSuccess')
@@ -123,15 +129,16 @@ class ConnectorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRecordWithError()
     {
-        $client = $this->createMock('Zend\Http\Client');
+        $client = $this->createMock(\Laminas\Http\Client::class);
         $connector = new Connector('key', $client);
         $client->expects($this->once())->method('setMethod')
             ->with($this->equalTo('POST'))
             ->will($this->returnValue($client));
+        $expectedUri = 'http://www.worldcat.org/webservices/catalog/content/baz?servicelevel=full&wskey=key';
         $client->expects($this->once())->method('setUri')
-            ->with($this->equalTo('http://www.worldcat.org/webservices/catalog/content/baz?servicelevel=full&wskey=key'));
+            ->with($this->equalTo($expectedUri));
         $body = '<foo><diagnostic>bad</diagnostic></foo>';
-        $response = $this->createMock('Zend\Http\Response');
+        $response = $this->createMock(\Laminas\Http\Response::class);
         $response->expects($this->once())->method('getBody')
             ->will($this->returnValue($body));
         $response->expects($this->any())->method('isSuccess')
@@ -149,15 +156,18 @@ class ConnectorTest extends \PHPUnit\Framework\TestCase
      */
     public function testSearch()
     {
-        $client = $this->createMock('Zend\Http\Client');
+        $client = $this->createMock(\Laminas\Http\Client::class);
         $connector = new Connector('key', $client);
         $client->expects($this->once())->method('setMethod')
             ->with($this->equalTo('POST'))
             ->will($this->returnValue($client));
+        $expectedUri = 'http://www.worldcat.org/webservices/catalog/search/sru?version=1.1&x=y'
+            . '&startRecord=0&maximumRecords=20&servicelevel=full&wskey=key';
         $client->expects($this->once())->method('setUri')
-            ->with($this->equalTo('http://www.worldcat.org/webservices/catalog/search/sru?version=1.1&x=y&startRecord=0&maximumRecords=20&servicelevel=full&wskey=key'));
-        $body = '<foo>,<numberOfRecords>1</numberOfRecords><records><record><recordData>bar</recordData></record></records></foo>';
-        $response = $this->createMock('Zend\Http\Response');
+            ->with($this->equalTo($expectedUri));
+        $body = '<foo>,<numberOfRecords>1</numberOfRecords><records><record><recordData>bar</recordData>'
+            . '</record></records></foo>';
+        $response = $this->createMock(\Laminas\Http\Response::class);
         $response->expects($this->once())->method('getBody')
             ->will($this->returnValue($body));
         $response->expects($this->any())->method('isSuccess')

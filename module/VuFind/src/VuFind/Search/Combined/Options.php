@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Combined search model.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\Combined;
 
 /**
@@ -38,6 +40,22 @@ namespace VuFind\Search\Combined;
  */
 class Options extends \VuFind\Search\Base\Options
 {
+    /**
+     * Constructor
+     *
+     * @param \VuFind\Config\PluginManager $configLoader Config loader
+     */
+    public function __construct(\VuFind\Config\PluginManager $configLoader)
+    {
+        parent::__construct($configLoader);
+        $searchSettings = $this->configLoader->get('combined');
+        if (isset($searchSettings->Basic_Searches)) {
+            foreach ($searchSettings->Basic_Searches as $key => $value) {
+                $this->basicHandlers[$key] = $value;
+            }
+        }
+    }
+
     /**
      * Return the route name for the search results action.
      *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Solr aspect of the Search Multi-class (Params)
  *
@@ -22,9 +23,11 @@
  * @category VuFind
  * @package  Search_Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\Solr;
 
 use VuFindSearch\ParamBag;
@@ -35,12 +38,30 @@ use VuFindSearch\ParamBag;
  * @category VuFind
  * @package  Search_Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
 class Params extends \VuFind\Search\Base\Params
 {
     use \VuFind\Search\Params\FacetLimitTrait;
+    use \VuFind\Search\Params\FacetRestrictionsTrait;
+
+    /**
+     * Search with facet.contains
+     * cf. https://lucene.apache.org/solr/guide/7_3/faceting.html
+     *
+     * @var string
+     */
+    protected $facetContains = null;
+
+    /**
+     * Ignore Case when using facet.contains
+     * cf. https://lucene.apache.org/solr/guide/7_3/faceting.html
+     *
+     * @var bool
+     */
+    protected $facetContainsIgnoreCase = null;
 
     /**
      * Offset for facet results
@@ -85,13 +106,39 @@ class Params extends \VuFind\Search\Base\Params
     protected $facetHelper;
 
     /**
+     * Are we searching by ID only (instead of a normal query)?
+     *
+     * @var bool
+     */
+    protected $searchingById = false;
+
+    /**
+     * Config sections to search for facet labels if no override configuration
+     * is set.
+     *
+     * @var array
+     */
+    protected $defaultFacetLabelSections
+        = ['Advanced', 'HomePage', 'ResultsTop', 'Results', 'ExtraFacetLabels'];
+
+    /**
+     * Config sections to search for checkbox facet labels if no override
+     * configuration is set.
+     *
+     * @var array
+     */
+    protected $defaultFacetLabelCheckboxSections = ['CheckboxFacets'];
+
+    /**
      * Constructor
      *
      * @param \VuFind\Search\Base\Options  $options      Options to use
      * @param \VuFind\Config\PluginManager $configLoader Config loader
      * @param HierarchicalFacetHelper      $facetHelper  Hierarchical facet helper
      */
-    public function __construct($options, \VuFind\Config\PluginManager $configLoader,
+    public function __construct(
+        $options,
+        \VuFind\Config\PluginManager $configLoader,
         HierarchicalFacetHelper $facetHelper = null
     ) {
         parent::__construct($options, $configLoader);
@@ -100,13 +147,12 @@ class Params extends \VuFind\Search\Base\Params
         // Use basic facet limit by default, if set:
         $config = $configLoader->get($options->getFacetsIni());
         $this->initFacetLimitsFromConfig($config->Results_Settings ?? null);
+        $this->initFacetRestrictionsFromConfig($config->Results_Settings ?? null);
         if (isset($config->LegacyFields)) {
             $this->facetAliases = $config->LegacyFields->toArray();
         }
-        if (isset($config->ExtraFacetLabels)) {
-            $this->extraFacetLabels = $config->ExtraFacetLabels->toArray();
-        }
-        if (isset($config->Results_Settings->sorted_by_index)
+        if (
+            isset($config->Results_Settings->sorted_by_index)
             && count($config->Results_Settings->sorted_by_index) > 0
         ) {
             $this->setIndexSortedFacets(
@@ -125,7 +171,7 @@ class Params extends \VuFind\Search\Base\Params
         // Define Filter Query
         $filterQuery = [];
         $orFilters = [];
-        $filterList = array_merge(
+        $filterList = array_merge_recursive(
             $this->getHiddenFilters(),
             $this->filterList
         );
@@ -137,7 +183,8 @@ class Params extends \VuFind\Search\Base\Params
                 // Special case -- complex filter, that should be taken as-is:
                 if ($field == '#') {
                     $q = $value;
-                } elseif (substr($value, -1) == '*'
+                } elseif (
+                    substr($value, -1) == '*'
                     || preg_match('/\[[^\]]+\s+TO\s+[^\]]+\]/', $value)
                 ) {
                     // Special case -- allow trailing wildcards and ranges
@@ -146,7 +193,7 @@ class Params extends \VuFind\Search\Base\Params
                     $q = $field . ':"' . addcslashes($value, '"\\') . '"';
                 }
                 if ($orFacet) {
-                    $orFilters[$field] = $orFilters[$field] ?? [];
+                    $orFilters[$field] ??= [];
                     $orFilters[$field][] = $q;
                 } else {
                     $filterQuery[] = $q;
@@ -177,10 +224,25 @@ class Params extends \VuFind\Search\Base\Params
                 if ($fieldLimit != $this->facetLimit) {
                     $facetSet["f.{$facetField}.facet.limit"] = $fieldLimit;
                 }
+                $fieldPrefix = $this->getFacetPrefixForField($facetField);
+                if (!empty($fieldPrefix)) {
+                    $facetSet["f.{$facetField}.facet.prefix"] = $fieldPrefix;
+                }
+                $fieldMatches = $this->getFacetMatchesForField($facetField);
+                if (!empty($fieldMatches)) {
+                    $facetSet["f.{$facetField}.facet.matches"] = $fieldMatches;
+                }
                 if ($this->getFacetOperator($facetField) == 'OR') {
                     $facetField = '{!ex=' . $facetField . '_filter}' . $facetField;
                 }
                 $facetSet['field'][] = $facetField;
+            }
+            if ($this->facetContains != null) {
+                $facetSet['contains'] = $this->facetContains;
+            }
+            if ($this->facetContainsIgnoreCase != null) {
+                $facetSet['contains.ignoreCase']
+                    = $this->facetContainsIgnoreCase ? 'true' : 'false';
             }
             if ($this->facetOffset != null) {
                 $facetSet['offset'] = $this->facetOffset;
@@ -201,7 +263,7 @@ class Params extends \VuFind\Search\Base\Params
     /**
      * Initialize the object's search settings from a request object.
      *
-     * @param \Zend\StdLib\Parameters $request Parameter object representing user
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
      * request.
      *
      * @return void
@@ -216,6 +278,30 @@ class Params extends \VuFind\Search\Base\Params
             // Use standard initialization:
             parent::initSearch($request);
         }
+    }
+
+    /**
+     * Set Facet Contains
+     *
+     * @param string $p the new contains value
+     *
+     * @return void
+     */
+    public function setFacetContains($p)
+    {
+        $this->facetContains = $p;
+    }
+
+    /**
+     * Set Facet Contains Ignore Case
+     *
+     * @param bool $val the new boolean value
+     *
+     * @return void
+     */
+    public function setFacetContainsIgnoreCase($val)
+    {
+        $this->facetContainsIgnoreCase = $val;
     }
 
     /**
@@ -308,47 +394,9 @@ class Params extends \VuFind\Search\Base\Params
     }
 
     /**
-     * Initialize facet settings for the standard search screen.
-     *
-     * @return void
-     */
-    public function initBasicFacets()
-    {
-        $this->initFacetList('ResultsTop', 'Results_Settings');
-        $this->initFacetList('Results', 'Results_Settings');
-    }
-
-    /**
-     * Load all available facet settings.  This is mainly useful for showing
-     * appropriate labels when an existing search has multiple filters associated
-     * with it.
-     *
-     * @param string $preferredSection Section to favor when loading settings; if
-     * multiple sections contain the same facet, this section's description will
-     * be favored.
-     *
-     * @return void
-     */
-    public function activateAllFacets($preferredSection = false)
-    {
-        // Based on preference, change the order of initialization to make sure
-        // that preferred facet labels come in last.
-        if ($preferredSection == 'Advanced') {
-            $this->initHomePageFacets();
-            $this->initBasicFacets();
-            $this->initAdvancedFacets();
-        } else {
-            $this->initHomePageFacets();
-            $this->initAdvancedFacets();
-            $this->initBasicFacets();
-        }
-        $this->initCheckboxFacets();
-    }
-
-    /**
      * Add filters to the object based on values found in the request object.
      *
-     * @param \Zend\StdLib\Parameters $request Parameter object representing user
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
      * request.
      *
      * @return void
@@ -359,12 +407,12 @@ class Params extends \VuFind\Search\Base\Params
         // special illustrations filter.
         parent::initFilters($request);
         switch ($request->get('illustration', -1)) {
-        case 1:
-            $this->addFilter('illustrated:Illustrated');
-            break;
-        case 0:
-            $this->addFilter('illustrated:"Not Illustrated"');
-            break;
+            case 1:
+                $this->addFilter('illustrated:Illustrated');
+                break;
+            case 0:
+                $this->addFilter('illustrated:"Not Illustrated"');
+                break;
         }
     }
 
@@ -384,13 +432,15 @@ class Params extends \VuFind\Search\Base\Params
 
         // Special case -- no IDs to set:
         if (empty($ids)) {
-            return $this->setOverrideQuery('NOT *:*');
+            $this->setOverrideQuery('NOT *:*');
+            return;
         }
 
         $callback = function ($i) {
             return '"' . addcslashes($i, '"') . '"';
         };
         $ids = array_map($callback, $ids);
+        $this->searchingById = true;
         $this->setOverrideQuery('id:(' . implode(' OR ', $ids) . ')');
     }
 
@@ -403,8 +453,7 @@ class Params extends \VuFind\Search\Base\Params
     public function getQueryIDLimit()
     {
         $config = $this->configLoader->get($this->getOptions()->getMainIni());
-        return isset($config->Index->maxBooleanClauses)
-            ? $config->Index->maxBooleanClauses : 1024;
+        return $config->Index->maxBooleanClauses ?? 1024;
     }
 
     /**
@@ -425,7 +474,13 @@ class Params extends \VuFind\Search\Base\Params
             'relevance' => ['field' => 'score', 'order' => 'desc'],
             'callnumber' => ['field' => 'callnumber-sort', 'order' => 'asc'],
         ];
+        $tieBreaker = $this->getOptions()->getSortTieBreaker();
+        if ($tieBreaker) {
+            $sort .= ',' . $tieBreaker;
+        }
+
         $normalized = [];
+        $fields = [];
         foreach (explode(',', $sort) as $component) {
             $parts = explode(' ', trim($component));
             $field = reset($parts);
@@ -436,12 +491,16 @@ class Params extends \VuFind\Search\Base\Params
                     $table[$field]['field'],
                     $order ?: $table[$field]['order']
                 );
+                $fields[] = $field;
             } else {
-                $normalized[] = sprintf(
-                    '%s %s',
-                    $field,
-                    $order ?: 'asc'
-                );
+                if (!in_array($field, $fields)) {
+                    $normalized[] = sprintf(
+                        '%s %s',
+                        $field,
+                        $order ?: 'asc'
+                    );
+                    $fields[] = $field;
+                }
             }
         }
         return implode(',', $normalized);
@@ -458,7 +517,8 @@ class Params extends \VuFind\Search\Base\Params
 
         // Spellcheck
         $backendParams->set(
-            'spellcheck', $this->getOptions()->spellcheckEnabled() ? 'true' : 'false'
+            'spellcheck',
+            $this->getOptions()->spellcheckEnabled() ? 'true' : 'false'
         );
 
         // Facets
@@ -503,9 +563,10 @@ class Params extends \VuFind\Search\Base\Params
             // If we have an empty search with relevance sort as the primary sort
             // field, see if there is an override configured:
             $sortFields = explode(',', $sort);
-            $allTerms = trim($this->getQuery()->getAllTerms());
-            if ('relevance' === $sortFields[0]
-                && ('' === $allTerms || '*:*' === $allTerms)
+            $allTerms = trim($this->getQuery()->getAllTerms() ?? '');
+            if (
+                'relevance' === $sortFields[0]
+                && ('' === $allTerms || '*:*' === $allTerms || $this->searchingById)
                 && ($relOv = $this->getOptions()->getEmptySearchRelevanceOverride())
             ) {
                 $sort = $relOv;
@@ -522,6 +583,7 @@ class Params extends \VuFind\Search\Base\Params
 
         if ($pf = $this->getPivotFacets()) {
             $backendParams->add('facet.pivot', $pf);
+            $backendParams->set('facet', 'true');
         }
 
         return $backendParams;
@@ -562,7 +624,10 @@ class Params extends \VuFind\Search\Base\Params
     protected function formatFilterListEntry($field, $value, $operator, $translate)
     {
         $filter = parent::formatFilterListEntry(
-            $field, $value, $operator, $translate
+            $field,
+            $value,
+            $operator,
+            $translate
         );
 
         $hierarchicalFacets = $this->getOptions()->getHierarchicalFacets();
@@ -576,7 +641,8 @@ class Params extends \VuFind\Search\Base\Params
         } elseif (preg_match($caseInsensitiveRegex, $value, $matches)) {
             // Case insensitive case: [x TO y] OR [X TO Y]; convert
             // only if values in both ranges match up!
-            if (strtolower($matches[3]) == strtolower($matches[1])
+            if (
+                strtolower($matches[3]) == strtolower($matches[1])
                 && strtolower($matches[4]) == strtolower($matches[2])
             ) {
                 $filter['displayText'] = $matches[1] . '-' . $matches[2];
@@ -584,19 +650,75 @@ class Params extends \VuFind\Search\Base\Params
         } elseif ($this->facetHelper && in_array($field, $hierarchicalFacets)) {
             // Display hierarchical facet levels nicely
             $separator = $hierarchicalFacetSeparators[$field] ?? '/';
-            $filter['displayText'] = $this->facetHelper->formatDisplayText(
-                $filter['displayText'], true, $separator
-            );
-            if ($translate) {
-                $domain = $this->getOptions()->getTextDomainForTranslatedFacet(
-                    $field
+            if (!$translate) {
+                $filter['displayText'] = $this->facetHelper->formatDisplayText(
+                    $filter['displayText'],
+                    true,
+                    $separator
+                )->getDisplayString();
+            } else {
+                $domain = $this->getOptions()
+                    ->getTextDomainForTranslatedFacet($field);
+
+                // Provide translation of each separate element as a default
+                // while allowing one to translate the full string too:
+                $parts = $this->facetHelper
+                    ->getFilterStringParts($filter['value']);
+                $translated = [];
+                foreach ($parts as $part) {
+                    $translated[] = $this->translate([$domain, $part]);
+                }
+                $translatedParts = implode($separator, $translated);
+
+                $parts = array_map(
+                    function ($part) {
+                        return $part->getDisplayString();
+                    },
+                    $parts
                 );
-                $filter['displayText'] = $this->translate(
-                    [$domain, $filter['displayText']]
-                );
+                $str = implode($separator, $parts);
+                $filter['displayText']
+                    = $this->translate([$domain, $str], [], $translatedParts);
             }
         }
 
         return $filter;
+    }
+
+    /**
+     * Get information on the current state of the boolean checkbox facets.
+     *
+     * @param array $include        List of checkbox filters to return (null for all)
+     * @param bool  $includeDynamic Should we include dynamically-generated
+     * checkboxes that are not part of the include list above?
+     *
+     * @return array
+     */
+    public function getCheckboxFacets(
+        array $include = null,
+        bool $includeDynamic = true
+    ) {
+        // Grab checkbox facet details using the standard method:
+        $facets = parent::getCheckboxFacets($include, $includeDynamic);
+
+        $config = $this->configLoader->get($this->getOptions()->getFacetsIni());
+        $filterField = $config->CustomFilters->custom_filter_field ?? 'vufind';
+
+        // Special case -- inverted checkbox facets should always appear, even on
+        // the "no results" screen, since setting them actually EXPANDS rather than
+        // reduces the result set.
+        foreach ($facets as $i => $facet) {
+            // Append colon on end to ensure that $customFilter is always set.
+            [$field, $customFilter] = explode(':', $facet['filter'] . ':');
+            if (
+                $field == $filterField
+                && isset($config->CustomFilters->inverted_filters[$customFilter])
+            ) {
+                $facets[$i]['alwaysVisible'] = true;
+            }
+        }
+
+        // Return modified list:
+        return $facets;
     }
 }

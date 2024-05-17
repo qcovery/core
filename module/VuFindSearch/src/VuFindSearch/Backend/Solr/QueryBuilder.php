@@ -28,12 +28,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\Solr;
 
 use VuFindSearch\ParamBag;
 use VuFindSearch\Query\AbstractQuery;
 use VuFindSearch\Query\Query;
-
 use VuFindSearch\Query\QueryGroup;
 
 /**
@@ -71,6 +71,13 @@ class QueryBuilder implements QueryBuilderInterface
     protected $exactSpecs = [];
 
     /**
+     * Global extra Solr query parameters
+     *
+     * @var array
+     */
+    protected $globalExtraParams = [];
+
+    /**
      * Solr fields to highlight. Also serves as a flag for whether to perform
      * highlight-specific behavior; if the field list is empty, highlighting is
      * skipped.
@@ -102,7 +109,8 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @return void
      */
-    public function __construct(array $specs = [],
+    public function __construct(
+        array $specs = [],
         $defaultDismaxHandler = 'dismax'
     ) {
         $this->defaultDismaxHandler = $defaultDismaxHandler;
@@ -144,7 +152,9 @@ class QueryBuilder implements QueryBuilderInterface
         $highlight = !empty($this->fieldsToHighlight);
 
         if ($handler = $this->getSearchHandler($finalQuery->getHandler(), $string)) {
-            if (!$handler->hasExtendedDismax()
+            $string = $handler->preprocessQueryString($string);
+            if (
+                !$handler->hasExtendedDismax()
                 && $this->getLuceneHelper()->containsAdvancedLuceneSyntax($string)
             ) {
                 $string = $this->createAdvancedInnerSearchString($string, $handler);
@@ -178,25 +188,114 @@ class QueryBuilder implements QueryBuilderInterface
         }
         $params->set('q', $string);
 
+        // Handle any extra parameters:
+        foreach ($this->globalExtraParams as $extraParam) {
+            if (empty($extraParam['param']) || empty($extraParam['value'])) {
+                continue;
+            }
+            if (
+                !$this->checkParamConditions($query, $extraParam['conditions'] ?? [])
+            ) {
+                continue;
+            }
+            foreach ((array)$extraParam['value'] as $value) {
+                $params->add($extraParam['param'], $value);
+            }
+        }
+
         return $params;
     }
 
     /**
-     * Control whether or not the QueryBuilder should create an hl.q parameter
-     * when the main query includes clauses that should not be factored into
-     * highlighting. (Turned off by default).
+     * Check if the conditions match for an extra parameter
      *
-     * @param bool $enable Should highlighting query generation be enabled?
+     * @param AbstractQuery $query      Search query
+     * @param array         $conditions Required conditions
      *
-     * @return void
-     *
-     * @deprecated
+     * @return bool
      */
-    public function setCreateHighlightingQuery($enable)
+    protected function checkParamConditions(
+        AbstractQuery $query,
+        array $conditions
+    ): bool {
+        if (empty($conditions)) {
+            return true;
+        }
+        $searchTypes = $this->getSearchTypes($query);
+        foreach ($conditions as $condition) {
+            if (!is_array($condition)) {
+                continue;
+            }
+            $values = reset($condition);
+            $condition = key($condition);
+            switch ($condition) {
+                case 'SearchTypeIn':
+                    if (empty(array_intersect((array)$values, $searchTypes))) {
+                        return false;
+                    }
+                    break;
+                case 'AllSearchTypesIn':
+                    if (array_diff($searchTypes, (array)$values)) {
+                        return false;
+                    }
+                    break;
+                case 'SearchTypeNotIn':
+                    if (!empty(array_intersect((array)$values, $searchTypes))) {
+                        return false;
+                    }
+                    break;
+                case 'NoDismaxParams':
+                    foreach ((array)$values as $value) {
+                        if ($this->hasDismaxParamsField($searchTypes, $value)) {
+                            return false;
+                        }
+                    }
+                    break;
+                default:
+                    throw new \Exception("Unknown parameter condition: $condition");
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if any of the given search types has the field in DismaxParams
+     *
+     * @param array  $searchTypes Search types to check
+     * @param string $field       Field to check for
+     *
+     * @return bool
+     */
+    protected function hasDismaxParamsField(array $searchTypes, string $field): bool
     {
-        // This is deprecated, but use it to manipulate the highlighted field
-        // list for backward compatibility.
-        $this->fieldsToHighlight = $enable ? '*' : '';
+        foreach ($searchTypes as $searchType) {
+            if ($handler = $this->getSearchHandler($searchType, '')) {
+                foreach ($handler->getDismaxParams() as $param) {
+                    if (reset($param) === $field) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get an array of search types used in the given search
+     *
+     * @param AbstractQuery $query Query
+     *
+     * @return array
+     */
+    protected function getSearchTypes(AbstractQuery $query): array
+    {
+        if ($query instanceof QueryGroup) {
+            $callback = function ($carry, $item) {
+                return array_merge($carry, $this->getSearchTypes($item));
+            };
+            return array_unique(array_reduce($query->getQueries(), $callback, []));
+        }
+        return [$query->getHandler()];
     }
 
     /**
@@ -257,9 +356,14 @@ class QueryBuilder implements QueryBuilderInterface
     public function setSpecs(array $specs)
     {
         foreach ($specs as $handler => $spec) {
+            if ('GlobalExtraParams' === $handler) {
+                $this->globalExtraParams = $spec;
+                continue;
+            }
             if (isset($spec['ExactSettings'])) {
                 $this->exactSpecs[strtolower($handler)] = new SearchHandler(
-                    $spec['ExactSettings'], $this->defaultDismaxHandler
+                    $spec['ExactSettings'],
+                    $this->defaultDismaxHandler
                 );
                 unset($spec['ExactSettings']);
             }
@@ -303,7 +407,7 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @return SearchHandler|null
      */
-    protected function getSearchHandler($handler, $searchString)
+    protected function getSearchHandler($handler, string $searchString)
     {
         $handler = $handler ? strtolower($handler) : $handler;
         if ($handler) {
@@ -311,8 +415,9 @@ class QueryBuilder implements QueryBuilderInterface
             // to check for a handler first before doing multiple string
             // operations to determine eligibility for exact handling.
             if (isset($this->exactSpecs[$handler])) {
-                $searchString = isset($searchString) ? trim($searchString) : '';
-                if (strlen($searchString) > 1
+                $searchString = trim($searchString);
+                if (
+                    strlen($searchString) > 1
                     && substr($searchString, 0, 1) == '"'
                     && substr($searchString, -1, 1) == '"'
                 ) {
@@ -349,25 +454,26 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @return string
      *
-     * @see self::reduceQueryGroup()
+     * @see \VuFindSearch\Backend\Solr\QueryBuilder::reduceQueryGroup()
      */
     protected function reduceQueryGroupComponents(AbstractQuery $component)
     {
         if ($component instanceof QueryGroup) {
             $reduced = array_map(
-                [$this, 'reduceQueryGroupComponents'], $component->getQueries()
+                [$this, 'reduceQueryGroupComponents'],
+                $component->getQueries()
             );
-            $searchString = $component->isNegated() ? 'NOT ' : '';
             $reduced = array_filter(
                 $reduced,
                 function ($s) {
                     return '' !== $s;
                 }
             );
-            if ($reduced) {
-                $searchString .= sprintf(
-                    '(%s)', implode(" {$component->getOperator()} ", $reduced)
-                );
+            $searchString = $reduced
+                ? ('(' . implode(" {$component->getOperator()} ", $reduced) . ')')
+                : '';
+            if ($component->isNegated() && !empty($searchString)) {
+                $searchString = '(*:* NOT ' . $searchString . ')';
             }
         } else {
             $searchString = $this->getNormalizedQueryString($component);
@@ -436,7 +542,9 @@ class QueryBuilder implements QueryBuilderInterface
         // Use a lookahead to skip matches found within quoted phrases.
         $lookahead = '(?=(?:[^\"]*+\"[^\"]*+\")*+[^\"]*+$)';
         $string = preg_replace_callback(
-            '/([^\s:()]+\?)(\s|$)' . $lookahead . '/', $callback, $string
+            '/([^\s:()]+\?)(\s|$)' . $lookahead . '/',
+            $callback,
+            $string
         );
         return rtrim($string);
     }
@@ -465,7 +573,8 @@ class QueryBuilder implements QueryBuilderInterface
      *
      * @return string
      */
-    protected function createAdvancedInnerSearchString($string,
+    protected function createAdvancedInnerSearchString(
+        $string,
         SearchHandler $handler
     ) {
         // Special case -- if the user wants all records but the current handler
@@ -482,6 +591,6 @@ class QueryBuilder implements QueryBuilderInterface
         }
 
         return $handler
-            ? $handler->createAdvancedQueryString($string, false) : $string;
+            ? $handler->createAdvancedQueryString($string) : $string;
     }
 }

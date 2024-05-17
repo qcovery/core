@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Wikipedia connection class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Connection;
 
 use VuFind\I18n\Translator\TranslatorAwareInterface;
@@ -45,7 +47,7 @@ class Wikipedia implements TranslatorAwareInterface
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $client;
 
@@ -66,9 +68,9 @@ class Wikipedia implements TranslatorAwareInterface
     /**
      * Constructor
      *
-     * @param \Zend\Http\Client $client HTTP client
+     * @param \Laminas\Http\Client $client HTTP client
      */
-    public function __construct(\Zend\Http\Client $client)
+    public function __construct(\Laminas\Http\Client $client)
     {
         $this->client = $client;
     }
@@ -91,7 +93,7 @@ class Wikipedia implements TranslatorAwareInterface
      *
      * @param string $author The author name to search for
      *
-     * @return array
+     * @return ?array
      */
     public function get($author)
     {
@@ -102,7 +104,7 @@ class Wikipedia implements TranslatorAwareInterface
         }
 
         // Get information from Wikipedia API
-        $uri = 'http://' . $this->lang . '.wikipedia.org/w/api.php' .
+        $uri = 'https://' . $this->lang . '.wikipedia.org/w/api.php' .
                '?action=query&prop=revisions&rvprop=content&format=php' .
                '&list=allpages&titles=' . urlencode($author);
 
@@ -135,7 +137,7 @@ class Wikipedia implements TranslatorAwareInterface
      *
      * @param string $infoboxStr Infobox text
      *
-     * @return string
+     * @return array Array with two values values: image name and image caption
      */
     protected function extractImageFromInfoBox($infoboxStr)
     {
@@ -143,7 +145,8 @@ class Wikipedia implements TranslatorAwareInterface
 
         // Get rid of the last pair of braces and split
         $infobox = explode(
-            "\n|", preg_replace('/^\s+|/m', '', substr($infoboxStr, 2, -2))
+            "\n|",
+            preg_replace('/^\s+|/m', '', substr($infoboxStr, 2, -2))
         );
 
         // Look through every row of the infobox
@@ -154,25 +157,25 @@ class Wikipedia implements TranslatorAwareInterface
 
             // At the moment we only want stuff related to the image.
             switch (strtolower($key)) {
-            case "img":
-            case "image":
-            case "image:":
-            case "image_name":
-            case "imagem":
-            case 'imagen':
-            case 'immagine':
-                $imageName = str_replace(' ', '_', $value);
-                break;
-            case "caption":
-            case "img_capt":
-            case "image_caption":
-            case "legenda":
-            case 'textoimagen':
-                $imageCaption = $value;
-                break;
-            default:
-                /* Nothing else... yet */
-                break;
+                case "img":
+                case "image":
+                case "image:":
+                case "image_name":
+                case "imagem":
+                case 'imagen':
+                case 'immagine':
+                    $imageName = str_replace(' ', '_', $value);
+                    break;
+                case "caption":
+                case "img_capt":
+                case "image_caption":
+                case "legenda":
+                case 'textoimagen':
+                    $imageCaption = $value;
+                    break;
+                default:
+                    /* Nothing else... yet */
+                    break;
             }
         }
 
@@ -195,7 +198,7 @@ class Wikipedia implements TranslatorAwareInterface
         foreach ($matches[1] as $m) {
             // Check if this is the Infobox; name may vary by language
             $infoboxTags = [
-                'Bio', 'Ficha de escritor', 'Infobox', 'Info/Biografia'
+                'Bio', 'Ficha de escritor', 'Infobox', 'Info/Biografia',
             ];
             foreach ($infoboxTags as $tag) {
                 if (substr($m, 0, strlen($tag) + 1) == '{' . $tag) {
@@ -220,7 +223,7 @@ class Wikipedia implements TranslatorAwareInterface
         $imageName = $imageCaption = null;
         // The tag marking image files will vary depending on API language:
         $tags = [
-            'Archivo', 'Bestand', 'Datei', 'Ficheiro', 'Fichier', 'File', 'Image'
+            'Archivo', 'Bestand', 'Datei', 'Ficheiro', 'Fichier', 'File', 'Image',
         ];
         $pattern = '/(\x5b\x5b)('
             . implode('|', $tags)
@@ -266,7 +269,8 @@ class Wikipedia implements TranslatorAwareInterface
             foreach ($new_matches as $nm) {
                 foreach ((array)$nm as $n) {
                     // If it's a file link get rid of it
-                    if (strtolower(substr($n, 0, 7)) == "[[file:"
+                    if (
+                        strtolower(substr($n, 0, 7)) == "[[file:"
                         || strtolower(substr($n, 0, 8)) == "[[image:"
                     ) {
                         $body = str_replace($n, "", $body);
@@ -338,7 +342,7 @@ class Wikipedia implements TranslatorAwareInterface
         // Convert multiple newlines into two breaks
         // We DO want this to be greedy
         $pattern[] = "/\n{2,}/s";
-        $replacement[] = '<br/><br/>';
+        $replacement[] = '<br><br>';
 
         return preg_replace($pattern, $replacement, $body);
     }
@@ -407,20 +411,22 @@ class Wikipedia implements TranslatorAwareInterface
      * This method is responsible for parsing the output from the Wikipedia
      * REST API.
      *
-     * @param string $rawBody The Wikipedia response to parse
+     * @param array $rawBody The Wikipedia response to parse
      *
      * @return array
      * @author Rushikesh Katikar <rushikesh.katikar@gmail.com>
      */
     protected function parseWikipedia($rawBody)
     {
+        $imageName = null;
+        $imageCaption = null;
         // Check if data exists or not
         if (isset($rawBody['query']['pages']['-1'])) {
             return null;
         }
 
         // Check for redirects; get some basic information:
-        list($name, $redirectTo, $bodyArr) = $this->checkForRedirect($rawBody);
+        [$name, $redirectTo, $bodyArr] = $this->checkForRedirect($rawBody);
 
         // Recurse if we only found redirects:
         if ($redirectTo) {
@@ -442,11 +448,11 @@ class Wikipedia implements TranslatorAwareInterface
 
         // Try to find an image in either the infobox or the body:
         if ($infoboxStr) {
-            list($imageName, $imageCaption)
+            [$imageName, $imageCaption]
                 = $this->extractImageFromInfoBox($infoboxStr);
         }
         if (!isset($imageName)) {
-            list($imageName, $imageCaption) = $this->extractImageFromBody($bodyArr);
+            [$imageName, $imageCaption] = $this->extractImageFromBody($bodyArr);
         }
 
         // Given an image name found above, look up the associated URL and add it to
@@ -471,7 +477,8 @@ class Wikipedia implements TranslatorAwareInterface
      */
     protected function getWikipediaImageURL($imageName)
     {
-        $url = "http://{$this->lang}.wikipedia.org/w/api.php" .
+        $imageUrl = null;
+        $url = "https://{$this->lang}.wikipedia.org/w/api.php" .
                '?prop=imageinfo&action=query&iiprop=url&iiurlwidth=150&format=php' .
                '&titles=Image:' . urlencode($imageName);
 
@@ -486,7 +493,8 @@ class Wikipedia implements TranslatorAwareInterface
 
         if ($response = $result->getBody()) {
             if ($imageinfo = unserialize($response)) {
-                if (isset($imageinfo['query']['pages']['-1']['imageinfo'][0]['url'])
+                if (
+                    isset($imageinfo['query']['pages']['-1']['imageinfo'][0]['url'])
                 ) {
                     $imageUrl
                         = $imageinfo['query']['pages']['-1']['imageinfo'][0]['url'];
@@ -495,9 +503,9 @@ class Wikipedia implements TranslatorAwareInterface
                 // Hack for wikipedia api, just in case we couldn't find it
                 //   above look for a http url inside the response.
                 if (!isset($imageUrl)) {
-                    preg_match('/\"http:\/\/(.*)\"/', $response, $matches);
+                    preg_match('/\"https?:\/\/(.*)\"/', $response, $matches);
                     if (isset($matches[1])) {
-                        $imageUrl = 'http://' .
+                        $imageUrl = 'https://' .
                             substr($matches[1], 0, strpos($matches[1], '"'));
                     }
                 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Shared factory for ILS logic classes.
  *
@@ -25,10 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ILS\Logic;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Shared factory for ILS logic classes.
@@ -53,19 +58,21 @@ class LogicFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
         return new $requestedName(
-            $container->get('VuFind\Auth\ILSAuthenticator'),
-            $container->get('VuFind\ILS\Connection'),
-            $container->get('VuFind\Crypt\HMAC'),
-            $container->get('VuFind\Config\PluginManager')->get('config')
+            $container->get(\VuFind\Auth\ILSAuthenticator::class),
+            $container->get(\VuFind\ILS\Connection::class),
+            $container->get(\VuFind\Crypt\HMAC::class),
+            $container->get(\VuFind\Config\PluginManager::class)->get('config')
         );
     }
 }

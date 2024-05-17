@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lightweight Dummy ILS Driver -- Always returns hard-coded sample values.
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
+
 namespace VuFind\ILS\Driver;
 
 /**
@@ -46,7 +48,6 @@ class Sample extends AbstractBase
      * Validate configuration and perform all resource-intensive tasks needed to
      * make the driver active.
      *
-     * @throws ILSException
      * @return void
      */
     public function init()
@@ -78,7 +79,7 @@ class Sample extends AbstractBase
                 'duedate' => '',
                 'number' => 1,
                 'barcode' => '1234567890',
-            ]
+            ],
         ];
     }
 
@@ -107,8 +108,9 @@ class Sample extends AbstractBase
      * This is responsible for retrieving the holding information of a certain
      * record.
      *
-     * @param string $id     The record id to retrieve the holdings for
-     * @param array  $patron Patron data
+     * @param string $id      The record id to retrieve the holdings for
+     * @param array  $patron  Patron data
+     * @param array  $options Extra options (not currently used)
      *
      * @return mixed     On success, an associative array with the following keys:
      * id, availability (boolean), status, location, reserve, callnumber, duedate,
@@ -116,7 +118,7 @@ class Sample extends AbstractBase
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getHolding($id, array $patron = null)
+    public function getHolding($id, array $patron = null, array $options = [])
     {
         return $this->getStatus($id);
     }

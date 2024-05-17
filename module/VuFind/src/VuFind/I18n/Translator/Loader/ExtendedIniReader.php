@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Helper class to load .ini files from disk.
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\I18n\Translator\Loader;
 
-use Zend\I18n\Translator\TextDomain;
+use Laminas\I18n\Translator\TextDomain;
 
 /**
  * Helper class to load .ini files from disk.
@@ -65,16 +67,20 @@ class ExtendedIniReader
                     // Trim outermost double quotes off the value if present:
                     if (isset($parts[1])) {
                         $value = preg_replace(
-                            '/^\"?(.*?)\"?$/', '$1', trim($parts[1])
+                            '/^\"?(.*?)\"?$/',
+                            '$1',
+                            trim($parts[1])
                         );
 
                         // Store the key/value pair (allow empty values -- sometimes
                         // we want to replace a language token with a blank string,
-                        // but Zend translator doesn't support them so replace with
-                        // a zero-width non-joiner):
+                        // but Laminas translator doesn't support them so replace
+                        // with a zero-width non-joiner):
                         if ($convertBlanks && $value === '') {
                             $value = html_entity_decode(
-                                '&#x200C;', ENT_NOQUOTES, 'UTF-8'
+                                '&#x200C;',
+                                ENT_NOQUOTES,
+                                'UTF-8'
                             );
                         }
                         $data[$key] = $value;

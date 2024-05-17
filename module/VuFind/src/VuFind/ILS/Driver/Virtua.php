@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VTLS Virtua Driver
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
+
 namespace VuFind\ILS\Driver;
 
 use VuFind\Exception\ILS as ILSException;
@@ -79,7 +81,8 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                ')';
         $this->db = new \VuFind\Connection\Oracle(
             $this->config['Catalog']['user'],
-            $this->config['Catalog']['password'], $tns
+            $this->config['Catalog']['password'],
+            $tns
         );
     }
 
@@ -152,79 +155,79 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                     'status'       => null,
                     'location'     => "Toowoomba",
                     'campus'       => "Toowoomba",
-                    'callnumber'   => $result[0]['CALL_NUMBER']
+                    'callnumber'   => $result[0]['CALL_NUMBER'],
                     ];
 
                 switch ($result[0]['CALL_NUMBER']) {
-                case 'ELECTRONIC RESOURCE':
-                    $new_holding['availability'] = true;
-                    $new_holding['status']       = null;
-                    $new_holding['location']     = "Online";
-                    $new_holding['reserve']      = "N";
-                    $holding[] = $new_holding;
-                    return $holding;
-                    break;
-                case 'ON ORDER':
-                    $new_holding['status']       = "ON ORDER";
-                    $new_holding['location']     = "Pending...";
-                    $holding[] = $new_holding;
-                    return $holding;
-                    break;
-                case 'ORDER CANCELLED':
-                    $new_holding['status']       = "ORDER CANCELLED";
-                    $new_holding['location']     = "None";
-                    $holding[] = $new_holding;
-                    return $holding;
-                    break;
-                case 'MISSING':
-                    $new_holding['status']       = "MISSING";
-                    $new_holding['location']     = "Unknown";
-                    $holding[] = $new_holding;
-                    return $holding;
-                    break;
+                    case 'ELECTRONIC RESOURCE':
+                        $new_holding['availability'] = true;
+                        $new_holding['status']       = null;
+                        $new_holding['location']     = "Online";
+                        $new_holding['reserve']      = "N";
+                        $holding[] = $new_holding;
+                        return $holding;
+                        break;
+                    case 'ON ORDER':
+                        $new_holding['status']       = "ON ORDER";
+                        $new_holding['location']     = "Pending...";
+                        $holding[] = $new_holding;
+                        return $holding;
+                        break;
+                    case 'ORDER CANCELLED':
+                        $new_holding['status']       = "ORDER CANCELLED";
+                        $new_holding['location']     = "None";
+                        $holding[] = $new_holding;
+                        return $holding;
+                        break;
+                    case 'MISSING':
+                        $new_holding['status']       = "MISSING";
+                        $new_holding['location']     = "Unknown";
+                        $holding[] = $new_holding;
+                        return $holding;
+                        break;
 
-                // Still haven't find it. Let's check if it has a serials holding
-                // location
-                default:
-                    $call_number = $result[0]['CALL_NUMBER'];
-                    $sql = "SELECT l.name, " .
-                        "SUBSTR(l.location_id, 0, 1) as camp_id " .
-                        "FROM dbadmin.holdlink h, location l " .
-                        "WHERE h.location = l.location_id " .
-                        "AND h.bibid = :bib_id";
-                    $result = $this->db->simpleSelect($sql, $fields);
+                    default:
+                        // Still haven't found it. Let's check if it has a serials
+                        // holding location
+                        $call_number = $result[0]['CALL_NUMBER'];
+                        $sql = "SELECT l.name, " .
+                            "SUBSTR(l.location_id, 0, 1) as camp_id " .
+                            "FROM dbadmin.holdlink h, location l " .
+                            "WHERE h.location = l.location_id " .
+                            "AND h.bibid = :bib_id";
+                        $result = $this->db->simpleSelect($sql, $fields);
 
-                    if (count($result) > 0) {
-                        foreach ($result as $r) {
-                            $tmp_holding = $new_holding;
-                            // TODO: create a configuration file mechanism for
-                            // specifying locations so we can eliminate these
-                            // hard-coded USQ-specific values.
-                            switch ($r["CAMP_ID"]) {
-                            case 4:
-                                $campus = "Fraser Coast";
-                                break;
-                            case 5:
-                                $campus = "Springfield";
-                                break;
-                            default:
-                                $campus = "Toowoomba";
-                                break;
+                        if (count($result) > 0) {
+                            foreach ($result as $r) {
+                                $tmp_holding = $new_holding;
+                                // TODO: create a configuration file mechanism for
+                                // specifying locations so we can eliminate these
+                                // hard-coded USQ-specific values.
+                                switch ($r["CAMP_ID"]) {
+                                    case 4:
+                                        $campus = "Fraser Coast";
+                                        break;
+                                    case 5:
+                                        $campus = "Springfield";
+                                        break;
+                                    default:
+                                        $campus = "Toowoomba";
+                                        break;
+                                }
+
+                                $tmp_holding['status']     = "Not For Loan";
+                                $tmp_holding['location']   = $r['NAME'];
+                                $tmp_holding['reserve']    = "N";
+                                $tmp_holding['campus']     = $campus;
+                                $tmp_holding['callnumber'] = $call_number;
+                                $holding[] = $tmp_holding;
                             }
-
-                            $tmp_holding['status']     = "Not For Loan";
-                            $tmp_holding['location']   = $r['NAME'];
-                            $tmp_holding['reserve']    = "N";
-                            $tmp_holding['campus']     = $campus;
-                            $tmp_holding['callnumber'] = $call_number;
-                            $holding[] = $tmp_holding;
+                            return $holding;
+                        } else {
+                            // Still haven't found anything? Return nothing then...
+                            return $holding;
                         }
-                        return $holding;
-                    } else {
-                        // Still haven't found anything? Return nothing then...
-                        return $holding;
-                    }
-                    break;
+                        break;
                 }
             } else {
                 // Still haven't found anything? Return nothing then...
@@ -237,15 +240,15 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
             // TODO: create a configuration file mechanism for specifying locations
             // so we can eliminate these hard-coded USQ-specific values.
             switch ($row["CAMP_ID"]) {
-            case 4:
-                $campus = "Fraser Coast";
-                break;
-            case 5:
-                $campus = "Springfield";
-                break;
-            default:
-                $campus = "Toowoomba";
-                break;
+                case 4:
+                    $campus = "Fraser Coast";
+                    break;
+                case 5:
+                    $campus = "Springfield";
+                    break;
+                default:
+                    $campus = "Toowoomba";
+                    break;
             }
 
             // If it has a due date... not available
@@ -255,31 +258,31 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                 // All these statuses are also unavailable
                 // TODO: make these configurable through Virtua.ini.
                 switch ($row['STATUS_CODE']) {
-                case '5402':  // '24 hour hold'
-                case '4401':  // 'At Repair'
-                case '5400':  // 'Being Processed'
-                case '2101':  // 'Damaged Item'
-                case '7400':  // 'Fraser Coast only'
-                case '5700':  // 'IN TRANSIT'
-                case '7700':  // 'Invoiced'
-                case '3400':  // 'Invoiced - Re-ordered'
-                case '4600':  // 'LONG OVERDUE'
-                case '4700':  // 'MISSING'
-                case '4705':  // 'ON HOLD'
-                case '5710':  // 'REQUESTED FOR HOLD'
-                case '5401':  // 'Staff Use'
-                    $available = false;
-                    break;
+                    case '5402':  // '24 hour hold'
+                    case '4401':  // 'At Repair'
+                    case '5400':  // 'Being Processed'
+                    case '2101':  // 'Damaged Item'
+                    case '7400':  // 'Fraser Coast only'
+                    case '5700':  // 'IN TRANSIT'
+                    case '7700':  // 'Invoiced'
+                    case '3400':  // 'Invoiced - Re-ordered'
+                    case '4600':  // 'LONG OVERDUE'
+                    case '4700':  // 'MISSING'
+                    case '4705':  // 'ON HOLD'
+                    case '5710':  // 'REQUESTED FOR HOLD'
+                    case '5401':  // 'Staff Use'
+                        $available = false;
+                        break;
                 // Otherwise it's available
-                case '7200':  // 'External Loan Only'
-                case '3100':  // 'In Library use only'
-                case '2700':  // 'Limited Loan'
-                case '2701':  // 'Not For Loan'
-                case '2100':  // 'Not for loan'
-                case '5401':  // 'On Display'
-                default:
-                    $available = true;
-                    break;
+                    case '7200':  // 'External Loan Only'
+                    case '3100':  // 'In Library use only'
+                    case '2700':  // 'Limited Loan'
+                    case '2701':  // 'Not For Loan'
+                    case '2100':  // 'Not for loan'
+                    case '5401':  // 'On Display'
+                    default:
+                        $available = true;
+                        break;
                 }
             }
 
@@ -290,7 +293,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                 'location'     => $row['LOCATION'],
                 'reserve'      => $row['RESERVE'],
                 'campus'       => $campus,
-                'callnumber'   => $row['BIB_CALL_NUM']
+                'callnumber'   => $row['BIB_CALL_NUM'],
                 ];
         }
 
@@ -323,16 +326,19 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      * This is responsible for retrieving the holding information of a certain
      * record.
      *
-     * @param string $id     The record id to retrieve the holdings for
-     * @param array  $patron Patron data
+     * @param string $id      The record id to retrieve the holdings for
+     * @param array  $patron  Patron data
+     * @param array  $options Extra options (not currently used)
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return array         On success, an associative array with the following
      * keys: id, availability (boolean), status, location, reserve, callnumber,
      * duedate, number, barcode.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getHolding($id, array $patron = null)
+    public function getHolding($id, array $patron = null, array $options = [])
     {
         // Strip off the prefix from vtls exports
         $db_id = str_replace("vtls", "", $id);
@@ -399,6 +405,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         }
 
         // Build Holdings Array
+        $holding = [];
         foreach ($result as $row) {
             // If it's reserved or has a due date... not available
             if ($row['DUE_DATE'] != null || $row['REQ_COUNT'] != null) {
@@ -407,26 +414,26 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                 // All these statuses are also unavailable
                 // TODO: Make this configurable through Virtua.ini.
                 switch ($row['STATUS']) {
-                case 'Fraser Coast only':
-                case 'Being Processed':
-                case 'Not For Loan':
-                case 'Not for loan':
-                case 'Invoiced':
-                case 'IN TRANSIT':
-                case 'Staff Use':
-                case 'MISSING':
-                case 'Damaged Item':
-                case 'At Repair':
-                case 'ON ORDER':
-                case 'ON HOLD':
-                case 'Springfield Only':
-                case 'Part Order Received':
-                    $available = false;
-                    break;
-                // Otherwise it's available
-                default:
-                    $available = true;
-                    break;
+                    case 'Fraser Coast only':
+                    case 'Being Processed':
+                    case 'Not For Loan':
+                    case 'Not for loan':
+                    case 'Invoiced':
+                    case 'IN TRANSIT':
+                    case 'Staff Use':
+                    case 'MISSING':
+                    case 'Damaged Item':
+                    case 'At Repair':
+                    case 'ON ORDER':
+                    case 'ON HOLD':
+                    case 'Springfield Only':
+                    case 'Part Order Received':
+                        $available = false;
+                        break;
+                        // Otherwise it's available
+                    default:
+                        $available = true;
+                        break;
                 }
             }
 
@@ -451,18 +458,15 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                 "barcode"       => $row['BARCODE'],
                 "itemclass"     => $row['ITEM_CLASS'],
                 "units"         => $row['UNITS'],
-                "resitemclass"  => $row['RESERVE_ITEM_CLASS']
+                "resitemclass"  => $row['RESERVE_ITEM_CLASS'],
                 ];
 
             // Add to the holdings array
             $holding[] = $temp;
         }
 
-        if (count($holding) != 0 && $patron['id'] != null) {
-            return $this->checkHoldAllowed($patron['id'], $holding);
-        } else {
-            return $holding;
-        }
+        return (count($holding) != 0 && $patron['id'] != null)
+            ? $this->checkHoldAllowed($patron['id'], $holding) : $holding;
     }
 
     /**
@@ -507,7 +511,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
             '5' => ['US', 'ES', 'PS', 'AS', 'GS', 'TS', 'TAS', 'EPS', 'XVS',
                 'XPS'],
             // 4  => Fraser Coast
-            '4' => ['UF', 'PF', 'AF']
+            '4' => ['UF', 'PF', 'AF'],
             ];
         // Where is the patron from?
         $location = "";
@@ -524,25 +528,25 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
             "5400", // Being Processed
             "5401", // On Display
             "5402", // 24 Hour Hold
-            "5700"  // IN TRANSIT
+            "5700",  // IN TRANSIT
             ];
         // Who can place reservations on available items
         $available_locs = [
             '1' => ['5', '4'],
             '4' => [],
-            '5' => []
+            '5' => [],
             ];
         // Who can place reservations on UNavailable items
         $unavailable_locs = [
             '1' => ['1', '5', '4'],
             '4' => [],
-            '5' => ['5']
+            '5' => ['5'],
             ];
         // Who can place reservations on STATUS items
         $status_locs = [
             '1' => ['1', '5', '4'],
             '4' => [],
-            '5' => ['5']
+            '5' => ['5'],
             ];
 
         // Set a flag for super users, better then
@@ -563,6 +567,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         $sorted = []; // We'll put items from the patron's location in here
         $return = []; // Everything else in here
         foreach ($holdings as $h) {
+            $item_loc_code = null;
             // Super Users (eg. Off-Camp, and Lending) can request anything
             if ($super_user) {
                 $h['req_allowed'] = true;
@@ -585,13 +590,15 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                     // The item is on loan ...
                     if ($item_is_out) {
                         // ... and has a requestable status or no status ...
-                        if (in_array($item_stat_code, $status_list)
+                        if (
+                            in_array($item_stat_code, $status_list)
                             || $item_stat_code === null
                         ) {
                             // ... can this user borrow on loan items at this
                             // location?
                             $can_req = in_array(
-                                $location, $unavailable_locs[$item_loc_code]
+                                $location,
+                                $unavailable_locs[$item_loc_code]
                             );
                         }
                     } else {
@@ -610,7 +617,8 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                                 // ... can the user borrow available items at this
                                 // location?
                                 $can_req = in_array(
-                                    $location, $available_locs[$item_loc_code]
+                                    $location,
+                                    $available_locs[$item_loc_code]
                                 );
                             }
                         }
@@ -666,6 +674,8 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      */
     protected function renderPartSubPattern($data)
     {
+        $end_time = $start_string = null;
+
         // Handle empty patterns
         if (count($data) == 0) {
             return "";
@@ -683,140 +693,148 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                 $i++;
             }
 
-            // Chrono
-            // Important note: strtotime() expects
-            // 01/02/2000 = 2nd Jan 2000
-            // 01-02-2000 = 1st Feb 2000 <= Use hyphens
+        // Chrono
+        // Important note: strtotime() expects
+        // 01/02/2000 = 2nd Jan 2000
+        // 01-02-2000 = 1st Feb 2000 <= Use hyphens
         } else {
             $pattern = implode("", $data['pattern']);
             switch (strtolower(trim($pattern))) {
-            // Error case
-            case "":
-                return null;
-                break;
-            // Year only
-            case "(year)":
-                return $data['data'][0] . " ";
-                break;
-            // Year + Month
-            case "(year)(month)":
-                $months = explode("-", $data['data'][1]); $m = count($months);
-                $years  = explode("-", $data['data'][0]); $y = count($years);
-                $my = $m . $y;
+                // Error case
+                case "":
+                    return null;
+                    break;
+                    // Year only
+                case "(year)":
+                    return $data['data'][0] . " ";
+                    break;
+                    // Year + Month
+                case "(year)(month)":
+                    $months = explode("-", $data['data'][1]);
+                    $m = count($months);
+                    $years  = explode("-", $data['data'][0]);
+                    $y = count($years);
+                    $my = $m . $y;
 
-                $start_time = strtotime("01-" . $months[0] . "-" . $years[0]);
-                $end_string = "F Y";
+                    $start_time = strtotime("01-" . $months[0] . "-" . $years[0]);
+                    $end_string = "F Y";
 
-                switch ($my) {
-                // January 2000 - February 2001
-                case "22":
-                    $start_string = "F Y";
-                    $end_time = strtotime("01-" . $months[1] . "-" . $years[1]);
+                    switch ($my) {
+                        // January 2000 - February 2001
+                        case "22":
+                            $start_string = "F Y";
+                            $end_time
+                                = strtotime("01-" . $months[1] . "-" . $years[1]);
+                            break;
+                            // January - February 2000
+                        case "21":
+                            $start_string = "F";
+                            $end_time
+                                = strtotime("01-" . $months[1] . "-" . $years[0]);
+                            break;
+                            // January 2000
+                        case "11":
+                            $start_string = "F Y";
+                            $end_time = null;
+                            break;
+                            // January 2000 - January 2001
+                        case "12":
+                            $start_string = "F Y";
+                            $end_time
+                                = strtotime("01-" . $months[0] . "-" . $years[1]);
+                            break;
+                    }
+                    if ($end_time != null) {
+                        return date($start_string, $start_time) . " - " .
+                            date($end_string, $end_time);
+                    } else {
+                        return date($start_string, $start_time);
+                    }
                     break;
-                // January - February 2000
-                case "21":
-                    $start_string = "F";
-                    $end_time = strtotime("01-" . $months[1] . "-" . $years[0]);
-                    break;
-                // January 2000
-                case "11":
-                    $start_string = "F Y";
-                    $end_time = null;
-                    break;
-                // January 2000 - January 2001
-                case "12":
-                    $start_string = "F Y";
-                    $end_time = strtotime("01-" . $months[0] . "-" . $years[1]);
-                    break;
-                }
-                if ($end_time != null) {
-                    return date($start_string, $start_time) . " - " .
-                        date($end_string, $end_time);
-                } else {
-                    return date($start_string, $start_time);
-                }
-                break;
-            // Year + Month + Day
-            case "(year)(month)(day)":
-                $days   = explode("-", $data['data'][2]); $d = count($days);
-                $months = explode("-", $data['data'][1]); $m = count($months);
-                $years  = explode("-", $data['data'][0]); $y = count($years);
-                $dmy = $d . $m . $y;
+                    // Year + Month + Day
+                case "(year)(month)(day)":
+                    $days   = explode("-", $data['data'][2]);
+                    $d = count($days);
+                    $months = explode("-", $data['data'][1]);
+                    $m = count($months);
+                    $years  = explode("-", $data['data'][0]);
+                    $y = count($years);
+                    $dmy = $d . $m . $y;
 
-                $start_time
-                    = strtotime($days[0] . "-" . $months[0] . "-" . $years[0]);
-                $end_string = "jS F Y";
+                    $start_time
+                        = strtotime($days[0] . "-" . $months[0] . "-" . $years[0]);
+                    $end_string = "jS F Y";
 
-                switch ($dmy) {
-                // 01 January 2000
-                case "111":
-                    $start_string = "jS F Y";
-                    $end_time = null;
+                    switch ($dmy) {
+                        // 01 January 2000
+                        case "111":
+                            $start_string = "jS F Y";
+                            $end_time = null;
+                            break;
+                            // 01 January 2000 - 01 January 2001
+                        case "112":
+                            $start_string = "jS F Y";
+                            $end_time = strtotime(
+                                $days[0] . "-" . $months[0] . "-" . $years[1]
+                            );
+                            break;
+                            // 01 January - 01 February 2000
+                        case "121":
+                            $start_string = "jS F";
+                            $end_time = strtotime(
+                                $days[0] . "-" . $months[1] . "-" . $years[0]
+                            );
+                            break;
+                            // 01 January 2000 - 01 February 2001
+                        case "122":
+                            $start_string = "jS F Y";
+                            $end_time = strtotime(
+                                $days[0] . "-" . $months[1] . "-" . $years[1]
+                            );
+                            break;
+                            // 01 - 02 January 2000
+                        case "211":
+                            $start_string = "jS";
+                            $end_time = strtotime(
+                                $days[1] . "-" . $months[0] . "-" . $years[0]
+                            );
+                            break;
+                            // 01 January 2000 - 02 January 2001
+                        case "212":
+                            $start_string = "jS F Y";
+                            $end_time = strtotime(
+                                $days[1] . "-" . $months[0] . "-" . $years[1]
+                            );
+                            break;
+                            // 01 January - 02 February 2000
+                        case "221":
+                            $start_string = "jS F";
+                            $end_time = strtotime(
+                                $days[1] . "-" . $months[1] . "-" . $years[0]
+                            );
+                            break;
+                            // 01 January 2000 - 02 February 2001
+                        case "222":
+                            $start_string = "jS F Y";
+                            $end_time = strtotime(
+                                $days[1] . "-" . $months[1] . "-" . $years[1]
+                            );
+                            break;
+                    }
+                    if ($end_time != null) {
+                        return date($start_string, $start_time) . " - " .
+                            date($end_string, $end_time);
+                    } else {
+                        return date($start_string, $start_time);
+                    }
                     break;
-                // 01 January 2000 - 01 January 2001
-                case "112":
-                    $start_string = "jS F Y";
-                    $end_time = strtotime(
-                        $days[0] . "-" . $months[0] . "-" . $years[1]
-                    );
+                default:
+                    $i = 0;
+                    foreach ($data['pattern'] as $d) {
+                        $return_string .= $d . " " . $data['data'][$i] . " ";
+                        $i++;
+                    }
                     break;
-                // 01 January - 01 February 2000
-                case "121":
-                    $start_string = "jS F";
-                    $end_time = strtotime(
-                        $days[0] . "-" . $months[1] . "-" . $years[0]
-                    );
-                    break;
-                // 01 January 2000 - 01 February 2001
-                case "122":
-                    $start_string = "jS F Y";
-                    $end_time = strtotime(
-                        $days[0] . "-" . $months[1] . "-" . $years[1]
-                    );
-                    break;
-                // 01 - 02 January 2000
-                case "211":
-                    $start_string = "jS";
-                    $end_time = strtotime(
-                        $days[1] . "-" . $months[0] . "-" . $years[0]
-                    );
-                    break;
-                // 01 January 2000 - 02 January 2001
-                case "212":
-                    $start_string = "jS F Y";
-                    $end_time = strtotime(
-                        $days[1] . "-" . $months[0] . "-" . $years[1]
-                    );
-                    break;
-                // 01 January - 02 February 2000
-                case "221":
-                    $start_string = "jS F";
-                    $end_time = strtotime(
-                        $days[1] . "-" . $months[1] . "-" . $years[0]
-                    );
-                    break;
-                // 01 January 2000 - 02 February 2001
-                case "222":
-                    $start_string = "jS F Y";
-                    $end_time = strtotime(
-                        $days[1] . "-" . $months[1] . "-" . $years[1]
-                    );
-                    break;
-                }
-                if ($end_time != null) {
-                    return date($start_string, $start_time) . " - " .
-                        date($end_string, $end_time);
-                } else {
-                    return date($start_string, $start_time);
-                }
-                break;
-            default:
-                $i = 0;
-                foreach ($data['pattern'] as $d) {
-                    $return_string .= $d . " " . $data['data'][$i] . " ";
-                    $i++;
-                }
-                break;
             }
         }
 
@@ -885,12 +903,12 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         $i = 0;
         foreach ($data['data'] as $d) {
             switch ($data['pattern_code'][$i]) {
-            case "z":
-                $return['notes'][] = $d;
-                break;
-            default:
-                $return[$data['pattern_code'][$i]][] = $d;
-                break;
+                case "z":
+                    $return['notes'][] = $d;
+                    break;
+                default:
+                    $return[$data['pattern_code'][$i]][] = $d;
+                    break;
             }
             $i++;
         }
@@ -914,7 +932,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         if (isset($field['pattern']) && isset($patterns[$field['pattern']])) {
             // Enumeration, Chonology and Other fields
             $enum_chrono = [
-                'a', 'b', 'c', 'd', 'e', 'f', 'i', 'j', 'k', 'l', 'm'
+                'a', 'b', 'c', 'd', 'e', 'f', 'i', 'j', 'k', 'l', 'm',
             ];
             $this_en_ch  = ['pattern' => [], 'data' => []];
             $this_other  = ['pattern' => [], 'data' => []];
@@ -959,13 +977,14 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         // Convert to one line per tag
         $data_set = [];
         foreach ($holdings_marc as $row) {
-            if ($row['SUBFIELD_DATA'] != null
+            if (
+                $row['SUBFIELD_DATA'] != null
                 && trim($row['SUBFIELD_DATA']) != ""
             ) {
                 $data_set[$row['FIELD_SEQUENCE']][] = [
                     'tag'  => trim($row['FIELD_TAG']),
                     'code' => trim($row['SUBFIELD_CODE']),
-                    'data' => trim($row['SUBFIELD_DATA'])
+                    'data' => trim($row['SUBFIELD_DATA']),
                 ];
             }
         }
@@ -974,10 +993,10 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         $sort_set = [];
         // Loop through each sequence
         foreach ($data_set as $row) {
-            $sort = '';
             $tag  = '';
             $data = [];
-
+            $sort_rule = '';
+            $sort_order = '';
             // And each subfield
             foreach ($row as $subfield) {
                 // Found the '8' subfield
@@ -992,14 +1011,13 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                     // Everything else goes in the data bucket
                     $data[] = [
                         'code' => $subfield['code'],
-                        'data' => $subfield['data']
+                        'data' => $subfield['data'],
                     ];
                 }
             }
-
             $sort_set[$sort_rule . "." . $sort_order] = [
                 'tag'  => $tag,
-                'data' => $data
+                'data' => $data,
             ];
         }
 
@@ -1017,7 +1035,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
             } else {
                 $holdings_data[] = [
                     'pattern' => $rule[0],
-                    'data'    => $row['data']
+                    'data'    => $row['data'],
                 ];
             }
         }
@@ -1099,13 +1117,14 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
 
         $data_set = [];
         foreach ($hresult as $row) {
-            if ($row['SUBFIELD_DATA'] != null
+            if (
+                $row['SUBFIELD_DATA'] != null
                 && trim($row['SUBFIELD_DATA']) != ""
             ) {
                 $data_set[$row['ID'] . "_" . $row['FIELD_SEQUENCE']][] = [
                     'id'   => trim($row['ID']),
                     'code' => trim($row['SUBFIELD_CODE']),
-                    'data' => trim($row['SUBFIELD_DATA'])
+                    'data' => trim($row['SUBFIELD_DATA']),
                     ];
             }
         }
@@ -1216,7 +1235,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                 'address2'  => trim($result[0]['STREET_ADDRESS_2']),
                 'zip'       => trim($result[0]['POSTAL_CODE']),
                 'phone'     => trim($result[0]['TELEPHONE_PRIMARY']),
-                'group'     => trim($result[0]['PATRON_TYPE'])
+                'group'     => trim($result[0]['PATRON_TYPE']),
                 ];
 
             if ($result[0]['CITY'] != null) {
@@ -1240,7 +1259,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      *
      * @param array $patron The patron array from patronLogin
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return mixed        Array of the patron's fines on success.
      */
@@ -1267,7 +1286,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                     "fine"     => $row['DESCRIPTION'],
                     "balance"  => $row['BALANCE'] * 100,
                     "duedate"  => $row['DUE_DATE'],
-                    "id"       => "vtls" . sprintf("%09d", (int)$row['BIB_ID'])
+                    "id"       => "vtls" . sprintf("%09d", (int)$row['BIB_ID']),
                     ];
             }
         }
@@ -1281,7 +1300,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      *
      * @param array $patron The patron array from patronLogin
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return array        Array of the patron's holds on success.
      */
@@ -1305,7 +1324,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                     "location" => $row['PICKUP_LOCATION'],
                     "expire"   => $row['DATE_LAST_NEEDED'],
                     "create"   => $row['DATE_PLACED'],
-                    "reqnum"   => $row['REQUEST_CONTROL_NUMBER']
+                    "reqnum"   => $row['REQUEST_CONTROL_NUMBER'],
                     ];
             }
         }
@@ -1320,7 +1339,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      *
      * @param array $patron The patron array from patronLogin
      *
-     * @throws VuFind\Date\DateException;
+     * @throws VuFind\Date\DateException
      * @throws ILSException
      * @return array        Array of the patron's transactions on success.
      */
@@ -1357,7 +1376,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                     'renew'   => $row['RENEW_COUNT'],
                     'request' => $row['REQ_COUNT'],
                     // IDs need to show as 'vtls000589589'
-                    'id'      => "vtls" . sprintf("%09d", (int)$row['BIBID'])
+                    'id'      => "vtls" . sprintf("%09d", (int)$row['BIBID']),
                     ];
             }
         }
@@ -1472,7 +1491,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                     date($time_format, strtotime($row['OPEN_TIME'])),
                 'close'  => "$today " .
                     date($time_format, strtotime($row['CLOSE_TIME'])),
-                'status' => $row['STATUS']
+                'status' => $row['STATUS'],
                 ];
         }
 
@@ -1504,7 +1523,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
                 'close'  => "$today "
                     . date($time_format, strtotime($row['CLOSE_TIME'])),
                 'status' => $row['STATUS'],
-                'reason' => $row['REASON']
+                'reason' => $row['REASON'],
             ];
         }
         return $times;
@@ -1540,7 +1559,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         $allowed_req_levels = [
             'item'   => 0,
             'bib'    => 1,
-            'volume' => 2
+            'volume' => 2,
             ];
         if (!in_array($req_level, array_keys($allowed_req_levels))) {
             return $response;
@@ -1549,7 +1568,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
         $allowed_pickup_locs = [
             'Toowoomba'    => '10000',
             'Fraser Coast' => '40000',
-            'Springfield'  => '50000'
+            'Springfield'  => '50000',
             ];
         if (!in_array($pickup_loc, array_keys($allowed_pickup_locs))) {
             return $response;
@@ -1602,15 +1621,16 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      * separated by a pipe, which is then submitted as form data in Hold.php. This
      * value is then extracted by the CancelHolds function.
      *
-     * @param array $holdDetails An array of item data
+     * @param array $holdDetails A single hold array from getMyHolds
+     * @param array $patron      Patron information from patronLogin
      *
      * @return string Data for use in a form field
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getCancelHoldDetails($holdDetails)
+    public function getCancelHoldDetails($holdDetails, $patron = [])
     {
-        // TODO: implement me.
+        throw new \Exception('TODO: implement getCancelHoldDetails.');
     }
 
     /**
@@ -1630,6 +1650,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
     {
         // TODO: implement standard VuFind holds API; utilize cancelHold()
         // below as a support method.
+        throw new \Exception('cancelHolds() is not supported yet.');
     }
 
     /**
@@ -1694,7 +1715,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
             "skin" => "homepage",
             "patronid" => $patron['cat_username'],
             "patronpassword" => $patron['cat_password'],
-            "patronhost" => $this->config['Catalog']['patron_host']
+            "patronhost" => $this->config['Catalog']['patron_host'],
         ];
 
         // Get the response
@@ -1726,7 +1747,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      */
     public function getRenewDetails($checkOutDetails)
     {
-        // TODO: implement me
+        throw new \Exception('TODO: implement getRenewDetails');
     }
 
     /**
@@ -1855,8 +1876,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
      */
     protected function getConfiguredLanguage()
     {
-        return isset($this->config['Catalog']['language'])
-            ? $this->config['Catalog']['language'] : 'en';
+        return $this->config['Catalog']['language'] ?? 'en';
     }
 
     /**
@@ -1887,7 +1907,7 @@ class Virtua extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterfa
             }
             $result = $client->setMethod($method)->send();
         } catch (\Exception $e) {
-            throw new ILSException($e->getMessage());
+            $this->throwAsIlsException($e);
         }
 
         if (!$result->isSuccess()) {

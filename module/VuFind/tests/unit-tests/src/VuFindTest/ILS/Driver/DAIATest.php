@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS driver test
  *
@@ -26,14 +27,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\ILS\Driver;
 
 use InvalidArgumentException;
-
+use Laminas\Http\Client\Adapter\Test as TestAdapter;
+use Laminas\Http\Response as HttpResponse;
 use VuFind\ILS\Driver\DAIA;
-use Zend\Http\Client\Adapter\Test as TestAdapter;
-
-use Zend\Http\Response as HttpResponse;
 
 /**
  * ILS driver test
@@ -46,6 +46,8 @@ use Zend\Http\Response as HttpResponse;
  */
 class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
 {
+    use \VuFindTest\Feature\FixtureTrait;
+
     protected $testResult = [
         0 =>
             [
@@ -74,7 +76,7 @@ class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'addStorageRetrievalRequestLink' => true,
                 'customData' => [],
                 'limitation_types' => [],
-                'doc_id' => 'http://uri.gbv.de/document/opac-de-000:ppn:027586081'
+                'doc_id' => 'http://uri.gbv.de/document/opac-de-000:ppn:027586081',
             ],
         1 =>
             [
@@ -103,7 +105,7 @@ class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'addStorageRetrievalRequestLink' => false,
                 'customData' => [],
                 'limitation_types' => [],
-                'doc_id' => 'http://uri.gbv.de/document/opac-de-000:ppn:027586081'
+                'doc_id' => 'http://uri.gbv.de/document/opac-de-000:ppn:027586081',
             ],
         2 =>
             [
@@ -132,7 +134,7 @@ class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                 'addStorageRetrievalRequestLink' => false,
                 'customData' => [],
                 'limitation_types' => [],
-                'doc_id' => 'http://uri.gbv.de/document/opac-de-000:ppn:027586081'
+                'doc_id' => 'http://uri.gbv.de/document/opac-de-000:ppn:027586081',
             ],
     ];
 
@@ -141,7 +143,7 @@ class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->driver = $this->createConnector();
     }
@@ -161,7 +163,7 @@ class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                         'baseUrl'            => 'http://daia.gbv.de/',
                         'daiaIdPrefix'       => 'http://uri.gbv.de/document/opac-de-000:ppn:',
                         'daiaResponseFormat' => 'json',
-                    ]
+                    ],
             ]
         );
         $conn->init();
@@ -187,7 +189,7 @@ class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
                         'baseUrl'            => 'http://daia.gbv.de/',
                         'daiaIdPrefix'       => 'http://uri.gbv.de/document/opac-de-000:ppn:',
                         'daiaResponseFormat' => 'xml',
-                    ]
+                    ],
             ]
         );
         $conn->init();
@@ -209,17 +211,9 @@ class DAIATest extends \VuFindTest\Unit\ILSDriverTestCase
     {
         $adapter = new TestAdapter();
         if ($fixture) {
-            $file = realpath(
-                __DIR__ .
-                '/../../../../../../tests/fixtures/daia/response/' . $fixture
+            $responseObj = HttpResponse::fromString(
+                $this->getFixture("daia/response/$fixture")
             );
-            if (!is_string($file) || !file_exists($file) || !is_readable($file)) {
-                throw new InvalidArgumentException(
-                    sprintf('Unable to load fixture file: %s ', $file)
-                );
-            }
-            $response = file_get_contents($file);
-            $responseObj = HttpResponse::fromString($response);
             $adapter->setResponse($responseObj);
         }
         $service = new \VuFindHttp\HttpService();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Trait to add facet limiting settings to a Params object.
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\Search\Params;
 
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 /**
  * Trait to add facet limiting settings to a Params object.
@@ -53,6 +55,13 @@ trait FacetLimitTrait
      * @var array
      */
     protected $facetLimitByField = [];
+
+    /**
+     * Hierarchical facet limit when facets are requested.
+     *
+     * @var int|null
+     */
+    protected $hierarchicalFacetLimit = null;
 
     /**
      * Initialize facet limit from a Config object.
@@ -96,6 +105,28 @@ trait FacetLimitTrait
     }
 
     /**
+     * Get current limit for hierarchical facets
+     *
+     * @return int
+     */
+    public function getHierarchicalFacetLimit()
+    {
+        return $this->hierarchicalFacetLimit;
+    }
+
+    /**
+     * Set limit for hierarchical facets
+     *
+     * @param int $limit New limit
+     *
+     * @return void
+     */
+    public function setHierarchicalFacetLimit($limit)
+    {
+        $this->hierarchicalFacetLimit = $limit;
+    }
+
+    /**
      * Get the facet limit for the specified field.
      *
      * @param string $field Field to look up
@@ -104,6 +135,19 @@ trait FacetLimitTrait
      */
     protected function getFacetLimitForField($field)
     {
-        return $this->facetLimitByField[$field] ?? $this->facetLimit;
+        $limit = $this->facetLimitByField[$field] ?? $this->facetLimit;
+
+        // Check for a different limit for hierarchical facets:
+        if (
+            null !== $this->hierarchicalFacetLimit
+            && $limit !== $this->hierarchicalFacetLimit
+        ) {
+            $hierarchicalFacets = $this->getOptions()->getHierarchicalFacets();
+            if (in_array($field, $hierarchicalFacets)) {
+                $limit = $this->hierarchicalFacetLimit;
+            }
+        }
+
+        return $limit;
     }
 }

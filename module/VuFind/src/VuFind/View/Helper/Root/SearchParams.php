@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Retrieve search params" view helper
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 use VuFind\Search\Params\PluginManager;
@@ -38,7 +40,7 @@ use VuFind\Search\Params\PluginManager;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class SearchParams extends \Zend\View\Helper\AbstractHelper
+class SearchParams extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * Search manager

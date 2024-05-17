@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AJAX handler to get all tags for a record as HTML.
  *
@@ -25,12 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\View\Renderer\RendererInterface;
 use VuFind\Db\Row\User;
 use VuFind\Db\Table\Tags;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\View\Renderer\RendererInterface;
 
 /**
  * AJAX handler to get all tags for a record as HTML.
@@ -93,7 +95,11 @@ class GetRecordTags extends AbstractBase
         $tags = $this->table->getForResource(
             $params->fromQuery('id'),
             $params->fromQuery('source', DEFAULT_SEARCH_BACKEND),
-            0, null, null, 'count', $is_me_id
+            0,
+            null,
+            null,
+            'count',
+            $is_me_id
         );
 
         // Build data structure for return:
@@ -102,7 +108,7 @@ class GetRecordTags extends AbstractBase
             $tagList[] = [
                 'tag'   => $tag->tag,
                 'cnt'   => $tag->cnt,
-                'is_me' => !empty($tag->is_me)
+                'is_me' => !empty($tag->is_me),
             ];
         }
 

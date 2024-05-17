@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Get ILS Status" AJAX handler
  *
@@ -26,12 +27,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\View\Renderer\RendererInterface;
 use VuFind\ILS\Connection;
 use VuFind\Session\Settings as SessionSettings;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\View\Renderer\RendererInterface;
 
 /**
  * "Get ILS Status" AJAX handler
@@ -69,7 +71,9 @@ class GetIlsStatus extends AbstractBase
      * @param Connection        $ils      ILS connection
      * @param RendererInterface $renderer View renderer
      */
-    public function __construct(SessionSettings $ss, Connection $ils,
+    public function __construct(
+        SessionSettings $ss,
+        Connection $ils,
         RendererInterface $renderer
     ) {
         $this->sessionSettings = $ss;
@@ -86,10 +90,12 @@ class GetIlsStatus extends AbstractBase
      */
     public function handleRequest(Params $params)
     {
+        $html = null;
         $this->disableSessionWrites();
         if ($this->ils->getOfflineMode(true) == 'ils-offline') {
             $offlineModeMsg = $params->fromPost(
-                'offlineModeMsg', $params->fromQuery('offlineModeMsg')
+                'offlineModeMsg',
+                $params->fromQuery('offlineModeMsg')
             );
             $html = $this->renderer
                 ->render('Helpers/ils-offline.phtml', compact('offlineModeMsg'));

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Additional functionality for API controllers.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
+
 namespace VuFindApi\Controller;
 
 /**
@@ -62,12 +64,12 @@ trait ApiTrait
     /**
      * Execute the request
      *
-     * @param \Zend\Mvc\MvcEvent $e Event
+     * @param \Laminas\Mvc\MvcEvent $e Event
      *
      * @return mixed
      * @throws Exception\DomainException
      */
-    public function onDispatch(\Zend\Mvc\MvcEvent $e)
+    public function onDispatch(\Laminas\Mvc\MvcEvent $e)
     {
         // Add CORS headers and handle OPTIONS requests. This is a simplistic
         // approach since we allow any origin. For more complete CORS handling
@@ -80,7 +82,8 @@ trait ApiTrait
             // Disable session writes
             $this->disableSessionWrites();
             $headers->addHeaderLine(
-                'Access-Control-Allow-Methods', 'GET, POST, OPTIONS'
+                'Access-Control-Allow-Methods',
+                'GET, POST, OPTIONS'
             );
             $headers->addHeaderLine('Access-Control-Max-Age', '86400');
 
@@ -100,8 +103,12 @@ trait ApiTrait
         $request = $this->getRequest();
         $this->jsonpCallback
             = $request->getQuery('callback', $request->getPost('callback', null));
-        $this->jsonPrettyPrint = $request->getQuery(
-            'prettyPrint', $request->getPost('prettyPrint', false)
+        $this->jsonPrettyPrint = filter_var(
+            $request->getQuery(
+                'prettyPrint',
+                $request->getPost('prettyPrint', false)
+            ),
+            FILTER_VALIDATE_BOOLEAN
         );
         $this->outputMode = empty($this->jsonpCallback) ? 'json' : 'jsonp';
     }
@@ -111,13 +118,19 @@ trait ApiTrait
      *
      * @param string $permission Permission to check
      *
-     * @return \Zend\Http\Response|boolean
+     * @return \Laminas\Http\Response|boolean
      */
     protected function isAccessDenied($permission)
     {
-        $auth = $this->serviceLocator->get('ZfcRbac\Service\AuthorizationService');
+        $auth = $this->serviceLocator
+            ->get(\LmcRbacMvc\Service\AuthorizationService::class);
         if (!$auth->isGranted($permission)) {
-            return $this->output([], self::STATUS_ERROR, 403, 'Permission denied');
+            return $this->output(
+                [],
+                ApiInterface::STATUS_ERROR,
+                403,
+                'Permission denied'
+            );
         }
         return false;
     }
@@ -130,7 +143,7 @@ trait ApiTrait
      * @param int    $httpCode A custom HTTP Status Code
      * @param string $message  Status message
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      * @throws \Exception
      */
     protected function output($data, $status, $httpCode = null, $message = '')

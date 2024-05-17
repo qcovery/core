@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Default Controller
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Controller;
 
+use Laminas\Config\Config;
 use VuFind\Auth\Manager as AuthManager;
-use Zend\Config\Config;
 
 /**
  * Redirects the user to the appropriate default VuFind action.
@@ -39,7 +41,7 @@ use Zend\Config\Config;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class IndexController extends \Zend\Mvc\Controller\AbstractActionController
+class IndexController extends \Laminas\Mvc\Controller\AbstractActionController
 {
     /**
      * VuFind configuration
@@ -77,16 +79,13 @@ class IndexController extends \Zend\Mvc\Controller\AbstractActionController
     {
         // Load different configurations depending on whether we're logged in or not:
         if ($this->authManager->isLoggedIn()) {
-            $controller = isset($this->config->Site->defaultLoggedInModule)
-                ? $this->config->Site->defaultLoggedInModule : 'MyResearch';
+            $controller = $this->config->Site->defaultLoggedInModule ?? 'MyResearch';
             $actionConfig = 'defaultLoggedInAction';
         } else {
-            $controller = isset($this->config->Site->defaultModule)
-                ? $this->config->Site->defaultModule : 'Search';
+            $controller = $this->config->Site->defaultModule ?? 'Search';
             $actionConfig = 'defaultAction';
         }
-        $action = isset($this->config->Site->$actionConfig)
-            ? $this->config->Site->$actionConfig : 'Home';
+        $action = $this->config->Site->$actionConfig ?? 'Home';
 
         // Forward to the appropriate controller and action:
         return $this->forward()->dispatch($controller, compact('action'));

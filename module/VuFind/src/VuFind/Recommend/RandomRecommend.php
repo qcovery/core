@@ -1,10 +1,11 @@
 <?php
+
 /**
  * RandomRecommend Recommendations Module
  *
  * PHP version 7
  *
- * Copyright (C) Villanova University 2012.
+ * Copyright (C) Villanova University 2012, 2022.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Recommend;
+
+use VuFindSearch\Command\RandomCommand;
 
 /**
  * RandomRecommend Module
@@ -59,7 +63,7 @@ class RandomRecommend implements RecommendInterface
     /**
      * Results Limit
      *
-     * @var number
+     * @var int
      */
     protected $limit = 10;
 
@@ -118,7 +122,8 @@ class RandomRecommend implements RecommendInterface
      * @param \VuFindSearch\Service               $searchService VuFind Search Serive
      * @param \VuFind\Search\Params\PluginManager $paramManager  Params manager
      */
-    public function __construct(\VuFindSearch\Service $searchService,
+    public function __construct(
+        \VuFindSearch\Service $searchService,
         \VuFind\Search\Params\PluginManager $paramManager
     ) {
         $this->searchService = $searchService;
@@ -155,13 +160,14 @@ class RandomRecommend implements RecommendInterface
     }
 
     /**
-     * Called at the end of the Search Params objects' initFromRequest() method.
+     * Called before the Search Results object performs its main search
+     * (specifically, in response to \VuFind\Search\SearchRunner::EVENT_CONFIGURED).
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
      * be needed.
      *
      * @param \VuFind\Search\Base\Params $params  Search parameter object
-     * @param \Zend\StdLib\Parameters    $request Parameter object representing user
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
      * request.
      *
      * @return void
@@ -178,9 +184,14 @@ class RandomRecommend implements RecommendInterface
         }
         $query = $randomParams->getQuery();
         $paramBag = $randomParams->getBackendParameters();
-        $this->results = $this->searchService->random(
-            $this->backend, $query, $this->limit, $paramBag
-        )->getRecords();
+        $command = new RandomCommand(
+            $this->backend,
+            $query,
+            $this->limit,
+            $paramBag
+        );
+        $this->results = $this->searchService->invoke($command)
+            ->getResult()->getRecords();
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Development Tools Controller
  *
@@ -26,9 +27,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/indexing:alphabetical_heading_browse Wiki
  */
+
 namespace VuFindDevTools\Controller;
 
+use VuFind\I18n\Locale\LocaleSettings;
 use VuFind\I18n\Translator\Loader\ExtendedIni;
+use VuFind\Search\Results\PluginManager as ResultsManager;
 use VuFindDevTools\LanguageHelper;
 
 /**
@@ -53,21 +57,20 @@ class DevtoolsController extends \VuFind\Controller\AbstractBase
      */
     protected function getQueryBuilder($id)
     {
+        $command = new \VuFindSearch\Command\GetQueryBuilderCommand($id);
         try {
-            $backend = $this->serviceLocator
-                ->get('VuFind\Search\BackendManager')
-                ->get($id);
+            $this->serviceLocator->get(\VuFindSearch\Service::class)
+                ->invoke($command);
         } catch (\Exception $e) {
             return null;
         }
-        return is_callable([$backend, 'getQueryBuilder'])
-            ? $backend->getQueryBuilder() : null;
+        return $command->getResult();
     }
 
     /**
      * Deminify action
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function deminifyAction()
     {
@@ -78,7 +81,7 @@ class DevtoolsController extends \VuFind\Controller\AbstractBase
         }
         if (isset($view->min) && $view->min) {
             $view->results = $view->min->deminify(
-                $this->serviceLocator->get('VuFind\Search\Results\PluginManager')
+                $this->serviceLocator->get(ResultsManager::class)
             );
         }
         if (isset($view->results) && $view->results) {
@@ -98,11 +101,25 @@ class DevtoolsController extends \VuFind\Controller\AbstractBase
     /**
      * Home action
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function homeAction()
     {
         return $this->createViewModel();
+    }
+
+    /**
+     * Icon action
+     *
+     * @return array
+     */
+    public function iconAction()
+    {
+        $config = $this->serviceLocator->get(\VuFindTheme\ThemeInfo::class)
+            ->getMergedConfig('icons');
+        $aliases = array_keys($config['aliases'] ?? []);
+        sort($aliases);
+        return compact('aliases');
     }
 
     /**
@@ -114,7 +131,12 @@ class DevtoolsController extends \VuFind\Controller\AbstractBase
     {
         // Test languages with no local overrides and no fallback:
         $loader = new ExtendedIni([APPLICATION_PATH . '/languages']);
-        $helper = new LanguageHelper($loader, $this->getConfig());
-        return $helper->getAllDetails($this->params()->fromQuery('main', 'en'));
+        $langs = $this->serviceLocator->get(LocaleSettings::class)
+            ->getEnabledLocales();
+        $helper = new LanguageHelper($loader, $langs);
+        return $helper->getAllDetails(
+            $this->params()->fromQuery('main', 'en'),
+            (bool)$this->params()->fromQuery('includeOptional', 1)
+        );
     }
 }

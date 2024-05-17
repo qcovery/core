@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generic factory suitable for most resolver drivers.
  *
@@ -25,10 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Resolver\Driver;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * Generic factory suitable for most resolver drivers.
@@ -39,7 +43,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class DriverWithHttpClientFactory implements FactoryInterface
+class DriverWithHttpClientFactory extends AbstractBaseFactory
 {
     /**
      * Create an object
@@ -53,16 +57,19 @@ class DriverWithHttpClientFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
-        $config = $container->get('VuFind\Config\PluginManager')->get('config');
-        return new $requestedName(
-            $config->OpenURL->url,
-            $container->get('VuFindHttp\HttpService')->createClient(),
-            ...($options ?: [])
-        );
+        $client = $container->get(\VuFindHttp\HttpService::class)->createClient();
+        if ($options) {
+            array_unshift($options, $client);
+        } else {
+            $options = [$client];
+        }
+        return parent::__invoke($container, $requestedName, $options);
     }
 }

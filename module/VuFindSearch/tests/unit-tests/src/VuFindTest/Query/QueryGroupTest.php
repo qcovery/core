@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Query;
 
 use PHPUnit\Framework\TestCase;
@@ -88,6 +89,24 @@ class QueryGroupTest extends TestCase
     }
 
     /**
+     * Test replaceTerm() method with and without normalization using complex input
+     *
+     * @return void
+     */
+    public function testReplaceTermWithNormalization()
+    {
+        $normalizer = new \VuFind\Normalizer\DefaultSpellingNormalizer();
+        // Without normalization we only replace the accented instance of "query":
+        $q = $this->getSampleQueryGroupWithWeirdCharacters();
+        $q->replaceTerm('quéry', 'quéstion');
+        $this->assertEquals('tést quéstion multi WORD query', $q->getAllTerms());
+        // With normalization, we replace both instances of "query":
+        $q = $this->getSampleQueryGroupWithWeirdCharacters();
+        $q->replaceTerm('quéry', 'quéstion', $normalizer);
+        $this->assertEquals('test quéstion multi word quéstion', $q->getAllTerms());
+    }
+
+    /**
      * Test QueryGroup cloning.
      *
      * @return void
@@ -122,14 +141,29 @@ class QueryGroupTest extends TestCase
      * Test setting an invalid operator.
      *
      * @return void
-     *
-     * @expectedException        VuFindSearch\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unknown or invalid boolean operator: fizz
      */
     public function testIllegalOperator()
     {
+        $this->expectException(\VuFindSearch\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown or invalid boolean operator: fizz');
+
         $q = $this->getSampleQueryGroup();
         $q->setOperator('fizz');
+    }
+
+    /**
+     * Test detection of normalized terms.
+     *
+     * @return void
+     */
+    public function testContainsTermWithNormalization()
+    {
+        $normalizer = new \VuFind\Normalizer\DefaultSpellingNormalizer();
+        $q = $this->getSampleQueryGroupWithWeirdCharacters();
+        // regular contains will fail because of the accent:
+        $this->assertFalse($q->containsTerm('test'));
+        // normalized contains will succeed:
+        $this->assertTrue($q->containsTerm('test', $normalizer));
     }
 
     /**
@@ -142,6 +176,19 @@ class QueryGroupTest extends TestCase
         $q1 = new Query('test');
         $q2 = new Query('query');
         $q3 = new Query('multi word query');
+        return new QueryGroup('OR', [$q1, $q2, $q3]);
+    }
+
+    /**
+     * Get a test object with uppercase and accents.
+     *
+     * @return QueryGroup
+     */
+    protected function getSampleQueryGroupWithWeirdCharacters()
+    {
+        $q1 = new Query('tést');
+        $q2 = new Query('Quéry');
+        $q3 = new Query('multi WORD query');
         return new QueryGroup('OR', [$q1, $q2, $q3]);
     }
 }

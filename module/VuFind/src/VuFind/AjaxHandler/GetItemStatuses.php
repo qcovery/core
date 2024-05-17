@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Get Item Status" AJAX handler
  *
@@ -27,16 +28,17 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
+use Laminas\Config\Config;
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\View\Renderer\RendererInterface;
 use VuFind\Exception\ILS as ILSException;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\ILS\Connection;
 use VuFind\ILS\Logic\Holds;
 use VuFind\Session\Settings as SessionSettings;
-use Zend\Config\Config;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\View\Renderer\RendererInterface;
 
 /**
  * "Get Item Status" AJAX handler
@@ -52,9 +54,12 @@ use Zend\View\Renderer\RendererInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
+class GetItemStatuses extends AbstractBase implements
+    TranslatorAwareInterface,
+    \VuFind\I18n\HasSorterInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
+    use \VuFind\I18n\HasSorterTrait;
 
     /**
      * Top-level configuration
@@ -93,8 +98,12 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
      * @param RendererInterface $renderer  View renderer
      * @param Holds             $holdLogic Holds logic
      */
-    public function __construct(SessionSettings $ss, Config $config, Connection $ils,
-        RendererInterface $renderer, Holds $holdLogic
+    public function __construct(
+        SessionSettings $ss,
+        Config $config,
+        Connection $ils,
+        RendererInterface $renderer,
+        Holds $holdLogic
     ) {
         $this->sessionSettings = $ss;
         $this->config = $config;
@@ -139,9 +148,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
     {
         $transList = [];
         foreach ($list as $current) {
-            $transList[] = $this->translate(
-                $transPrefix . $current, [], $current
-            );
+            $transList[] = $this->translateWithPrefix($transPrefix, $current);
         }
         return $transList;
     }
@@ -166,9 +173,10 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
         // If there is only one value in the list, or if we're in "first" mode,
         // send back the first list value:
         if ($mode == 'first' || count($list) == 1) {
-            return $transPrefix
-                ? $this->translate($transPrefix . $list[0], [], $list[0])
-                : $list[0];
+            if ($transPrefix) {
+                return $this->translateWithPrefix($transPrefix, $list[0]);
+            }
+            return $list[0];
         } elseif (count($list) == 0) {
             // Empty list?  Return a blank string:
             return '';
@@ -199,9 +207,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
         if ($displaySetting == 'msg' && count($list) > 1) {
             return false;
         }
-        return isset($this->config->Item_Status->callnumber_handler)
-            ? $this->config->Item_Status->callnumber_handler
-            : false;
+        return $this->config->Item_Status->callnumber_handler ?? false;
     }
 
     /**
@@ -218,7 +224,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             return strtolower(preg_replace('/[^A-Za-z]/', '', $in));
         };
         $services = array_map($normalize, array_unique($rawServices));
-        sort($services);
+        $this->getSorter()->sort($services);
 
         // Do we need to deal with a preferred service?
         $preferred = isset($this->config->Item_Status->preferred_service)
@@ -231,6 +237,20 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             'ajax/status-available-services.phtml',
             ['services' => $services]
         );
+    }
+
+    /**
+     * Create a delimited version of the call number to allow the Javascript code
+     * to handle the prefix appropriately.
+     *
+     * @param string $prefix     Callnumber prefix or empty string.
+     * @param string $callnumber Main call number.
+     *
+     * @return string
+     */
+    protected function formatCallNo($prefix, $callnumber)
+    {
+        return !empty($prefix) ? $prefix . '::::' . $callnumber : $callnumber;
     }
 
     /**
@@ -248,7 +268,10 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
      *
      * @return array                    Summarized availability information
      */
-    protected function getItemStatus($record, $messages, $locationSetting,
+    protected function getItemStatus(
+        $record,
+        $messages,
+        $locationSetting,
         $callnumberSetting
     ) {
         // Summarize call number, location and availability info across all items:
@@ -262,13 +285,18 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                 $available = true;
             }
             // Check for a use_unknown_message flag
-            if (isset($info['use_unknown_message'])
+            if (
+                isset($info['use_unknown_message'])
                 && $info['use_unknown_message'] == true
             ) {
                 $use_unknown_status = true;
             }
             // Store call number/location info:
-            $callNumbers[] = $info['callnumber'];
+            $callNumbers[] = $this->formatCallNo(
+                $info['callnumber_prefix'] ?? '',
+                $info['callnumber']
+            );
+
             $locations[] = $info['location'];
             // Store all available services
             if (isset($info['services'])) {
@@ -277,17 +305,23 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
         }
 
         $callnumberHandler = $this->getCallnumberHandler(
-            $callNumbers, $callnumberSetting
+            $callNumbers,
+            $callnumberSetting
         );
 
         // Determine call number string based on findings:
         $callNumber = $this->pickValue(
-            $callNumbers, $callnumberSetting, 'Multiple Call Numbers'
+            $callNumbers,
+            $callnumberSetting,
+            'Multiple Call Numbers'
         );
 
         // Determine location string based on findings:
         $location = $this->pickValue(
-            $locations, $locationSetting, 'Multiple Locations', 'location_'
+            $locations,
+            $locationSetting,
+            'Multiple Locations',
+            'location_'
         );
 
         if (!empty($services)) {
@@ -311,7 +345,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                 ? $this->translate('on_reserve')
                 : $this->translate('Not On Reserve'),
             'callnumber' => htmlentities($callNumber, ENT_COMPAT, 'UTF-8'),
-            'callnumber_handler' => $callnumberHandler
+            'callnumber_handler' => $callnumberHandler,
         ];
     }
 
@@ -331,7 +365,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
     protected function getItemStatusGroup($record, $messages, $callnumberSetting)
     {
         // Summarize call number, location and availability info across all items:
-        $locations =  [];
+        $locations = [];
         $use_unknown_status = $available = false;
         foreach ($record as $info) {
             // Find an available copy
@@ -339,38 +373,46 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                 $available = $locations[$info['location']]['available'] = true;
             }
             // Check for a use_unknown_message flag
-            if (isset($info['use_unknown_message'])
+            if (
+                isset($info['use_unknown_message'])
                 && $info['use_unknown_message'] == true
             ) {
                 $use_unknown_status = true;
                 $locations[$info['location']]['status_unknown'] = true;
             }
             // Store call number/location info:
-            $locations[$info['location']]['callnumbers'][] = $info['callnumber'];
+            $locations[$info['location']]['callnumbers'][] = $this->formatCallNo(
+                $info['callnumber_prefix'] ?? '',
+                $info['callnumber']
+            );
         }
 
         // Build list split out by location:
-        $locationList = false;
+        $locationList = [];
         foreach ($locations as $location => $details) {
             $locationCallnumbers = array_unique($details['callnumbers']);
             // Determine call number string based on findings:
             $callnumberHandler = $this->getCallnumberHandler(
-                $locationCallnumbers, $callnumberSetting
+                $locationCallnumbers,
+                $callnumberSetting
             );
             $locationCallnumbers = $this->pickValue(
-                $locationCallnumbers, $callnumberSetting, 'Multiple Call Numbers'
+                $locationCallnumbers,
+                $callnumberSetting,
+                'Multiple Call Numbers'
             );
             $locationInfo = [
                 'availability' =>
                     $details['available'] ?? false,
                 'location' => htmlentities(
-                    $this->translate('location_' . $location, [], $location),
-                    ENT_COMPAT, 'UTF-8'
+                    $this->translateWithPrefix('location_', $location),
+                    ENT_COMPAT,
+                    'UTF-8'
                 ),
                 'callnumbers' =>
                     htmlentities($locationCallnumbers, ENT_COMPAT, 'UTF-8'),
                 'status_unknown' => $details['status_unknown'] ?? false,
-                'callnumber_handler' => $callnumberHandler
+                'callnumber_handler' => $callnumberHandler,
             ];
             $locationList[] = $locationInfo;
         }
@@ -391,7 +433,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             'reserve_message' => $record[0]['reserve'] == 'Y'
                 ? $this->translate('on_reserve')
                 : $this->translate('Not On Reserve'),
-            'callnumber' => false
+            'callnumber' => false,
         ];
     }
 
@@ -414,8 +456,28 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             'locationList' => [],
             'reserve' => false,
             'reserve_message' => '',
-            'callnumber' => false
+            'callnumber' => false,
         ];
+    }
+
+    /**
+     * Render full item status.
+     *
+     * @param array $record Record
+     * @param array $values Additional values for the template
+     *
+     * @return string
+     */
+    protected function renderFullStatus($record, array $values = [])
+    {
+        $values = array_merge(
+            [
+                'statusItems' => $record,
+                'callnumberHandler' => $this->getCallnumberHandler(),
+            ],
+            $values
+        );
+        return $this->renderer->render('ajax/status-full.phtml', $values);
     }
 
     /**
@@ -427,8 +489,10 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
      */
     public function handleRequest(Params $params)
     {
+        $results = [];
         $this->disableSessionWrites();  // avoid session write timing bug
-        $ids = $params->fromPost('id', $params->fromQuery('id', []));
+        $ids = $params->fromPost('id') ?? $params->fromQuery('id', []);
+        $searchId = $params->fromPost('sid') ?? $params->fromQuery('sid');
         try {
             $results = $this->ils->getStatuses($ids);
         } catch (ILSException $e) {
@@ -439,8 +503,8 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                 $results[] = [
                     [
                         'id' => $id,
-                        'error' => 'An error has occurred'
-                    ]
+                        'error' => 'An error has occurred',
+                    ],
                 ];
             }
         }
@@ -462,16 +526,13 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
             'available' => $this->renderer->render('ajax/status-available.phtml'),
             'unavailable' =>
                 $this->renderer->render('ajax/status-unavailable.phtml'),
-            'unknown' => $this->renderer->render('ajax/status-unknown.phtml')
+            'unknown' => $this->renderer->render('ajax/status-unknown.phtml'),
         ];
 
         // Load callnumber and location settings:
-        $callnumberSetting = isset($this->config->Item_Status->multiple_call_nos)
-            ? $this->config->Item_Status->multiple_call_nos : 'msg';
-        $locationSetting = isset($this->config->Item_Status->multiple_locations)
-            ? $this->config->Item_Status->multiple_locations : 'msg';
-        $showFullStatus = isset($this->config->Item_Status->show_full_status)
-            ? $this->config->Item_Status->show_full_status : false;
+        $callnumberSetting = $this->config->Item_Status->multiple_call_nos ?? 'msg';
+        $locationSetting = $this->config->Item_Status->multiple_locations ?? 'msg';
+        $showFullStatus = $this->config->Item_Status->show_full_status ?? false;
 
         // Loop through all the status information that came back
         $statuses = [];
@@ -487,20 +548,24 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                         ->getItemStatusError($record, $messages['unknown']);
                 } elseif ($locationSetting === 'group') {
                     $current = $this->getItemStatusGroup(
-                        $record, $messages, $callnumberSetting
+                        $record,
+                        $messages,
+                        $callnumberSetting
                     );
                 } else {
                     $current = $this->getItemStatus(
-                        $record, $messages, $locationSetting, $callnumberSetting
+                        $record,
+                        $messages,
+                        $locationSetting,
+                        $callnumberSetting
                     );
                 }
-                // If a full status display has been requested, append the HTML:
-                if ($showFullStatus) {
-                    $current['full_status'] = $this->renderer->render(
-                        'ajax/status-full.phtml', [
-                            'statusItems' => $record,
-                            'callnumberHandler' => $this->getCallnumberHandler()
-                         ]
+                // If a full status display has been requested and no errors were
+                // encountered, append the HTML:
+                if ($showFullStatus && empty($record[0]['error'])) {
+                    $current['full_status'] = $this->renderFullStatus(
+                        $record,
+                        compact('searchId')
                     );
                 }
                 $current['record_number'] = array_search($current['id'], $ids);
@@ -523,7 +588,7 @@ class GetItemStatuses extends AbstractBase implements TranslatorAwareInterface
                 'reserve_message'      => $this->translate('Not On Reserve'),
                 'callnumber'           => '',
                 'missing_data'         => true,
-                'record_number'        => $recordNumber
+                'record_number'        => $recordNumber,
             ];
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Related record plugin manager
  *
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:related_records_modules Wiki
  */
+
 namespace VuFind\Related;
+
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
  * Related record plugin manager
@@ -44,11 +48,12 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'channels' => 'VuFind\Related\Channels',
-        'editions' => 'VuFind\Related\Deprecated',
-        'similar' => 'VuFind\Related\Similar',
-        'worldcateditions' => 'VuFind\Related\Deprecated',
-        'worldcatsimilar' => 'VuFind\Related\WorldCatSimilar',
+        'channels' => Channels::class,
+        'bookplate' => Bookplate::class,
+        'editions' => Deprecated::class,
+        'similar' => Similar::class,
+        'worldcateditions' => Deprecated::class,
+        'worldcatsimilar' => WorldCatSimilar::class,
     ];
 
     /**
@@ -57,11 +62,11 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Related\Channels' => 'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Related\Deprecated' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Related\Similar' => 'VuFind\Related\SimilarFactory',
-        'VuFind\Related\WorldCatSimilar' => 'VuFind\Related\SimilarFactory',
+        Channels::class => InvokableFactory::class,
+        Bookplate::class => BookplateFactory::class,
+        Deprecated::class => InvokableFactory::class,
+        Similar::class => SimilarFactory::class,
+        WorldCatSimilar::class => SimilarFactory::class,
     ];
 
     /**
@@ -73,13 +78,14 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @param array $v3config                  If $configOrContainerInstance is a
      * container, this value will be passed to the parent constructor.
      */
-    public function __construct($configOrContainerInstance = null,
+    public function __construct(
+        $configOrContainerInstance = null,
         array $v3config = []
     ) {
         // These objects are not meant to be shared -- every time we retrieve one,
         // we are building a brand new object.
         $this->sharedByDefault = false;
-        $this->addAbstractFactory('VuFind\Related\PluginFactory');
+        $this->addAbstractFactory(PluginFactory::class);
         parent::__construct($configOrContainerInstance, $v3config);
     }
 
@@ -91,6 +97,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Related\RelatedInterface';
+        return RelatedInterface::class;
     }
 }

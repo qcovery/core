@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for BrowZine records.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\RecordDriver;
 
 /**
@@ -55,7 +57,7 @@ class BrowZine extends DefaultRecord
      */
     public function getSjrValue()
     {
-        return isset($this->fields['sjrValue']) ? $this->fields['sjrValue'] : '';
+        return $this->fields['sjrValue'] ?? '';
     }
 
     /**
@@ -65,9 +67,7 @@ class BrowZine extends DefaultRecord
      */
     public function getTitle()
     {
-        return isset($this->fields['name'])
-            ? $this->fields['name']
-            : parent::getTitle();
+        return $this->fields['name'] ?? parent::getTitle();
     }
 
     /**

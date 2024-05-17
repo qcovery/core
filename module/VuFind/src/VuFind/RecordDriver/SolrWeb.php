@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for Solr web records.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\RecordDriver;
 
 /**
@@ -41,13 +43,16 @@ class SolrWeb extends SolrDefault
     /**
      * Constructor
      *
-     * @param \Zend\Config\Config $mainConfig     VuFind main configuration (omit for
-     * built-in defaults)
-     * @param \Zend\Config\Config $recordConfig   Record-specific configuration file
-     * (omit to use $mainConfig as $recordConfig)
-     * @param \Zend\Config\Config $searchSettings Search-specific configuration file
+     * @param \Laminas\Config\Config $mainConfig     VuFind main configuration (omit
+     * for built-in defaults)
+     * @param \Laminas\Config\Config $recordConfig   Record-specific configuration
+     * file (omit to use $mainConfig as $recordConfig)
+     * @param \Laminas\Config\Config $searchSettings Search-specific configuration
+     * file
      */
-    public function __construct($mainConfig = null, $recordConfig = null,
+    public function __construct(
+        $mainConfig = null,
+        $recordConfig = null,
         $searchSettings = null
     ) {
         $this->preferredSnippetFields = ['description', 'fulltext'];
@@ -82,7 +87,6 @@ class SolrWeb extends SolrDefault
      */
     public function getLastModified()
     {
-        return isset($this->fields['last_modified'])
-            ? $this->fields['last_modified'] : '';
+        return $this->fields['last_modified'] ?? '';
     }
 }

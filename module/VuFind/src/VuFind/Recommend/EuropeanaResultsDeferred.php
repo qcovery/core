@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EuropeanaResultsDeferred Recommendations Module
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
+
 namespace VuFind\Recommend;
 
 /**
@@ -76,13 +78,14 @@ class EuropeanaResultsDeferred implements RecommendInterface
     }
 
     /**
-     * Called at the end of the Search Params objects' initFromRequest() method.
+     * Called before the Search Results object performs its main search
+     * (specifically, in response to \VuFind\Search\SearchRunner::EVENT_CONFIGURED).
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
      * be needed.
      *
      * @param \VuFind\Search\Base\Params $params  Search parameter object
-     * @param \Zend\StdLib\Parameters    $request Parameter object representing user
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
      * request.
      *
      * @return void
@@ -96,11 +99,11 @@ class EuropeanaResultsDeferred implements RecommendInterface
         // with a blank string, so we can rebuild the parameters to pass through
         // AJAX later on!
         for ($i = 0; $i < 4; $i++) {
-            $settings[$i] = $settings[$i] ?? '';
+            $settings[$i] ??= '';
         }
 
         // Collect the best possible search term(s):
-        $this->lookfor =  $request->get('lookfor', '');
+        $this->lookfor = $request->get('lookfor', '');
         if (empty($this->lookfor) && is_object($params)) {
             $this->lookfor = $params->getQuery()->getAllTerms();
         }

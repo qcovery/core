@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Table Definition for user_list
  *
@@ -25,14 +26,16 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Db\Table;
 
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Expression;
+use Laminas\Db\Sql\Select;
+use Laminas\Session\Container;
 use VuFind\Db\Row\RowGateway;
 use VuFind\Exception\LoginRequired as LoginRequiredException;
 use VuFind\Exception\RecordMissing as RecordMissingException;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Expression;
-use Zend\Session\Container;
 
 /**
  * Table Definition for user_list
@@ -57,14 +60,19 @@ class UserList extends Gateway
      *
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
-     * @param array         $cfg     Zend Framework configuration
+     * @param array         $cfg     Laminas configuration
      * @param RowGateway    $rowObj  Row prototype object (null for default)
      * @param Container     $session Session container (must use same
      * namespace as container provided to \VuFind\View\Helper\Root\UserList).
      * @param string        $table   Name of database table to interface with
      */
-    public function __construct(Adapter $adapter, PluginManager $tm, $cfg,
-        RowGateway $rowObj = null, Container $session = null, $table = 'user_list'
+    public function __construct(
+        Adapter $adapter,
+        PluginManager $tm,
+        $cfg,
+        ?RowGateway $rowObj = null,
+        Container $session = null,
+        $table = 'user_list'
     ) {
         $this->session = $session;
         parent::__construct($adapter, $tm, $cfg, $rowObj, $table);
@@ -118,25 +126,31 @@ class UserList extends Gateway
      *
      * @return array
      */
-    public function getListsContainingResource($resourceId,
-        $source = DEFAULT_SEARCH_BACKEND, $userId = null
+    public function getListsContainingResource(
+        $resourceId,
+        $source = DEFAULT_SEARCH_BACKEND,
+        $userId = null
     ) {
         // Set up base query:
         $callback = function ($select) use ($resourceId, $source, $userId) {
             $select->columns(
                 [
                     new Expression(
-                        'DISTINCT(?)', ['user_list.id'],
+                        'DISTINCT(?)',
+                        ['user_list.id'],
                         [Expression::TYPE_IDENTIFIER]
-                    ), '*'
+                    ), Select::SQL_STAR,
                 ]
             );
             $select->join(
-                ['ur' => 'user_resource'], 'ur.list_id = user_list.id',
+                ['ur' => 'user_resource'],
+                'ur.list_id = user_list.id',
                 []
             );
             $select->join(
-                ['r' => 'resource'], 'r.id = ur.resource_id', []
+                ['r' => 'resource'],
+                'r.id = ur.resource_id',
+                []
             );
             $select->where->equalTo('r.source', $source)
                 ->equalTo('r.record_id', $resourceId);

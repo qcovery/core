@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Head link view helper (extended for VuFind's theme system)
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFindTheme\View\Helper;
 
 use VuFindTheme\ThemeInfo;
@@ -37,10 +39,15 @@ use VuFindTheme\ThemeInfo;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
+ *
+ * @method getWhitespace(string|int $indent)
+ * @method getIndent()
+ * @method getSeparator()
  */
-class HeadLink extends \Zend\View\Helper\HeadLink
+class HeadLink extends \Laminas\View\Helper\HeadLink implements \Laminas\Log\LoggerAwareInterface
 {
     use ConcatTrait;
+    use \VuFind\Log\LoggerAwareTrait;
 
     /**
      * Theme information service
@@ -50,16 +57,39 @@ class HeadLink extends \Zend\View\Helper\HeadLink
     protected $themeInfo;
 
     /**
+     * CSP nonce
+     *
+     * @var string
+     */
+    protected $cspNonce;
+
+    /**
+     * Maximum import size (for inlining of e.g. images) in kilobytes
+     *
+     * @var int|null
+     */
+    protected $maxImportSize;
+
+    /**
      * Constructor
      *
-     * @param ThemeInfo   $themeInfo Theme information service
-     * @param string|bool $plconfig  Config for current application environment
+     * @param ThemeInfo   $themeInfo     Theme information service
+     * @param string|bool $plconfig      Config for current application environment
+     * @param string      $nonce         Nonce from nonce generator
+     * @param int         $maxImportSize Maximum imported (inlined) file size
      */
-    public function __construct(ThemeInfo $themeInfo, $plconfig = false)
-    {
+    public function __construct(
+        ThemeInfo $themeInfo,
+        $plconfig = false,
+        $nonce = '',
+        $maxImportSize = null
+    ) {
         parent::__construct();
         $this->themeInfo = $themeInfo;
         $this->usePipeline = $this->enabledInConfig($plconfig);
+        $this->cspNonce = $nonce;
+        $this->maxImportSize = $maxImportSize;
+        $this->itemKeys[] = 'nonce';
     }
 
     /**
@@ -93,53 +123,35 @@ class HeadLink extends \Zend\View\Helper\HeadLink
             $url .= filemtime($details['path']);
             $item->href = $url;
         }
-
+        $this->addNonce($item);
         return parent::itemToString($item);
     }
 
     /**
-     * Compile a less file to css and add to css folder
+     * Forcibly prepend a stylesheet removing it from any existing position
      *
-     * @param string $file Path to less file
+     * @param string $href                  Stylesheet href
+     * @param string $media                 Media
+     * @param string $conditionalStylesheet Any conditions
+     * @param array  $extras                Array of extra attributes
      *
-     * @return string
+     * @return void
      */
-    public function addLessStylesheet($file)
-    {
-        $relPath = 'less/' . $file;
-        $urlHelper = $this->getView()->plugin('url');
-        $currentTheme = $this->themeInfo->findContainingTheme($relPath);
-        $helperHome = $urlHelper('home');
-        $home = APPLICATION_PATH . '/themes/' . $currentTheme . '/';
-        $cssDirectory = $helperHome . 'themes/' . $currentTheme . '/css/less/';
-
-        try {
-            $less_files = [
-                APPLICATION_PATH . '/themes/' . $currentTheme . '/' . $relPath
-                    => $cssDirectory
-            ];
-            $themeParents = array_keys($this->themeInfo->getThemeInfo());
-            $directories = [];
-            foreach ($themeParents as $theme) {
-                $directories[APPLICATION_PATH . '/themes/' . $theme . '/less/']
-                    = $helperHome . 'themes/' . $theme . '/css/less/';
+    public function forcePrependStylesheet(
+        $href,
+        $media = 'screen',
+        $conditionalStylesheet = '',
+        $extras = []
+    ) {
+        // Look for existing entry and remove it if found. Comparison method
+        // copied from isDuplicate().
+        foreach ($this->getContainer() as $offset => $item) {
+            if (($item->rel == 'stylesheet') && ($item->href == $href)) {
+                $this->offsetUnset($offset);
+                break;
             }
-            $css_file_name = \Less_Cache::Get(
-                $less_files,
-                [
-                    'cache_dir' => $home . 'css/less/',
-                    'cache_method' => false,
-                    'compress' => true,
-                    'import_dirs' => $directories,
-                    'output' => str_replace('.less', '.css', $file)
-                ]
-            );
-            return $cssDirectory . $css_file_name;
-        } catch (\Exception $e) {
-            error_log($e->getMessage());
-            list($fileName, ) = explode('.', $file);
-            return $urlHelper('home') . "themes/{$currentTheme}/css/{$fileName}.css";
         }
+        parent::prependStylesheet($href, $media, $conditionalStylesheet, $extras);
     }
 
     /**
@@ -193,7 +205,11 @@ class HeadLink extends \Zend\View\Helper\HeadLink
      */
     public function getType($item)
     {
-        return isset($item->media) ? $item->media : 'all';
+        $type = $item->media ?? 'all';
+        if (isset($item->conditionalStylesheet)) {
+            $type .= '_' . $item->conditionalStylesheet;
+        }
+        return $type;
     }
 
     /**
@@ -204,6 +220,10 @@ class HeadLink extends \Zend\View\Helper\HeadLink
      */
     protected function getMinifier()
     {
-        return new \VuFindTheme\Minify\CSS();
+        $minifier = new \VuFindTheme\Minify\CSS();
+        if (null !== $this->maxImportSize) {
+            $minifier->setMaxImportSize($this->maxImportSize);
+        }
+        return $minifier;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Table Definition for user
  *
@@ -25,12 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Db\Table;
 
+use Laminas\Config\Config;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Session\Container;
 use VuFind\Db\Row\RowGateway;
-use Zend\Config\Config;
-use Zend\Db\Adapter\Adapter;
-use Zend\Session\Container;
+use VuFind\Db\Row\User as UserRow;
 
 /**
  * Table Definition for user
@@ -62,15 +65,20 @@ class User extends Gateway
      *
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
-     * @param array         $cfg     Zend Framework configuration
+     * @param array         $cfg     Laminas configuration
      * @param RowGateway    $rowObj  Row prototype object (null for default)
      * @param Config        $config  VuFind configuration
      * @param Container     $session Session container to inject into rows
      * (optional; used for privacy mode)
      * @param string        $table   Name of database table to interface with
      */
-    public function __construct(Adapter $adapter, PluginManager $tm, $cfg,
-        RowGateway $rowObj, Config $config, Container $session = null,
+    public function __construct(
+        Adapter $adapter,
+        PluginManager $tm,
+        $cfg,
+        ?RowGateway $rowObj,
+        Config $config,
+        Container $session = null,
         $table = 'user'
     ) {
         $this->config = $config;
@@ -90,7 +98,22 @@ class User extends Gateway
         $row = $this->createRow();
         $row->username = $username;
         $row->created = date('Y-m-d H:i:s');
+        // Failing to initialize this here can cause Laminas\Db errors in
+        // the VuFind\Auth\Shibboleth and VuFind\Auth\ILS integration tests.
+        $row->user_provided_email = 0;
         return $row;
+    }
+
+    /**
+     * Retrieve a user object from the database based on ID.
+     *
+     * @param string $id ID.
+     *
+     * @return UserRow
+     */
+    public function getById($id)
+    {
+        return $this->select(['id' => $id])->current();
     }
 
     /**
@@ -98,7 +121,7 @@ class User extends Gateway
      *
      * @param string $catId Catalog ID.
      *
-     * @return UserRow
+     * @return ?UserRow
      */
     public function getByCatalogId($catId)
     {

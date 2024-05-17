@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Solr Reserves aspect of the Search Multi-class (Results)
  *
@@ -26,10 +27,8 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
-namespace VuFind\Search\SolrReserves;
 
-use VuFind\Record\Loader;
-use VuFindSearch\Service as SearchService;
+namespace VuFind\Search\SolrReserves;
 
 /**
  * Solr Reserves Search Parameters
@@ -44,17 +43,9 @@ use VuFindSearch\Service as SearchService;
 class Results extends \VuFind\Search\Solr\Results
 {
     /**
-     * Constructor
+     * Search backend identifier.
      *
-     * @param \VuFind\Search\Base\Params $params        Object representing user
-     * search parameters.
-     * @param SearchService              $searchService Search service
-     * @param Loader                     $recordLoader  Record loader
+     * @var string
      */
-    public function __construct(\VuFind\Search\Base\Params $params,
-        SearchService $searchService, Loader $recordLoader
-    ) {
-        parent::__construct($params, $searchService, $recordLoader);
-        $this->backendId = 'SolrReserves';
-    }
+    protected $backendId = 'SolrReserves';
 }

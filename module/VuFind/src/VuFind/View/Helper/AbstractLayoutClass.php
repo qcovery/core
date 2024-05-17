@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Helper class for managing high-level (body vs. sidebar) page layout.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper;
 
 /**
@@ -36,7 +38,7 @@ namespace VuFind\View\Helper;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-abstract class AbstractLayoutClass extends \Zend\View\Helper\AbstractHelper
+abstract class AbstractLayoutClass extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * Does the sidebar go on the left?

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author notes content loader plugin manager
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Content\AuthorNotes;
 
 /**
@@ -44,9 +46,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'demo' => 'VuFind\Content\AuthorNotes\Demo',
-        'syndetics' => 'VuFind\Content\AuthorNotes\Syndetics',
-        'syndeticsplus' => 'VuFind\Content\AuthorNotes\SyndeticsPlus',
+        'demo' => Demo::class,
+        'syndetics' => Syndetics::class,
+        'syndeticsplus' => SyndeticsPlus::class,
     ];
 
     /**
@@ -55,12 +57,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Content\AuthorNotes\Demo' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Content\AuthorNotes\Syndetics' =>
-            'VuFind\Content\AbstractSyndeticsFactory',
-        'VuFind\Content\AuthorNotes\SyndeticsPlus' =>
-            'VuFind\Content\AbstractSyndeticsFactory',
+        Demo::class => \Laminas\ServiceManager\Factory\InvokableFactory::class,
+        Syndetics::class => \VuFind\Content\AbstractSyndeticsFactory::class,
+        SyndeticsPlus::class => \VuFind\Content\AbstractSyndeticsFactory::class,
     ];
 
     /**
@@ -71,6 +70,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Content\AbstractBase';
+        return \VuFind\Content\AbstractBase::class;
     }
 }

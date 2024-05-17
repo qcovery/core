@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Solr Autocomplete Module
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:autosuggesters Wiki
  */
+
 namespace VuFind\Autocomplete;
 
 /**
@@ -172,7 +174,7 @@ class Solr implements AutocompleteInterface
     protected function mungeQuery($query)
     {
         // Modify the query so it makes a nice, truncated autocomplete query:
-        $forbidden = [':', '(', ')', '*', '+', '"'];
+        $forbidden = [':', '(', ')', '*', '+', '"', "'"];
         $query = str_replace($forbidden, " ", $query);
         if (substr($query, -1) != " ") {
             $query .= "*";
@@ -190,13 +192,15 @@ class Solr implements AutocompleteInterface
      */
     public function getSuggestions($query)
     {
+        $results = null;
         if (!is_object($this->searchObject)) {
             throw new \Exception('Please set configuration first.');
         }
 
         try {
             $this->searchObject->getParams()->setBasicSearch(
-                $this->mungeQuery($query), $this->handler
+                $this->mungeQuery($query),
+                $this->handler
             );
             $this->searchObject->getParams()->setSort($this->sortField);
             foreach ($this->filters as $current) {
@@ -212,7 +216,9 @@ class Solr implements AutocompleteInterface
             $results = $this->getSuggestionsFromSearch($searchResults, $query, true);
             if (empty($results)) {
                 $results = $this->getSuggestionsFromSearch(
-                    $searchResults, $query, false
+                    $searchResults,
+                    $query,
+                    false
                 );
             }
         } catch (\Exception $e) {
@@ -238,7 +244,9 @@ class Solr implements AutocompleteInterface
             foreach ($this->displayField as $field) {
                 if (isset($current[$field])) {
                     $bestMatch = $this->pickBestMatch(
-                        $current[$field], $query, $exact
+                        $current[$field],
+                        $query,
+                        $exact
                     );
                     if ($bestMatch) {
                         $results[] = $bestMatch;
@@ -329,7 +337,7 @@ class Solr implements AutocompleteInterface
     {
         $terms = preg_split("/\s+/", $query);
         foreach ($terms as $term) {
-            if (stripos($data, $term) === false) {
+            if (stripos($data, (string)$term) === false) {
                 return false;
             }
         }

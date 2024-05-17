@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AuthorFacets Recommendations Module
  *
@@ -26,11 +27,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
+
 namespace VuFind\Recommend;
 
+use Laminas\Http\Request;
+use Laminas\Stdlib\Parameters;
 use VuFindSearch\Query\Query;
-use Zend\Http\Request;
-use Zend\StdLib\Parameters;
 
 /**
  * AuthorFacets Recommendations Module
@@ -92,13 +94,14 @@ class AuthorFacets implements RecommendInterface
     }
 
     /**
-     * Called at the end of the Search Params objects' initFromRequest() method.
+     * Called before the Search Results object performs its main search
+     * (specifically, in response to \VuFind\Search\SearchRunner::EVENT_CONFIGURED).
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
      * be needed.
      *
      * @param \VuFind\Search\Base\Params $params  Search parameter object
-     * @param \Zend\StdLib\Parameters    $request Parameter object representing user
+     * @param Parameters                 $request Parameter object representing user
      * request.
      *
      * @return void
@@ -173,7 +176,7 @@ class AuthorFacets implements RecommendInterface
             // false; if we are able to find this information out in the future,
             // we can fill it in here and the templates will display it).
             'count' => false,
-            'list' => $results->getResults()
+            'list' => $results->getResults(),
         ];
     }
 }

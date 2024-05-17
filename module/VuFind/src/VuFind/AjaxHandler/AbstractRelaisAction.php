@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract Relais Ajax Action
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
 use VuFind\Connection\Relais;
@@ -41,8 +43,7 @@ use VuFind\Session\Settings as SessionSettings;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-abstract class AbstractRelaisAction extends AbstractBase
-    implements TranslatorAwareInterface
+abstract class AbstractRelaisAction extends AbstractBase implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
@@ -67,7 +68,9 @@ abstract class AbstractRelaisAction extends AbstractBase
      * @param Relais          $relais Relais connector
      * @param User            $user   Logged in user (or null if none)
      */
-    public function __construct(SessionSettings $ss, Relais $relais,
+    public function __construct(
+        SessionSettings $ss,
+        Relais $relais,
         User $user = null
     ) {
         $this->sessionSettings = $ss;

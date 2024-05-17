@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class for translatable string with a special default translation.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\I18n;
 
 /**
@@ -53,15 +55,24 @@ class TranslatableString implements TranslatableStringInterface
     protected $displayString;
 
     /**
+     * Whether translation is allowed
+     *
+     * @var bool
+     */
+    protected $translatable;
+
+    /**
      * Constructor
      *
      * @param string $string        Original string
      * @param string $displayString Translatable display string
+     * @param bool   $translatable  Whether translation is allowed
      */
-    public function __construct($string, $displayString)
+    public function __construct($string, $displayString, $translatable = true)
     {
         $this->string = (string)$string;
         $this->displayString = $displayString;
+        $this->translatable = $translatable;
     }
 
     /**
@@ -83,5 +94,15 @@ class TranslatableString implements TranslatableStringInterface
     public function getDisplayString()
     {
         return $this->displayString;
+    }
+
+    /**
+     * Checks if the string can be translated
+     *
+     * @return bool
+     */
+    public function isTranslatable()
+    {
+        return $this->translatable;
     }
 }

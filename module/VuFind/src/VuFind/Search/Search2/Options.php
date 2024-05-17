@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\Search2;
 
 /**
@@ -48,6 +49,27 @@ class Options extends \VuFind\Search\Solr\Options
     {
         $this->mainIni = $this->searchIni = $this->facetsIni = 'Search2';
         parent::__construct($configLoader);
+    }
+
+    /**
+     * Return the route name for the facet list action. Returns false to cover
+     * unimplemented support.
+     *
+     * @return string|bool
+     */
+    public function getFacetListAction()
+    {
+        return 'search2-facetlist';
+    }
+
+    /**
+     * Return the route name for the versions search action or false if disabled.
+     *
+     * @return string|bool
+     */
+    public function getVersionsAction()
+    {
+        return $this->displayRecordVersions ? 'search2-versions' : false;
     }
 
     /**

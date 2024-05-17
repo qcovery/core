@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Permission Manager
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/ Wiki
  */
+
 namespace VuFind\Role;
 
 /**
@@ -123,7 +125,9 @@ class PermissionDeniedManager
             $defaultBehavior = $this->defaultDeniedControllerBehavior;
         }
         return $this->getDeniedBehavior(
-            $permission, 'deniedControllerBehavior', $defaultBehavior
+            $permission,
+            'deniedControllerBehavior',
+            $defaultBehavior
         );
     }
 
@@ -142,7 +146,9 @@ class PermissionDeniedManager
             $defaultBehavior = $this->defaultDeniedTemplateBehavior;
         }
         return $this->getDeniedBehavior(
-            $permission, 'deniedTemplateBehavior', $defaultBehavior
+            $permission,
+            'deniedTemplateBehavior',
+            $defaultBehavior
         );
     }
 
@@ -158,8 +164,7 @@ class PermissionDeniedManager
      */
     protected function getDeniedBehavior($permission, $mode, $defaultBehavior)
     {
-        $config = isset($this->config[$permission][$mode])
-            ? $this->config[$permission][$mode] : $defaultBehavior;
+        $config = $this->config[$permission][$mode] ?? $defaultBehavior;
 
         return empty($config) ? false : $this->processConfigString($config);
     }

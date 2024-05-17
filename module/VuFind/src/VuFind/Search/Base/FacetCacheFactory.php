@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract FacetCache Factory.
  *
@@ -25,10 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Search\Base;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
+use VuFind\I18n\Locale\LocaleSettings;
 
 /**
  * Abstract FacetCache Factory.
@@ -52,7 +58,8 @@ class FacetCacheFactory implements FactoryInterface
      */
     protected function getResults(ContainerInterface $container, $name)
     {
-        return $container->get('VuFind\Search\Results\PluginManager')->get($name);
+        return $container->get(\VuFind\Search\Results\PluginManager::class)
+            ->get($name);
     }
 
     /**
@@ -67,9 +74,11 @@ class FacetCacheFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
@@ -78,8 +87,8 @@ class FacetCacheFactory implements FactoryInterface
         $parts = explode('\\', $requestedName);
         $requestedNamespace = $parts[count($parts) - 2];
         $results = $this->getResults($container, $requestedNamespace);
-        $cacheManager = $container->get('VuFind\Cache\Manager');
-        $language = $container->get('Zend\Mvc\I18n\Translator')->getLocale();
+        $cacheManager = $container->get(\VuFind\Cache\Manager::class);
+        $language = $container->get(LocaleSettings::class)->getUserLocale();
         return new $requestedName($results, $cacheManager, $language);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Row Definition for user
  *
@@ -25,11 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Db\Row;
 
-use Zend\Crypt\BlockCipher as BlockCipher;
-use Zend\Crypt\Symmetric\Openssl;
-use Zend\Db\Sql\Expression;
+use Laminas\Crypt\BlockCipher as BlockCipher;
+use Laminas\Crypt\Symmetric\Openssl;
+use Laminas\Db\Sql\Expression;
+use Laminas\Db\Sql\Select;
 
 /**
  * Row Definition for user
@@ -39,9 +42,33 @@ use Zend\Db\Sql\Expression;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
+ *
+ * @property int     $id
+ * @property ?string $username
+ * @property string  $password
+ * @property ?string $pass_hash
+ * @property string  $firstname
+ * @property string  $lastname
+ * @property string  $email
+ * @property ?string $email_verified
+ * @property string  $pending_email
+ * @property int     $user_provided_email
+ * @property ?string $cat_id
+ * @property ?string $cat_username
+ * @property ?string $cat_password
+ * @property ?string $cat_pass_enc
+ * @property string  $college
+ * @property string  $major
+ * @property ?string $home_library
+ * @property string  $created
+ * @property string  $verify_hash
+ * @property string  $last_login
+ * @property ?string $auth_method
+ * @property string  $last_language
  */
-class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
-    \ZfcRbac\Identity\IdentityInterface
+class User extends RowGateway implements
+    \VuFind\Db\Table\DbTableAwareInterface,
+    \LmcRbacMvc\Identity\IdentityInterface
 {
     use \VuFind\Db\Table\DbTableAwareTrait;
 
@@ -62,14 +89,14 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
     /**
      * VuFind configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config = null;
 
     /**
      * Constructor
      *
-     * @param \Zend\Db\Adapter\Adapter $adapter Database adapter
+     * @param \Laminas\Db\Adapter\Adapter $adapter Database adapter
      */
     public function __construct($adapter)
     {
@@ -79,11 +106,11 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
     /**
      * Configuration setter
      *
-     * @param \Zend\Config\Config $config VuFind configuration
+     * @param \Laminas\Config\Config $config VuFind configuration
      *
      * @return void
      */
-    public function setConfig(\Zend\Config\Config $config)
+    public function setConfig(\Laminas\Config\Config $config)
     {
         $this->config = $config;
     }
@@ -144,6 +171,23 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
     }
 
     /**
+     * Save date/time when email address has been verified.
+     *
+     * @param string $datetime optional date/time to save.
+     *
+     * @return mixed           The output of the save method.
+     */
+    public function saveEmailVerified($datetime = null)
+    {
+        if ($datetime === null) {
+            $datetime = date('Y-m-d H:i:s');
+        }
+
+        $this->email_verified = $datetime;
+        return $this->save();
+    }
+
+    /**
      * This is a getter for the Catalog Password. It will return a plaintext version
      * of the password.
      *
@@ -156,7 +200,7 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
             return isset($this->cat_pass_enc)
                 ? $this->encryptOrDecrypt($this->cat_pass_enc, false) : null;
         }
-        return isset($this->cat_password) ? $this->cat_password : null;
+        return $this->cat_password ?? null;
     }
 
     /**
@@ -168,8 +212,7 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         if (null === $this->encryptionEnabled) {
             $this->encryptionEnabled
-                = isset($this->config->Authentication->encrypt_ils_password)
-                ? $this->config->Authentication->encrypt_ils_password : false;
+                = $this->config->Authentication->encrypt_ils_password ?? false;
         }
         return $this->encryptionEnabled;
     }
@@ -192,23 +235,42 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
             return $text;
         }
 
+        $configAuth = $this->config->Authentication;
+
         // Load encryption key from configuration if not already present:
-        if (null === $this->encryptionKey) {
-            if (!isset($this->config->Authentication->ils_encryption_key)
-                || empty($this->config->Authentication->ils_encryption_key)
-            ) {
+        if ($this->encryptionKey === null) {
+            if (empty($configAuth->ils_encryption_key)) {
                 throw new \VuFind\Exception\PasswordSecurity(
                     'ILS password encryption on, but no key set.'
                 );
             }
-            $this->encryptionKey = $this->config->Authentication->ils_encryption_key;
+
+            $this->encryptionKey = $configAuth->ils_encryption_key;
         }
 
         // Perform encryption:
-        $algo = isset($this->config->Authentication->ils_encryption_algo)
-            ? $this->config->Authentication->ils_encryption_algo
-            : 'blowfish';
-        $cipher = new BlockCipher(new Openssl(['algorithm' => $algo]));
+        $algo = $configAuth->ils_encryption_algo ?? 'blowfish';
+
+        // Check if OpenSSL error is caused by blowfish support
+        try {
+            $cipher = new BlockCipher(new Openssl(['algorithm' => $algo]));
+            if ($algo == 'blowfish') {
+                trigger_error(
+                    'Deprecated encryption algorithm (blowfish) detected',
+                    E_USER_DEPRECATED
+                );
+            }
+        } catch (\InvalidArgumentException $e) {
+            if ($algo == 'blowfish') {
+                throw new \VuFind\Exception\PasswordSecurity(
+                    'The blowfish encryption algorithm ' .
+                    'is not supported by your version of OpenSSL. ' .
+                    'Please visit /Upgrade/CriticalFixBlowfish for further details.'
+                );
+            } else {
+                throw $e;
+            }
+        }
         $cipher->setKey($this->encryptionKey);
         return $encrypt ? $cipher->encrypt($text) : $cipher->decrypt($text);
     }
@@ -216,15 +278,28 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
     /**
      * Change home library.
      *
-     * @param string $homeLibrary New home library to store.
+     * @param ?string $homeLibrary New home library to store, or null to indicate
+     * that the user does not want a default. An empty string is the default for
+     * backward compatibility and indicates that system's default pick up location is
+     * to be used
      *
-     * @return mixed           The output of the save method.
+     * @return mixed               The output of the save method.
      */
     public function changeHomeLibrary($homeLibrary)
     {
         $this->home_library = $homeLibrary;
         $this->updateLibraryCardEntry();
         return $this->save();
+    }
+
+    /**
+     * Check whether the email address has been verified yet.
+     *
+     * @return bool
+     */
+    public function checkEmailVerified()
+    {
+        return !empty($this->email_verified);
     }
 
     /**
@@ -239,12 +314,25 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
      * @param string $source     Filter for tags tied to a specific record source.
      * (null for no filter).
      *
-     * @return \Zend\Db\ResultSet\AbstractResultSet
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
      */
     public function getTags($resourceId = null, $listId = null, $source = null)
     {
         return $this->getDbTable('Tags')
-            ->getForUser($this->id, $resourceId, $listId, $source);
+            ->getListTagsForUser($this->id, $resourceId, $listId, $source);
+    }
+
+    /**
+     * Get tags assigned by the user to a favorite list.
+     *
+     * @param int $listId List id
+     *
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
+     */
+    public function getListTags($listId)
+    {
+        return $this->getDbTable('Tags')
+            ->getForList($listId, $this->id);
     }
 
     /**
@@ -262,14 +350,25 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
      */
     public function getTagString($resourceId = null, $listId = null, $source = null)
     {
-        $myTagList = $this->getTags($resourceId, $listId, $source);
+        return $this->formatTagString($this->getTags($resourceId, $listId, $source));
+    }
+
+    /**
+     * Same as getTagString(), but operates on a list of tags.
+     *
+     * @param array $tags Tags
+     *
+     * @return string
+     */
+    public function formatTagString($tags)
+    {
         $tagStr = '';
-        if (count($myTagList) > 0) {
-            foreach ($myTagList as $myTag) {
-                if (strstr($myTag->tag, ' ')) {
-                    $tagStr .= "\"$myTag->tag\" ";
+        if (count($tags) > 0) {
+            foreach ($tags as $tag) {
+                if (strstr($tag->tag, ' ')) {
+                    $tagStr .= "\"$tag->tag\" ";
                 } else {
-                    $tagStr .= "$myTag->tag ";
+                    $tagStr .= "$tag->tag ";
                 }
             }
         }
@@ -279,7 +378,7 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
     /**
      * Get all of the lists associated with this user.
      *
-     * @return \Zend\Db\ResultSet\AbstractResultSet
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
      */
     public function getLists()
     {
@@ -287,22 +386,25 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
         $callback = function ($select) use ($userId) {
             $select->columns(
                 [
-                    '*',
+                    Select::SQL_STAR,
                     'cnt' => new Expression(
-                        'COUNT(DISTINCT(?))', ['ur.resource_id'],
+                        'COUNT(DISTINCT(?))',
+                        ['ur.resource_id'],
                         [Expression::TYPE_IDENTIFIER]
-                    )
+                    ),
                 ]
             );
             $select->join(
-                ['ur' => 'user_resource'], 'user_list.id = ur.list_id',
-                [], $select::JOIN_LEFT
+                ['ur' => 'user_resource'],
+                'user_list.id = ur.list_id',
+                [],
+                $select::JOIN_LEFT
             );
             $select->where->equalTo('user_list.user_id', $userId);
             $select->group(
                 [
                     'user_list.id', 'user_list.user_id', 'title', 'description',
-                    'created', 'public'
+                    'created', 'public',
                 ]
             );
             $select->order(['title']);
@@ -322,7 +424,9 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
      *
      * @return array
      */
-    public function getSavedData($resourceId, $listId = null,
+    public function getSavedData(
+        $resourceId,
+        $listId = null,
         $source = DEFAULT_SEARCH_BACKEND
     ) {
         $table = $this->getDbTable('UserResource');
@@ -344,7 +448,11 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
      * @return void
      */
     public function saveResource(
-        $resource, $list, $tagArray, $notes, $replaceExisting = true
+        $resource,
+        $list,
+        $tagArray,
+        $notes,
+        $replaceExisting = true
     ) {
         // Create the resource link if it doesn't exist and update the notes in any
         // case:
@@ -402,13 +510,13 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
     /**
      * Get all library cards associated with the user.
      *
-     * @return \Zend\Db\ResultSet\AbstractResultSet
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
      * @throws \VuFind\Exception\LibraryCard
      */
     public function getLibraryCards()
     {
         if (!$this->libraryCardsEnabled()) {
-            return new \Zend\Db\ResultSet\ResultSet();
+            return new \Laminas\Db\ResultSet\ResultSet();
         }
         $userCard = $this->getDbTable('UserCard');
         return $userCard->select(['user_id' => $this->id]);
@@ -443,7 +551,8 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
             }
             if ($this->passwordEncryptionEnabled()) {
                 $row->cat_password = $this->encryptOrDecrypt(
-                    $row->cat_pass_enc, false
+                    $row->cat_pass_enc,
+                    false
                 );
             }
         }
@@ -524,8 +633,12 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
      * @return int Card ID
      * @throws \VuFind\Exception\LibraryCard
      */
-    public function saveLibraryCard($id, $cardName, $username,
-        $password, $homeLib = ''
+    public function saveLibraryCard(
+        $id,
+        $cardName,
+        $username,
+        $password,
+        $homeLib = ''
     ) {
         if (!$this->libraryCardsEnabled()) {
             throw new \VuFind\Exception\LibraryCard('Library Cards Disabled');
@@ -567,9 +680,12 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
 
         $row->save();
 
-        // If this is the first library card or no credentials are currently set,
-        // activate the card now
-        if ($this->getLibraryCards()->count() == 1 || empty($this->cat_username)) {
+        // If this is the first or active library card, or no credentials are
+        // currently set, activate the card now
+        if (
+            $this->getLibraryCards()->count() == 1 || empty($this->cat_username)
+            || $this->cat_username === $row->cat_username
+        ) {
             $this->activateLibraryCard($row->id);
         }
 
@@ -612,10 +728,11 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
      * Destroy the user.
      *
      * @param bool $removeComments Whether to remove user's comments
+     * @param bool $removeRatings  Whether to remove user's ratings
      *
      * @return int The number of rows deleted.
      */
-    public function delete($removeComments = true)
+    public function delete($removeComments = true, $removeRatings = true)
     {
         // Remove all lists owned by the user:
         $lists = $this->getLists();
@@ -627,10 +744,14 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
             $list->delete($this, true);
         }
         $resourceTags = $this->getDbTable('ResourceTags');
-        $resourceTags->destroyLinks(null, $this->id);
+        $resourceTags->destroyResourceLinks(null, $this->id);
         if ($removeComments) {
             $comments = $this->getDbTable('Comments');
             $comments->deleteByUser($this);
+        }
+        if ($removeRatings) {
+            $ratings = $this->getDbTable('Ratings');
+            $ratings->deleteByUser($this);
         }
 
         // Remove the user itself:
@@ -649,6 +770,41 @@ class User extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface,
         $time = str_pad(substr((string)time(), 0, 10), 10, '0', STR_PAD_LEFT);
         $this->verify_hash = $hash . $time;
         return $this->save();
+    }
+
+    /**
+     * Updated saved language
+     *
+     * @param string $language New language
+     *
+     * @return void
+     */
+    public function updateLastLanguage($language)
+    {
+        $this->last_language = $language;
+        $this->save();
+    }
+
+    /**
+     * Update the user's email address, if appropriate. Note that this does NOT
+     * automatically save the row; it assumes a subsequent call will be made to
+     * the save() method.
+     *
+     * @param string $email        New email address
+     * @param bool   $userProvided Was this email provided by the user (true) or
+     * an automated lookup (false)?
+     *
+     * @return void
+     */
+    public function updateEmail($email, $userProvided = false)
+    {
+        // Only change the email if it is a non-empty value and was user provided
+        // (the user is always right) or the previous email was NOT user provided
+        // (a value may have changed in an upstream system).
+        if (!empty($email) && ($userProvided || !$this->user_provided_email)) {
+            $this->email = $email;
+            $this->user_provided_email = $userProvided ? 1 : 0;
+        }
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Primo Central Record Controller
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Controller;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Primo Central Record Controller
@@ -49,7 +51,7 @@ class PrimorecordController extends AbstractRecord
     {
         // Override some defaults:
         $this->accessPermission = 'access.PrimoModule';
-        $this->searchClassId = 'Primo';
+        $this->sourceId = 'Primo';
         $this->fallbackDefaultTab = 'Description';
 
         // Call standard record controller initialization:
@@ -63,7 +65,7 @@ class PrimorecordController extends AbstractRecord
      */
     protected function resultScrollerActive()
     {
-        $config = $this->serviceLocator->get('VuFind\Config\PluginManager')
+        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
             ->get('Primo');
         return isset($config->Record->next_prev_navigation)
             && $config->Record->next_prev_navigation;

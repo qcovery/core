@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Abstract base for Syndetics content loader plug-ins.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Content;
 
 use DOMDocument;
@@ -80,7 +82,7 @@ abstract class AbstractSyndetics extends AbstractBase
      *
      * @param string $url URL for client to use
      *
-     * @return \Zend\Http\Client
+     * @return \Laminas\Http\Client
      * @throws \Exception
      */
     protected function getHttpClient($url = null)

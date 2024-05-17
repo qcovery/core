@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Driver for offline/missing ILS.
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
+
 namespace VuFind\ILS\Driver;
 
 use VuFind\Exception\ILS as ILSException;
@@ -87,7 +89,7 @@ class NoILS extends AbstractBase implements TranslatorAwareInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getConfig($function, $params = null)
+    public function getConfig($function, $params = [])
     {
         return $this->config[$function] ?? false;
     }
@@ -151,8 +153,8 @@ class NoILS extends AbstractBase implements TranslatorAwareInterface
                     'reserve' => $this->config['Status']['reserve'],
                     'callnumber' => $this->translate(
                         $this->config['Status']['callnumber']
-                    )
-                ]
+                    ),
+                ],
             ];
         } elseif ($useStatus == "marc") {
             // Retrieve record from index:
@@ -192,15 +194,18 @@ class NoILS extends AbstractBase implements TranslatorAwareInterface
      * This is responsible for retrieving the holding information of a certain
      * record.
      *
-     * @param string $id     The record id to retrieve the holdings for
-     * @param array  $patron Patron data
+     * @param string $id      The record id to retrieve the holdings for
+     * @param array  $patron  Patron data
+     * @param array  $options Extra options (not currently used)
      *
      * @throws ILSException
      * @return array         On success, an associative array with the following
      * keys: id, availability (boolean), status, location, reserve, callnumber,
      * duedate, number, barcode.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getHolding($id, array $patron = null)
+    public function getHolding($id, array $patron = null, array $options = [])
     {
         $useHoldings = $this->config['settings']['useHoldings'] ?? 'none';
 
@@ -226,8 +231,8 @@ class NoILS extends AbstractBase implements TranslatorAwareInterface
                     ),
                     'barcode' => $this->config['Holdings']['barcode'],
                     'notes' => $this->config['Holdings']['notes'] ?? [],
-                    'summary' => $this->config['Holdings']['summary'] ?? []
-                ]
+                    'summary' => $this->config['Holdings']['summary'] ?? [],
+                ],
             ];
         } elseif ($useHoldings == "marc") {
             // Retrieve record from index:
@@ -255,12 +260,14 @@ class NoILS extends AbstractBase implements TranslatorAwareInterface
             $field = $marcStatus['marcField'];
             unset($marcStatus['marcField']);
             $result = $recordDriver->tryMethod(
-                'getFormattedMarcDetails', [$field, $marcStatus]
+                'getFormattedMarcDetails',
+                [$field, $marcStatus]
             );
             // If the details coming back from the record driver include the
             // ID prefix, strip it off!
             $idPrefix = $this->getIdPrefix();
-            if (isset($result[0]['id']) && strlen($idPrefix)
+            if (
+                isset($result[0]['id']) && strlen($idPrefix)
                 && $idPrefix === substr($result[0]['id'], 0, strlen($idPrefix))
             ) {
                 $result[0]['id'] = substr($result[0]['id'], strlen($idPrefix));
@@ -284,17 +291,13 @@ class NoILS extends AbstractBase implements TranslatorAwareInterface
      */
     public function hasHoldings($id)
     {
-        // If the ILS is disabled, there will never be holdings:
-        if ($this->getOfflineMode() == 'ils-none') {
-            return false;
-        }
-
         // If the ILS is offline, we should if we can look up details:
         $useHoldings = $this->config['settings']['useHoldings'] ?? '';
 
         // "none" will be processed differently in the config depending
         // on whether it's in or out of quotes; handle both cases.
-        return $useHoldings != 'none' && !empty($useHoldings);
+        return $useHoldings != 'none' && !empty($useHoldings)
+            && !empty($this->getHolding($id));
     }
 
     /**

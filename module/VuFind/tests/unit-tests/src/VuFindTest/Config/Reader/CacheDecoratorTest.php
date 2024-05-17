@@ -26,8 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Config\Reader;
 
+use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Config\Reader\ReaderInterface;
 use VuFind\Config\Reader\CacheDecorator;
 
 /**
@@ -48,13 +51,13 @@ class CacheDecoratorTest extends \PHPUnit\Framework\TestCase
      */
     public function testFromFileAndString()
     {
-        $cache = $this->getMockForAbstractClass('Zend\Cache\Storage\StorageInterface', ['setItem', 'hasItem']);
+        $cache = $this->getMockForAbstractClass(StorageInterface::class);
         $cache->expects($this->exactly(2))
             ->method('setItem');
         $cache->expects($this->exactly(2))
             ->method('hasItem')
             ->will($this->returnValue(false));
-        $reader = $this->getMockForAbstractClass('Zend\Config\Reader\ReaderInterface', ['fromFile', 'fromString']);
+        $reader = $this->getMockForAbstractClass(ReaderInterface::class);
         $reader->expects($this->once())
             ->method('fromFile')
             ->will($this->returnValue([]));
@@ -73,7 +76,7 @@ class CacheDecoratorTest extends \PHPUnit\Framework\TestCase
      */
     public function testFromFileAndStringCached()
     {
-        $cache = $this->getMockForAbstractClass('Zend\Cache\Storage\StorageInterface', ['setItem', 'hasItem', 'getItem']);
+        $cache = $this->getMockForAbstractClass(StorageInterface::class);
         $cache->expects($this->never())
             ->method('setItem');
         $cache->expects($this->exactly(2))
@@ -82,7 +85,7 @@ class CacheDecoratorTest extends \PHPUnit\Framework\TestCase
         $cache->expects($this->exactly(2))
             ->method('getItem')
             ->will($this->returnValue([]));
-        $reader = $this->getMockForAbstractClass('Zend\Config\Reader\ReaderInterface', ['fromFile', 'fromString']);
+        $reader = $this->getMockForAbstractClass(ReaderInterface::class);
         $deco = new CacheDecorator($reader, $cache);
         $deco->fromFile('ignore');
         $deco->fromString('ignore');

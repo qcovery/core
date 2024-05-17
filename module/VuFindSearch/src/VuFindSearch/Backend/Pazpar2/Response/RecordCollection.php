@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\Pazpar2\Response;
 
 use VuFindSearch\Response\AbstractRecordCollection;
@@ -47,6 +48,13 @@ class RecordCollection extends AbstractRecordCollection
      * @var array
      */
     protected $response;
+
+    /**
+     * Total records
+     *
+     * @var int
+     */
+    protected $total;
 
     /**
      * Constructor.

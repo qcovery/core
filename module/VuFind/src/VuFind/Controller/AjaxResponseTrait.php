@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Trait to allow AJAX response generation.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
+
 namespace VuFind\Controller;
 
 use VuFind\AjaxHandler\AjaxHandlerInterface as Ajax;
@@ -57,7 +59,7 @@ trait AjaxResponseTrait
     /**
      * AJAX Handler plugin manager
      *
-     * @var PluginManager;
+     * @var PluginManager
      */
     protected $ajaxManager = null;
 
@@ -74,19 +76,23 @@ trait AjaxResponseTrait
     protected function formatContent($type, $data, $httpCode)
     {
         switch ($type) {
-        case 'application/javascript':
-            $output = ['data' => $data];
-            if ('development' == APPLICATION_ENV && count(self::$php_errors) > 0) {
-                $output['php_errors'] = self::$php_errors;
-            }
-            return json_encode($output);
-        case 'text/plain':
-            return ((null !== $httpCode && $httpCode >= 400) ? 'ERROR ' : 'OK ')
-                . $data;
-        case 'text/html':
-            return $data ?: '';
-        default:
-            throw new \Exception("Unsupported content type: $type");
+            case 'application/javascript':
+            case 'application/json':
+                $output = ['data' => $data];
+                if (
+                    'development' == APPLICATION_ENV
+                    && count(self::$php_errors) > 0
+                ) {
+                    $output['php_errors'] = self::$php_errors;
+                }
+                return json_encode($output);
+            case 'text/plain':
+                return ((null !== $httpCode && $httpCode >= 400) ? 'ERROR ' : 'OK ')
+                    . $data;
+            case 'text/html':
+                return $data ?: '';
+            default:
+                throw new \Exception("Unsupported content type: $type");
         }
     }
 
@@ -97,7 +103,7 @@ trait AjaxResponseTrait
      * @param mixed  $data     The response data
      * @param int    $httpCode A custom HTTP Status Code
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      * @throws \Exception
      */
     protected function getAjaxResponse($type, $data, $httpCode = null)
@@ -120,7 +126,7 @@ trait AjaxResponseTrait
      * @param string     $type Content type to output
      * @param \Exception $e    Exception to output.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     protected function getExceptionResponse($type, \Exception $e)
     {
@@ -139,9 +145,9 @@ trait AjaxResponseTrait
      * @param string $method AJAX method to call
      * @param string $type   Content type to output
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
-    protected function callAjaxMethod($method, $type = 'application/javascript')
+    protected function callAjaxMethod($method, $type = 'application/json')
     {
         // Check the AJAX handler plugin manager for the method.
         if (!$this->ajaxManager) {
@@ -151,7 +157,8 @@ trait AjaxResponseTrait
             try {
                 $handler = $this->ajaxManager->get($method);
                 return $this->getAjaxResponse(
-                    $type, ...$handler->handleRequest($this->params())
+                    $type,
+                    ...$handler->handleRequest($this->params())
                 );
             } catch (\Exception $e) {
                 return $this->getExceptionResponse($type, $e);
@@ -178,7 +185,7 @@ trait AjaxResponseTrait
      */
     public static function storeError($errno, $errstr, $errfile, $errline)
     {
-        self::$php_errors[] = "ERROR [$errno] - " . $errstr . "<br />\n"
+        self::$php_errors[] = "ERROR [$errno] - " . $errstr . "<br>\n"
             . " Occurred in " . $errfile . " on line " . $errline . ".";
         return true;
     }

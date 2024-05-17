@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class to determine which account capabilities are available, based on
  * configuration and other factors.
@@ -26,10 +27,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Config;
 
+use Laminas\Config\Config;
 use VuFind\Auth\Manager as AuthManager;
-use Zend\Config\Config;
 
 /**
  * Class to determine which account capabilities are available, based on
@@ -99,8 +101,8 @@ class AccountCapabilities
         if (!$setting) {
             $setting = 'disabled';
         }
-        $whitelist = ['enabled', 'disabled', 'public_only', 'private_only'];
-        if (!in_array($setting, $whitelist)) {
+        $legal = ['enabled', 'disabled', 'public_only', 'private_only'];
+        if (!in_array($setting, $legal)) {
             $setting = 'enabled';
         }
         return $setting;
@@ -137,6 +139,29 @@ class AccountCapabilities
     }
 
     /**
+     * Get list tag setting.
+     *
+     * @return string
+     */
+    public function getListTagSetting()
+    {
+        if (!$this->isAccountAvailable()) {
+            return 'disabled';
+        }
+        return $this->config->Social->listTags ?? 'disabled';
+    }
+
+    /**
+     * Is scheduled search enabled?
+     *
+     * @return bool
+     */
+    public function isScheduledSearchEnabled(): bool
+    {
+        return $this->config->Account->schedule_searches ?? false;
+    }
+
+    /**
      * Get SMS setting ('enabled' or 'disabled').
      *
      * @return string
@@ -157,5 +182,15 @@ class AccountCapabilities
     {
         // We can't use account features if login is broken or privacy is on:
         return $this->auth->loginEnabled() && !$this->auth->inPrivacyMode();
+    }
+
+    /**
+     * Check if record ratings can be removed
+     *
+     * @return bool
+     */
+    public function isRatingRemovalAllowed(): bool
+    {
+        return (bool)($this->config->Social->remove_rating ?? true);
     }
 }

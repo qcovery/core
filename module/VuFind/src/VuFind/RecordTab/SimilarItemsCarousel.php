@@ -1,10 +1,11 @@
 <?php
+
 /**
- * Staff view (array dump) tab
+ * Similar items carousel tab.
  *
  * PHP version 7
  *
- * Copyright (C) Villanova University 2010.
+ * Copyright (C) Villanova University 2010, 2022.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -25,10 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
+
 namespace VuFind\RecordTab;
 
+use VuFindSearch\Command\SimilarCommand;
+
 /**
- * Staff view (array dump) tab
+ * Similar items carousel tab.
  *
  * @category VuFind
  * @package  RecordTabs
@@ -76,14 +80,17 @@ class SimilarItemsCarousel extends AbstractBase
      * Get an array of Record Driver objects representing items similar to the one
      * passed to the constructor.
      *
-     * @return array
+     * @return RecordCollectionInterface
      */
     public function getResults()
     {
         $record = $this->getRecordDriver();
         $params = new \VuFindSearch\ParamBag(['rows' => 40]);
-        return $this->searchService->similar(
-            $record->getSourceIdentifier(), $record->getUniqueId(), $params
+        $command = new SimilarCommand(
+            $record->getSourceIdentifier(),
+            $record->getUniqueId(),
+            $params
         );
+        return $this->searchService->invoke($command)->getResult();
     }
 }

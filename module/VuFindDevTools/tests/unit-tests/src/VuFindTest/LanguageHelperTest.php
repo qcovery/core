@@ -26,10 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Controller;
 
 use VuFindDevTools\LanguageHelper;
-use Zend\Config\Config;
 
 /**
  * Unit tests for language helper.
@@ -40,7 +40,7 @@ use Zend\Config\Config;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
-class LanguageHelperTest extends \VuFindTest\Unit\TestCase
+class LanguageHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test language mappings.
@@ -76,7 +76,7 @@ class LanguageHelperTest extends \VuFindTest\Unit\TestCase
             'notInL1' => [4],
             'notInL2' => [1, 3],
             'l1Percent' => '150.00',
-            'l2Percent' => '66.67'
+            'l2Percent' => '66.67',
         ];
         $this->assertEquals($expected, $h->compareLanguages($l1, $l2));
     }
@@ -88,10 +88,9 @@ class LanguageHelperTest extends \VuFindTest\Unit\TestCase
      */
     protected function getMockHelper()
     {
-        $config = new Config(['Languages' => ['en' => 'English']]);
         return new LanguageHelper(
-            $this->createMock('VuFind\I18n\Translator\Loader\ExtendedIni'),
-            $config
+            $this->createMock(\VuFind\I18n\Translator\Loader\ExtendedIni::class),
+            ['en' => 'English']
         );
     }
 }

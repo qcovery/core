@@ -27,9 +27,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\LibGuides;
 
-use Zend\Http\Client as HttpClient;
+use Laminas\Http\Client as HttpClient;
 
 /**
  * LibGuides connector.
@@ -41,7 +42,7 @@ use Zend\Http\Client as HttpClient;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
-class Connector implements \Zend\Log\LoggerAwareInterface
+class Connector implements \Laminas\Log\LoggerAwareInterface
 {
     use \VuFind\Log\LoggerAwareTrait;
 
@@ -126,7 +127,7 @@ class Connector implements \Zend\Log\LoggerAwareInterface
                 $result = [
                     'recordCount' => 0,
                     'documents' => [],
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ];
             } else {
                 throw $e;
@@ -150,6 +151,7 @@ class Connector implements \Zend\Log\LoggerAwareInterface
     {
         $this->debug("{$method}: {$this->host}{$qs}");
         $this->client->resetParameters();
+        $baseUrl = null;
         if ($method == 'GET') {
             $baseUrl = $this->host . $qs;
         } elseif ($method == 'POST') {
@@ -194,7 +196,7 @@ class Connector implements \Zend\Log\LoggerAwareInterface
 
         $results = [
             'recordCount' => count($items),
-            'documents' => $items
+            'documents' => $items,
         ];
 
         return $results;
@@ -224,7 +226,6 @@ class Connector implements \Zend\Log\LoggerAwareInterface
                 'widget_type' => 1,
                 'search_match' => 2,
                 'search_type' => 0,
-                'sort_by' => 'relevance',
                 'list_format' => 1,
                 'output_format' => 1,
                 'load_type' => 2,

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin Configuration Controller
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFindAdmin\Controller;
 
 /**
@@ -41,13 +43,14 @@ class ConfigController extends AbstractAdmin
     /**
      * Configuration management
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function homeAction()
     {
         $view = $this->createViewModel();
         $view->setTemplate('admin/config/home');
-        $view->baseConfigPath = \VuFind\Config\Locator::getBaseConfigPath('');
+        $resolver = $this->serviceLocator->get(\VuFind\Config\PathResolver::class);
+        $view->baseConfigPath = $resolver->getBaseConfigPath('');
         $conf = $this->getConfig();
         $view->showInstallLink
             = isset($conf->System->autoConfigure) && $conf->System->autoConfigure;
@@ -61,7 +64,14 @@ class ConfigController extends AbstractAdmin
      */
     public function enableautoconfigAction()
     {
-        $configFile = \VuFind\Config\Locator::getConfigPath('config.ini');
+        $resolver = $this->serviceLocator->get(\VuFind\Config\PathResolver::class);
+        if (!($configFile = $resolver->getLocalConfigPath('config.ini'))) {
+            $this->flashMessenger()->addErrorMessage(
+                'Could not enable auto-configuration; local '
+                . $configFile . ' not found.'
+            );
+            return $this->forwardTo('AdminConfig', 'Home');
+        }
         $writer = new \VuFind\Config\Writer($configFile);
         $writer->set('System', 'autoConfigure', 1);
         if ($writer->save()) {
@@ -70,12 +80,13 @@ class ConfigController extends AbstractAdmin
 
             // Reload config now that it has been edited (otherwise, old setting
             // will persist in cache):
-            $this->serviceLocator->get('VuFind\Config\PluginManager')
+            $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
                 ->reload('config');
         } else {
             $this->flashMessenger()->addMessage(
                 'Could not enable auto-configuration; check permissions on '
-                . $configFile . '.', 'error'
+                . $configFile . '.',
+                'error'
             );
         }
         return $this->forwardTo('AdminConfig', 'Home');

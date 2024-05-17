@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hierarchy tree renderer plugin manager
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Hierarchy\TreeRenderer;
 
 /**
@@ -44,7 +46,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'jstree' => 'VuFind\Hierarchy\TreeRenderer\JSTree'
+        'jstree' => JSTree::class,
     ];
 
     /**
@@ -53,8 +55,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Hierarchy\TreeRenderer\JSTree' =>
-            'VuFind\Hierarchy\TreeRenderer\JSTreeFactory'
+        JSTree::class => JSTreeFactory::class,
     ];
 
     /**
@@ -65,6 +66,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Hierarchy\TreeRenderer\AbstractBase';
+        return AbstractBase::class;
     }
 }

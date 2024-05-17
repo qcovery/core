@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Syndetics excerpt content loader.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Content\Excerpts;
 
 /**
@@ -47,8 +49,8 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
         'DBCHAPTER' => [
             'title' => 'First Chapter or Excerpt',
             'file' => 'DBCHAPTER.XML',
-            'div' => '<div id="syn_dbchapter"></div>'
-        ]
+            'div' => '<div id="syn_dbchapter"></div>',
+        ],
     ];
 
     /**
@@ -131,7 +133,8 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
 
                     if ($excerpt[$i]['Copyright']) {  //stop duplicate copyrights
                         $location = strripos(
-                            $excerpt[0]['Content'], $excerpt[0]['Copyright']
+                            $excerpt[0]['Content'],
+                            (string)$excerpt[0]['Copyright']
                         );
                         if ($location > 0) {
                             $excerpt[$i]['Content']

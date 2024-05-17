@@ -1,6 +1,7 @@
 <?php
+
 /**
- * ZF2 module definition for the VuFind theme system.
+ * Module definition for the VuFind theme system.
  *
  * PHP version 7
  *
@@ -25,12 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development
  */
+
 namespace VuFindTheme;
 
-use Zend\ServiceManager\ServiceManager;
+use Laminas\Mvc\View\Http\InjectTemplateListener as ParentInjectTemplateListener;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
- * ZF2 module definition for the VuFind theme system.
+ * Module definition for the VuFind theme system.
  *
  * @category VuFind
  * @package  Theme
@@ -48,10 +51,42 @@ class Module
     public function getAutoloaderConfig()
     {
         return [
-            'Zend\Loader\StandardAutoloader' => [
+            'Laminas\Loader\StandardAutoloader' => [
                 'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * Return generic configuration
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return [
+            'vufind' => [
+                // VuFind's theme system overrides the default Laminas template
+                // loading behavior based on template name prefixes, which usually
+                // correspond to module names. By default, VuFind will apply the
+                // theme system to all loaded modules. If you need to apply theming
+                // to a controller whose namespace does not directly correspond to a
+                // loaded module, you will need to add it as a prefix in
+                // extra_theme_prefixes (e.g. 'MyNamespace/').  Conversely, if you
+                // are loading a Laminas module that includes templates and does not
+                // follow VuFind's theme conventions, you should add that module name
+                // as a prefix in excluded_theme_prefixes to allow the default
+                // behavior to take effect.
+                //
+                // By default, VuFind assumes that any modules loaded from the
+                // Laminas ecosystem use default Laminas template inflection, and
+                // all other modules follow VuFind conventions. If you need different
+                // behavior, just override the below settings in your local module's
+                // module.config.php configuration.
+                'excluded_theme_prefixes' => ['Laminas'],
+                'extra_theme_prefixes' => [],
             ],
         ];
     }
@@ -64,18 +99,18 @@ class Module
     public function getServiceConfig()
     {
         return [
+            'aliases' => [
+                ParentInjectTemplateListener::class => InjectTemplateListener::class,
+            ],
             'factories' => [
-                'VuFindTheme\MixinGenerator' =>
-                    'VuFindTheme\Module::getMixinGenerator',
-                'VuFindTheme\Mobile' =>
-                    'Zend\ServiceManager\Factory\InvokableFactory',
-                'VuFindTheme\ResourceContainer' =>
-                    'Zend\ServiceManager\Factory\InvokableFactory',
-                'VuFindTheme\ThemeCompiler' =>
-                    'VuFindTheme\Module::getThemeCompiler',
-                'VuFindTheme\ThemeGenerator' =>
-                    'VuFindTheme\Module::getThemeGenerator',
-                'VuFindTheme\ThemeInfo' => 'VuFindTheme\Module::getThemeInfo',
+                InjectTemplateListener::class =>
+                    InjectTemplateListenerFactory::class,
+                MixinGenerator::class => ThemeInfoInjectorFactory::class,
+                Mobile::class => InvokableFactory::class,
+                ResourceContainer::class => InvokableFactory::class,
+                ThemeCompiler::class => ThemeInfoInjectorFactory::class,
+                ThemeGenerator::class => ThemeGeneratorFactory::class,
+                ThemeInfo::class => ThemeInfoFactory::class,
             ],
         ];
     }
@@ -89,67 +124,39 @@ class Module
     {
         return [
             'factories' => [
-                'VuFindTheme\View\Helper\HeadThemeResources' =>
-                    'VuFindTheme\View\Helper\Factory::getHeadThemeResources',
-                'VuFindTheme\View\Helper\ImageLink' =>
-                    'VuFindTheme\View\Helper\Factory::getImageLink',
-                'Zend\View\Helper\HeadLink' =>
-                    'VuFindTheme\View\Helper\Factory::getHeadLink',
-                'Zend\View\Helper\HeadScript' =>
-                    'VuFindTheme\View\Helper\Factory::getHeadScript',
-                'Zend\View\Helper\InlineScript' =>
-                    'VuFindTheme\View\Helper\Factory::getInlineScript',
+                View\Helper\FootScript::class =>
+                    View\Helper\PipelineInjectorFactory::class,
+                View\Helper\ImageLink::class => View\Helper\ImageLinkFactory::class,
+                View\Helper\HeadLink::class =>
+                    View\Helper\PipelineInjectorFactory::class,
+                View\Helper\HeadScript::class =>
+                    View\Helper\PipelineInjectorFactory::class,
+                View\Helper\ParentTemplate::class =>
+                    View\Helper\ParentTemplateFactory::class,
+                View\Helper\InlineScript::class =>
+                    View\Helper\PipelineInjectorFactory::class,
+                View\Helper\Slot::class =>
+                    View\Helper\PipelineInjectorFactory::class,
+                View\Helper\TemplatePath::class =>
+                    View\Helper\TemplatePathFactory::class,
+                View\Helper\SetupThemeResources::class =>
+                    View\Helper\SetupThemeResourcesFactory::class,
             ],
             'aliases' => [
-                'headThemeResources' => 'VuFindTheme\View\Helper\HeadThemeResources',
-                'imageLink' => 'VuFindTheme\View\Helper\ImageLink',
+                'footScript' => View\Helper\FootScript::class,
+                // Legacy alias for compatibility with pre-8.0 templates:
+                'headThemeResources' => View\Helper\SetupThemeResources::class,
+                'imageLink' => View\Helper\ImageLink::class,
+                \Laminas\View\Helper\HeadLink::class => View\Helper\HeadLink::class,
+                \Laminas\View\Helper\HeadScript::class =>
+                    View\Helper\HeadScript::class,
+                \Laminas\View\Helper\InlineScript::class =>
+                    View\Helper\InlineScript::class,
+                'parentTemplate' => View\Helper\ParentTemplate::class,
+                'slot' => View\Helper\Slot::class,
+                'templatePath' => View\Helper\TemplatePath::class,
+                'setupThemeResources' => View\Helper\SetupThemeResources::class,
             ],
         ];
-    }
-
-    /**
-     * Factory function for MixinGenerator object.
-     *
-     * @param ServiceManager $sm Service manager
-     *
-     * @return MixinGenerator
-     */
-    public static function getMixinGenerator(ServiceManager $sm)
-    {
-        return new MixinGenerator($sm->get('VuFindTheme\ThemeInfo'));
-    }
-
-    /**
-     * Factory function for ThemeCompiler object.
-     *
-     * @param ServiceManager $sm Service manager
-     *
-     * @return ThemeCompiler
-     */
-    public static function getThemeCompiler(ServiceManager $sm)
-    {
-        return new ThemeCompiler($sm->get('VuFindTheme\ThemeInfo'));
-    }
-
-    /**
-     * Factory function for ThemeGenerator object.
-     *
-     * @param ServiceManager $sm Service manager
-     *
-     * @return ThemeGenerator
-     */
-    public static function getThemeGenerator(ServiceManager $sm)
-    {
-        return new ThemeGenerator($sm->get('VuFindTheme\ThemeInfo'));
-    }
-
-    /**
-     * Factory function for ThemeInfo object.
-     *
-     * @return ThemeInfo
-     */
-    public static function getThemeInfo()
-    {
-        return new ThemeInfo(realpath(APPLICATION_PATH . '/themes'), 'bootprint3');
     }
 }

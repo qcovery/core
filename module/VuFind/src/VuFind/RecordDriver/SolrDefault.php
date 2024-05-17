@@ -1,11 +1,13 @@
 <?php
+
 /**
  * Default model for Solr records -- used when a more specific model based on
- * the recordtype field cannot be found.
+ * the record_format field cannot be found.
  *
  * PHP version 7
  *
- * Copyright (C) Villanova University 2010.
+ * Copyright (C) Villanova University 2010, 2022.
+ * Copyright (C) The National Library of Finland 2019.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -23,28 +25,37 @@
  * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\RecordDriver;
+
+use VuFindSearch\Command\SearchCommand;
 
 /**
  * Default model for Solr records -- used when a more specific model based on
- * the recordtype field cannot be found.
+ * the record_format field cannot be found.
  *
  * This should be used as the base class for all Solr-based record models.
  *
  * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  *
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class SolrDefault extends DefaultRecord
+class SolrDefault extends DefaultRecord implements
+    Feature\PreviousUniqueIdInterface,
+    Feature\VersionAwareInterface
 {
-    use HierarchyAwareTrait;
+    use Feature\HierarchyAwareTrait;
+    use Feature\PreviousUniqueIdTrait;
+    use Feature\VersionAwareTrait;
 
     /**
      * These Solr fields should be used for snippets if available (listed in order
@@ -53,7 +64,7 @@ class SolrDefault extends DefaultRecord
      * @var array
      */
     protected $preferredSnippetFields = [
-        'contents', 'topic'
+        'contents', 'topic',
     ];
 
     /**
@@ -67,7 +78,8 @@ class SolrDefault extends DefaultRecord
     protected $forbiddenSnippetFields = [
         'author', 'title', 'title_short', 'title_full',
         'title_full_unstemmed', 'title_auth', 'title_sub', 'spelling', 'id',
-        'ctrlnum', 'author_variant', 'author2_variant', 'fullrecord'
+        'ctrlnum', 'author_variant', 'author2_variant', 'fullrecord',
+        'work_keys_str_mv',
     ];
 
     /**
@@ -109,19 +121,24 @@ class SolrDefault extends DefaultRecord
     /**
      * Constructor
      *
-     * @param \Zend\Config\Config $mainConfig     VuFind main configuration (omit for
-     * built-in defaults)
-     * @param \Zend\Config\Config $recordConfig   Record-specific configuration file
-     * (omit to use $mainConfig as $recordConfig)
-     * @param \Zend\Config\Config $searchSettings Search-specific configuration file
+     * @param \Laminas\Config\Config $mainConfig     VuFind main configuration (omit
+     * for built-in defaults)
+     * @param \Laminas\Config\Config $recordConfig   Record-specific configuration
+     * file (omit to use $mainConfig as $recordConfig)
+     * @param \Laminas\Config\Config $searchSettings Search-specific configuration
+     * file
      */
-    public function __construct($mainConfig = null, $recordConfig = null,
+    public function __construct(
+        $mainConfig = null,
+        $recordConfig = null,
         $searchSettings = null
     ) {
+        $this->setSourceIdentifiers('Solr');
         // Load snippet settings:
         $this->snippet = !isset($searchSettings->General->snippets)
             ? false : $searchSettings->General->snippets;
-        if (isset($searchSettings->Snippet_Captions)
+        if (
+            isset($searchSettings->Snippet_Captions)
             && count($searchSettings->Snippet_Captions) > 0
         ) {
             foreach ($searchSettings->Snippet_Captions as $key => $value) {
@@ -132,7 +149,18 @@ class SolrDefault extends DefaultRecord
         $this->containerLinking
             = !isset($mainConfig->Hierarchy->simpleContainerLinks)
             ? false : $mainConfig->Hierarchy->simpleContainerLinks;
+
         parent::__construct($mainConfig, $recordConfig, $searchSettings);
+    }
+
+    /**
+     * Get the date this record was first indexed (if set).
+     *
+     * @return string
+     */
+    public function getFirstIndexed()
+    {
+        return $this->fields['first_indexed'] ?? '';
     }
 
     /**
@@ -178,8 +206,7 @@ class SolrDefault extends DefaultRecord
      */
     public function getSnippetCaption($field)
     {
-        return isset($this->snippetCaptions[$field])
-            ? $this->snippetCaptions[$field] : false;
+        return $this->snippetCaptions[$field] ?? false;
     }
 
     /**
@@ -197,20 +224,21 @@ class SolrDefault extends DefaultRecord
                 if (isset($this->highlightDetails[$current][0])) {
                     return [
                         'snippet' => $this->highlightDetails[$current][0],
-                        'caption' => $this->getSnippetCaption($current)
+                        'caption' => $this->getSnippetCaption($current),
                     ];
                 }
             }
 
             // No preferred field found, so try for a non-forbidden field:
-            if (isset($this->highlightDetails)
+            if (
+                isset($this->highlightDetails)
                 && is_array($this->highlightDetails)
             ) {
                 foreach ($this->highlightDetails as $key => $value) {
                     if ($value && !in_array($key, $this->forbiddenSnippetFields)) {
                         return [
                             'snippet' => $value[0],
-                            'caption' => $this->getSnippetCaption($key)
+                            'caption' => $this->getSnippetCaption($key),
                         ];
                     }
                 }
@@ -232,8 +260,7 @@ class SolrDefault extends DefaultRecord
         if (!$this->highlight) {
             return '';
         }
-        return (isset($this->highlightDetails['title'][0]))
-            ? $this->highlightDetails['title'][0] : '';
+        return $this->highlightDetails['title'][0] ?? '';
     }
 
     /**
@@ -258,7 +285,8 @@ class SolrDefault extends DefaultRecord
     {
         // Shortcut: if this record is not the top record, let's not find out the
         // count. This assumes that contained records cannot contain more records.
-        if (!$this->containerLinking
+        if (
+            !$this->containerLinking
             || empty($this->fields['is_hierarchy_id'])
             || null === $this->searchService
         ) {
@@ -271,9 +299,9 @@ class SolrDefault extends DefaultRecord
         );
         // Disable highlighting for efficiency; not needed here:
         $params = new \VuFindSearch\ParamBag(['hl' => ['false']]);
+        $command = new SearchCommand($this->sourceIdentifier, $query, 0, 0, $params);
         return $this->searchService
-            ->search($this->sourceIdentifier, $query, 0, 0, $params)
-            ->getTotal();
+            ->invoke($command)->getResult()->getTotal();
     }
 
     /**
@@ -286,5 +314,15 @@ class SolrDefault extends DefaultRecord
         return $this->containerLinking
             && !empty($this->fields['hierarchy_parent_id'])
             ? $this->fields['hierarchy_parent_id'][0] : '';
+    }
+
+    /**
+     * Get work identification keys
+     *
+     * @return array
+     */
+    public function getWorkKeys()
+    {
+        return $this->fields['work_keys_str_mv'] ?? [];
     }
 }

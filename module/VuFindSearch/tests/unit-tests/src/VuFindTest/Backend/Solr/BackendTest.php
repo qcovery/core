@@ -26,17 +26,19 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Backend\Solr;
 
 use InvalidArgumentException;
+use Laminas\Http\Response;
 use PHPUnit\Framework\TestCase;
 use VuFindSearch\Backend\Exception\RemoteErrorException;
 use VuFindSearch\Backend\Solr\Backend;
+use VuFindSearch\Backend\Solr\Document\CommitDocument;
 use VuFindSearch\Backend\Solr\HandlerMap;
-
+use VuFindSearch\Backend\Solr\Response\Json\RecordCollection;
 use VuFindSearch\ParamBag;
 use VuFindSearch\Query\Query;
-use Zend\Http\Response;
 
 /**
  * Unit tests for SOLR backend.
@@ -49,6 +51,9 @@ use Zend\Http\Response;
  */
 class BackendTest extends TestCase
 {
+    use \VuFindTest\Feature\FixtureTrait;
+    use \VuFindTest\Feature\ReflectionTrait;
+
     /**
      * Test retrieving a record.
      *
@@ -84,8 +89,20 @@ class BackendTest extends TestCase
         $conn->expects($this->once())
             ->method('search')
             ->will($this->returnValue($resp->getBody()));
-
         $back = new Backend($conn);
+        $this->runRetrieveBatchTests($back);
+    }
+
+    /**
+     * Given a configured backend, run some standard tests (this allows us
+     * to test two different versions of the same scenario.
+     *
+     * @param Backend $back Backend
+     *
+     * @return void
+     */
+    protected function runRetrieveBatchTests($back)
+    {
         $back->setIdentifier('test');
         $coll = $back->retrieveBatch(['12345', '125456', '234547']);
         $this->assertCount(3, $coll);
@@ -99,6 +116,26 @@ class BackendTest extends TestCase
         $rec  = $coll->next();
         $this->assertEquals('test', $recs[2]->getSourceIdentifier());
         $this->assertEquals('234547', $recs[2]->id);
+    }
+
+    /**
+     * Test retrieving a batch of records, using a non-default page size.
+     *
+     * @return void
+     */
+    public function testRetrieveBatchWithNonDefaultPageSize()
+    {
+        $resp1 = $this->loadResponse('multi-record-part1');
+        $resp2 = $this->loadResponse('multi-record-part2');
+        $resp3 = $this->loadResponse('multi-record-part3');
+        $conn = $this->getConnectorMock(['search']);
+        $conn->expects($this->exactly(3))
+            ->method('search')
+            ->willReturnOnConsecutiveCalls($resp1->getBody(), $resp2->getBody(), $resp3->getBody());
+
+        $back = new Backend($conn);
+        $back->setPageSize(1);
+        $this->runRetrieveBatchTests($back);
     }
 
     /**
@@ -144,6 +181,198 @@ class BackendTest extends TestCase
     }
 
     /**
+     * Test facets.
+     *
+     * @return void
+     */
+    public function testFacets()
+    {
+        $resp = $this->loadResponse('facet');
+        $conn = $this->getConnectorMock(['query']);
+        $conn->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue($resp->getBody()));
+        $back = new Backend($conn);
+        $response = $back->search(new Query(), 0, 0);
+        $facets = $response->getFacets();
+        $this->assertIsArray($facets);
+        $this->assertEquals(
+            [
+                'topic_facet' => [
+                    'Research' => 16,
+                    'Psychotherapy' => 8,
+                    'Adult children of aging parents' => 7,
+                    'Automobile drivers\' tests' => 7,
+                    'Fathers and daughters' => 7,
+                ],
+            ],
+            $facets
+        );
+    }
+
+    /**
+     * Test pivot facets.
+     *
+     * @return void
+     */
+    public function testPivotFacets()
+    {
+        $resp = $this->loadResponse('pivot-facet');
+        $conn = $this->getConnectorMock(['query']);
+        $conn->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue($resp->getBody()));
+        $back = new Backend($conn);
+        $response = $back->search(new Query(), 0, 0);
+        $facets = $response->getPivotFacets();
+        $this->assertIsArray($facets);
+
+        $this->assertEquals(
+            [
+                'A - General Works' => [
+                    'field' => 'callnumber-first',
+                    'value' => 'A - General Works',
+                    'count' => 40,
+                    'pivot' => [
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Research',
+                            'count' => 16,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Psychotherapy',
+                            'count' => 8,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Cognitive therapy',
+                            'count' => 4,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Crime',
+                            'count' => 4,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Criminal justice, Administration of',
+                            'count' => 4,
+                        ],
+                    ],
+                ],
+                'P - Language and Literature' => [
+                    'field' => 'callnumber-first',
+                    'value' => 'P - Language and Literature',
+                    'count' => 7,
+                    'pivot' => [
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Adult children of aging parents',
+                            'count' => 7,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Automobile drivers\' tests',
+                            'count' => 7,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Fathers and daughters',
+                            'count' => 7,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Middle aged women',
+                            'count' => 7,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Older men',
+                            'count' => 7,
+                        ],
+                    ],
+                ],
+                'D - World History' => [
+                    'field' => 'callnumber-first',
+                    'value' => 'D - World History',
+                    'count' => 3,
+                    'pivot' => [
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'History',
+                            'count' => 2,
+                        ],
+                    ],
+                ],
+                'B - Philosophy, Psychology, Religion' => [
+                    'field' => 'callnumber-first',
+                    'value' => 'B - Philosophy, Psychology, Religion',
+                    'count' => 2,
+                ],
+                'H - Social Science' => [
+                    'field' => 'callnumber-first',
+                    'value' => 'H - Social Science',
+                    'count' => 1,
+                    'pivot' => [
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Bank employees',
+                            'count' => 1,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Bank management',
+                            'count' => 1,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Globalization',
+                            'count' => 1,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Industrial relations',
+                            'count' => 1,
+                        ],
+                        [
+                            'field' => 'topic_facet',
+                            'value' => 'Labor unions',
+                            'count' => 1,
+                        ],
+                    ],
+                ],
+            ],
+            $facets
+        );
+    }
+
+    /**
+     * Test query facets.
+     *
+     * @return void
+     */
+    public function testQueryFacets()
+    {
+        $resp = $this->loadResponse('query-facet');
+        $conn = $this->getConnectorMock(['query']);
+        $conn->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue($resp->getBody()));
+        $back = new Backend($conn);
+        $response = $back->search(new Query(), 0, 0);
+        $facets = $response->getQueryFacets();
+        $this->assertIsArray($facets);
+        $this->assertEquals(
+            [
+                'publishDate:[* TO 2000]' => 45,
+                'publishDate:[2001 TO 2010]' => 11,
+            ],
+            $facets
+        );
+    }
+
+    /**
      * Test terms component (using ParamBag as first param).
      *
      * @return void
@@ -170,12 +399,12 @@ class BackendTest extends TestCase
      * Test handling of a bad JSON response.
      *
      * @return void
-     *
-     * @expectedException        VuFindSearch\Backend\Exception\BackendException
-     * @expectedExceptionMessage JSON decoding error: 4 -- bad {
      */
     public function testBadJson()
     {
+        $this->expectException(\VuFindSearch\Backend\Exception\BackendException::class);
+        $this->expectExceptionMessage('JSON decoding error: 4 -- bad {');
+
         $conn = $this->getConnectorMock(['query']);
         $conn->expects($this->once())
             ->method('query')
@@ -188,12 +417,12 @@ class BackendTest extends TestCase
      * Test injectResponseWriter throws on incompatible response writer.
      *
      * @return void
-     *
-     * @expectedException        VuFindSearch\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid response writer type: xml
      */
     public function testInjectResponseWriterThrownOnIncompabileResponseWriter()
     {
+        $this->expectException(\VuFindSearch\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid response writer type: xml');
+
         $conn = $this->getConnectorMock();
         $back = new Backend($conn);
         $back->retrieve('foobar', new ParamBag(['wt' => ['xml']]));
@@ -203,12 +432,12 @@ class BackendTest extends TestCase
      * Test injectResponseWriter throws on incompatible named list setting.
      *
      * @return void
-     *
-     * @expectedException        VuFindSearch\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid named list implementation type: bad
      */
     public function testInjectResponseWriterThrownOnIncompabileNamedListSetting()
     {
+        $this->expectException(\VuFindSearch\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid named list implementation type: bad');
+
         $conn = $this->getConnectorMock();
         $back = new Backend($conn);
         $back->retrieve('foobar', new ParamBag(['json.nl' => ['bad']]));
@@ -240,15 +469,53 @@ class BackendTest extends TestCase
     }
 
     /**
+     * Test getting multiple IDs.
+     *
+     * @return void
+     */
+    public function testGetIds()
+    {
+        $paramBagChecker = function (ParamBag $params) {
+            $expected = [
+                'wt' => ['json'],
+                'json.nl' => ['arrarr'],
+                'fl' => ['id'],
+                'rows' => [10],
+                'start' => [0],
+                'q' => ['foo'],
+            ];
+            $paramsArr = $params->getArrayCopy();
+            foreach ($expected as $key => $vals) {
+                if (count(array_diff($vals, $paramsArr[$key] ?? [])) !== 0) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        // TODO: currently this test is concerned with ensuring that the right
+        // parameters are sent to Solr; it may be worth adding a more realistic
+        // return value to better test processing of retrieved records.
+        $conn = $this->getConnectorMock(['search']);
+        $conn->expects($this->once())->method('search')
+            ->with($this->callback($paramBagChecker))
+            ->will($this->returnValue(json_encode([])));
+        $back = new Backend($conn);
+        $query = new Query('foo');
+        $result = $back->getIds($query, 0, 10);
+        $this->assertInstanceOf(RecordCollection::class, $result);
+        $this->assertCount(0, $result);
+    }
+
+    /**
      * Test refining an alphabrowse exception (string 1).
      *
      * @return void
-     *
-     * @expectedException        VuFindSearch\Backend\Exception\RemoteErrorException
-     * @expectedExceptionMessage Alphabetic Browse index missing.
      */
     public function testRefineAlphaBrowseException()
     {
+        $this->expectException(\VuFindSearch\Backend\Exception\RemoteErrorException::class);
+        $this->expectExceptionMessage('Alphabetic Browse index missing.');
+
         $this->runRefineExceptionCall('does not exist');
     }
 
@@ -256,12 +523,12 @@ class BackendTest extends TestCase
      * Test refining an alphabrowse exception (string 2).
      *
      * @return void
-     *
-     * @expectedException        VuFindSearch\Backend\Exception\RemoteErrorException
-     * @expectedExceptionMessage Alphabetic Browse index missing.
      */
     public function testRefineAlphaBrowseExceptionWithAltString()
     {
+        $this->expectException(\VuFindSearch\Backend\Exception\RemoteErrorException::class);
+        $this->expectExceptionMessage('Alphabetic Browse index missing.');
+
         $this->runRefineExceptionCall('couldn\'t find a browse index');
     }
 
@@ -269,12 +536,12 @@ class BackendTest extends TestCase
      * Test that we don't refine a non-alphabrowse-related exception.
      *
      * @return void
-     *
-     * @expectedException        VuFindSearch\Backend\Exception\RemoteErrorException
-     * @expectedExceptionMessage not a browse error
      */
     public function testRefineAlphaBrowseExceptionWithNonBrowseString()
     {
+        $this->expectException(\VuFindSearch\Backend\Exception\RemoteErrorException::class);
+        $this->expectExceptionMessage('not a browse error');
+
         $this->runRefineExceptionCall('not a browse error');
     }
 
@@ -286,21 +553,60 @@ class BackendTest extends TestCase
     public function testRandom()
     {
         // Test that random sort parameter is added:
-        $params = $this->getMockBuilder('VuFindSearch\ParamBag')
-            ->setMethods(['set'])->getMock();
+        $params = $this->getMockBuilder(\VuFindSearch\ParamBag::class)
+            ->onlyMethods(['set'])->getMock();
         $params->expects($this->once())->method('set')
             ->with($this->equalTo('sort'), $this->matchesRegularExpression('/[0-9]+_random asc/'));
 
         // Test that random proxies search; stub out injectResponseWriter() to prevent it
         // from injecting unwanted extra parameters into $params:
-        $back = $this->getMockBuilder(__NAMESPACE__ . '\BackendMock')
-            ->setMethods(['search', 'injectResponseWriter'])
+        $back = $this->getMockBuilder(Backend::class)
+            ->onlyMethods(['search', 'injectResponseWriter'])
             ->setConstructorArgs([$this->getConnectorMock()])
             ->getMock();
         $back->expects($this->once())->method('injectResponseWriter');
         $back->expects($this->once())->method('search')
             ->will($this->returnValue('dummy'));
         $this->assertEquals('dummy', $back->random(new Query('foo'), 1, $params));
+    }
+
+    /**
+     * Test writeDocument
+     *
+     * @return void
+     */
+    public function testWriteDocument()
+    {
+        $doc = new CommitDocument();
+        $client = $this->getMockBuilder(\Laminas\Http\Client::class)
+            ->onlyMethods(['setOptions'])
+            ->getMock();
+        $client->expects($this->exactly(1))->method('setOptions')
+            ->with(['timeout' => 60]);
+        $connector = $this->getConnectorMock(['getUrl', 'write'], $client);
+        $connector->expects($this->once())->method('write')
+            ->with(
+                $this->equalTo($doc),
+                $this->equalTo('update'),
+                $this->isNull()
+            )
+            ->will(
+                $this->returnCallback(
+                    function () use ($connector) {
+                        // Call client factory for expectations to be met:
+                        $factory = $this->getProperty($connector, 'clientFactory');
+                        $factory('');
+                        return true;
+                    }
+                )
+            );
+        $connector->expects($this->once())->method('getUrl')
+            ->will($this->returnValue('http://localhost:8983/solr/core/biblio'));
+        $backend = new Backend($connector);
+        $this->assertEquals(
+            ['core' => 'biblio'],
+            $backend->writeDocument($doc, 60)
+        );
     }
 
     /// Internal API
@@ -315,7 +621,7 @@ class BackendTest extends TestCase
     protected function runRefineExceptionCall($msg)
     {
         $conn = $this->getConnectorMock(['query']);
-        $e = new RemoteErrorException($msg, 400, new \Zend\Http\Response());
+        $e = new RemoteErrorException($msg, 400, new \Laminas\Http\Response());
         $conn->expects($this->once())->method('query')
             ->with($this->equalTo('browse'))
             ->will($this->throwException($e));
@@ -328,39 +634,41 @@ class BackendTest extends TestCase
      *
      * @param string $fixture Fixture file
      *
-     * @return Zend\Http\Response
+     * @return Laminas\Http\Response
      *
      * @throws InvalidArgumentException Fixture files does not exist
      */
     protected function loadResponse($fixture)
     {
-        $file = realpath(sprintf('%s/solr/response/%s', PHPUNIT_SEARCH_FIXTURES, $fixture));
-        if (!is_string($file) || !file_exists($file) || !is_readable($file)) {
-            throw new InvalidArgumentException(sprintf('Unable to load fixture file: %s', $file));
-        }
-        return Response::fromString(file_get_contents($file));
+        return Response::fromString(
+            $this->getFixture("solr/response/$fixture", 'VuFindSearch')
+        );
     }
 
     /**
      * Return connector mock.
      *
-     * @param array $mock Functions to mock
+     * @param array      $mock   Functions to mock
+     * @param HttpClient $client HTTP Client (optional)
      *
      * @return Connector
      */
-    protected function getConnectorMock(array $mock = [])
+    protected function getConnectorMock(array $mock = [], $client = null)
     {
         $map = new HandlerMap(['select' => ['fallback' => true]]);
-        return $this->getMockBuilder('VuFindSearch\Backend\Solr\Connector')
-            ->setMethods($mock)
-            ->setConstructorArgs(['http://example.org/', $map])
+        return $this->getMockBuilder(\VuFindSearch\Backend\Solr\Connector::class)
+            ->onlyMethods($mock)
+            ->setConstructorArgs(
+                [
+                    'http://localhost/',
+                    $map,
+                    function () use ($client) {
+                        // If client is provided, return it since it may have test
+                        // expectations:
+                        return $client ?? new \Laminas\Http\Client();
+                    },
+                ]
+            )
             ->getMock();
-    }
-}
-
-class BackendMock extends \VuFindSearch\Backend\Solr\Backend
-{
-    public function injectResponseWriter(\VuFindSearch\ParamBag $params)
-    {
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Get Request Group Pickup Locations" AJAX handler
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\AjaxHandler;
 
-use Zend\Mvc\Controller\Plugin\Params;
+use Laminas\Mvc\Controller\Plugin\Params;
 
 /**
  * "Get Request Group Pickup Locations" AJAX handler
@@ -72,14 +74,13 @@ class GetRequestGroupPickupLocations extends AbstractIlsAndUserAction
             if ($patron = $this->ilsAuthenticator->storedCatalogLogin()) {
                 $details = [
                     'id' => $id,
-                    'requestGroupId' => $requestGroupId
+                    'requestGroupId' => $requestGroupId,
                 ];
                 $results = $this->ils->getPickupLocations($patron, $details);
                 foreach ($results as &$result) {
                     if (isset($result['locationDisplay'])) {
-                        $result['locationDisplay'] = $this->translate(
-                            'location_' . $result['locationDisplay'],
-                            [],
+                        $result['locationDisplay'] = $this->translateWithPrefix(
+                            'location_',
                             $result['locationDisplay']
                         );
                     }
@@ -91,7 +92,8 @@ class GetRequestGroupPickupLocations extends AbstractIlsAndUserAction
         }
 
         return $this->formatResponse(
-            $this->translate('An error has occurred'), self::STATUS_HTTP_ERROR
+            $this->translate('An error has occurred'),
+            self::STATUS_HTTP_ERROR
         );
     }
 }

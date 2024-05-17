@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindTest\Backend\EIT;
 
 use InvalidArgumentException;
@@ -42,8 +43,10 @@ use VuFindSearch\Query\Query;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
-class BackendTest extends \VuFindTest\Unit\TestCase
+class BackendTest extends \PHPUnit\Framework\TestCase
 {
+    use \VuFindTest\Feature\FixtureTrait;
+
     /**
      * Test retrieving a record.
      *
@@ -128,7 +131,7 @@ class BackendTest extends \VuFindTest\Unit\TestCase
      */
     public function testConstructorSetters()
     {
-        $fact = $this->createMock('VuFindSearch\Response\RecordCollectionFactoryInterface');
+        $fact = $this->createMock(\VuFindSearch\Response\RecordCollectionFactoryInterface::class);
         $conn = $this->getConnectorMock();
         $back = new Backend($conn, $fact);
         $this->assertEquals($fact, $back->getRecordCollectionFactory());
@@ -148,11 +151,7 @@ class BackendTest extends \VuFindTest\Unit\TestCase
      */
     protected function loadResponse($fixture)
     {
-        $file = realpath(sprintf('%s/eit/response/%s', PHPUNIT_SEARCH_FIXTURES, $fixture));
-        if (!is_string($file) || !file_exists($file) || !is_readable($file)) {
-            throw new InvalidArgumentException(sprintf('Unable to load fixture file: %s', $fixture));
-        }
-        return file_get_contents($file);
+        return $this->getFixture("eit/response/$fixture", 'VuFindSearch');
     }
 
     /**
@@ -164,9 +163,9 @@ class BackendTest extends \VuFindTest\Unit\TestCase
      */
     protected function getConnectorMock(array $mock = [])
     {
-        $client = $this->createMock('Zend\Http\Client');
-        return $this->getMockBuilder(__NAMESPACE__ . '\ConnectorMock')
-            ->setMethods($mock)
+        $client = $this->createMock(\Laminas\Http\Client::class);
+        return $this->getMockBuilder(\VuFindSearch\Backend\EIT\Connector::class)
+            ->onlyMethods($mock)
             ->setConstructorArgs(['http://fake', $client, 'profile', 'pwd', 'dbs'])
             ->getMock();
     }
@@ -184,12 +183,5 @@ class BackendTest extends \VuFindTest\Unit\TestCase
             return $driver;
         };
         return new \VuFindSearch\Backend\EIT\Response\XML\RecordCollectionFactory($callback);
-    }
-}
-
-class ConnectorMock extends \VuFindSearch\Backend\EIT\Connector
-{
-    public function call($method = 'GET', $params = null)
-    {
     }
 }

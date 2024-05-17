@@ -26,10 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Search;
 
 use VuFind\Search\SearchTabsHelper;
-use VuFindTest\Unit\TestCase as TestCase;
 
 /**
  * SearchTabsHelper unit tests.
@@ -40,24 +40,24 @@ use VuFindTest\Unit\TestCase as TestCase;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class SearchTabsHelperTest extends TestCase
+class SearchTabsHelperTest extends \PHPUnit\Framework\TestCase
 {
     protected $tabConfig = [
         'default_unfiltered' => [
             'Solr' => 'Local Index',
             'Solr:video' => 'Local Videos',
             'Primo' => 'Primo Central',
-            'Primo:dissertation' => 'Dissertations in Primo Central'
+            'Primo:dissertation' => 'Dissertations in Primo Central',
         ],
         'default_filtered' => [
             'Solr:main' => 'Main Library',
             'Solr:mainvideo' => 'Main Library Videos',
             'Solr:branch' => 'Branch Library',
             'Primo' => 'Primo Central',
-            'Primo:dissertation' => 'Dissertations in Primo Central'
+            'Primo:dissertation' => 'Dissertations in Primo Central',
         ],
         'no_tabs' => [
-        ]
+        ],
     ];
 
     protected $filterConfig = [
@@ -65,7 +65,7 @@ class SearchTabsHelperTest extends TestCase
         'Solr:main' => ['building:main'],
         'Solr:mainvideo' => ['building:main', 'format:video'],
         'Solr:branch' => ['building:branch'],
-        'Primo:dissertation' => ['rtype:Dissertations']
+        'Primo:dissertation' => ['rtype:Dissertations'],
     ];
 
     /**
@@ -83,7 +83,8 @@ class SearchTabsHelperTest extends TestCase
         // Non-default tab with filters
         $helper = $this->getSearchTabsHelper('default_unfiltered', ['format:video']);
         $this->assertEquals(
-            ['format' => ['video']], $helper->getHiddenFilters('Solr')
+            ['format' => ['video']],
+            $helper->getHiddenFilters('Solr')
         );
         $this->assertEquals(
             ['format' => ['video']],
@@ -93,12 +94,14 @@ class SearchTabsHelperTest extends TestCase
         // Default tab with filters
         $helper = $this->getSearchTabsHelper('default_filtered');
         $this->assertEquals(
-            ['building' => ['main']], $helper->getHiddenFilters('Solr')
+            ['building' => ['main']],
+            $helper->getHiddenFilters('Solr')
         );
         $this->assertEmpty($helper->getHiddenFilters('Solr', false));
 
         $helper = $this->getSearchTabsHelper(
-            'default_unfiltered', ['building:main', 'format:video']
+            'default_unfiltered',
+            ['building:main', 'format:video']
         );
         $this->assertEquals(
             ['building' => ['main'], 'format' => ['video']],
@@ -111,7 +114,8 @@ class SearchTabsHelperTest extends TestCase
 
         // Non-default tab with filters
         $helper = $this->getSearchTabsHelper(
-            'default_unfiltered', ['rtype:Dissertation']
+            'default_unfiltered',
+            ['rtype:Dissertation']
         );
         $this->assertEquals(
             ['rtype' => ['Dissertation']],
@@ -132,7 +136,8 @@ class SearchTabsHelperTest extends TestCase
     {
         $helper = $this->getSearchTabsHelper();
         $this->assertEquals(
-            $this->tabConfig['default_unfiltered'], $helper->getTabConfig()
+            $this->tabConfig['default_unfiltered'],
+            $helper->getTabConfig()
         );
         $this->assertEquals($this->filterConfig, $helper->getTabFilterConfig());
     }
@@ -200,25 +205,26 @@ class SearchTabsHelperTest extends TestCase
     /**
      * Create a SearchTabsHelper
      *
-     * @param string $config   Which config set to use
-     * @param array  $filters  Active filters for a simulated request
+     * @param string $config  Which config set to use
+     * @param array  $filters Active filters for a simulated request
      *
      * @return \VuFind\Search\SearchTabsHelper
      */
-    protected function getSearchTabsHelper($config = 'default_unfiltered',
+    protected function getSearchTabsHelper(
+        $config = 'default_unfiltered',
         $filters = null
     ) {
-        $mockRequest = $this->createMock('Zend\Http\Request');
+        $mockRequest = $this->createMock(\Laminas\Http\Request::class);
         $mockRequest->expects($this->any())
             ->method('getQuery')
             ->with($this->equalTo('hiddenFilters'))
             ->willReturn($filters);
 
-        $configManager = $this->createMock('VuFind\Config\PluginManager');
+        $configManager = $this->createMock(\VuFind\Config\PluginManager::class);
 
-        $mockSolrOptions = $this->getMockBuilder('VuFind\Search\Solr\Options')
+        $mockSolrOptions = $this->getMockBuilder(\VuFind\Search\Solr\Options::class)
             ->disableOriginalConstructor()->getMock();
-        $mockSolr = $this->getMockBuilder('VuFind\Search\Solr\Results')
+        $mockSolr = $this->getMockBuilder(\VuFind\Search\Solr\Results::class)
             ->disableOriginalConstructor()->getMock();
         $mockSolr->expects($this->any())
             ->method('getParams')
@@ -226,9 +232,9 @@ class SearchTabsHelperTest extends TestCase
                 new \VuFind\Search\Solr\Params($mockSolrOptions, $configManager)
             );
 
-        $mockPrimoOptions = $this->getMockBuilder('VuFind\Search\Primo\Options')
+        $mockPrimoOptions = $this->getMockBuilder(\VuFind\Search\Primo\Options::class)
             ->disableOriginalConstructor()->getMock();
-        $mockPrimo = $this->getMockBuilder('VuFind\Search\Primo\Results')
+        $mockPrimo = $this->getMockBuilder(\VuFind\Search\Primo\Results::class)
             ->disableOriginalConstructor()->getMock();
         $mockPrimo->expects($this->any())
             ->method('getParams')
@@ -236,18 +242,21 @@ class SearchTabsHelperTest extends TestCase
                 new \VuFind\Search\Primo\Params($mockPrimoOptions, $configManager)
             );
 
-        $mockResults = $this->createMock('VuFind\Search\Results\PluginManager');
+        $mockResults = $this->createMock(\VuFind\Search\Results\PluginManager::class);
         $mockResults->expects($this->any())
             ->method('get')
             ->will(
                 $this->returnCallback(
                     function ($backend) use ($mockSolr, $mockPrimo) {
                         switch ($backend) {
-                            case 'Solr': return $mockSolr;
-                            case 'Primo': return $mockPrimo;
-                            default: throw new \Exception(
-                                "Unsupported backend $backend"
-                            );
+                            case 'Solr':
+                                return $mockSolr;
+                            case 'Primo':
+                                return $mockPrimo;
+                            default:
+                                throw new \Exception(
+                                    "Unsupported backend $backend"
+                                );
                         }
                     }
                 )

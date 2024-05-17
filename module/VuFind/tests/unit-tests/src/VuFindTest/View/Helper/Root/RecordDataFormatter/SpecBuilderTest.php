@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RecordDataFormatter spec builder Test Class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\View\Helper\Root\RecordDataFormatter;
 
 use VuFind\View\Helper\Root\RecordDataFormatter\SpecBuilder;
@@ -38,8 +40,10 @@ use VuFind\View\Helper\Root\RecordDataFormatter\SpecBuilder;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class SpecBuilderTest extends \VuFindTest\Unit\ViewHelperTestCase
+class SpecBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    use \VuFindTest\Feature\ViewTrait;
+
     /**
      * Test the spec builder
      *

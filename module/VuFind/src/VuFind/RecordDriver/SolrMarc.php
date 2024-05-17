@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for MARC records in Solr.
  *
@@ -27,6 +28,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\RecordDriver;
 
 /**
@@ -41,7 +43,7 @@ namespace VuFind\RecordDriver;
  */
 class SolrMarc extends SolrDefault
 {
-    use IlsAwareTrait;
-    use MarcReaderTrait;
-    use MarcAdvancedTrait;
+    use Feature\IlsAwareTrait;
+    use Feature\MarcReaderTrait;
+    use Feature\MarcAdvancedTrait;
 }

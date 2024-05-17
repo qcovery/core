@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Facet-driven channel provider.
  *
@@ -25,14 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ChannelProvider;
 
+use Laminas\Mvc\Controller\Plugin\Url;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\RecordDriver\AbstractBase as RecordDriver;
 use VuFind\Search\Base\Params;
 use VuFind\Search\Base\Results;
 use VuFind\Search\Results\PluginManager as ResultsManager;
-use Zend\Mvc\Controller\Plugin\Url;
 
 /**
  * Facet-driven channel provider.
@@ -43,10 +45,10 @@ use Zend\Mvc\Controller\Plugin\Url;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class Facets extends AbstractChannelProvider
-   implements TranslatorAwareInterface
+class Facets extends AbstractChannelProvider implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
+
     /**
      * Facet fields to use (field name => description).
      *
@@ -197,7 +199,10 @@ class Facets extends AbstractChannelProvider
                     $tokenOnly = $fieldCount >= $this->maxFieldsToSuggest
                         || $currentValueCount >= $this->maxValuesToSuggestPerField;
                     $channel = $this->buildChannelFromFacet(
-                        $results, $field, $current, $tokenOnly
+                        $results,
+                        $field,
+                        $current,
+                        $tokenOnly
                     );
                     if ($tokenOnly || count($channel['contents']) > 0) {
                         $channels[] = $channel;
@@ -238,7 +243,10 @@ class Facets extends AbstractChannelProvider
      *
      * @return array
      */
-    protected function buildChannel(Results $results, $filter, $title,
+    protected function buildChannel(
+        Results $results,
+        $filter,
+        $title,
         $tokenOnly = false
     ) {
         $retVal = [
@@ -246,7 +254,7 @@ class Facets extends AbstractChannelProvider
             'providerId' => $this->providerId,
             'groupId' => current(explode(':', $filter)),
             'token' => $this->getToken($filter, $title),
-            'links' => []
+            'links' => [],
         ];
         if ($tokenOnly) {
             return $retVal;
@@ -258,18 +266,18 @@ class Facets extends AbstractChannelProvider
         // Determine the filter for the current channel, and add it:
         $params->addFilter($filter);
 
-        $query = $newResults->getUrlQuery();
+        $query = $newResults->getUrlQuery()->getParams(false);
         $retVal['links'][] = [
             'label' => 'channel_search',
             'icon' => 'fa-list',
             'url' => $this->url->fromRoute($params->getOptions()->getSearchAction())
-                . $query
+                . $query,
         ];
         $retVal['links'][] = [
             'label' => 'channel_expand',
             'icon' => 'fa-search-plus',
             'url' => $this->url->fromRoute('channels-search')
-                . $query . '&source=' . urlencode($params->getSearchClassId())
+                . $query . '&source=' . urlencode($params->getSearchClassId()),
         ];
 
         // Run the search and convert the results into a channel:
@@ -307,7 +315,10 @@ class Facets extends AbstractChannelProvider
      *
      * @return array
      */
-    protected function buildChannelFromFacet(Results $results, $field, $value,
+    protected function buildChannelFromFacet(
+        Results $results,
+        $field,
+        $value,
         $tokenOnly = false
     ) {
         return $this->buildChannel(

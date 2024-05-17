@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Table Definition for resource
  *
@@ -25,13 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Db\Table;
 
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Expression;
+use Laminas\Db\Sql\Select;
 use VuFind\Date\Converter as DateConverter;
 use VuFind\Db\Row\RowGateway;
 use VuFind\Record\Loader;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Sql\Expression;
 
 /**
  * Table Definition for resource
@@ -63,14 +66,19 @@ class Resource extends Gateway
      *
      * @param Adapter       $adapter   Database adapter
      * @param PluginManager $tm        Table manager
-     * @param array         $cfg       Zend Framework configuration
+     * @param array         $cfg       Laminas configuration
      * @param RowGateway    $rowObj    Row prototype object (null for default)
      * @param DateConverter $converter Date converter
      * @param Loader        $loader    Record loader
      * @param string        $table     Name of database table to interface with
      */
-    public function __construct(Adapter $adapter, PluginManager $tm, $cfg,
-        RowGateway $rowObj, DateConverter $converter, Loader $loader,
+    public function __construct(
+        Adapter $adapter,
+        PluginManager $tm,
+        $cfg,
+        ?RowGateway $rowObj,
+        DateConverter $converter,
+        Loader $loader,
         $table = 'resource'
     ) {
         $this->dateConverter = $converter;
@@ -84,8 +92,7 @@ class Resource extends Gateway
      * @param string                            $id     Record ID to look up
      * @param string                            $source Source of record to look up
      * @param bool                              $create If true, create the row if it
-     * does not
-     * yet exist.
+     * does not yet exist.
      * @param \VuFind\RecordDriver\AbstractBase $driver A record driver for the
      * resource being created (optional -- improves efficiency if provided, but will
      * be auto-loaded as needed if left null).
@@ -93,8 +100,11 @@ class Resource extends Gateway
      * @return \VuFind\Db\Row\Resource|null Matching row if found or created, null
      * otherwise.
      */
-    public function findResource($id, $source = DEFAULT_SEARCH_BACKEND,
-        $create = true, $driver = null
+    public function findResource(
+        $id,
+        $source = DEFAULT_SEARCH_BACKEND,
+        $create = true,
+        $driver = null
     ) {
         if (empty($id)) {
             throw new \Exception('Resource ID cannot be empty');
@@ -128,7 +138,7 @@ class Resource extends Gateway
      * @param array  $ids    Array of IDs
      * @param string $source Source of records to look up
      *
-     * @return \Zend\Db\ResultSet\AbstractResultSet
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
      */
     public function findResources($ids, $source = DEFAULT_SEARCH_BACKEND)
     {
@@ -150,10 +160,15 @@ class Resource extends Gateway
      * @param int    $offset Offset for results
      * @param int    $limit  Limit for results (null for none)
      *
-     * @return \Zend\Db\ResultSet\AbstractResultSet
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
      */
-    public function getFavorites($user, $list = null, $tags = [],
-        $sort = null, $offset = 0, $limit = null
+    public function getFavorites(
+        $user,
+        $list = null,
+        $tags = [],
+        $sort = null,
+        $offset = 0,
+        $limit = null
     ) {
         // Set up base query:
         $obj = & $this;
@@ -162,13 +177,15 @@ class Resource extends Gateway
                 $s->columns(
                     [
                         new Expression(
-                            'DISTINCT(?)', ['resource.id'],
+                            'DISTINCT(?)',
+                            ['resource.id'],
                             [Expression::TYPE_IDENTIFIER]
-                        ), '*'
+                        ), Select::SQL_STAR,
                     ]
                 );
                 $s->join(
-                    ['ur' => 'user_resource'], 'resource.id = ur.resource_id',
+                    ['ur' => 'user_resource'],
+                    'resource.id = ur.resource_id',
                     []
                 );
                 $s->where->equalTo('ur.user_id', $user);
@@ -210,7 +227,7 @@ class Resource extends Gateway
      * Get a set of records that do not have metadata stored in the resource
      * table.
      *
-     * @return \Zend\Db\ResultSet\AbstractResultSet
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
      */
     public function findMissingMetadata()
     {
@@ -233,16 +250,17 @@ class Resource extends Gateway
      */
     public function updateRecordId($oldId, $newId, $source = DEFAULT_SEARCH_BACKEND)
     {
-        if ($oldId !== $newId
-            && $resource = $this->findResource($oldId, $source)
+        if (
+            $oldId !== $newId
+            && $resource = $this->findResource($oldId, $source, false)
         ) {
+            $tableObjects = [];
             // Do this as a transaction to prevent odd behavior:
             $connection = $this->getAdapter()->getDriver()->getConnection();
             $connection->beginTransaction();
             // Does the new ID already exist?
-            if ($newResource = $this->findResource($newId, $source)) {
+            if ($newResource = $this->findResource($newId, $source, false)) {
                 // Special case: merge new ID and old ID:
-                $tableObjects = [];
                 foreach (['comments', 'userresource', 'resourcetags'] as $table) {
                     $tableObjects[$table] = $this->getDbTable($table);
                     $tableObjects[$table]->update(
@@ -253,7 +271,7 @@ class Resource extends Gateway
                 $resource->delete();
             } else {
                 // Default case: just update the record ID:
-                $resource->record_id = $newId();
+                $resource->record_id = $newId;
                 $resource->save();
             }
             // Done -- commit the transaction:
@@ -273,10 +291,10 @@ class Resource extends Gateway
     /**
      * Apply a sort parameter to a query on the resource table.
      *
-     * @param \Zend\Db\Sql\Select $query Query to modify
-     * @param string              $sort  Field to use for sorting (may include 'desc'
-     * qualifier)
-     * @param string              $alias Alias to the resource table (defaults to
+     * @param \Laminas\Db\Sql\Select $query Query to modify
+     * @param string                 $sort  Field to use for sorting (may include
+     * 'desc' qualifier)
+     * @param string                 $alias Alias to the resource table (defaults to
      * 'resource')
      *
      * @return void
@@ -285,7 +303,7 @@ class Resource extends Gateway
     {
         // Apply sorting, if necessary:
         $legalSorts = [
-            'title', 'title desc', 'author', 'author desc', 'year', 'year desc'
+            'title', 'title desc', 'author', 'author desc', 'year', 'year desc',
         ];
         if (!empty($sort) && in_array(strtolower($sort), $legalSorts)) {
             // Strip off 'desc' to obtain the raw field name -- we'll need it
@@ -300,7 +318,8 @@ class Resource extends Gateway
             // isnull() sort in that case.
             if (strtolower($rawField) != 'title') {
                 $order[] = new Expression(
-                    'isnull(?)', [$alias . '.' . $rawField],
+                    'isnull(?)',
+                    [$alias . '.' . $rawField],
                     [Expression::TYPE_IDENTIFIER]
                 );
             }

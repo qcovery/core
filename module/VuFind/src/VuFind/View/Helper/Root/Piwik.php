@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Piwik view helper
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\View\Helper\Root;
 
 /**
@@ -36,7 +38,7 @@ namespace VuFind\View\Helper\Root;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class Piwik extends \Zend\View\Helper\AbstractHelper
+class Piwik extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * Piwik URL (false if disabled)
@@ -60,6 +62,13 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
     protected $searchPrefix;
 
     /**
+     * Whether to disable cookies (see config.ini for details)
+     *
+     * @var bool
+     */
+    protected $disableCookies;
+
+    /**
      * Whether to track use custom variables to track additional information
      *
      * @var bool
@@ -69,14 +78,14 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
     /**
      * Request object
      *
-     * @var Zend\Http\PhpEnvironment\Request
+     * @var \Laminas\Http\PhpEnvironment\Request
      */
     protected $request;
 
     /**
      * Router object
      *
-     * @var Zend\Router\Http\RouteMatch
+     * @var \Laminas\Router\Http\RouteMatch
      */
     protected $router;
 
@@ -105,14 +114,14 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
     /**
      * Constructor
      *
-     * @param string|bool                      $url        Piwik address
+     * @param string|bool                         $url        Piwik address
      * (false if disabled)
-     * @param int|array                        $options    Options array (or,
+     * @param int|array                           $options    Options array (or,
      * if a single value, the Piwik site ID -- for backward compatibility)
-     * @param bool                             $customVars Whether to track
+     * @param bool                                $customVars Whether to track
      * additional information in custom variables
-     * @param Zend\Router\Http\RouteMatch      $router     Request
-     * @param Zend\Http\PhpEnvironment\Request $request    Request
+     * @param Laminas\Router\Http\RouteMatch      $router     Request
+     * @param Laminas\Http\PhpEnvironment\Request $request    Request
      */
     public function __construct($url, $options, $customVars, $router, $request)
     {
@@ -123,6 +132,7 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
         if (is_array($options)) {
             $this->siteId = $options['siteId'];
             $this->searchPrefix = $options['searchPrefix'] ?? '';
+            $this->disableCookies = $options['disableCookies'] ?? '';
         } else {
             $this->siteId = $options;
         }
@@ -162,7 +172,7 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
         }
 
         $inlineScript = $this->getView()->plugin('inlinescript');
-        return $inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, $code, 'SET');
+        return $inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $code, 'SET');
     }
 
     /**
@@ -266,7 +276,7 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
             $template = $children[0]->getTemplate();
             if (!strstr($template, '/home') && !strstr($template, 'facet-list')) {
                 $results = $children[0]->getVariable('results');
-                if (is_a($results, 'VuFind\Search\Base\Results')) {
+                if ($results instanceof \VuFind\Search\Base\Results) {
                     return $results;
                 }
             }
@@ -310,14 +320,15 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
         $current = $viewModel->getCurrent();
         if (null === $current) {
             $driver = $view->vars('driver');
-            if (is_a($driver, 'VuFind\RecordDriver\AbstractBase')) {
+            if ($driver instanceof \VuFind\RecordDriver\AbstractBase) {
                 return $driver;
             }
+            return null;
         }
         $children = $current->getChildren();
         if (isset($children[0])) {
             $driver = $children[0]->getVariable('driver');
-            if (is_a($driver, 'VuFind\RecordDriver\AbstractBase')) {
+            if ($driver instanceof \VuFind\RecordDriver\AbstractBase) {
                 return $driver;
             }
         }
@@ -357,7 +368,7 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
             'Sort' => $params->getSort(),
             'Page' => $params->getPage(),
             'Limit' => $params->getLimit(),
-            'View' => $params->getView()
+            'View' => $params->getView(),
         ];
     }
 
@@ -394,7 +405,7 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
         return [
             'RecordFormat' => $formats,
             'RecordData' => "$id|$author|$title",
-            'RecordInstitution' => $institutions
+            'RecordInstitution' => $institutions,
         ];
     }
 
@@ -426,16 +437,24 @@ class Piwik extends \Zend\View\Helper\AbstractHelper
     protected function getOpeningTrackingCode()
     {
         $escape = $this->getView()->plugin('escapejs');
-        return <<<EOT
+        $code = <<<EOT
 
-function initVuFindPiwikTracker{$this->timestamp}(){
-    var VuFindPiwikTracker = Piwik.getTracker();
+            function initVuFindPiwikTracker{$this->timestamp}(){
+                var VuFindPiwikTracker = Piwik.getTracker();
 
-    VuFindPiwikTracker.setSiteId({$this->siteId});
-    VuFindPiwikTracker.setTrackerUrl('{$this->url}piwik.php');
-    VuFindPiwikTracker.setCustomUrl('{$escape($this->getCustomUrl())}');
+                VuFindPiwikTracker.setSiteId({$this->siteId});
+                VuFindPiwikTracker.setTrackerUrl('{$this->url}piwik.php');
+                VuFindPiwikTracker.setCustomUrl('{$escape($this->getCustomUrl())}');
 
-EOT;
+            EOT;
+        if ($this->disableCookies) {
+            $code .= <<<EOT
+                    VuFindPiwikTracker.disableCookies();
+
+                EOT;
+        }
+
+        return $code;
     }
 
     /**
@@ -447,7 +466,8 @@ EOT;
     {
         $path = $this->request->getUri()->toString();
         $routeMatch = $this->router->match($this->request);
-        if ($routeMatch
+        if (
+            $routeMatch
             && $routeMatch->getMatchedRouteName() == 'vufindrecord-ajaxtab'
         ) {
             // Replace 'AjaxTab' with tab name in record page URLs
@@ -468,21 +488,21 @@ EOT;
     protected function getClosingTrackingCode()
     {
         return <<<EOT
-    VuFindPiwikTracker.enableLinkTracking();
-};
-(function(){
-    if (typeof Piwik === 'undefined') {
-        var d=document, g=d.createElement('script'),
-            s=d.getElementsByTagName('script')[0];
-        g.type='text/javascript'; g.defer=true; g.async=true;
-        g.src='{$this->url}piwik.js';
-        g.onload=initVuFindPiwikTracker{$this->timestamp};
-        s.parentNode.insertBefore(g,s);
-    } else {
-        initVuFindPiwikTracker{$this->timestamp}();
-    }
-})();
-EOT;
+                VuFindPiwikTracker.enableLinkTracking();
+            };
+            (function(){
+                if (typeof Piwik === 'undefined') {
+                    var d=document, g=d.createElement('script'),
+                        s=d.getElementsByTagName('script')[0];
+                    g.type='text/javascript'; g.defer=true; g.async=true;
+                    g.src='{$this->url}piwik.js';
+                    g.onload=initVuFindPiwikTracker{$this->timestamp};
+                    s.parentNode.insertBefore(g,s);
+                } else {
+                    initVuFindPiwikTracker{$this->timestamp}();
+                }
+            })();
+            EOT;
     }
 
     /**
@@ -508,9 +528,9 @@ EOT;
 
             $value = $escape($value);
             $code .= <<<EOT
-    VuFindPiwikTracker.setCustomVariable($i, '$key', '$value', 'page');
+                    VuFindPiwikTracker.setCustomVariable($i, '$key', '$value', 'page');
 
-EOT;
+                EOT;
         }
         return $code;
     }
@@ -533,11 +553,11 @@ EOT;
 
         // Use trackSiteSearch *instead* of trackPageView in searches
         return <<<EOT
-    VuFindPiwikTracker.trackSiteSearch(
-        '{$this->searchPrefix}$backendId|$searchTerms', '$searchType', $resultCount
-    );
+                VuFindPiwikTracker.trackSiteSearch(
+                    '{$this->searchPrefix}$backendId|$searchTerms', '$searchType', $resultCount
+                );
 
-EOT;
+            EOT;
     }
 
     /**
@@ -568,11 +588,11 @@ EOT;
 
         // Use trackSiteSearch *instead* of trackPageView in searches
         return <<<EOT
-    VuFindPiwikTracker.trackSiteSearch(
-        '{$this->searchPrefix}Combined|$searchTerms', '$searchType', $resultCount
-    );
+                VuFindPiwikTracker.trackSiteSearch(
+                    '{$this->searchPrefix}Combined|$searchTerms', '$searchType', $resultCount
+                );
 
-EOT;
+            EOT;
     }
 
     /**
@@ -583,8 +603,8 @@ EOT;
     protected function getTrackPageViewCode()
     {
         return <<<EOT
-    VuFindPiwikTracker.trackPageView();
+                VuFindPiwikTracker.trackPageView();
 
-EOT;
+            EOT;
     }
 }

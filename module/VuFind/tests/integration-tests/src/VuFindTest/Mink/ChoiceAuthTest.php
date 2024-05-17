@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mink ChoiceAuth test class.
  *
@@ -25,42 +26,34 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\Mink;
 
 /**
  * Mink ChoiceAuth test class.
+ *
+ * Class must be final due to use of "new static()" by LiveDatabaseTrait.
  *
  * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
+ * @retry    4
  */
-class ChoiceAuthTest extends \VuFindTest\Unit\MinkTestCase
+final class ChoiceAuthTest extends \VuFindTest\Integration\MinkTestCase
 {
-    use \VuFindTest\Unit\UserCreationTrait;
+    use \VuFindTest\Feature\LiveDatabaseTrait;
+    use \VuFindTest\Feature\UserCreationTrait;
 
     /**
      * Standard setup method.
      *
      * @return void
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
-        return static::failIfUsersExist();
-    }
-
-    /**
-     * Standard setup method.
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        // Give up if we're not running in CI:
-        if (!$this->continuousIntegrationRunning()) {
-            return $this->markTestSkipped('Continuous integration not running.');
-        }
+        static::failIfDataExists();
     }
 
     /**
@@ -99,6 +92,10 @@ class ChoiceAuthTest extends \VuFindTest\Unit\MinkTestCase
 
     /**
      * Test creating a DB user....
+     *
+     * @retryCallback tearDownAfterClass
+     *
+     * @return void
      */
     public function testCreateDatabaseUser()
     {
@@ -116,16 +113,12 @@ class ChoiceAuthTest extends \VuFindTest\Unit\MinkTestCase
         $element = $this->findCss($page, '#loginOptions a');
         $this->assertEquals('Login', $element->getText());
         $element->click();
-        $this->snooze();
-        $this->findCss($page, '.createAccountLink')->click();
-        $this->snooze();
+        $this->clickCss($page, '.createAccountLink');
         $this->fillInAccountForm($page);
-        $this->findCss($page, 'input.btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, 'input.btn.btn-primary');
 
         // Log out
-        $this->findCss($page, '.logoutOptions a.logout')->click();
-        $this->snooze();
+        $this->clickCss($page, '.logoutOptions a.logout');
 
         // Log back in to confirm that creation worked
         $element = $this->findCss($page, '#loginOptions a');
@@ -135,7 +128,7 @@ class ChoiceAuthTest extends \VuFindTest\Unit\MinkTestCase
         $this->submitLoginForm($page, true, '.authmethod0 ');
 
         // Log out again to confirm that login worked
-        $this->findCss($page, '.logoutOptions a.logout')->click();
+        $this->clickCss($page, '.logoutOptions a.logout');
     }
 
     /**
@@ -163,7 +156,7 @@ class ChoiceAuthTest extends \VuFindTest\Unit\MinkTestCase
 
         // Confirm that demo driver expected values are present:
         $texts = [
-            'Lib-catuser', 'Somewhere...', 'Over the Rainbow'
+            'Lib-catuser', 'Somewhere...', 'Over the Rainbow',
         ];
         foreach ($texts as $text) {
             $this->assertTrue($this->hasElementsMatchingText($page, 'td', $text));
@@ -175,7 +168,7 @@ class ChoiceAuthTest extends \VuFindTest\Unit\MinkTestCase
      *
      * @return void
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::removeUsers(['username1', 'catuser']);
     }

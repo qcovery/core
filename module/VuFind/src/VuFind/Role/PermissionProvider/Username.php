@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Username permission provider for VuFind.
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Role\PermissionProvider;
 
-use ZfcRbac\Service\AuthorizationService;
+use LmcRbacMvc\Service\AuthorizationService;
 
 /**
  * Username permission provider for VuFind.
@@ -68,7 +70,7 @@ class Username implements PermissionProviderInterface
     public function getPermissions($options)
     {
         // If no user is logged in, or the user doesn't match the passed-in
-        // whitelist, we can't grant the permission to any roles.
+        // filter, we can't grant the permission to any roles.
         $user = $this->auth->getIdentity();
         if (!$user || !in_array($user->username, (array)$options)) {
             return [];

@@ -26,16 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\Factory;
 
-use Interop\Container\ContainerInterface;
-
+use Psr\Container\ContainerInterface;
 use VuFindSearch\Backend\WorldCat\Backend;
 use VuFindSearch\Backend\WorldCat\Connector;
 use VuFindSearch\Backend\WorldCat\QueryBuilder;
 use VuFindSearch\Backend\WorldCat\Response\XML\RecordCollectionFactory;
-
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Factory for WorldCat backends.
@@ -46,33 +44,26 @@ use Zend\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class WorldCatBackendFactory implements FactoryInterface
+class WorldCatBackendFactory extends AbstractBackendFactory
 {
     /**
      * Logger.
      *
-     * @var Zend\Log\LoggerInterface
+     * @var \Laminas\Log\LoggerInterface
      */
     protected $logger;
 
     /**
-     * Superior service manager.
-     *
-     * @var ContainerInterface
-     */
-    protected $serviceLocator;
-
-    /**
      * VuFind configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * WorldCat configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $wcConfig;
 
@@ -89,13 +80,14 @@ class WorldCatBackendFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $sm, $name, array $options = null)
     {
-        $this->serviceLocator = $sm;
-        $this->config = $this->serviceLocator->get('VuFind\Config\PluginManager')
+        $this->setup($sm);
+        $this->config = $this->serviceLocator
+            ->get(\VuFind\Config\PluginManager::class)
             ->get('config');
         $this->wcConfig = $this->serviceLocator
-            ->get('VuFind\Config\PluginManager')->get('WorldCat');
-        if ($this->serviceLocator->has('VuFind\Log\Logger')) {
-            $this->logger = $this->serviceLocator->get('VuFind\Log\Logger');
+            ->get(\VuFind\Config\PluginManager::class)->get('WorldCat');
+        if ($this->serviceLocator->has(\VuFind\Log\Logger::class)) {
+            $this->logger = $this->serviceLocator->get(\VuFind\Log\Logger::class);
         }
         $connector = $this->createConnector();
         $backend   = $this->createBackend($connector);
@@ -124,13 +116,12 @@ class WorldCatBackendFactory implements FactoryInterface
      */
     protected function createConnector()
     {
-        $wsKey = isset($this->config->WorldCat->apiKey)
-            ? $this->config->WorldCat->apiKey : null;
+        $wsKey = $this->config->WorldCat->apiKey ?? null;
         $connectorOptions = isset($this->wcConfig->Connector)
             ? $this->wcConfig->Connector->toArray() : [];
         $connector = new Connector(
             $wsKey,
-            $this->serviceLocator->get('VuFindHttp\HttpService')->createClient(),
+            $this->createHttpClient(),
             $connectorOptions
         );
         $connector->setLogger($this->logger);
@@ -144,8 +135,7 @@ class WorldCatBackendFactory implements FactoryInterface
      */
     protected function createQueryBuilder()
     {
-        $exclude = isset($this->config->WorldCat->OCLCCode)
-            ? $this->config->WorldCat->OCLCCode : null;
+        $exclude = $this->config->WorldCat->OCLCCode ?? null;
         return new QueryBuilder($exclude);
     }
 
@@ -156,7 +146,8 @@ class WorldCatBackendFactory implements FactoryInterface
      */
     protected function createRecordCollectionFactory()
     {
-        $manager = $this->serviceLocator->get('VuFind\RecordDriver\PluginManager');
+        $manager = $this->serviceLocator
+            ->get(\VuFind\RecordDriver\PluginManager::class);
         $callback = function ($data) use ($manager) {
             $driver = $manager->get('WorldCat');
             $driver->setRawData($data);

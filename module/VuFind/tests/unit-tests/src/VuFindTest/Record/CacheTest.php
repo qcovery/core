@@ -28,10 +28,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Record;
 
 use VuFind\Record\Cache;
-use VuFindTest\Unit\TestCase as TestCase;
 
 /**
  * Record cache tests.
@@ -43,7 +43,7 @@ use VuFindTest\Unit\TestCase as TestCase;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class CacheTest extends TestCase
+class CacheTest extends \PHPUnit\Framework\TestCase
 {
     protected $recordTable = [];
 
@@ -52,7 +52,7 @@ class CacheTest extends TestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $cache = $this->getRecordCache();
         $this->recordTable = [
@@ -60,19 +60,19 @@ class CacheTest extends TestCase
                 'record_id' => '020645147',
                 'source' => 'Solr',
                 'version' => '2.5',
-                'data' => 's:17:"dummy_solr_record";'
+                'data' => 's:17:"dummy_solr_record";',
             ],
             [
                 'record_id' => '70764764',
                 'source' => 'WorldCat',
                 'version' => '2.5',
-                'data' => 's:21:"dummy_worldcat_record";'
+                'data' => 's:21:"dummy_worldcat_record";',
             ],
             [
                 'record_id' => '00033321',
                 'source' => 'Solr',
                 'version' => '2.5',
-                'data' => 's:19:"dummy_solr_record_2";'
+                'data' => 's:19:"dummy_solr_record_2";',
             ],
         ];
     }
@@ -205,7 +205,7 @@ class CacheTest extends TestCase
     /**
      * Create configuration
      *
-     * @return \Zend\Config\Config
+     * @return \Laminas\Config\Config
      */
     protected function getConfig()
     {
@@ -215,14 +215,14 @@ class CacheTest extends TestCase
                 'WorldCat' => ['operatingMode' => 'fallback'],
             ],
             'Disabled' => [
-                'Solr' => []
+                'Solr' => [],
             ],
             'Fallback' => [
-                'Solr' => ['operatingMode' => 'fallback']
+                'Solr' => ['operatingMode' => 'fallback'],
             ],
         ];
 
-        $config = new \Zend\Config\Config($configArr);
+        $config = new \Laminas\Config\Config($configArr);
 
         return $config;
     }
@@ -230,14 +230,15 @@ class CacheTest extends TestCase
     /**
      * Create Record Table
      *
-     * @return PHPUnit\Framework\MockObject\MockObject
+     * @return \VuFind\Db\Table\Record
      */
-    protected function getRecordTable()
+    protected function getRecordTable(): \VuFind\Db\Table\Record
     {
-        $findRecordsCallback = function ($ids, $source) {
+        $findRecordsCallback = function (array $ids, string $source): array {
             $results = [];
             foreach ($this->recordTable as $row) {
-                if (in_array($row['record_id'], $ids)
+                if (
+                    in_array($row['record_id'], $ids)
                     && $row['source'] == $source
                 ) {
                     $results[] = $row;
@@ -248,7 +249,8 @@ class CacheTest extends TestCase
 
         $findRecordCallback = function ($id, $source) {
             foreach ($this->recordTable as $row) {
-                if ($row['record_id'] == $id
+                if (
+                    $row['record_id'] == $id
                     && $row['source'] == $source
                 ) {
                     return $row;
@@ -257,19 +259,19 @@ class CacheTest extends TestCase
             return false;
         };
 
-        $recordTable = $this->getMockBuilder('VuFind\Db\Table\Record')
+        $recordTable = $this->getMockBuilder(\VuFind\Db\Table\Record::class)
             ->disableOriginalConstructor()->getMock();
         $recordTable->method('findRecords')
             ->will($this->returnCallback($findRecordsCallback));
         $recordTable->method('findRecord')
             ->will($this->returnCallback($findRecordCallback));
 
-        $updateRecordCallback = function ($recordId, $source, $rawData) {
+        $updateRecordCallback = function ($recordId, $source, $rawData): void {
             $this->recordTable[] = [
                 'record_id' => $recordId,
                 'source' => $source,
                 'version' => '2.5',
-                'data' => serialize($rawData)
+                'data' => serialize($rawData),
             ];
         };
         $recordTable->method('updateRecord')
@@ -281,12 +283,12 @@ class CacheTest extends TestCase
     /**
      * Create a Record Factory Manager
      *
-     * @return PHPUnit\Framework\MockObject\MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getRecordFactoryManager()
+    protected function getRecordFactoryManager(): \PHPUnit\Framework\MockObject\MockObject
     {
         $recordFactoryManager = $this->createMock(
-            'VuFind\RecordDriver\PluginManager'
+            \VuFind\RecordDriver\PluginManager::class
         );
         $recordFactoryManager->method('getSolrRecord')->will(
             $this->returnValue($this->getDriver('test', 'Solr'))
@@ -321,11 +323,13 @@ class CacheTest extends TestCase
      * @param string $id     id
      * @param string $source source
      *
-     * @return PHPUnit\Framework\MockObject\MockObject
+     * @return \VuFind\RecordDriver\AbstractBase
      */
-    protected function getDriver($id = 'test', $source = 'Solr')
-    {
-        $driver = $this->createMock('VuFind\RecordDriver\AbstractBase');
+    protected function getDriver(
+        $id = 'test',
+        $source = 'Solr'
+    ): \VuFind\RecordDriver\AbstractBase {
+        $driver = $this->createMock(\VuFind\RecordDriver\AbstractBase::class);
         $driver->expects($this->any())
             ->method('getUniqueId')
             ->will($this->returnValue($id));

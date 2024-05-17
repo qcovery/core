@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Solr spelling processor.
  *
@@ -25,11 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\Solr;
 
+use Laminas\Config\Config;
 use VuFindSearch\Backend\Solr\Response\Json\Spellcheck;
 use VuFindSearch\Query\AbstractQuery;
-use Zend\Config\Config;
 
 /**
  * Solr spelling processor.
@@ -72,16 +74,25 @@ class SpellingProcessor
     protected $phrase;
 
     /**
+     * Callback for normalizing text.
+     *
+     * @var callable
+     */
+    protected $normalizer;
+
+    /**
      * Constructor
      *
-     * @param Config $config Spelling configuration (optional)
+     * @param Config   $config     Spelling configuration (optional)
+     * @param callable $normalizer Callback for normalization of text (optional).
      */
-    public function __construct($config = null)
+    public function __construct($config = null, $normalizer = null)
     {
         $this->spellingLimit = $config->limit ?? 3;
         $this->spellSkipNumeric = $config->skip_numeric ?? true;
         $this->expand = $config->expand ?? true;
         $this->phrase = $config->phrase ?? false;
+        $this->normalizer = $normalizer;
     }
 
     /**
@@ -118,7 +129,7 @@ class SpellingProcessor
      */
     public function tokenize($input)
     {
-        // Blacklist of useless tokens:
+        // Exclusion list of useless tokens:
         $joins = ["AND", "OR", "NOT"];
 
         // Strip out parentheses -- irrelevant for tokenization:
@@ -164,12 +175,13 @@ class SpellingProcessor
     {
         $allSuggestions = [];
         foreach ($spellcheck as $term => $info) {
-            if (!$this->shouldSkipTerm($query, $term, false)
+            if (
+                !$this->shouldSkipTerm($query, $term, false)
                 && ($suggestions = $this->formatAndFilterSuggestions($query, $info))
             ) {
                 $allSuggestions[$term] = [
                     'freq' => $info['origFreq'],
-                    'suggestions' => $suggestions
+                    'suggestions' => $suggestions,
                 ];
             }
         }
@@ -230,7 +242,7 @@ class SpellingProcessor
             return true;
         }
         // We should also skip terms already contained within the query:
-        return $queryContains == $query->containsTerm($term);
+        return $queryContains == $query->containsTerm($term, $this->normalizer);
     }
 
     /**
@@ -250,15 +262,19 @@ class SpellingProcessor
             $inToken = false;
             $targetTerm = "";
             foreach ($this->tokenize($query) as $token) {
-                // TODO - Do we need stricter matching here, similar to that in
-                // \VuFindSearch\Query\Query::replaceTerm()?
-                if (stripos($token, $term) !== false) {
+                // Is the term part of the current token?
+                if (strpos($token, (string)$term) !== false) {
                     $inToken = true;
                     // We need to replace the whole token
                     $targetTerm = $token;
                     // Go and replace this token
                     $returnArray = $this->doSingleReplace(
-                        $term, $targetTerm, $inToken, $details, $returnArray, $params
+                        $term,
+                        $targetTerm,
+                        $inToken,
+                        $details,
+                        $returnArray,
+                        $params
                     );
                 }
             }
@@ -266,7 +282,12 @@ class SpellingProcessor
             if ($targetTerm == "") {
                 $targetTerm = $term;
                 $returnArray = $this->doSingleReplace(
-                    $term, $targetTerm, $inToken, $details, $returnArray, $params
+                    $term,
+                    $targetTerm,
+                    $inToken,
+                    $details,
+                    $returnArray,
+                    $params
                 );
             }
         }
@@ -286,40 +307,39 @@ class SpellingProcessor
      *
      * @return array              $returnArray modified
      */
-    protected function doSingleReplace($term, $targetTerm, $inToken, $details,
-        $returnArray, Params $params
+    protected function doSingleReplace(
+        $term,
+        $targetTerm,
+        $inToken,
+        $details,
+        $returnArray,
+        Params $params
     ) {
         $returnArray[$targetTerm]['freq'] = $details['freq'];
         foreach ($details['suggestions'] as $word => $freq) {
-            // If the suggested word is part of a token
-            if ($inToken) {
-                // We need to make sure we replace the whole token
-                $replacement = str_replace($term, $word, $targetTerm);
-            } else {
-                $replacement = $word;
-            }
+            // If the suggested word is part of a token, we need to make sure we
+            // replace the whole token:
+            $replacement = $inToken ? str_replace($term, $word, $targetTerm) : $word;
+
             //  Do we need to show the whole, modified query?
-            if ($this->phrase) {
-                $label = $params->getDisplayQueryWithReplacedTerm(
-                    $targetTerm, $replacement
-                );
-            } else {
-                $label = $replacement;
-            }
+            $label = $this->phrase
+                ? $params->getDisplayQueryWithReplacedTerm(
+                    $targetTerm,
+                    $replacement
+                ) : $replacement;
+
             // Basic spelling suggestion data
             $returnArray[$targetTerm]['suggestions'][$label] = [
                 'freq' => $freq,
-                'new_term' => $replacement
+                'new_term' => $replacement,
             ];
 
             // Only generate expansions if enabled in config
             if ($this->expand) {
                 // Parentheses differ for shingles
-                if (strstr($targetTerm, " ") !== false) {
-                    $replacement = "(($targetTerm) OR ($replacement))";
-                } else {
-                    $replacement = "($targetTerm OR $replacement)";
-                }
+                $replacement = (strstr($targetTerm, " ") !== false)
+                    ? "(($targetTerm) OR ($replacement))"
+                    : "($targetTerm OR $replacement)";
                 $returnArray[$targetTerm]['suggestions'][$label]['expand_term']
                     = $replacement;
             }

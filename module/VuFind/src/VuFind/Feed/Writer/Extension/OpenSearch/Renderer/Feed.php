@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Zend\Feed\Renderer\Feed extension for Open Search
+ * Laminas\Feed\Renderer\Feed extension for Open Search
  *
  * PHP version 7
  *
@@ -25,14 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Feed\Writer\Extension\OpenSearch\Renderer;
 
 use DOMDocument;
 use DOMElement;
-use Zend\Feed\Writer\Extension\AbstractRenderer;
+use Laminas\Feed\Writer\Extension\AbstractRenderer;
 
 /**
- * Zend\Feed\Renderer\Feed extension for Open Search
+ * Laminas\Feed\Renderer\Feed extension for Open Search
  *
  * @category VuFind
  * @package  Feed_Plugins
@@ -188,6 +190,9 @@ class Feed extends AbstractRenderer
             if ($link['type'] != null) {
                 $mime = 'application/' . strtolower($link['type']) . '+xml';
                 $elem->setAttribute('type', $mime);
+            }
+            if ($link['title'] ?? null) {
+                $elem->setAttribute('title', $link['title']);
             }
             $elem->setAttribute('href', $link['url']);
             $root->appendChild($elem);

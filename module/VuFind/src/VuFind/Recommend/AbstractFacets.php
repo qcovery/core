@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SideFacets Recommendations Module
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
+
 namespace VuFind\Recommend;
 
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 /**
  * SideFacets Recommendations Module
@@ -137,7 +139,9 @@ abstract class AbstractFacets implements RecommendInterface
      *
      * @return void
      */
-    protected function loadBooleanConfigs(Config $config, $allFacets,
+    protected function loadBooleanConfigs(
+        Config $config,
+        $allFacets,
         $section = 'Results_Settings'
     ) {
         // Which facets are excludable?
@@ -148,7 +152,7 @@ abstract class AbstractFacets implements RecommendInterface
         }
 
         // Which facets are ORed?
-        if (isset($config->Results_Settings->orFacets)) {
+        if (isset($config->$section->orFacets)) {
             $this->orFacets = ($config->$section->orFacets === '*')
                 ? $allFacets
                 : array_map('trim', explode(',', $config->$section->orFacets));

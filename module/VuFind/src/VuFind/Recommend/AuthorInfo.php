@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AuthorInfo Recommendations Module
  *
@@ -25,12 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
+
 namespace VuFind\Recommend;
 
+use Laminas\I18n\Translator\TranslatorInterface;
 use VuFind\Connection\Wikipedia;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFindSearch\Query\Query;
-use Zend\I18n\Translator\TranslatorInterface;
 
 /**
  * AuthorInfo Recommendations Module
@@ -54,7 +56,7 @@ class AuthorInfo implements RecommendInterface, TranslatorAwareInterface
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $client;
 
@@ -98,12 +100,14 @@ class AuthorInfo implements RecommendInterface, TranslatorAwareInterface
      * Constructor
      *
      * @param \VuFind\Search\Results\PluginManager $results Results plugin manager
-     * @param \Zend\Http\Client                    $client  HTTP client
+     * @param \Laminas\Http\Client                 $client  HTTP client
      * @param string                               $sources Source identifiers
      * (currently, only 'wikipedia' is supported)
      */
-    public function __construct(\VuFind\Search\Results\PluginManager $results,
-        \Zend\Http\Client $client, $sources = 'wikipedia'
+    public function __construct(
+        \VuFind\Search\Results\PluginManager $results,
+        \Laminas\Http\Client $client,
+        $sources = 'wikipedia'
     ) {
         $this->resultsManager = $results;
         $this->client = $client;
@@ -121,7 +125,8 @@ class AuthorInfo implements RecommendInterface, TranslatorAwareInterface
     public function setConfig($settings)
     {
         $parts = explode(':', $settings);
-        if (isset($parts[0]) && !empty($parts[0])
+        if (
+            isset($parts[0]) && !empty($parts[0])
             && strtolower(trim($parts[0])) !== 'false'
         ) {
             $this->useViaf = true;
@@ -144,13 +149,14 @@ class AuthorInfo implements RecommendInterface, TranslatorAwareInterface
     }
 
     /**
-     * Called at the end of the Search Params objects' initFromRequest() method.
+     * Called before the Search Results object performs its main search
+     * (specifically, in response to \VuFind\Search\SearchRunner::EVENT_CONFIGURED).
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
      * be needed.
      *
      * @param \VuFind\Search\Base\Params $params  Search parameter object
-     * @param \Zend\StdLib\Parameters    $request Parameter object representing user
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
      * request.
      *
      * @return void
@@ -212,11 +218,11 @@ class AuthorInfo implements RecommendInterface, TranslatorAwareInterface
         $last = $nameParts[0];
         // - move all names up an index, move last name to last
         // - Last, First M. -> First M. Last
-        for ($i = 1;$i < count($nameParts);$i++) {
+        for ($i = 1; $i < count($nameParts); $i++) {
             $nameParts[$i - 1] = $nameParts[$i];
         }
         $nameParts[count($nameParts) - 1] = $last;
-        $author = implode($nameParts, ' ');
+        $author = implode(' ', $nameParts);
         return $author;
     }
 
@@ -237,7 +243,7 @@ class AuthorInfo implements RecommendInterface, TranslatorAwareInterface
             return false;
         }
         $details = json_decode($result->getBody());
-        return isset($details->WKP[0]) ? $details->WKP[0] : false;
+        return $details->WKP[0] ?? false;
     }
 
     /**

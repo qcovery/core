@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VF Configuration Writer
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Config;
 
 /**
@@ -109,7 +111,8 @@ class Writer
             if (preg_match('/^\[(.+)\]$/', trim($content), $matches)) {
                 // If we just left the target section and didn't find the
                 // desired setting, we should write it to the end.
-                if ($currentSection == $section && !$settingSet
+                if (
+                    $currentSection == $section && !$settingSet
                     && $value !== null
                 ) {
                     $line = $this->buildContentLine($setting, $value, 0)
@@ -242,11 +245,19 @@ class Writer
         // accordingly:
         if (is_array($value)) {
             $retVal = '';
-            foreach ($value as $current) {
-                $retVal .= $key . '[]' . $tabStr . " = "
-                    . $this->buildContentValue($current);
+            // TODO: replace $autoIndex code with array_is_list() check
+            // when supported (after PHP 8.1 is minimum required version).
+            $autoIndex = 0;
+            foreach ($value as $i => $current) {
+                // If the array indices are a numeric sequence starting at 0,
+                // omit them from the key names; any other index should be
+                // explicitly set:
+                $currentIndex = ($i === $autoIndex) ? '' : $i;
+                $retVal .= $key . '[' . $currentIndex . ']' . $tabStr . " = "
+                    . $this->buildContentValue($current) . "\n";
+                $autoIndex++;
             }
-            return $retVal;
+            return rtrim($retVal);
         }
 
         // Standard case: value is not an array:

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Summon Controller
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Controller;
 
-use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Mvc\MvcEvent;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Summon Controller
@@ -59,7 +61,7 @@ class SummonController extends AbstractSearch
      */
     protected function resultScrollerActive()
     {
-        $config = $this->serviceLocator->get('VuFind\Config\PluginManager')
+        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
             ->get('Summon');
         return isset($config->Record->next_prev_navigation)
             && $config->Record->next_prev_navigation;
@@ -90,7 +92,9 @@ class SummonController extends AbstractSearch
         parent::attachDefaultListeners();
         $events = $this->getEventManager();
         $events->attach(
-            MvcEvent::EVENT_DISPATCH, [$this, 'injectSummonMessage'], 1000
+            MvcEvent::EVENT_DISPATCH,
+            [$this, 'injectSummonMessage'],
+            1000
         );
     }
 
@@ -106,7 +110,7 @@ class SummonController extends AbstractSearch
 
         // Set up facet information:
         $facets = $this->serviceLocator
-            ->get('VuFind\Search\FacetCache\PluginManager')->get('Summon')
+            ->get(\VuFind\Search\FacetCache\PluginManager::class)->get('Summon')
             ->getList('Advanced');
         $view->facetList = $this->processAdvancedFacets($facets, $view->saved);
         $specialFacets = $this->parseSpecialFacetsSetting(
@@ -114,7 +118,8 @@ class SummonController extends AbstractSearch
         );
         if (isset($specialFacets['checkboxes'])) {
             $view->checkboxFacets = $this->processAdvancedCheckboxes(
-                $specialFacets['checkboxes'], $view->saved
+                $specialFacets['checkboxes'],
+                $view->saved
             );
         }
         $view->ranges = $this
@@ -153,7 +158,8 @@ class SummonController extends AbstractSearch
                 // If we haven't already found a selected facet and the current
                 // facet has been applied to the search, we should store it as
                 // the selected facet for the current control.
-                if ($searchObject
+                if (
+                    $searchObject
                     && $searchObject->getParams()->hasFilter($fullFilter)
                 ) {
                     $facetList[$facet]['list'][$key]['selected'] = true;

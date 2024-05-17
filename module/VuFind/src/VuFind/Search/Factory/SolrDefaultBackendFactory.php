@@ -26,11 +26,8 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-namespace VuFind\Search\Factory;
 
-use VuFindSearch\Backend\Solr\Backend;
-use VuFindSearch\Backend\Solr\Connector;
-use VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory;
+namespace VuFind\Search\Factory;
 
 /**
  * Factory for the default SOLR backend.
@@ -52,33 +49,21 @@ class SolrDefaultBackendFactory extends AbstractSolrBackendFactory
         $this->searchConfig = 'searches';
         $this->searchYaml = 'searchspecs.yaml';
         $this->facetConfig = 'facets';
+        $this->defaultIndexName = 'biblio';
+        $this->allowFallbackForIndexName = true;
     }
 
     /**
-     * Get the Solr core.
+     * Get the callback for creating a record.
      *
-     * @return string
+     * Returns a callable or null to use RecordCollectionFactory's default method.
+     *
+     * @return callable|null
      */
-    protected function getSolrCore()
+    protected function getCreateRecordCallback(): ?callable
     {
-        $config = $this->config->get($this->mainConfig);
-        return isset($config->Index->default_core)
-            ? $config->Index->default_core : 'biblio';
-    }
-
-    /**
-     * Create the SOLR backend.
-     *
-     * @param Connector $connector Connector
-     *
-     * @return Backend
-     */
-    protected function createBackend(Connector $connector)
-    {
-        $backend = parent::createBackend($connector);
-        $manager = $this->serviceLocator->get('VuFind\RecordDriver\PluginManager');
-        $factory = new RecordCollectionFactory([$manager, 'getSolrRecord']);
-        $backend->setRecordCollectionFactory($factory);
-        return $backend;
+        $manager = $this->serviceLocator
+            ->get(\VuFind\RecordDriver\PluginManager::class);
+        return [$manager, 'getSolrRecord'];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Trait to add asset pipeline functionality (concatenation / minification) to
  * a HeadLink/HeadScript-style view helper.
@@ -28,6 +29,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFindTheme\View\Helper;
 
 use VuFindTheme\ThemeInfo;
@@ -76,7 +78,7 @@ trait ConcatTrait
      * @param stdClass $item Element object
      * @param string   $path New path string
      *
-     * @return void
+     * @return stdClass
      */
     abstract protected function setResourceFilePath($item, $path);
 
@@ -86,6 +88,20 @@ trait ConcatTrait
      * @return minifying object like \MatthiasMullie\Minify\JS
      */
     abstract protected function getMinifier();
+
+    /**
+     * Add a content security policy nonce to the item
+     *
+     * @param stdClass $item Item
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function addNonce($item)
+    {
+        // Default implementation does nothing
+    }
 
     /**
      * Set the file path of the link object
@@ -134,7 +150,8 @@ trait ConcatTrait
         if ($config === false || $config == 'off') {
             return false;
         }
-        if ($config == '*' || $config == 'on'
+        if (
+            $config == '*' || $config == 'on'
             || $config == 'true' || $config === true
         ) {
             return true;
@@ -145,10 +162,10 @@ trait ConcatTrait
 
     /**
      * Initialize class properties related to concatenation of resources.
-     * All of the elements to be concatenated into ($this->concatItems)
-     * and those that need to remain on their own ($this->otherItems).
+     * All of the elements to be concatenated into groups and
+     * and those that need to remain on their own special group 'other'.
      *
-     * @return void
+     * @return bool True if there are items
      */
     protected function filterItems()
     {
@@ -161,23 +178,36 @@ trait ConcatTrait
             if ($this->isExcludedFromConcat($item)) {
                 $this->groups[] = [
                     'other' => true,
-                    'item' => $item
+                    'item' => $item,
                 ];
                 $groupTypes[] = 'other';
                 continue;
             }
 
+            $path = $this->getFileType() . '/' . $this->getResourceFilePath($item);
             $details = $this->themeInfo->findContainingTheme(
-                $this->getFileType() . '/' . $this->getResourceFilePath($item),
+                $path,
                 ThemeInfo::RETURN_ALL_DETAILS
             );
+            // Deal with special case: $path was not found in any theme.
+            if (null === $details) {
+                $errorMsg = "Could not find file '$path' in theme files";
+                method_exists($this, 'logError')
+                    ? $this->logError($errorMsg) : error_log($errorMsg);
+                $this->groups[] = [
+                    'other' => true,
+                    'item' => $item,
+                ];
+                $groupTypes[] = 'other';
+                continue;
+            }
 
             $type = $this->getType($item);
             $index = array_search($type, $groupTypes);
             if ($index === false) {
                 $this->groups[] = [
                     'items' => [$item],
-                    'key' => $details['path'] . filemtime($details['path'])
+                    'key' => $details['path'] . filemtime($details['path']),
                 ];
                 $groupTypes[] = $type;
             } else {
@@ -230,7 +260,10 @@ trait ConcatTrait
         }
         // Locate/create concatenated asset file
         $filename = md5($group['key']) . '.min.' . $this->getFileType();
-        $concatPath = $this->getResourceCacheDir() . $filename;
+        // Minifier uses realpath, so do that here too to make sure we're not
+        // pointing to a symlink. Otherwise the path converter won't find the correct
+        // shared directory part.
+        $concatPath = realpath($this->getResourceCacheDir()) . '/' . $filename;
         if (!file_exists($concatPath)) {
             $lockfile = "$concatPath.lock";
             $handle = fopen($lockfile, 'c+');
@@ -276,6 +309,7 @@ trait ConcatTrait
                 . $this->getResourceFilePath($item),
                 ThemeInfo::RETURN_ALL_DETAILS
             );
+            $details['path'] = realpath($details['path']);
             $data[] = $this->getMinifiedData($details, $concatPath);
         }
         // Separate each file's data with a new line so that e.g. a file
@@ -328,7 +362,7 @@ trait ConcatTrait
         if ($this->view) {
             $useCdata = $this->view->plugin('doctype')->isXhtml();
         } else {
-            $useCdata = $this->useCdata;
+            $useCdata = $this->useCdata ?? false;
         }
 
         $escapeStart = ($useCdata) ? '//<![CDATA[' : '//<!--';
@@ -337,8 +371,18 @@ trait ConcatTrait
         $output = [];
         foreach ($this->groups as $group) {
             if (isset($group['other'])) {
+                /**
+                 * PHPStan doesn't like this because of incompatible itemToString
+                 * signatures in HeadLink/HeadScript, but it is safe to use because
+                 * the extra parameters will be ignored appropriately.
+                 *
+                 * @phpstan-ignore-next-line
+                 */
                 $output[] = $this->itemToString(
-                    $group['item'], $indent, $escapeStart, $escapeEnd
+                    $group['item'],
+                    $indent,
+                    $escapeStart,
+                    $escapeEnd
                 );
             } else {
                 // Note that we  use parent::itemToString() below instead of
@@ -347,14 +391,26 @@ trait ConcatTrait
                 // files, which are stored in a theme-independent cache).
                 $path = $this->getConcatenatedFilePath($group);
                 $item = $this->setResourceFilePath($group['items'][0], $path);
+                $this->addNonce($item);
+                /**
+                 * PHPStan doesn't like this because of incompatible itemToString
+                 * signatures in HeadLink/HeadScript, but it is safe to use because
+                 * the extra parameters will be ignored appropriately.
+                 *
+                 * @phpstan-ignore-next-line
+                 */
                 $output[] = parent::itemToString(
-                    $item, $indent, $escapeStart, $escapeEnd
+                    $item,
+                    $indent,
+                    $escapeStart,
+                    $escapeEnd
                 );
             }
         }
 
         return $indent . implode(
-            $this->escape($this->getSeparator()) . $indent, $output
+            $this->escape($this->getSeparator()) . $indent,
+            $output
         );
     }
 
@@ -406,7 +462,8 @@ trait ConcatTrait
     {
         // toString must not throw exception
         try {
-            if (!$this->isPipelineActive() || !$this->filterItems()
+            if (
+                !$this->isPipelineActive() || !$this->filterItems()
                 || count($this) == 1
             ) {
                 return parent::toString($indent);

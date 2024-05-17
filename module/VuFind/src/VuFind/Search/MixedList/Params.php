@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mixed List aspect of the Search Multi-class (Params)
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\MixedList;
 
 /**
@@ -48,7 +50,7 @@ class Params extends \VuFind\Search\Base\Params
     /**
      * Initialize the object's search settings from a request object.
      *
-     * @param \Zend\StdLib\Parameters $request Parameter object representing user
+     * @param \Laminas\Stdlib\Parameters $request Parameter object representing user
      * request.
      *
      * @return void
@@ -87,7 +89,7 @@ class Params extends \VuFind\Search\Base\Params
      */
     public function addHiddenFilter($newFilter)
     {
-        list($field, $value) = $this->parseFilter($newFilter);
+        [$field, $value] = $this->parseFilter($newFilter);
         if ($field == 'ids') {
             $this->setRecordIdsFromFilter($value);
         } else {
@@ -119,7 +121,8 @@ class Params extends \VuFind\Search\Base\Params
     public function getDisplayQuery()
     {
         return $this->translate(
-            'result_count', ['%%count%%' => count($this->recordsToRequest)]
+            'result_count',
+            ['%%count%%' => count($this->recordsToRequest)]
         );
     }
 

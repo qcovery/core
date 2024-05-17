@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mink test class for combined search.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFindTest\Mink;
 
 use Behat\Mink\Element\Element;
@@ -37,8 +39,9 @@ use Behat\Mink\Element\Element;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
+ * @retry    4
  */
-class CombinedSearchTest extends \VuFindTest\Unit\MinkTestCase
+class CombinedSearchTest extends \VuFindTest\Integration\MinkTestCase
 {
     /**
      * Get config settings for combined.ini.
@@ -55,7 +58,7 @@ class CombinedSearchTest extends \VuFindTest\Unit\MinkTestCase
             'Solr:two' => [
                 'label' => 'Solr Two',
                 'hiddenFilter' => 'building:weird_ids.mrc',
-            ]
+            ],
         ];
     }
 
@@ -77,10 +80,13 @@ class CombinedSearchTest extends \VuFindTest\Unit\MinkTestCase
         ];
         foreach ($expectedResults as $container => $title) {
             $this->assertEquals(
-                $title, $this->findCss($page, "$container a.title")->getText()
+                $title,
+                $this->findCss($page, "$container a.title")->getText()
             );
             // Check for sample driver location/call number in output (this will
             // only appear after AJAX returns):
+            $this->unFindCss($page, '.callnumber.ajax-availability');
+            $this->unFindCss($page, '.location.ajax-availability');
             $this->assertEquals(
                 'A1234.567',
                 $this->findCss($page, "$container .callnumber")->getText()
@@ -100,15 +106,17 @@ class CombinedSearchTest extends \VuFindTest\Unit\MinkTestCase
     public function testCombinedSearchResults()
     {
         $this->changeConfigs(
-            ['combined' => $this->getCombinedIniOverrides()], ['combined']
+            ['combined' => $this->getCombinedIniOverrides()],
+            ['combined']
         );
         $session = $this->getMinkSession();
         $session->visit($this->getVuFindUrl() . '/Combined');
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('id:"testsample1" OR id:"theplus+andtheminus-"');
-        $this->findCss($page, '.btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.btn.btn-primary');
+        $this->waitForPageLoad($page);
+        $this->unFindCss($page, '.fa-spinner.icon--spin');
         $this->assertResultsForDefaultQuery($page);
     }
 
@@ -123,15 +131,16 @@ class CombinedSearchTest extends \VuFindTest\Unit\MinkTestCase
         $config['Solr:one']['ajax'] = true;
         $config['Solr:two']['ajax'] = true;
         $this->changeConfigs(
-            ['combined' => $config], ['combined']
+            ['combined' => $config],
+            ['combined']
         );
         $session = $this->getMinkSession();
         $session->visit($this->getVuFindUrl() . '/Combined');
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('id:"testsample1" OR id:"theplus+andtheminus-"');
-        $this->findCss($page, '.btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.btn.btn-primary');
+        $this->waitForPageLoad($page);
         $this->assertResultsForDefaultQuery($page);
     }
 
@@ -145,15 +154,16 @@ class CombinedSearchTest extends \VuFindTest\Unit\MinkTestCase
         $config = $this->getCombinedIniOverrides();
         $config['Solr:one']['ajax'] = true;
         $this->changeConfigs(
-            ['combined' => $config], ['combined']
+            ['combined' => $config],
+            ['combined']
         );
         $session = $this->getMinkSession();
         $session->visit($this->getVuFindUrl() . '/Combined');
         $page = $session->getPage();
         $this->findCss($page, '#searchForm_lookfor')
             ->setValue('id:"testsample1" OR id:"theplus+andtheminus-"');
-        $this->findCss($page, '.btn.btn-primary')->click();
-        $this->snooze();
+        $this->clickCss($page, '.btn.btn-primary');
+        $this->waitForPageLoad($page);
         $this->assertResultsForDefaultQuery($page);
     }
 }

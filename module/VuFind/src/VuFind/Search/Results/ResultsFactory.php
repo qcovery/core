@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generic factory for search results objects.
  *
@@ -25,10 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Search\Results;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
+use VuFind\Search\Factory\UrlQueryHelperFactory;
 
 /**
  * Generic factory for search results objects.
@@ -53,19 +59,34 @@ class ResultsFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         // Replace trailing "Results" with "Params" to get the params service:
         $paramsService = preg_replace('/Results$/', 'Params', $requestedName);
-        $params = $container->get('VuFind\Search\Params\PluginManager')
+        // Replace leading namespace with "VuFind" if service is not available:
+        $paramsServiceAvailable = $container
+            ->get(\VuFind\Search\Params\PluginManager::class)->has($paramsService);
+        if (!$paramsServiceAvailable) {
+            $paramsService = preg_replace('/^[^\\\]+/', 'VuFind', $paramsService);
+        }
+        $params = $container->get(\VuFind\Search\Params\PluginManager::class)
             ->get($paramsService);
-        $searchService = $container->get('VuFindSearch\Service');
-        $recordLoader = $container->get('VuFind\Record\Loader');
-        return new $requestedName(
-            $params, $searchService, $recordLoader, ...($options ?: [])
+        $searchService = $container->get(\VuFindSearch\Service::class);
+        $recordLoader = $container->get(\VuFind\Record\Loader::class);
+        $results = new $requestedName(
+            $params,
+            $searchService,
+            $recordLoader,
+            ...($options ?: [])
         );
+        $results->setUrlQueryHelperFactory(
+            $container->get(UrlQueryHelperFactory::class)
+        );
+        return $results;
     }
 }

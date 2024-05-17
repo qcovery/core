@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Guardian review content loader.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Content\Reviews;
 
 /**
@@ -82,7 +84,8 @@ class Guardian extends \VuFind\Content\AbstractBase
                     $result[$i]['Date'] = $review['webPublicationDate'];
                     $result[$i]['Summary'] = $review['fields']['headline'] . ". " .
                         preg_replace(
-                            '/<p>|<p [^>]*>|<\/p>/', '',
+                            '/<p>|<p [^>]*>|<\/p>/',
+                            '',
                             html_entity_decode($review['fields']['trailText'])
                         );
                     $result[$i]['ReviewURL'] = $review['fields']['shortUrl'];
@@ -102,7 +105,8 @@ class Guardian extends \VuFind\Content\AbstractBase
                     $result[$i]['Source'] = $review['fields']['byline'];
                     // Only return Content if the body tag contains a usable review
                     $redist = "Redistribution rights for this field are unavailable";
-                    if ((strlen($review['fields']['body']) > 0)
+                    if (
+                        (strlen($review['fields']['body']) > 0)
                         && (!strstr($review['fields']['body'], $redist))
                     ) {
                         $result[$i]['Content'] = $review['fields']['body'];

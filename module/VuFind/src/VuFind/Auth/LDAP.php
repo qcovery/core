@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LDAP authentication class
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:authentication_handlers Wiki
  */
+
 namespace VuFind\Auth;
 
 use VuFind\Exception\Auth as AuthException;
@@ -55,7 +57,8 @@ class LDAP extends AbstractBase
         // Check for missing parameters:
         $requiredParams = ['host', 'port', 'basedn', 'username'];
         foreach ($requiredParams as $param) {
-            if (!isset($this->config->LDAP->$param)
+            if (
+                !isset($this->config->LDAP->$param)
                 || empty($this->config->LDAP->$param)
             ) {
                 throw new AuthException(
@@ -75,7 +78,7 @@ class LDAP extends AbstractBase
     protected function getSetting($name)
     {
         $config = $this->getConfig();
-        $value = isset($config->LDAP->$name) ? $config->LDAP->$name : '';
+        $value = $config->LDAP->$name ?? '';
 
         // Normalize all values to lowercase except for potentially case-sensitive
         // bind and basedn credentials.
@@ -86,7 +89,7 @@ class LDAP extends AbstractBase
     /**
      * Attempt to authenticate the current user.  Throws exception if login fails.
      *
-     * @param \Zend\Http\PhpEnvironment\Request $request Request object containing
+     * @param \Laminas\Http\PhpEnvironment\Request $request Request object containing
      * account credentials.
      *
      * @throws AuthException
@@ -263,7 +266,7 @@ class LDAP extends AbstractBase
         // Database fields that we may be able to load from LDAP:
         $fields = [
             'firstname', 'lastname', 'email', 'cat_username', 'cat_password',
-            'college', 'major'
+            'college', 'major',
         ];
 
         // User object to populate from LDAP:
@@ -294,7 +297,7 @@ class LDAP extends AbstractBase
                         }
 
                         if ($field != "cat_password") {
-                            $user->$field = ($value === null) ? '' : $value;
+                            $user->$field = $value ?? '';
                         } else {
                             $catPassword = $value;
                         }

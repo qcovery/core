@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\Solr\Response\Json;
 
 use VuFindSearch\Exception\InvalidArgumentException;
@@ -45,7 +46,7 @@ class RecordCollectionFactory implements RecordCollectionFactoryInterface
     /**
      * Factory to turn data into a record object.
      *
-     * @var Callable
+     * @var callable
      */
     protected $recordFactory;
 
@@ -59,13 +60,14 @@ class RecordCollectionFactory implements RecordCollectionFactoryInterface
     /**
      * Constructor.
      *
-     * @param Callable $recordFactory   Callback to construct records
+     * @param callable $recordFactory   Callback to construct records
      * @param string   $collectionClass Class of collection
      *
      * @return void
      */
-    public function __construct($recordFactory = null,
-        $collectionClass = 'VuFindSearch\Backend\Solr\Response\Json\RecordCollection'
+    public function __construct(
+        $recordFactory = null,
+        $collectionClass = RecordCollection::class
     ) {
         if (null === $recordFactory) {
             $this->recordFactory = function ($data) {
@@ -95,10 +97,8 @@ class RecordCollectionFactory implements RecordCollectionFactoryInterface
             );
         }
         $collection = new $this->collectionClass($response);
-        if (isset($response['response']['docs'])) {
-            foreach ($response['response']['docs'] as $doc) {
-                $collection->add(call_user_func($this->recordFactory, $doc));
-            }
+        foreach ($response['response']['docs'] ?? [] as $doc) {
+            $collection->add(call_user_func($this->recordFactory, $doc), false);
         }
         return $collection;
     }

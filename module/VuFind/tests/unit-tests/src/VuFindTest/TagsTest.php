@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tags Test Class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest;
 
 /**
@@ -50,7 +52,7 @@ class TagsTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new \VuFind\Tags();
     }

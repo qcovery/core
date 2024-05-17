@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SRU Search Interface
  *
@@ -25,11 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFindSearch\Backend\SRU;
 
 use VuFind\XSLT\Processor as XSLTProcessor;
 use VuFindSearch\Backend\Exception\BackendException;
-
 use VuFindSearch\Backend\Exception\HttpErrorException;
 
 /**
@@ -41,7 +42,7 @@ use VuFindSearch\Backend\Exception\HttpErrorException;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class Connector implements \Zend\Log\LoggerAwareInterface
+class Connector implements \Laminas\Log\LoggerAwareInterface
 {
     use \VuFind\Log\LoggerAwareTrait;
 
@@ -55,7 +56,7 @@ class Connector implements \Zend\Log\LoggerAwareInterface
     /**
      * The HTTP_Request object used for REST transactions
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $client;
 
@@ -78,10 +79,10 @@ class Connector implements \Zend\Log\LoggerAwareInterface
      *
      * Sets up the SOAP Client
      *
-     * @param string            $host   The URL of the SRU Server
-     * @param \Zend\Http\Client $client An HTTP client object
+     * @param string               $host   The URL of the SRU Server
+     * @param \Laminas\Http\Client $client An HTTP client object
      */
-    public function __construct($host, \Zend\Http\Client $client)
+    public function __construct($host, \Laminas\Http\Client $client)
     {
         // Initialize properties needed for HTTP connection:
         $this->host = $host;
@@ -150,8 +151,13 @@ class Connector implements \Zend\Log\LoggerAwareInterface
      *
      * @return array          An array of query results
      */
-    public function sruSearch($query, $start = 1, $limit = null, $sortBy = null,
-        $schema = 'marcxml', $process = true
+    public function sruSearch(
+        $query,
+        $start = 1,
+        $limit = null,
+        $sortBy = null,
+        $schema = 'marcxml',
+        $process = true
     ) {
         $this->debug('Query: ' . print_r($query, true));
 
@@ -173,7 +179,7 @@ class Connector implements \Zend\Log\LoggerAwareInterface
     /**
      * Check for HTTP errors in a response.
      *
-     * @param \Zend\Http\Response $result The response to check.
+     * @param \Laminas\Http\Response $result The response to check.
      *
      * @throws BackendException
      * @return void
@@ -196,6 +202,7 @@ class Connector implements \Zend\Log\LoggerAwareInterface
      */
     protected function call($method = 'GET', $params = null, $process = true)
     {
+        $queryString = null;
         if ($params) {
             $query = ['version=' . $this->sruVersion];
             foreach ($params as $function => $value) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Inline script view helper (extended for VuFind's theme system)
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFindTheme\View\Helper;
 
 /**
@@ -39,13 +41,6 @@ namespace VuFindTheme\View\Helper;
 class InlineScript extends HeadScript
 {
     /**
-     * Registry key for placeholder
-     *
-     * @var string
-     */
-    protected $regKey = 'Zend_View_Helper_InlineScript';
-
-    /**
      * Return InlineScript object
      *
      * Returns InlineScript helper object; optionally, allows specifying a
@@ -59,8 +54,12 @@ class InlineScript extends HeadScript
      *
      * @return InlineScript
      */
-    public function __invoke($mode = HeadScript::FILE, $spec = null,
-        $placement = 'APPEND', array $attrs = [], $type = 'text/javascript'
+    public function __invoke(
+        $mode = HeadScript::FILE,
+        $spec = null,
+        $placement = 'APPEND',
+        array $attrs = [],
+        $type = 'text/javascript'
     ) {
         return parent::__invoke($mode, $spec, $placement, $attrs, $type);
     }

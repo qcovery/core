@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cover layer plugin manager
  *
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
+
 namespace VuFind\Cover\Layer;
+
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
  * Cover layer plugin manager
@@ -44,10 +48,10 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $aliases = [
-        'defaulttext' => 'VuFind\Cover\Layer\DefaultText',
-        'gridbackground' => 'VuFind\Cover\Layer\GridBackground',
-        'initialtext' => 'VuFind\Cover\Layer\InitialText',
-        'solidbackground' => 'VuFind\Cover\Layer\SolidBackground',
+        'defaulttext' => DefaultText::class,
+        'gridbackground' => GridBackground::class,
+        'initialtext' => InitialText::class,
+        'solidbackground' => SolidBackground::class,
     ];
 
     /**
@@ -56,14 +60,10 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      * @var array
      */
     protected $factories = [
-        'VuFind\Cover\Layer\DefaultText' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Cover\Layer\GridBackground' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Cover\Layer\InitialText' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
-        'VuFind\Cover\Layer\SolidBackground' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
+        DefaultText::class => InvokableFactory::class,
+        GridBackground::class => InvokableFactory::class,
+        InitialText::class => InvokableFactory::class,
+        SolidBackground::class => InvokableFactory::class,
     ];
 
     /**
@@ -74,6 +74,6 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
      */
     protected function getExpectedInterface()
     {
-        return 'VuFind\Cover\Layer\LayerInterface';
+        return LayerInterface::class;
     }
 }

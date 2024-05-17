@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Logger Test Class
  *
@@ -25,12 +26,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Log;
 
 use VuFind\Log\Logger;
 
 /**
- * Sitemap Test Class
+ * Logger Test Class
  *
  * @category VuFind
  * @package  Tests
@@ -38,7 +40,7 @@ use VuFind\Log\Logger;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class LoggerTest extends \VuFindTest\Unit\TestCase
+class LoggerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test logException()
@@ -47,19 +49,22 @@ class LoggerTest extends \VuFindTest\Unit\TestCase
      */
     public function testLogException()
     {
-        $callback = function ($a) {
+        $callback = function ($a): bool {
             $expectedContext = <<<CONTEXT
-Server Context:
-Array
-(
-    [REMOTE_ADDR] => 1.2.3.4
-    [HTTP_USER_AGENT] => Fake browser
-    [HTTP_HOST] => localhost:80
-    [REQUEST_URI] => /foo/bar
-)
-CONTEXT;
+                Server Context:
+                Array
+                (
+                    [REMOTE_ADDR] => 5.6.7.8
+                    [HTTP_USER_AGENT] => Fake browser
+                    [HTTP_HOST] => localhost:80
+                    [REQUEST_URI] => /foo/bar
+                )
+                CONTEXT;
+            $expectedA2 = 'Exception : test'
+                . '(Server: IP = 1.2.3.4, Referer = none, User Agent = Fake browser, '
+                . 'Host = localhost:80, Request URI = /foo/bar)';
             return $a[1] === 'Exception : test'
-                && $a[2] === 'Exception : test(Server: IP = 1.2.3.4, Referer = none, User Agent = Fake browser, Host = localhost:80, Request URI = /foo/bar)'
+                && $a[2] === $expectedA2
                 && false !== strpos($a[3], $a[2])
                 && false !== strpos($a[3], 'Backtrace:')
                 && false !== strpos($a[3], 'line')
@@ -78,19 +83,30 @@ CONTEXT;
                 && false !== strpos($a[5], 'function =')
                 && count($a) == 5;
         };
-        $logger = $this->getMockBuilder('VuFind\Log\Logger')
-            ->setMethods(['log'])
+        $mockIpReader = $this->getMockBuilder(\VuFind\Net\UserIpReader::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getUserIp'])
+            ->getMock();
+        $mockIpReader->expects($this->once())->method('getUserIp')
+            ->will($this->returnValue('1.2.3.4'));
+        $logger = $this->getMockBuilder(\VuFind\Log\Logger::class)
+            ->setConstructorArgs([$mockIpReader])
+            ->onlyMethods(['log'])
             ->getMock();
         $logger->expects($this->once())->method('log')->with($this->equalTo(Logger::CRIT), $this->callback($callback));
         try {
             throw new \Exception('test');
         } catch (\Exception $e) {
-            $fakeServer = new \Zend\Stdlib\Parameters(
+            // Note that we use a different REMOTE_ADDR in the request than
+            // in the mock IP reader above, to confirm that the IP reader is
+            // being used instead of the request; this ensures that proxies
+            // are handled correctly, etc.
+            $fakeServer = new \Laminas\Stdlib\Parameters(
                 [
-                    'REMOTE_ADDR' => '1.2.3.4',
+                    'REMOTE_ADDR' => '5.6.7.8',
                     'HTTP_USER_AGENT' => 'Fake browser',
                     'HTTP_HOST' => 'localhost:80',
-                    'REQUEST_URI' => '/foo/bar'
+                    'REQUEST_URI' => '/foo/bar',
                 ]
             );
             $logger->logException($e, $fakeServer);

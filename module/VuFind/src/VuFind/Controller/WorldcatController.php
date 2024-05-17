@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WorldCat Controller
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Controller;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * WorldCat Controller
@@ -58,7 +60,7 @@ class WorldcatController extends AbstractSearch
      */
     protected function resultScrollerActive()
     {
-        $config = $this->serviceLocator->get('VuFind\Config\PluginManager')
+        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
             ->get('WorldCat');
         return isset($config->Record->next_prev_navigation)
             && $config->Record->next_prev_navigation;

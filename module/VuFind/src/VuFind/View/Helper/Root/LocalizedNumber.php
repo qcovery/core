@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Localization based number formatting
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * Class NumberFormat
@@ -69,13 +71,20 @@ class LocalizedNumber extends AbstractHelper
         $translator = $this->getView()->plugin('translate');
 
         $decimalPoint = $translator(
-            'number_decimal_point', [], $this->defaultDecimalPoint
+            'number_decimal_point',
+            [],
+            $this->defaultDecimalPoint
         );
         $thousandSep = $translator(
-            'number_thousands_separator', [], $this->defaultThousandSep
+            'number_thousands_separator',
+            [],
+            $this->defaultThousandSep
         );
         $formattedNumber = number_format(
-            $number, $decimals, $decimalPoint, $thousandSep
+            $number,
+            $decimals,
+            $decimalPoint,
+            $thousandSep
         );
         if ($escapeHtml) {
             $escaper = $this->getView()->plugin('escapeHtml');

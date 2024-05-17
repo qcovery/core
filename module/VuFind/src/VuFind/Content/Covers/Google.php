@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Google cover content loader.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\Content\Covers;
 
 /**
@@ -36,8 +38,7 @@ namespace VuFind\Content\Covers;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class Google extends \VuFind\Content\AbstractCover
-    implements \VuFindHttp\HttpServiceAwareInterface
+class Google extends \VuFind\Content\AbstractCover implements \VuFindHttp\HttpServiceAwareInterface
 {
     use \VuFindHttp\HttpServiceAwareTrait;
 
@@ -54,7 +55,7 @@ class Google extends \VuFind\Content\AbstractCover
      *
      * @param string $url URL for client to use
      *
-     * @return \Zend\Http\Client
+     * @return \Laminas\Http\Client
      */
     protected function getHttpClient($url = null)
     {
@@ -89,12 +90,14 @@ class Google extends \VuFind\Content\AbstractCover
         $result = $this->getHttpClient($url)->send();
 
         // If the request was successful and we can extract a valid response...
-        if ($result->isSuccess()
+        if (
+            $result->isSuccess()
             && preg_match('/^[^{]*({.*})[^}]*$/', $result->getBody(), $matches)
         ) {
             // convert \x26 or \u0026 to &
             $json = json_decode(
-                str_replace(['\\x26', '\\u0026'], '&', $matches[1]), true
+                str_replace(['\\x26', '\\u0026'], '&', $matches[1]),
+                true
             );
 
             // find the first thumbnail URL and process it:

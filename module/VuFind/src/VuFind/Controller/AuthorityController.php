@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authority Controller
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Controller;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Authority Controller
@@ -54,37 +56,21 @@ class AuthorityController extends AbstractSearch
     /**
      * Home action
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function homeAction()
     {
-        // If we came in with a record ID, forward to the record action:
+        // If we came in with a record ID, forward to the record action; this
+        // provides backward compatibility with multiple legacy routes.
         if ($id = $this->params()->fromRoute('id', false)) {
-            $this->getRequest()->getQuery()->set('id', $id);
-            return $this->forwardTo('Authority', 'Record');
+            if ($id === 'Record') {
+                $id = $this->params()->fromQuery('id', $id);
+            }
+            return $this->redirect()->toRoute('solrauthrecord', compact('id'));
         }
 
         // Default behavior:
         return parent::homeAction();
-    }
-
-    /**
-     * Record action -- display a record
-     *
-     * @return \Zend\View\Model\ViewModel
-     */
-    public function recordAction()
-    {
-        $id = $this->params()->fromQuery('id');
-        $cfg = $this->serviceLocator->get('Config');
-        $tabConfig = $cfg['vufind']['recorddriver_tabs'];
-        $driver = $this->serviceLocator->get('VuFind\Record\Loader')
-            ->load($id, 'SolrAuth');
-        $request = $this->getRequest();
-        $tabs = $this->serviceLocator
-            ->get('VuFind\RecordTab\PluginManager')
-            ->getTabsForRecord($driver, $tabConfig, $request);
-        return $this->createViewModel(['driver' => $driver, 'tabs' => $tabs]);
     }
 
     /**

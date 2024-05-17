@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Solr Reserves aspect of the Search Multi-class (Params)
  *
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\SolrReserves;
 
 /**
@@ -40,4 +42,11 @@ namespace VuFind\Search\SolrReserves;
  */
 class Params extends \VuFind\Search\Solr\Params
 {
+    /**
+     * Config sections to search for facet labels if no override configuration
+     * is set.
+     *
+     * @var array
+     */
+    protected $defaultFacetLabelSections = ['Facets'];
 }

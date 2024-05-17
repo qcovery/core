@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for missing records -- used for saved favorites that have been deleted
  * from the index.
@@ -26,6 +27,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\RecordDriver;
 
 /**
@@ -43,15 +45,15 @@ class Missing extends DefaultRecord
     /**
      * Constructor
      *
-     * @param \Zend\Config\Config $mainConfig   VuFind main configuration (omit for
-     * built-in defaults)
-     * @param \Zend\Config\Config $recordConfig Record-specific configuration file
+     * @param \Laminas\Config\Config $mainConfig   VuFind main configuration (omit
+     * for built-in defaults)
+     * @param \Laminas\Config\Config $recordConfig Record-specific configuration file
      * (omit to use $mainConfig as $recordConfig)
      */
     public function __construct($mainConfig = null, $recordConfig = null)
     {
-        $this->sourceIdentifier = 'missing';
         parent::__construct($mainConfig, $recordConfig);
+        $this->setSourceIdentifiers('missing');
     }
 
     /**
@@ -102,5 +104,15 @@ class Missing extends DefaultRecord
     {
         $title = parent::getShortTitle();
         return empty($title) ? $this->determineMissingTitle() : $title;
+    }
+
+    /**
+     * Get an array of all the formats associated with the record.
+     *
+     * @return array
+     */
+    public function getFormats()
+    {
+        return ['Unknown'];
     }
 }

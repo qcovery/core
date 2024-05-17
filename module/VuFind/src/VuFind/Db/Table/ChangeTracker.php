@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Table Definition for change_tracker
  *
@@ -25,10 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Db\Table;
 
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Sql\Expression;
 use VuFind\Db\Row\RowGateway;
-use Zend\Db\Adapter\Adapter;
 
 /**
  * Table Definition for change_tracker
@@ -53,12 +56,16 @@ class ChangeTracker extends Gateway
      *
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
-     * @param array         $cfg     Zend Framework configuration
+     * @param array         $cfg     Laminas configuration
      * @param RowGateway    $rowObj  Row prototype object (null for default)
      * @param string        $table   Name of database table to interface with
      */
-    public function __construct(Adapter $adapter, PluginManager $tm, $cfg,
-        RowGateway $rowObj = null, $table = 'change_tracker'
+    public function __construct(
+        Adapter $adapter,
+        PluginManager $tm,
+        $cfg,
+        ?RowGateway $rowObj = null,
+        $table = 'change_tracker'
     ) {
         parent::__construct($adapter, $tm, $cfg, $rowObj, $table);
     }
@@ -78,23 +85,96 @@ class ChangeTracker extends Gateway
     }
 
     /**
+     * Build a callback function for use by the retrieveDeleted* methods.
+     *
+     * @param string $core    The Solr core holding the record.
+     * @param string $from    The beginning date of the range to search.
+     * @param string $until   The end date of the range to search.
+     * @param int    $offset  Record number to retrieve first.
+     * @param int    $limit   Retrieval limit (null for no limit)
+     * @param array  $columns Columns to retrieve (null for all)
+     *
+     * @return callable
+     */
+    public function getRetrieveDeletedCallback(
+        $core,
+        $from,
+        $until,
+        $offset = 0,
+        $limit = null,
+        $columns = null
+    ) {
+        return function ($select) use (
+            $core,
+            $from,
+            $until,
+            $offset,
+            $limit,
+            $columns
+        ) {
+            if ($columns !== null) {
+                $select->columns($columns);
+            }
+            $select->where
+                ->equalTo('core', $core)
+                ->greaterThanOrEqualTo('deleted', $from)
+                ->lessThanOrEqualTo('deleted', $until);
+            $select->order('deleted');
+            if ($offset > 0) {
+                $select->offset($offset);
+            }
+            if ($limit !== null) {
+                $select->limit($limit);
+            }
+        };
+    }
+
+    /**
      * Retrieve a set of deleted rows from the database.
      *
      * @param string $core  The Solr core holding the record.
      * @param string $from  The beginning date of the range to search.
      * @param string $until The end date of the range to search.
      *
-     * @return \Zend\Db\ResultSet\AbstractResultSet
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
      */
-    public function retrieveDeleted($core, $from, $until)
+    public function retrieveDeletedCount($core, $from, $until)
     {
-        $callback = function ($select) use ($core, $from, $until) {
-            $select->where
-                ->equalTo('core', $core)
-                ->greaterThanOrEqualTo('deleted', $from)
-                ->lessThanOrEqualTo('deleted', $until);
-            $select->order('deleted');
-        };
+        $columns = ['count' => new Expression('COUNT(*)')];
+        $callback = $this
+            ->getRetrieveDeletedCallback($core, $from, $until, 0, null, $columns);
+        $select = $this->sql->select();
+        $callback($select);
+        $statement = $this->sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+        return ((array)$result->current())['count'];
+    }
+
+    /**
+     * Retrieve a set of deleted rows from the database.
+     *
+     * @param string $core   The Solr core holding the record.
+     * @param string $from   The beginning date of the range to search.
+     * @param string $until  The end date of the range to search.
+     * @param int    $offset Record number to retrieve first.
+     * @param int    $limit  Retrieval limit (null for no limit)
+     *
+     * @return \Laminas\Db\ResultSet\AbstractResultSet
+     */
+    public function retrieveDeleted(
+        $core,
+        $from,
+        $until,
+        $offset = 0,
+        $limit = null
+    ) {
+        $callback = $this->getRetrieveDeletedCallback(
+            $core,
+            $from,
+            $until,
+            $offset,
+            $limit
+        );
         return $this->select($callback);
     }
 
@@ -156,7 +236,7 @@ class ChangeTracker extends Gateway
     {
         $oldTz = date_default_timezone_get();
         date_default_timezone_set('UTC');
-        $date = date($this->dateFormat, null === $ts ? time() : $ts);
+        $date = date($this->dateFormat, $ts ?? time());
         date_default_timezone_set($oldTz);
         return $date;
     }
@@ -209,7 +289,8 @@ class ChangeTracker extends Gateway
         // Are we restoring a previously deleted record, or was the stored
         // record change date before current record change date?  Either way,
         // we need to update the table!
-        if (!empty($row->deleted)
+        if (
+            !empty($row->deleted)
             || $this->strToUtcTime($row->last_record_change) < $change
         ) {
             // Save new values to the object:

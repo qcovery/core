@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Catalog Connection Class
  *
@@ -29,12 +30,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
+
 namespace VuFind\ILS;
 
+use Laminas\Log\LoggerAwareInterface;
+use VuFind\Exception\BadConfig;
 use VuFind\Exception\ILS as ILSException;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\ILS\Driver\DriverInterface;
-use Zend\Log\LoggerAwareInterface;
 
 /**
  * Catalog Connection Class
@@ -48,6 +51,8 @@ use Zend\Log\LoggerAwareInterface;
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
+ *
+ * @method array getStatus(string $id)
  */
 class Connection implements TranslatorAwareInterface, LoggerAwareInterface
 {
@@ -71,7 +76,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     /**
      * ILS configuration
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -111,16 +116,26 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     protected $failing = false;
 
     /**
+     * Request object
+     *
+     * @var \Laminas\Http\Request
+     */
+    protected $request;
+
+    /**
      * Constructor
      *
-     * @param \Zend\Config\Config              $config        Configuration
+     * @param \Laminas\Config\Config           $config        Configuration
      * representing the [Catalog] section of config.ini
      * @param \VuFind\ILS\Driver\PluginManager $driverManager Driver plugin manager
      * @param \VuFind\Config\PluginManager     $configReader  Configuration loader
+     * @param \Laminas\Http\Request            $request       Request object
      */
-    public function __construct(\Zend\Config\Config $config,
+    public function __construct(
+        \Laminas\Config\Config $config,
         \VuFind\ILS\Driver\PluginManager $driverManager,
-        \VuFind\Config\PluginManager $configReader
+        \VuFind\Config\PluginManager $configReader,
+        \Laminas\Http\Request $request = null
     ) {
         if (!isset($config->driver)) {
             throw new \Exception('ILS driver setting missing.');
@@ -131,6 +146,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         $this->config = $config;
         $this->configReader = $configReader;
         $this->driverManager = $driverManager;
+        $this->request = $request;
     }
 
     /**
@@ -164,7 +180,15 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
      */
     protected function initializeDriver()
     {
-        $this->driver->setConfig($this->getDriverConfig());
+        try {
+            $this->driver->setConfig($this->getDriverConfig());
+        } catch (\Exception $e) {
+            // Any errors thrown during configuration should be cast to BadConfig
+            // so we can handle them differently from other runtime problems.
+            throw $e instanceof BadConfig
+                ? $e
+                : new BadConfig('Failure during configuration.', 0, $e);
+        }
         $this->driver->init();
         $this->driverInitialized = true;
     }
@@ -185,10 +209,20 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
      * If configured, fail over to the NoILS driver and return true; otherwise,
      * return false.
      *
+     * @param \Exception $e The exception that triggered the failover.
+     *
      * @return bool
      */
-    protected function failOverToNoILS()
+    protected function failOverToNoILS(\Exception $e = null)
     {
+        // If the exception is caused by a configuration error, the administrator
+        // needs to fix it, but failing over to NoILS will mask the error and cause
+        // confusion. We shouldn't do that!
+        if ($e instanceof BadConfig) {
+            return false;
+        }
+
+        // If we got this far, we want to proceed with failover...
         $this->failing = true;
 
         // Only fail over if we're configured to allow it and we haven't already
@@ -222,7 +256,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             try {
                 $this->initializeDriver();
             } catch (\Exception $e) {
-                if (!$this->failOverToNoILS()) {
+                if (!$this->failOverToNoILS($e)) {
                     throw $e;
                 }
             }
@@ -276,7 +310,9 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         try {
             // Extract the configuration from the driver if available:
             $functionConfig = $this->checkCapability(
-                'getConfig', [$function, $params], true
+                'getConfig',
+                [$function, $params],
+                true
             ) ? $this->getDriver()->getConfig($function, $params) : false;
 
             // See if we have a corresponding check method to analyze the response:
@@ -316,7 +352,8 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         // should contain 'id' and 'patron' keys; this isn't exactly the same as
         // the full parameter expected by placeHold() but should contain the
         // necessary details for determining eligibility.
-        if ($this->getHoldsMode() != "none"
+        if (
+            $this->getHoldsMode() != "none"
             && $this->checkCapability('placeHold', [$params ?: []])
             && isset($functionConfig['HMACKeys'])
         ) {
@@ -329,14 +366,21 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             if (isset($functionConfig['extraHoldFields'])) {
                 $response['extraHoldFields'] = $functionConfig['extraHoldFields'];
             }
-            if (isset($functionConfig['helpText'])) {
-                $response['helpText'] = $this->getHelpText(
-                    $functionConfig['helpText']
+            if (!empty($functionConfig['updateFields'])) {
+                $response['updateFields'] = array_map(
+                    'trim',
+                    explode(':', $functionConfig['updateFields'])
                 );
             }
+            $response['helpText']
+                = $this->getHelpText($functionConfig['helpText'] ?? '');
+            $response['updateHelpText']
+                = $this->getHelpText($functionConfig['updateHelpText'] ?? '');
             if (isset($functionConfig['consortium'])) {
                 $response['consortium'] = $functionConfig['consortium'];
             }
+            $response['pickUpLocationCheckLimit']
+                = intval($functionConfig['pickUpLocationCheckLimit'] ?? 0);
         } else {
             $id = $params['id'] ?? null;
             if ($this->checkCapability('getHoldLink', [$id, []])) {
@@ -368,12 +412,14 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         // We can't pass exactly accurate parameters to checkCapability in this
         // context, so we'll just pass along $params as the best available
         // approximation.
-        if (isset($this->config->cancel_holds_enabled)
+        if (
+            isset($this->config->cancel_holds_enabled)
             && $this->config->cancel_holds_enabled == true
             && $this->checkCapability('cancelHolds', [$params ?: []])
         ) {
             $response = ['function' => "cancelHolds"];
-        } elseif (isset($this->config->cancel_holds_enabled)
+        } elseif (
+            isset($this->config->cancel_holds_enabled)
             && $this->config->cancel_holds_enabled == true
             && $this->checkCapability('getCancelHoldLink', [$params ?: []])
         ) {
@@ -403,12 +449,14 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         // We can't pass exactly accurate parameters to checkCapability in this
         // context, so we'll just pass along $params as the best available
         // approximation.
-        if (isset($this->config->renewals_enabled)
+        if (
+            isset($this->config->renewals_enabled)
             && $this->config->renewals_enabled == true
             && $this->checkCapability('renewMyItems', [$params ?: []])
         ) {
             $response = ['function' => "renewMyItems"];
-        } elseif (isset($this->config->renewals_enabled)
+        } elseif (
+            isset($this->config->renewals_enabled)
             && $this->config->renewals_enabled == true
             && $this->checkCapability('renewMyItemsLink', [$params ?: []])
         ) {
@@ -438,7 +486,8 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         // $params doesn't include all of the keys used by
         // placeStorageRetrievalRequest, but it is the best we can do in the context.
         $check = $this->checkCapability(
-            'placeStorageRetrievalRequest', [$params ?: []]
+            'placeStorageRetrievalRequest',
+            [$params ?: []]
         );
         if ($check && isset($functionConfig['HMACKeys'])) {
             $response = ['function' => 'placeStorageRetrievalRequest'];
@@ -446,11 +495,8 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             if (isset($functionConfig['extraFields'])) {
                 $response['extraFields'] = $functionConfig['extraFields'];
             }
-            if (isset($functionConfig['helpText'])) {
-                $response['helpText'] = $this->getHelpText(
-                    $functionConfig['helpText']
-                );
-            }
+            $response['helpText']
+                = $this->getHelpText($functionConfig['helpText'] ?? '');
         }
         return $response;
     }
@@ -471,30 +517,34 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function checkMethodcancelStorageRetrievalRequests($functionConfig,
+    protected function checkMethodcancelStorageRetrievalRequests(
+        $functionConfig,
         $params
     ) {
         $response = false;
 
-        if (isset($this->config->cancel_storage_retrieval_requests_enabled)
+        if (
+            isset($this->config->cancel_storage_retrieval_requests_enabled)
             && $this->config->cancel_storage_retrieval_requests_enabled
         ) {
             $check = $this->checkCapability(
-                'cancelStorageRetrievalRequests', [$params ?: []]
+                'cancelStorageRetrievalRequests',
+                [$params ?: []]
             );
             if ($check) {
                 $response = ['function' => 'cancelStorageRetrievalRequests'];
             } else {
                 $cancelParams = [
                     $params ?: [],
-                    $params['patron'] ?? null
+                    $params['patron'] ?? null,
                 ];
                 $check2 = $this->checkCapability(
-                    'getCancelStorageRetrievalRequestLink', $cancelParams
+                    'getCancelStorageRetrievalRequestLink',
+                    $cancelParams
                 );
                 if ($check2) {
                     $response = [
-                        'function' => 'getCancelStorageRetrievalRequestLink'
+                        'function' => 'getCancelStorageRetrievalRequestLink',
                     ];
                 }
             }
@@ -521,7 +571,8 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
 
         // $params doesn't include all of the keys used by
         // placeILLRequest, but it is the best we can do in the context.
-        if ($this->checkCapability('placeILLRequest', [$params ?: []])
+        if (
+            $this->checkCapability('placeILLRequest', [$params ?: []])
             && isset($functionConfig['HMACKeys'])
         ) {
             $response = ['function' => 'placeILLRequest'];
@@ -533,11 +584,8 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             if (isset($functionConfig['extraFields'])) {
                 $response['extraFields'] = $functionConfig['extraFields'];
             }
-            if (isset($functionConfig['helpText'])) {
-                $response['helpText'] = $this->getHelpText(
-                    $functionConfig['helpText']
-                );
-            }
+            $response['helpText']
+                = $this->getHelpText($functionConfig['helpText']);
         }
         return $response;
     }
@@ -562,25 +610,28 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     {
         $response = false;
 
-        if (isset($this->config->cancel_ill_requests_enabled)
+        if (
+            isset($this->config->cancel_ill_requests_enabled)
             && $this->config->cancel_ill_requests_enabled
         ) {
             $check = $this->checkCapability(
-                'cancelILLRequests', [$params ?: []]
+                'cancelILLRequests',
+                [$params ?: []]
             );
             if ($check) {
                 $response = ['function' => 'cancelILLRequests'];
             } else {
                 $cancelParams = [
                     $params ?: [],
-                    $params['patron'] ?? null
+                    $params['patron'] ?? null,
                 ];
                 $check2 = $this->checkCapability(
-                    'getCancelILLRequestLink', $cancelParams
+                    'getCancelILLRequestLink',
+                    $cancelParams
                 );
                 if ($check2) {
                     $response = [
-                        'function' => 'getCancelILLRequestLink'
+                        'function' => 'getCancelILLRequestLink',
                     ];
                 }
             }
@@ -613,6 +664,29 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     }
 
     /**
+     * Check Current Loans
+     *
+     * A support method for checkFunction(). This is responsible for checking
+     * the driver configuration to determine if the system supports current
+     * loans.
+     *
+     * @param array $functionConfig Function configuration
+     * @param array $params         Patron data
+     *
+     * @return mixed On success, an associative array with specific function keys
+     * and values; on failure, false.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    protected function checkMethodgetMyTransactions($functionConfig, $params)
+    {
+        if ($this->checkCapability('getMyTransactions', [$params ?: []])) {
+            return $functionConfig;
+        }
+        return false;
+    }
+
+    /**
      * Check Historic Loans
      *
      * A support method for checkFunction(). This is responsible for checking
@@ -636,6 +710,24 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     }
 
     /**
+     * Check Patron login
+     *
+     * A support method for checkFunction(). This is responsible for checking
+     * the driver configuration to determine if the system supports patron login.
+     * It is currently assumed that all drivers do.
+     *
+     * @param array $functionConfig The patronLogin configuration values
+     * @param array $params         An array of function-specific params (or null)
+     *
+     * @return mixed On success, an associative array with specific function keys
+     * and values for login; on failure, false.
+     */
+    protected function checkMethodpatronLogin($functionConfig, $params)
+    {
+        return $functionConfig;
+    }
+
+    /**
      * Get proper help text from the function config
      *
      * @param string|array $helpText Help text(s)
@@ -646,7 +738,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     {
         if (is_array($helpText)) {
             $lang = $this->getTranslatorLocale();
-            return $helpText[$lang] ?? '';
+            return $helpText[$lang] ?? $helpText['*'] ?? '';
         }
         return $helpText;
     }
@@ -671,7 +763,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
                 return $this->getDriver()->checkRequestIsValid($id, $data, $patron);
             }
         } catch (\Exception $e) {
-            if ($this->failOverToNoILS()) {
+            if ($this->failOverToNoILS($e)) {
                 return call_user_func_array([$this, __METHOD__], func_get_args());
             }
             throw $e;
@@ -698,15 +790,18 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     {
         try {
             $check = $this->checkCapability(
-                'checkStorageRetrievalRequestIsValid', [$id, $data, $patron]
+                'checkStorageRetrievalRequestIsValid',
+                [$id, $data, $patron]
             );
             if ($check) {
                 return $this->getDriver()->checkStorageRetrievalRequestIsValid(
-                    $id, $data, $patron
+                    $id,
+                    $data,
+                    $patron
                 );
             }
         } catch (\Exception $e) {
-            if ($this->failOverToNoILS()) {
+            if ($this->failOverToNoILS($e)) {
                 return call_user_func_array([$this, __METHOD__], func_get_args());
             }
             throw $e;
@@ -734,11 +829,13 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             $params = [$id, $data, $patron];
             if ($this->checkCapability('checkILLRequestIsValid', $params)) {
                 return $this->getDriver()->checkILLRequestIsValid(
-                    $id, $data, $patron
+                    $id,
+                    $data,
+                    $patron
                 );
             }
         } catch (\Exception $e) {
-            if ($this->failOverToNoILS()) {
+            if ($this->failOverToNoILS($e)) {
                 return call_user_func_array([$this, __METHOD__], func_get_args());
             }
             throw $e;
@@ -782,7 +879,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         // If we need to perform a health check, try to do a random item lookup
         // before proceeding.
         if ($healthCheck) {
-            $this->getStatus('1');
+            $this->getStatus($this->config->healthCheckId ?? '1');
         }
 
         // If we're encountering failures, let's go into ils-offline mode if
@@ -822,7 +919,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             return $this->checkCapability('hasHoldings', [$id])
                 ? $this->getDriver()->hasHoldings($id) : true;
         } catch (\Exception $e) {
-            if ($this->failOverToNoILS()) {
+            if ($this->failOverToNoILS($e)) {
                 return call_user_func_array([$this, __METHOD__], func_get_args());
             }
             throw $e;
@@ -843,7 +940,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             return $this->checkCapability('loginIsHidden')
                 ? $this->getDriver()->loginIsHidden() : false;
         } catch (\Exception $e) {
-            if ($this->failOverToNoILS()) {
+            if ($this->failOverToNoILS($e)) {
                 return call_user_func_array([$this, __METHOD__], func_get_args());
             }
             throw $e;
@@ -868,8 +965,7 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
             // the driver class without wasting time initializing it; if NoILS
             // failover is enabled, we have to initialize the driver object now
             // to be sure we are checking capabilities on the appropriate class.
-            $driverToCheck = $this->hasNoILSFailover()
-                ? $this->getDriver() : $this->getDriverClass();
+            $driverToCheck = $this->getDriver($this->hasNoILSFailover());
 
             // First check that the function is callable:
             if (is_callable([$driverToCheck, $method])) {
@@ -919,9 +1015,91 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
     public function getPasswordPolicy($patron)
     {
         return $this->checkCapability(
-            'getConfig', ['changePassword', compact('patron')]
+            'getConfig',
+            ['changePassword', compact('patron')]
         ) ? $this->getDriver()->getConfig('changePassword', compact('patron'))
             : false;
+    }
+
+    /**
+     * Get Patron Transactions
+     *
+     * This is responsible for retrieving all transactions (i.e. checked out items)
+     * by a specific patron.
+     *
+     * @param array $patron The patron array from patronLogin
+     * @param array $params Parameters
+     *
+     * @return mixed        Array of the patron's transactions
+     */
+    public function getMyTransactions($patron, $params = [])
+    {
+        $result = $this->__call('getMyTransactions', [$patron, $params]);
+
+        // Support also older driver return value:
+        if (!isset($result['count'])) {
+            $result = [
+                'count' => count($result),
+                'records' => $result,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get holdings
+     *
+     * Retrieve holdings from ILS driver class and normalize result array if needed.
+     *
+     * @param string $id      The record id to retrieve the holdings for
+     * @param array  $patron  Patron data
+     * @param array  $options Additional options
+     *
+     * @return array Array with holding data
+     */
+    public function getHolding($id, $patron = null, $options = [])
+    {
+        // Get pagination options for holdings tab:
+        $params = compact('id', 'patron');
+        $config = $this->checkCapability('getConfig', ['Holdings', $params])
+            ? $this->getDriver()->getConfig('Holdings', $params) : [];
+        if (empty($config['itemLimit'])) {
+            // Use itemLimit in Holds as fallback for backward compatibility:
+            $config
+                = $this->checkCapability('getConfig', ['Holds', $params])
+                ? $this->getDriver()->getConfig('Holds', $params) : [];
+        }
+        $itemLimit = !empty($config['itemLimit']) ? $config['itemLimit'] : null;
+
+        $page = $this->request ? $this->request->getQuery('page', 1) : 1;
+        $offset = ($itemLimit && is_numeric($itemLimit))
+            ? ($page * $itemLimit) - $itemLimit
+            : null;
+        $defaultOptions = compact('page', 'itemLimit', 'offset');
+        $finalOptions = $options + $defaultOptions;
+
+        // Get the holdings from the ILS
+        $holdings = $this->__call('getHolding', [$id, $patron, $finalOptions]);
+
+        // Return all the necessary details:
+        if (!isset($holdings['holdings'])) {
+            $holdings = [
+                'total' => count($holdings),
+                'holdings' => $holdings,
+                'electronic_holdings' => [],
+            ];
+        } else {
+            if (!isset($holdings['total'])) {
+                $holdings['total'] = count($holdings['holdings']);
+            }
+            if (!isset($holdings['electronic_holdings'])) {
+                $holdings['electronic_holdings'] = [];
+            }
+        }
+        $holdings['page'] = $finalOptions['page'];
+        $holdings['itemLimit'] = $finalOptions['itemLimit'];
+        return $holdings;
     }
 
     /**
@@ -940,11 +1118,12 @@ class Connection implements TranslatorAwareInterface, LoggerAwareInterface
         try {
             if ($this->checkCapability($methodName, $params)) {
                 return call_user_func_array(
-                    [$this->getDriver(), $methodName], $params
+                    [$this->getDriver(), $methodName],
+                    $params
                 );
             }
         } catch (\Exception $e) {
-            if ($this->failOverToNoILS()) {
+            if ($this->failOverToNoILS($e)) {
                 return call_user_func_array([$this, __METHOD__], func_get_args());
             }
             throw $e;

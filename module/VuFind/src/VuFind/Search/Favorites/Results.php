@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Favorites aspect of the Search Multi-class (Results)
  *
@@ -25,8 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Search\Favorites;
 
+use LmcRbacMvc\Service\AuthorizationServiceAwareInterface;
+use LmcRbacMvc\Service\AuthorizationServiceAwareTrait;
 use VuFind\Db\Table\Resource as ResourceTable;
 use VuFind\Db\Table\UserList as ListTable;
 use VuFind\Exception\ListPermission as ListPermissionException;
@@ -34,8 +38,6 @@ use VuFind\Record\Cache;
 use VuFind\Record\Loader;
 use VuFind\Search\Base\Results as BaseResults;
 use VuFindSearch\Service as SearchService;
-use ZfcRbac\Service\AuthorizationServiceAwareInterface;
-use ZfcRbac\Service\AuthorizationServiceAwareTrait;
 
 /**
  * Search Favorites Results
@@ -46,8 +48,7 @@ use ZfcRbac\Service\AuthorizationServiceAwareTrait;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class Results extends BaseResults
-    implements AuthorizationServiceAwareInterface
+class Results extends BaseResults implements AuthorizationServiceAwareInterface
 {
     use AuthorizationServiceAwareTrait;
 
@@ -80,6 +81,13 @@ class Results extends BaseResults
     protected $listTable;
 
     /**
+     * Facet list
+     *
+     * @var array
+     */
+    protected $facets;
+
+    /**
      * Constructor
      *
      * @param \VuFind\Search\Base\Params $params        Object representing user
@@ -89,9 +97,12 @@ class Results extends BaseResults
      * @param ResourceTable              $resourceTable Resource table
      * @param ListTable                  $listTable     UserList table
      */
-    public function __construct(\VuFind\Search\Base\Params $params,
-        SearchService $searchService, Loader $recordLoader,
-        ResourceTable $resourceTable, ListTable $listTable
+    public function __construct(
+        \VuFind\Search\Base\Params $params,
+        SearchService $searchService,
+        Loader $recordLoader,
+        ResourceTable $resourceTable,
+        ListTable $listTable
     ) {
         parent::__construct($params, $searchService, $recordLoader);
         $this->resourceTable = $resourceTable;
@@ -127,25 +138,25 @@ class Results extends BaseResults
             if (!isset($this->facets[$field])) {
                 $this->facets[$field] = [
                     'label' => $this->getParams()->getFacetLabel($field),
-                    'list' => []
+                    'list' => [],
                 ];
                 switch ($field) {
-                case 'tags':
-                    if ($this->list) {
-                        $tags = $this->list->getTags();
-                    } else {
-                        $tags = $this->user ? $this->user->getTags() : [];
-                    }
-                    foreach ($tags as $tag) {
-                        $this->facets[$field]['list'][] = [
-                            'value' => $tag->tag,
-                            'displayText' => $tag->tag,
-                            'count' => $tag->cnt,
-                            'isApplied' =>
-                                $this->getParams()->hasFilter("$field:" . $tag->tag)
-                        ];
-                    }
-                    break;
+                    case 'tags':
+                        if ($this->list) {
+                            $tags = $this->list->getResourceTags();
+                        } else {
+                            $tags = $this->user ? $this->user->getTags() : [];
+                        }
+                        foreach ($tags as $tag) {
+                            $this->facets[$field]['list'][] = [
+                                'value' => $tag->tag,
+                                'displayText' => $tag->tag,
+                                'count' => $tag->cnt,
+                                'isApplied' => $this->getParams()
+                                    ->hasFilter("$field:" . $tag->tag),
+                            ];
+                        }
+                        break;
                 }
             }
             if (isset($this->facets[$field])) {
@@ -175,7 +186,8 @@ class Results extends BaseResults
                 'Cannot retrieve favorites without logged in user.'
             );
         }
-        if (null !== $list && !$list->public
+        if (
+            null !== $list && !$list->public
             && (!$this->user || $list->user_id != $this->user->id)
         ) {
             throw new ListPermissionException(
@@ -187,7 +199,10 @@ class Results extends BaseResults
         $userId = null === $list ? $this->user->id : $list->user_id;
         $listId = null === $list ? null : $list->id;
         $rawResults = $this->resourceTable->getFavorites(
-            $userId, $listId, $this->getTagFilters(), $this->getParams()->getSort()
+            $userId,
+            $listId,
+            $this->getTagFilters(),
+            $this->getParams()->getSort()
         );
         $this->resultTotal = count($rawResults);
 
@@ -195,8 +210,12 @@ class Results extends BaseResults
         $limit = $this->getParams()->getLimit();
         if ($this->resultTotal > $limit) {
             $rawResults = $this->resourceTable->getFavorites(
-                $userId, $listId, $this->getTagFilters(),
-                $this->getParams()->getSort(), $this->getStartRecord() - 1, $limit
+                $userId,
+                $listId,
+                $this->getTagFilters(),
+                $this->getParams()->getSort(),
+                $this->getStartRecord() - 1,
+                $limit
             );
         }
 
@@ -206,8 +225,8 @@ class Results extends BaseResults
             $recordsToRequest[] = [
                 'id' => $row->record_id, 'source' => $row->source,
                 'extra_fields' => [
-                    'title' => $row->title
-                ]
+                    'title' => $row->title,
+                ],
             ];
         }
 
@@ -222,7 +241,7 @@ class Results extends BaseResults
      */
     protected function getTagFilters()
     {
-        $filters = $this->getParams()->getFilters();
+        $filters = $this->getParams()->getRawFilters();
         return $filters['tags'] ?? [];
     }
 
@@ -238,7 +257,7 @@ class Results extends BaseResults
         if ($this->list === false) {
             // Check the filters for a list ID, and load the corresponding object
             // if one is found:
-            $filters = $this->getParams()->getFilters();
+            $filters = $this->getParams()->getRawFilters();
             $listId = $filters['lists'][0] ?? null;
             $this->list = (null === $listId)
                 ? null : $this->listTable->getExisting($listId);

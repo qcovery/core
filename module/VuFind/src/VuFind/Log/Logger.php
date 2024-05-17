@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VuFind Logger
  *
@@ -25,9 +26,12 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace VuFind\Log;
 
-use Zend\Log\Logger as BaseLogger;
+use Laminas\Log\Logger as BaseLogger;
+use Traversable;
+use VuFind\Net\UserIpReader;
 
 /**
  * This class wraps the BaseLogger class to allow for log verbosity
@@ -46,6 +50,32 @@ class Logger extends BaseLogger
      * @var bool
      */
     protected $debugNeeded = false;
+
+    /**
+     * User IP address reader
+     *
+     * @var UserIpReader
+     */
+    protected $userIpReader;
+
+    /**
+     * Constructor
+     *
+     * Set options for a logger. Accepted options are:
+     * - writers: array of writers to add to this logger
+     * - exceptionhandler: if true register this logger as exceptionhandler
+     * - errorhandler: if true register this logger as errorhandler
+     *
+     * @param UserIpReader      $userIpReader User IP reader
+     * @param array|Traversable $options      Configuration options
+     *
+     * @throws \Laminas\Log\Exception\InvalidArgumentException
+     */
+    public function __construct(UserIpReader $userIpReader, $options = null)
+    {
+        $this->userIpReader = $userIpReader;
+        parent::__construct($options);
+    }
 
     /**
      * Is one of the log writers listening for debug messages?  (This is useful to
@@ -86,7 +116,7 @@ class Logger extends BaseLogger
                         'priority'     => (int)$priority,
                         'priorityName' => $this->priorities[$priority],
                         'message'      => $message,
-                        'extra'        => $extra
+                        'extra'        => $extra,
                     ]
                 );
             }
@@ -104,8 +134,13 @@ class Logger extends BaseLogger
      */
     protected function getSeverityFromException($error)
     {
+        // If the exception provides the severity level, use it:
+        if ($error instanceof \VuFind\Exception\SeverityLevelInterface) {
+            return $error->getSeverityLevel();
+        }
         // Treat unexpected or 5xx errors as more severe than 4xx errors.
-        if ($error instanceof \VuFind\Exception\HttpStatusInterface
+        if (
+            $error instanceof \VuFind\Exception\HttpStatusInterface
             && in_array($error->getHttpStatus(), [403, 404])
         ) {
             return BaseLogger::WARN;
@@ -114,10 +149,10 @@ class Logger extends BaseLogger
     }
 
     /**
-     * Log an exception triggered by ZF2 for administrative purposes.
+     * Log an exception triggered by the framework for administrative purposes.
      *
-     * @param \Exception              $error  Exception to log
-     * @param \Zend\Stdlib\Parameters $server Server metadata
+     * @param \Exception                 $error  Exception to log
+     * @param \Laminas\Stdlib\Parameters $server Server metadata
      *
      * @return void
      */
@@ -132,8 +167,9 @@ class Logger extends BaseLogger
             $prev = $prev->getPrevious();
         }
         $referer = $server->get('HTTP_REFERER', 'none');
+        $ipAddr = $this->userIpReader->getUserIp();
         $basicServer
-            = '(Server: IP = ' . $server->get('REMOTE_ADDR') . ', '
+            = '(Server: IP = ' . $ipAddr . ', '
             . 'Referer = ' . $referer . ', '
             . 'User Agent = '
             . $server->get('HTTP_USER_AGENT') . ', '
@@ -175,7 +211,7 @@ class Logger extends BaseLogger
             2 => $baseError . $basicServer,
             3 => $baseError . $basicServer . $basicBacktrace,
             4 => $baseError . $detailedServer . $basicBacktrace,
-            5 => $baseError . $detailedServer . $detailedBacktrace
+            5 => $baseError . $detailedServer . $detailedBacktrace,
         ];
 
         $this->log($this->getSeverityFromException($error), $errorDetails);

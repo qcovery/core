@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Prints a human readable format from a number of milliseconds
  *
@@ -25,9 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * Prints a human readable format from a number of milliseconds
@@ -49,6 +51,10 @@ class Printms extends AbstractHelper
      */
     public function __invoke($ms)
     {
+        // If we can't do the math, don't bother formatting the value:
+        if (!is_numeric($ms)) {
+            return $ms;
+        }
         $seconds = floor($ms / 1000);
         $ms = ($ms % 1000);
 
@@ -69,17 +75,27 @@ class Printms extends AbstractHelper
                 if ($years) {
                     return sprintf(
                         "%d years %d days %d hours %d minutes %d seconds",
-                        $years, $days, $hours, $minutes, $seconds
+                        $years,
+                        $days,
+                        $hours,
+                        $minutes,
+                        $seconds
                     );
                 } else {
                     return sprintf(
                         "%d days %d hours %d minutes %d seconds",
-                        $days, $hours, $minutes, $seconds
+                        $days,
+                        $hours,
+                        $minutes,
+                        $seconds
                     );
                 }
             } else {
                 return sprintf(
-                    "%d hours %d minutes %d seconds", $hours, $minutes, $seconds
+                    "%d hours %d minutes %d seconds",
+                    $hours,
+                    $minutes,
+                    $seconds
                 );
             }
         } else {

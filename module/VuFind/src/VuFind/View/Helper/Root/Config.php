@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Config view helper
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\View\Helper\Root;
 
 use VuFind\Config\PluginManager;
@@ -38,7 +40,7 @@ use VuFind\Config\PluginManager;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class Config extends \Zend\View\Helper\AbstractHelper
+class Config extends \Laminas\View\Helper\AbstractHelper
 {
     /**
      * Configuration plugin manager
@@ -62,7 +64,7 @@ class Config extends \Zend\View\Helper\AbstractHelper
      *
      * @param string $config Name of configuration
      *
-     * @return \Zend\Config\Config
+     * @return \Laminas\Config\Config
      */
     public function get($config)
     {
@@ -77,5 +79,49 @@ class Config extends \Zend\View\Helper\AbstractHelper
     public function nonJavascriptSupportEnabled()
     {
         return $this->get('config')->Site->nonJavascriptSupportEnabled ?? false;
+    }
+
+    /**
+     * Should covers be loaded via AJAX?
+     *
+     * @return bool
+     */
+    public function ajaxCoversEnabled()
+    {
+        return $this->get('config')->Content->ajaxcovers ?? false;
+    }
+
+    /**
+     * Should we limit the number of items displayed on the full record?
+     *
+     * @return int
+     */
+    public function getHoldingsItemLimit()
+    {
+        $limit = $this->get('config')->Record->holdingsItemLimit;
+        return $limit ? (int)$limit : PHP_INT_MAX;
+    }
+
+    /**
+     * Should we limit the number of subjects displayed on the full record?
+     *
+     * @return int
+     */
+    public function getRecordSubjectLimit()
+    {
+        $limit = $this->get('config')->Record->subjectLimit;
+        return $limit ? (int)$limit : PHP_INT_MAX;
+    }
+
+    /**
+     * Check if index record should always be displayed (i.e. also when a
+     * format-specific template is available)
+     *
+     * @return bool
+     */
+    public function alwaysDisplayIndexRecordInStaffView(): bool
+    {
+        return (bool)($this->get('config')->Record
+            ->alwaysDisplayIndexRecordInStaffView ?? false);
     }
 }

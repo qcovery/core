@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ILS connection factory
  *
@@ -25,10 +26,14 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\ILS;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
 
 /**
  * ILS connection factory
@@ -53,19 +58,26 @@ class ConnectionFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
+        $configManager = $container->get(\VuFind\Config\PluginManager::class);
+        $request = $container->get('Request');
         $catalog = new $requestedName(
-            $container->get('VuFind\Config\PluginManager')->get('config')->Catalog,
-            $container->get('VuFind\ILS\Driver\PluginManager'),
-            $container->get('VuFind\Config\PluginManager')
+            $configManager->get('config')->Catalog,
+            $container->get(\VuFind\ILS\Driver\PluginManager::class),
+            $container->get(\VuFind\Config\PluginManager::class),
+            $request instanceof \Laminas\Http\Request ? $request : null
         );
-        return $catalog->setHoldConfig($container->get('VuFind\ILS\HoldSettings'));
+        return $catalog->setHoldConfig(
+            $container->get(\VuFind\ILS\HoldSettings::class)
+        );
     }
 }

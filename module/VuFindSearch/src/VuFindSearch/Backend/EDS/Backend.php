@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EDS API Backend
  *
@@ -26,19 +27,19 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace VuFindSearch\Backend\EDS;
 
 use Exception;
+use Laminas\Cache\Storage\Adapter\AbstractAdapter as CacheAdapter;
+use Laminas\Config\Config;
+use Laminas\Session\Container as SessionContainer;
 use VuFindSearch\Backend\AbstractBackend;
-use VuFindSearch\Backend\EDS\Zend2 as ApiClient;
 use VuFindSearch\Backend\Exception\BackendException;
 use VuFindSearch\ParamBag;
 use VuFindSearch\Query\AbstractQuery;
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
 use VuFindSearch\Response\RecordCollectionInterface;
-use Zend\Cache\Storage\Adapter\AbstractAdapter as CacheAdapter;
-use Zend\Config\Config;
-use Zend\Session\Container as SessionContainer;
 
 /**
  *  EDS API Backend
@@ -54,7 +55,7 @@ class Backend extends AbstractBackend
     /**
      * Client user to make the actually requests to the EdsApi
      *
-     * @var ApiClient
+     * @var Connector
      */
     protected $client;
 
@@ -109,7 +110,7 @@ class Backend extends AbstractBackend
     protected $orgId;
 
     /**
-     * Vufind Authentication manager
+     * VuFind Authentication manager
      *
      * @var \VuFind\Auth\Manager
      */
@@ -139,16 +140,20 @@ class Backend extends AbstractBackend
     /**
      * Constructor.
      *
-     * @param ApiClient                        $client  EdsApi client to use
+     * @param Connector                        $client  EdsApi client to use
      * @param RecordCollectionFactoryInterface $factory Record collection factory
      * @param CacheAdapter                     $cache   Object cache
      * @param SessionContainer                 $session Session container
      * @param Config                           $config  Object representing EDS.ini
      * @param bool                             $isGuest Is the current user a guest?
      */
-    public function __construct(ApiClient $client,
-        RecordCollectionFactoryInterface $factory, CacheAdapter $cache,
-        SessionContainer $session, Config $config = null, $isGuest = true
+    public function __construct(
+        Connector $client,
+        RecordCollectionFactoryInterface $factory,
+        CacheAdapter $cache,
+        SessionContainer $session,
+        Config $config = null,
+        $isGuest = true
     ) {
         // Save dependencies/incoming parameters:
         $this->client = $client;
@@ -164,7 +169,7 @@ class Backend extends AbstractBackend
         $this->profile = $config->EBSCO_Account->profile ?? null;
         $this->orgId = $config->EBSCO_Account->organization_id ?? null;
 
-        // Save default profile value, since profile property may be overriden:
+        // Save default profile value, since profile property may be overridden:
         $this->defaultProfile = $this->profile;
     }
 
@@ -178,7 +183,10 @@ class Backend extends AbstractBackend
      *
      * @return \VuFindSearch\Response\RecordCollectionInterface
      **/
-    public function search(AbstractQuery $query, $offset, $limit,
+    public function search(
+        AbstractQuery $query,
+        $offset,
+        $limit,
         ParamBag $params = null
     ) {
         // process EDS API communication tokens.
@@ -188,13 +196,8 @@ class Backend extends AbstractBackend
             "Authentication Token: $authenticationToken, SessionToken: $sessionToken"
         );
 
-        // check to see if there is a parameter to only process this call as a setup
-        if (null !== $params && true == $params->get('setuponly')) {
-            return false;
-        }
-
         // create query parameters from VuFind data
-        $queryString = !empty($query) ? $query->getAllTerms() : '';
+        $queryString = $query->getAllTerms();
         $paramsStr = implode('&', null !== $params ? $params->request() : []);
         $this->debugPrint(
             "Query: $queryString, Limit: $limit, Offset: $offset, "
@@ -220,25 +223,49 @@ class Backend extends AbstractBackend
         } catch (ApiException $e) {
             // if the auth or session token was invalid, try once more
             switch ($e->getApiErrorCode()) {
-            case 104:
-            case 108:
-            case 109:
-                try {
-                    // For error 104, retry auth token; for 108/9, retry sess token:
-                    if ($e->getApiErrorCode() == 104) {
-                        $authenticationToken = $this->getAuthenticationToken(true);
-                    } else {
-                        $sessionToken = $this->getSessionToken(true);
+                case 104:
+                case 108:
+                case 109:
+                    try {
+                        // For error 104, retry auth token; for 108/9, retry sess
+                        // token:
+                        if ($e->getApiErrorCode() == 104) {
+                            $authenticationToken
+                                = $this->getAuthenticationToken(true);
+                        } else {
+                            $sessionToken = $this->getSessionToken(true);
+                        }
+                        $response = $this->client->search(
+                            $searchModel,
+                            $authenticationToken,
+                            $sessionToken
+                        );
+                    } catch (Exception $e) {
+                        throw new BackendException(
+                            $e->getMessage(),
+                            $e->getCode(),
+                            $e
+                        );
                     }
-                    $response = $this->client
-                        ->search($searchModel, $authenticationToken, $sessionToken);
-                } catch (Exception $e) {
-                    throw new BackendException($e->getMessage(), $e->getCode(), $e);
-                }
-                break;
-            default:
-                $response = [];
-                break;
+                    break;
+                case 138:
+                    // User requested unavailable deep search results; first extract
+                    // the next legal position from the error message:
+                    $parts
+                        = explode(' ', trim($e->getApiDetailedErrorDescription()));
+                    $legalPos = array_pop($parts);
+                    // Now calculate the legal page number and throw an exception so
+                    // the controller can fix it from here:
+                    $legalPage = floor($legalPos / $limit);
+                    throw new \VuFindSearch\Backend\Exception\DeepPagingException(
+                        $e->getMessage(),
+                        $e->getCode(),
+                        $legalPage,
+                        $e
+                    );
+                default:
+                    $response = [];
+                    break;
             }
         } catch (Exception $e) {
             $this->debugPrint("Exception found: " . $e->getMessage());
@@ -259,9 +286,10 @@ class Backend extends AbstractBackend
      */
     public function retrieve($id, ParamBag $params = null)
     {
+        $an = $dbId = $authenticationToken = $sessionToken = $hlTerms = null;
         try {
             $authenticationToken = $this->getAuthenticationToken();
-            // check to see if the profile is overriden
+            // check to see if the profile is overridden
             $overrideProfile = (null !== $params) ? $params->get('profile') : null;
             if (isset($overrideProfile)) {
                 $this->profile = $overrideProfile;
@@ -273,38 +301,69 @@ class Backend extends AbstractBackend
                     'Retrieval id is not in the correct format.'
                 );
             }
-            list($dbId, $an) = $parts;
-            $hlTerms = (null != $params)
+            [$dbId, $an] = $parts;
+            $hlTerms = (null !== $params)
                 ? $params->get('highlightterms') : null;
+            $extras = [];
+            if (
+                null !== $params
+                && ($eBookFormat = $params->get('ebookpreferredformat'))
+            ) {
+                $extras['ebookpreferredformat'] = $eBookFormat;
+            }
             $response = $this->client->retrieve(
-                $an, $dbId, $authenticationToken, $sessionToken, $hlTerms
+                $an,
+                $dbId,
+                $authenticationToken,
+                $sessionToken,
+                $hlTerms,
+                $extras
             );
         } catch (ApiException $e) {
+            // Error codes can be reviewed at
+            // https://connect.ebsco.com/s/article
+            //    /EBSCO-Discovery-Service-API-Reference-Guide-Error-Codes
             // if the auth or session token was invalid, try once more
             switch ($e->getApiErrorCode()) {
-            case 104:
-            case 108:
-            case 109:
-                try {
-                    // For error 104, retry auth token; for 108/9, retry sess token:
-                    if ($e->getApiErrorCode() == 104) {
-                        $authenticationToken = $this->getAuthenticationToken(true);
-                    } else {
-                        $sessionToken = $this->getSessionToken(true);
+                case 104:
+                case 108:
+                case 109:
+                    try {
+                        // For error 104, retry auth token; for 108/9, retry sess
+                        // token:
+                        if ($e->getApiErrorCode() == 104) {
+                            $authenticationToken
+                                = $this->getAuthenticationToken(true);
+                        } else {
+                            $sessionToken = $this->getSessionToken(true);
+                        }
+                        $response = $this->client->retrieve(
+                            $an,
+                            $dbId,
+                            $authenticationToken,
+                            $sessionToken,
+                            $hlTerms
+                        );
+                    } catch (Exception $e) {
+                        throw new BackendException(
+                            $e->getMessage(),
+                            $e->getCode(),
+                            $e
+                        );
                     }
-                    $response = $this->client->retrieve(
-                        $an, $dbId, $authenticationToken, $sessionToken, $hlTerms
-                    );
-                } catch (Exception $e) {
-                    throw new BackendException($e->getMessage(), $e->getCode(), $e);
-                }
-                break;
-            case 135:
-                // DbId not in profile, fall through to treat as "record not found"
-                $response = [];
-                break;
-            default:
-                throw $e;
+                    break;
+                case 132:
+                case 133:
+                case 135:
+                    /* 132 Record not found
+                     * 133 Simultaneous User Limit Reached
+                     * 135 DbId not in profile
+                     * -> fall through to treat as "record not found"
+                     */
+                    $response = [];
+                    break;
+                default:
+                    throw $e;
             }
         }
         $collection = $this->createRecordCollection(['Records' => $response]);
@@ -326,7 +385,7 @@ class Backend extends AbstractBackend
         // Most parameters need to be flattened from array format, but a few
         // should remain as arrays:
         $arraySettings = [
-            'query', 'facets', 'filters', 'groupFilters', 'rangeFilters', 'limiters'
+            'query', 'facets', 'filters', 'groupFilters', 'rangeFilters', 'limiters',
         ];
         foreach ($params as $key => $param) {
             $options[$key] = in_array($key, $arraySettings)
@@ -421,7 +480,7 @@ class Backend extends AbstractBackend
         }
         $authTokenData = $this->cache->getItem('edsAuthenticationToken');
         if (isset($authTokenData)) {
-            $currentToken =  $authTokenData['token'] ?? '';
+            $currentToken = $authTokenData['token'] ?? '';
             $expirationTime = $authTokenData['expiration'] ?? 0;
             $this->debugPrint(
                 'Cached Authentication data: '
@@ -473,7 +532,7 @@ class Backend extends AbstractBackend
         }
         $autocompleteData = $this->cache->getItem('edsAutocomplete');
         if (!empty($autocompleteData)) {
-            $currentToken =  $autocompleteData['token'] ?? '';
+            $currentToken = $autocompleteData['token'] ?? '';
             $expirationTime = $autocompleteData['expiration'] ?? 0;
 
             // Check to see if the token expiration time is greater than the current
@@ -490,7 +549,8 @@ class Backend extends AbstractBackend
             $results = $this->client
                 ->authenticate($username, $password, $this->orgId, ['autocomplete']);
             $autoresult = $results['Autocomplete'] ?? [];
-            if (isset($autoresult['Token']) && isset($autoresult['TokenTimeOut'])
+            if (
+                isset($autoresult['Token']) && isset($autoresult['TokenTimeOut'])
                 && isset($autoresult['CustId']) && isset($autoresult['Url'])
             ) {
                 $token = $autoresult['Token'];
@@ -531,18 +591,13 @@ class Backend extends AbstractBackend
     {
         // check to see if the user has logged in/out between the creation
         // of this session token and now
-        if (!$isInvalid && !empty($this->session->sessionID)
+        if (
+            !$isInvalid && !empty($this->session->sessionID)
             && $this->session->sessionGuest == $this->isGuest()
         ) {
             return $this->session->sessionID;
         }
-
-        // When creating a new session, also call the INFO method to pull the
-        // available search criteria for this profile
-        $sessionToken = $this->createEBSCOSession();
-        $this->session->info = $this->getInfo($sessionToken);
-
-        return $sessionToken;
+        return $this->createEBSCOSession();
     }
 
     /**
@@ -557,7 +612,8 @@ class Backend extends AbstractBackend
             ? $this->defaultProfile : $this->profile;
         $this->session->sessionGuest = $this->isGuest();
         $this->session->sessionID = $this->createSession(
-            $this->session->sessionGuest, $this->session->profileID
+            $this->session->sessionGuest,
+            $this->session->profileID
         );
         return $this->session->sessionID;
     }
@@ -623,28 +679,53 @@ class Backend extends AbstractBackend
      */
     public function getInfo($sessionToken = null)
     {
+        // Use a different cache key for guests, just in case info differs:
+        $cacheKey = $this->isGuest ? 'edsGuestInfo' : 'edsLoggedInInfo';
+        if ($data = $this->cache->getItem($cacheKey)) {
+            return $data;
+        }
         $authenticationToken = $this->getAuthenticationToken();
         if (null == $sessionToken) {
-            $sessionToken = $this->getSessionToken();
+            try {
+                $sessionToken = $this->getSessionToken();
+            } catch (ApiException $e) {
+                // Retry once to work around occasional 106 errors:
+                $sessionToken = $this->getSessionToken();
+            }
         }
         try {
             $response = $this->client->info($authenticationToken, $sessionToken);
         } catch (ApiException $e) {
-            if ($e->getApiErrorCode() == 104) {
-                try {
-                    $authenticationToken = $this->getAuthenticationToken(true);
-                    $response = $this->client
-                        ->info($authenticationToken, $sessionToken);
-                } catch (Exception $e) {
-                    throw new BackendException(
-                        $e->getMessage(),
-                        $e->getCode(),
-                        $e
-                    );
-                }
-            } else {
-                $response = [];
+            // if the auth or session token was invalid, try once more
+            switch ($e->getApiErrorCode()) {
+                case 104:
+                case 108:
+                case 109:
+                    try {
+                        // For error 104, retry auth token; for 108/9, retry sess
+                        // token:
+                        if ($e->getApiErrorCode() == 104) {
+                            $authenticationToken
+                                = $this->getAuthenticationToken(true);
+                        } else {
+                            $sessionToken = $this->getSessionToken(true);
+                        }
+                        $response = $this->client
+                            ->info($authenticationToken, $sessionToken);
+                    } catch (Exception $e) {
+                        throw new BackendException(
+                            $e->getMessage(),
+                            $e->getCode(),
+                            $e
+                        );
+                    }
+                    break;
+                default:
+                    $response = [];
             }
+        }
+        if (!empty($response)) {
+            $this->cache->setItem($cacheKey, $response);
         }
         return $response;
     }

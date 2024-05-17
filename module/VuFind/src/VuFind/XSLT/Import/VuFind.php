@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XSLT importer support methods.
  *
@@ -25,10 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/indexing Wiki
  */
+
 namespace VuFind\XSLT\Import;
 
 use DOMDocument;
-use VuFind\Config\Locator as ConfigLocator;
 
 /**
  * XSLT support class -- all methods of this class must be public and static;
@@ -69,7 +70,7 @@ class VuFind
      */
     public static function getChangeTracker()
     {
-        return static::$serviceLocator->get('VuFind\Db\Table\PluginManager')
+        return static::$serviceLocator->get(\VuFind\Db\Table\PluginManager::class)
             ->get('ChangeTracker');
     }
 
@@ -78,11 +79,11 @@ class VuFind
      *
      * @param string $config Configuration name
      *
-     * @return \Zend\Config\Config
+     * @return \Laminas\Config\Config
      */
     public static function getConfig($config = 'config')
     {
-        return static::$serviceLocator->get('VuFind\Config\PluginManager')
+        return static::$serviceLocator->get(\VuFind\Config\PluginManager::class)
             ->get($config);
     }
 
@@ -180,13 +181,13 @@ class VuFind
     {
         $parser = static::getParser();
         switch (strtolower($parser)) {
-        case 'aperture':
-            return static::harvestWithAperture($url);
-        case 'tika':
-            return static::harvestWithTika($url);
-        default:
-            // Ignore unrecognized parser option:
-            return '';
+            case 'aperture':
+                return static::harvestWithAperture($url);
+            case 'tika':
+                return static::harvestWithTika($url);
+            default:
+                // Ignore unrecognized parser option:
+                return '';
         }
     }
 
@@ -199,7 +200,9 @@ class VuFind
      *
      * @return string        command to be executed
      */
-    public static function getApertureCommand($input, $output,
+    public static function getApertureCommand(
+        $input,
+        $output,
         $method = "webcrawler"
     ) {
         // get the path to our sh/bat from the config
@@ -293,10 +296,10 @@ class VuFind
         $descriptorspec = [
             0 => ['pipe', 'r'],
             1 => ['file', $output, 'w'],
-            2 => ['pipe', 'w']
+            2 => ['pipe', 'w'],
         ];
         return [
-            "java -jar $tika $arg -eUTF8 $input", $descriptorspec, []
+            "java -jar $tika $arg -eUTF8 $input", $descriptorspec, [],
         ];
     }
 
@@ -346,9 +349,9 @@ class VuFind
         // that PHP's parse_ini_file() function is not compatible with SolrMarc's
         // style of properties map, so we are parsing this manually.
         $map = [];
-        $mapFile
-            = ConfigLocator::getConfigPath($filename, 'import/translation_maps');
-        foreach (file($mapFile) as $line) {
+        $resolver = static::$serviceLocator->get(\VuFind\Config\PathResolver::class);
+        $mapFile = $resolver->getConfigPath($filename, 'import/translation_maps');
+        foreach ($mapFile ? file($mapFile) : [] as $line) {
             $parts = explode('=', $line, 2);
             if (isset($parts[1])) {
                 $key = trim($parts[0]);
@@ -393,16 +396,11 @@ class VuFind
      */
     public static function xmlAsText($in)
     {
-        // Ensure that $in is an array:
-        if (!is_array($in)) {
-            $in = [$in];
-        }
-
         // Start building return value:
         $text = '';
 
         // Extract all text:
-        foreach ($in as $current) {
+        foreach ((array)$in as $current) {
             // Convert DOMElement to SimpleXML:
             $xml = simplexml_import_dom($current);
 
@@ -427,12 +425,7 @@ class VuFind
      */
     public static function removeTagAndReturnXMLasText($in, $tag)
     {
-        // Ensure that $in is an array:
-        if (!is_array($in)) {
-            $in = [$in];
-        }
-
-        foreach ($in as $current) {
+        foreach ((array)$in as $current) {
             $matches = $current->getElementsByTagName($tag);
             foreach ($matches as $match) {
                 $current->removeChild($match);
@@ -456,6 +449,140 @@ class VuFind
         $dom = new DOMDocument('1.0', 'utf-8');
         foreach ($parts as $part) {
             $element = $dom->createElement('part', $part);
+            $dom->appendChild($element);
+        }
+        return $dom;
+    }
+
+    /**
+     * Proxy the implode PHP function for use in XSL transformation.
+     *
+     * @param string $glue   Glue string
+     * @param array  $pieces DOM elements to join together.
+     *
+     * @return string
+     */
+    public static function implode($glue, $pieces)
+    {
+        $mapper = function ($dom) {
+            return trim($dom->textContent);
+        };
+        return implode($glue, array_map($mapper, $pieces));
+    }
+
+    /**
+     * Try to find the best single year or date range in a set of DOM elements.
+     * Best is defined as the first value to consist of only YYYY or YYYY-ZZZZ,
+     * with no other text. If no "best" match is found, the first value is used.
+     *
+     * @param array $input DOM elements to search.
+     *
+     * @return string
+     */
+    public static function extractBestDateOrRange($input)
+    {
+        foreach ($input as $current) {
+            if (preg_match('/^\d{4}(-\d{4})?$/', $current->textContent)) {
+                return $current->textContent;
+            }
+        }
+        return reset($input)->textContent;
+    }
+
+    /**
+     * Try to find a four-digit year in a set of DOM elements.
+     *
+     * @param array $input DOM elements to search.
+     *
+     * @return string
+     */
+    public static function extractEarliestYear($input)
+    {
+        $goodMatch = $adequateMatch = '';
+        foreach ($input as $current) {
+            // Best match -- a four-digit string starting with 1 or 2
+            preg_match_all('/[12]\d{3}/', $current->textContent, $matches);
+            foreach ($matches[0] as $match) {
+                if (empty($goodMatch) || $goodMatch > $match) {
+                    $goodMatch = $match;
+                }
+            }
+            // Next best match -- any string of four or fewer digits.
+            for ($length = 4; $length > 0; $length--) {
+                preg_match_all(
+                    '/\d{' . $length . '}/',
+                    $current->textContent,
+                    $matches
+                );
+                foreach ($matches[0] as $match) {
+                    if (strlen($match) > strlen($adequateMatch)) {
+                        $adequateMatch = $match;
+                    }
+                }
+            }
+        }
+        return empty($goodMatch) ? $adequateMatch : $goodMatch;
+    }
+
+    /**
+     * Is the provided name inverted ("Last, First") or not ("First Last")?
+     *
+     * @param string $name Name to check
+     *
+     * @return bool
+     */
+    public static function isInvertedName(string $name): bool
+    {
+        $parts = explode(',', $name);
+        // If there are no commas, it's not inverted...
+        if (count($parts) < 2) {
+            return false;
+        }
+        // If there are commas, let's see if the last part is a title,
+        // in which case it could go either way, so we need to recalculate.
+        $lastPart = array_pop($parts);
+        $titles = ['jr', 'sr', 'dr', 'mrs', 'ii', 'iii', 'iv'];
+        if (in_array(strtolower(trim($lastPart, ' .')), $titles)) {
+            return count($parts) > 1;
+        }
+        return true;
+    }
+
+    /**
+     * Invert "Firstname Lastname" authors into "Lastname, Firstname."
+     *
+     * @param string $rawName Raw name
+     *
+     * @return string
+     */
+    public static function invertName(string $rawName): string
+    {
+        // includes the full name, eg.: Bento, Filipe Manuel dos Santos
+        $parts = preg_split('/\s+(?=[^\s]+$)/', $rawName, 2);
+        if (count($parts) != 2) {
+            return $rawName;
+        }
+        [$fnames, $lname] = $parts;
+        return "$lname, $fnames";
+    }
+
+    /**
+     * Call invertName on all matching elements; return a DOMDocument with a
+     * name tag for each inverted name.
+     *
+     * @param array $input DOM elements to adjust
+     *
+     * @return DOMDocument
+     */
+    public static function invertNames($input): DOMDocument
+    {
+        $dom = new DOMDocument('1.0', 'utf-8');
+        foreach ($input as $name) {
+            $inverted = self::isInvertedName($name->textContent)
+                ? $name->textContent
+                : self::invertName($name->textContent);
+            $element = $dom->createElement('name');
+            $element->nodeValue = htmlspecialchars($inverted);
             $dom->appendChild($element);
         }
         return $dom;

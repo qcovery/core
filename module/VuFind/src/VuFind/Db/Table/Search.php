@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Table Definition for search
  *
@@ -27,13 +28,16 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Db\Table;
 
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Adapter\ParameterContainer;
+use Laminas\Db\TableGateway\Feature;
 use minSO;
 use VuFind\Db\Row\RowGateway;
-use Zend\Db\Adapter\Adapter;
-use Zend\Db\Adapter\ParameterContainer;
-use Zend\Db\TableGateway\Feature;
+use VuFind\Search\NormalizedSearch;
+use VuFind\Search\SearchNormalizer;
 
 /**
  * Table Definition for search
@@ -54,12 +58,16 @@ class Search extends Gateway
      *
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
-     * @param array         $cfg     Zend Framework configuration
+     * @param array         $cfg     Laminas configuration
      * @param RowGateway    $rowObj  Row prototype object (null for default)
      * @param string        $table   Name of database table to interface with
      */
-    public function __construct(Adapter $adapter, PluginManager $tm, $cfg,
-        RowGateway $rowObj = null, $table = 'search'
+    public function __construct(
+        Adapter $adapter,
+        PluginManager $tm,
+        $cfg,
+        ?RowGateway $rowObj = null,
+        $table = 'search'
     ) {
         parent::__construct($adapter, $tm, $cfg, $rowObj, $table);
     }
@@ -67,7 +75,7 @@ class Search extends Gateway
     /**
      * Initialize features
      *
-     * @param array $cfg Zend Framework configuration
+     * @param array $cfg Laminas configuration
      *
      * @return void
      */
@@ -81,7 +89,8 @@ class Search extends Gateway
             }
             $eventFeature = new Feature\EventFeature();
             $eventFeature->getEventManager()->attach(
-                Feature\EventFeature::EVENT_PRE_INITIALIZE, [$this, 'onPreInit']
+                Feature\EventFeature::EVENT_PRE_INITIALIZE,
+                [$this, 'onPreInit']
             );
             $this->featureSet->addFeature($eventFeature);
         }
@@ -150,25 +159,6 @@ class Search extends Gateway
     }
 
     /**
-     * Get a query representing expired searches (this can be passed
-     * to select() or delete() for further processing).
-     *
-     * @param int $daysOld Age in days of an "expired" search.
-     *
-     * @return function
-     */
-    public function getExpiredQuery($daysOld = 2)
-    {
-        // Determine the expiration date:
-        $expireDate = date('Y-m-d', time() - $daysOld * 24 * 60 * 60);
-        $callback = function ($select) use ($expireDate) {
-            $select->where->lessThan('created', $expireDate)
-                ->equalTo('saved', 0);
-        };
-        return $callback;
-    }
-
-    /**
      * Get a single row matching a primary key value.
      *
      * @param int  $id                 Primary key value
@@ -195,7 +185,7 @@ class Search extends Gateway
      * @param string $sessId Current user session ID
      * @param int    $userId Current logged-in user ID (or null if none)
      *
-     * @return \VuFind\Db\Row\Search
+     * @return ?\VuFind\Db\Row\Search
      */
     public function getOwnedRowById($id, $sessId, $userId)
     {
@@ -213,29 +203,39 @@ class Search extends Gateway
     }
 
     /**
-     * Add a search into the search table (history)
+     * Get scheduled searches.
      *
-     * @param \VuFind\Search\Results\PluginManager $manager   Search manager
-     * @param \VuFind\Search\Base\Results          $newSearch Search to save
-     * @param string                               $sessionId Current session ID
-     * @param int|null                             $userId    Current user ID
-     *
-     * @return \VuFind\Db\Row\Search
+     * @return array Array of VuFind\Db\Row\Search objects.
      */
-    public function saveSearch(\VuFind\Search\Results\PluginManager $manager,
-        $newSearch, $sessionId, $userId
-    ) {
-        // Duplicate elimination
-        // Normalize the URL params by minifying and deminifying the search object
-        $newSearchMinified = new minSO($newSearch);
-        $newSearchCopy = $newSearchMinified->deminify($manager);
-        $newUrl = $newSearchCopy->getUrlQuery()->getParams();
-        // Use crc32 as the checksum but get rid of highest bit so that we don't
-        // need to care about signed/unsigned issues
-        // (note: the checksum doesn't need to be unique)
-        $checksum = crc32($newUrl) & 0xFFFFFFF;
+    public function getScheduledSearches()
+    {
+        $callback = function ($select) {
+            $select->where->equalTo('saved', 1);
+            $select->where->greaterThan('notification_frequency', 0);
+            $select->order('user_id');
+        };
+        return $this->select($callback);
+    }
 
+    /**
+     * Return existing search table rows matching the provided normalized search.
+     *
+     * @param NormalizedSearch $normalized Normalized search to match against
+     * @param string           $sessionId  Current session ID
+     * @param int|null         $userId     Current user ID
+     * @param int              $limit      Max rows to retrieve
+     * (default = no limit)
+     *
+     * @return \VuFind\Db\Row\Search[]
+     */
+    public function getSearchRowsMatchingNormalizedSearch(
+        NormalizedSearch $normalized,
+        string $sessionId,
+        ?int $userId,
+        int $limit = PHP_INT_MAX
+    ) {
         // Fetch all rows with the same CRC32 and try to match with the URL
+        $checksum = $normalized->getChecksum();
         $callback = function ($select) use ($checksum, $sessionId, $userId) {
             $nest = $select->where
                 ->equalTo('checksum', $checksum)
@@ -246,44 +246,79 @@ class Search extends Gateway
                 $nest->or->equalTo('user_id', $userId);
             }
         };
-        foreach ($this->select($callback) as $oldSearch) {
-            // Deminify the old search:
-            $oldSearchMinified = $oldSearch->getSearchObject();
-            $dupSearch = $oldSearchMinified->deminify($manager);
-            // Check first if classes match:
-            if (get_class($dupSearch) != get_class($newSearch)) {
-                continue;
-            }
-            // Check if URLs match:
-            $oldUrl = $dupSearch->getUrlQuery()->getParams();
-            if ($oldUrl == $newUrl) {
-                // Update the old search only if it wasn't saved:
-                if (!$oldSearch->saved) {
-                    $oldSearch->created = date('Y-m-d H:i:s');
-                    // Keep the ID of the old search:
-                    $newSearchMinified->id = $oldSearchMinified->id;
-                    $oldSearch->search_object = serialize($newSearchMinified);
-                    $oldSearch->save();
+        $results = [];
+        foreach ($this->select($callback) as $match) {
+            $minified = $match->getSearchObject();
+            if ($normalized->isEquivalentToMinifiedSearch($minified)) {
+                $results[] = $match;
+                if (count($results) >= $limit) {
+                    break;
                 }
-                // Update the new search from the existing one
-                $newSearch->updateSaveStatus($oldSearch);
-                return $oldSearch;
             }
+        }
+        return $results;
+    }
+
+    /**
+     * Add a search into the search table (history)
+     *
+     * @param SearchNormalizer            $normalizer Search manager
+     * @param \VuFind\Search\Base\Results $results    Search to save
+     * @param string                      $sessionId  Current session ID
+     * @param int|null                    $userId     Current user ID
+     *
+     * @return \VuFind\Db\Row\Search
+     */
+    public function saveSearch(
+        SearchNormalizer $normalizer,
+        $results,
+        $sessionId,
+        $userId
+    ) {
+        $normalized = $normalizer->normalizeSearch($results);
+        $duplicates = $this->getSearchRowsMatchingNormalizedSearch(
+            $normalized,
+            $sessionId,
+            $userId,
+            1 // we only need to identify at most one duplicate match
+        );
+        if ($existingRow = array_shift($duplicates)) {
+            // Update the existing search only if it wasn't already saved
+            // (to make it the most recent history entry and make sure it's
+            // using the most up-to-date serialization):
+            if (!$existingRow->saved) {
+                $existingRow->created = date('Y-m-d H:i:s');
+                // Keep the ID of the old search:
+                $minified = $normalized->getMinified();
+                $minified->id = $existingRow->getSearchObject()->id;
+                $existingRow->search_object = serialize($minified);
+                $existingRow->session_id = $sessionId;
+                $existingRow->save();
+            }
+            // Register the appropriate search history database row with the current
+            // search results object.
+            $results->updateSaveStatus($existingRow);
+            return $existingRow;
         }
 
         // If we got this far, we didn't find a saved duplicate, so we should
         // save the new search:
-        $this->insert(['created' => date('Y-m-d H:i:s'), 'checksum' => $checksum]);
+        $this->insert(
+            [
+                'created' => date('Y-m-d H:i:s'),
+                'checksum' => $normalized->getChecksum(),
+            ]
+        );
         $row = $this->getRowById($this->getLastInsertValue());
 
         // Chicken and egg... We didn't know the id before insert
-        $newSearch->updateSaveStatus($row);
+        $results->updateSaveStatus($row);
 
         // Don't set session ID until this stage, because we don't want to risk
         // ever having a row that's associated with a session but which has no
         // search object data attached to it; this could cause problems!
         $row->session_id = $sessionId;
-        $row->search_object = serialize(new minSO($newSearch));
+        $row->search_object = serialize(new minSO($results));
         $row->save();
         return $row;
     }
@@ -291,24 +326,14 @@ class Search extends Gateway
     /**
      * Update the select statement to find records to delete.
      *
-     * @param Select $select  Select clause
-     * @param int    $daysOld Age in days of an "expired" record.
-     * @param int    $idFrom  Lowest id of rows to delete.
-     * @param int    $idTo    Highest id of rows to delete.
+     * @param Select $select    Select clause
+     * @param string $dateLimit Date threshold of an "expired" record in format
+     * 'Y-m-d H:i:s'.
      *
      * @return void
      */
-    protected function expirationCallback($select, $daysOld, $idFrom = null,
-        $idTo = null
-    ) {
-        $expireDate = date('Y-m-d H:i:s', time() - $daysOld * 24 * 60 * 60);
-        $where = $select->where->lessThan('created', $expireDate)
-            ->equalTo('saved', 0);
-        if (null !== $idFrom) {
-            $where->and->greaterThanOrEqualTo('id', $idFrom);
-        }
-        if (null !== $idTo) {
-            $where->and->lessThanOrEqualTo('id', $idTo);
-        }
+    protected function expirationCallback($select, $dateLimit)
+    {
+        $select->where->lessThan('created', $dateLimit)->equalTo('saved', 0);
     }
 }

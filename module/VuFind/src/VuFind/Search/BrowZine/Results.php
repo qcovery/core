@@ -1,10 +1,11 @@
 <?php
+
 /**
  * BrowZine aspect of the Search Multi-class (Results)
  *
  * PHP version 7
  *
- * Copyright (C) Villanova University 2017.
+ * Copyright (C) Villanova University 2017, 2022.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -25,10 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
+
 namespace VuFind\Search\BrowZine;
 
-use VuFind\Record\Loader;
-use VuFindSearch\Service as SearchService;
+use VuFindSearch\Command\SearchCommand;
 
 /**
  * BrowZine Search Results
@@ -42,19 +43,11 @@ use VuFindSearch\Service as SearchService;
 class Results extends \VuFind\Search\Base\Results
 {
     /**
-     * Constructor
+     * Search backend identifier.
      *
-     * @param \VuFind\Search\Base\Params $params        Object representing user
-     * search parameters.
-     * @param SearchService              $searchService Search service
-     * @param Loader                     $recordLoader  Record loader
+     * @var string
      */
-    public function __construct(\VuFind\Search\Base\Params $params,
-        SearchService $searchService, Loader $recordLoader
-    ) {
-        parent::__construct($params, $searchService, $recordLoader);
-        $this->backendId = 'BrowZine';
-    }
+    protected $backendId = 'BrowZine';
 
     /**
      * Returns the stored list of facets for the last search
@@ -82,10 +75,14 @@ class Results extends \VuFind\Search\Base\Results
         $query  = $this->getParams()->getQuery();
         $limit  = $this->getParams()->getLimit();
         $offset = $this->getStartRecord() - 1;
-        $collection = $this->getSearchService()->search(
-            'BrowZine', $query, $offset, $limit
+        $command = new SearchCommand(
+            $this->backendId,
+            $query,
+            $offset,
+            $limit
         );
-
+        $collection = $this->getSearchService()->invoke($command)
+            ->getResult();
         $this->resultTotal = $collection->getTotal();
 
         // Construct record drivers for all the items in the response:

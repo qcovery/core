@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SwitchQuery recommendation module Test Class
  *
@@ -25,9 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Recommend;
 
 use VuFind\Recommend\SwitchQuery;
+use VuFind\Search\BackendManager;
 
 /**
  * SwitchQuery recommendation module Test Class
@@ -38,8 +41,10 @@ use VuFind\Recommend\SwitchQuery;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class SwitchQueryTest extends \VuFindTest\Unit\TestCase
+class SwitchQueryTest extends \PHPUnit\Framework\TestCase
 {
+    use \VuFindTest\Feature\SearchServiceTrait;
+
     /**
      * Test "getResults"
      *
@@ -142,7 +147,7 @@ class SwitchQueryTest extends \VuFindTest\Unit\TestCase
         $sq = $this->getSwitchQuery($results);
         $this->assertEquals(
             [
-                'switchquery_unwantedquotes' => 'my phrase'
+                'switchquery_unwantedquotes' => 'my phrase',
             ],
             $sq->getSuggestions()
         );
@@ -159,7 +164,7 @@ class SwitchQueryTest extends \VuFindTest\Unit\TestCase
         $sq = $this->getSwitchQuery($results, ':wildcard:truncatechar');
         $this->assertEquals(
             [
-                'switchquery_truncatechar' => 'abc'
+                'switchquery_truncatechar' => 'abc',
             ],
             $sq->getSuggestions()
         );
@@ -180,23 +185,20 @@ class SwitchQueryTest extends \VuFindTest\Unit\TestCase
     /**
      * Get a fully configured module
      *
-     * @param \VuFind\Search\Solr\Results   $results  results object
-     * @param string                        $settings settings
-     * @param \VuFind\Search\BackendManager $bm       backend manager
+     * @param \VuFind\Search\Solr\Results $results  results object
+     * @param string                      $settings settings
+     * @param BackendManager              $bm       backend manager
      *
      * @return SwitchQuery
      */
     protected function getSwitchQuery($results = null, $settings = '', $bm = null)
     {
-        if (null === $results) {
-            $results = $this->getMockResults();
-        }
-        if (null === $bm) {
-            $bm = $this->getMockBackendManager();
-        }
-        $sq = new SwitchQuery($bm);
+        $results ??= $this->getMockResults();
+        $sq = new SwitchQuery(
+            $this->getSearchService($bm ?? $this->getMockBackendManager())
+        );
         $sq->setConfig($settings);
-        $sq->init($results->getParams(), new \Zend\StdLib\Parameters([]));
+        $sq->init($results->getParams(), new \Laminas\Stdlib\Parameters([]));
         $sq->process($results);
         return $sq;
     }
@@ -207,24 +209,24 @@ class SwitchQueryTest extends \VuFindTest\Unit\TestCase
      * @param bool|string $csBools  Case sensitive Booleans setting
      * @param bool        $csRanges Case sensitive ranges setting
      *
-     * @return \VuFind\Search\BackendManager
+     * @return BackendManager
      */
     protected function getMockBackendManager($csBools = true, $csRanges = true)
     {
         $helper = new \VuFindSearch\Backend\Solr\LuceneSyntaxHelper($csBools, $csRanges);
-        $queryBuilder = $this->getMockBuilder('VuFindSearch\Backend\Solr\QueryBuilder')
+        $queryBuilder = $this->getMockBuilder(\VuFindSearch\Backend\Solr\QueryBuilder::class)
             ->disableOriginalConstructor()->getMock();
         $queryBuilder->expects($this->any())->method('getLuceneHelper')
             ->will($this->returnValue($helper));
-        $backend = $this->getMockBuilder('VuFindSearch\Backend\Solr\Backend')
+        $backend = $this->getMockBuilder(\VuFindSearch\Backend\Solr\Backend::class)
             ->disableOriginalConstructor()->getMock();
+        $backend->expects($this->any())->method('getIdentifier')
+            ->will($this->returnValue('Solr'));
         $backend->expects($this->any())->method('getQueryBuilder')
             ->will($this->returnValue($queryBuilder));
-        $loader = $this->getMockBuilder('VuFind\Search\BackendManager')
-            ->disableOriginalConstructor()->getMock();
-        $loader->expects($this->any())->method('get')->with($this->equalTo('Solr'))
-            ->will($this->returnValue($backend));
-        return $loader;
+        $container = new \VuFindTest\Container\MockContainer($this);
+        $container->set('Solr', $backend);
+        return new BackendManager($container);
     }
 
     /**
@@ -238,7 +240,7 @@ class SwitchQueryTest extends \VuFindTest\Unit\TestCase
     protected function getMockResults($query = '', $type = 'basic')
     {
         $params = $this->getMockParams($query, $type);
-        $results = $this->getMockBuilder('VuFind\Search\Solr\Results')
+        $results = $this->getMockBuilder(\VuFind\Search\Solr\Results::class)
             ->disableOriginalConstructor()->getMock();
         $results->expects($this->any())->method('getParams')
             ->will($this->returnValue($params));
@@ -255,7 +257,7 @@ class SwitchQueryTest extends \VuFindTest\Unit\TestCase
      */
     protected function getMockParams($query = '', $type = 'basic')
     {
-        $params = $this->getMockBuilder('VuFind\Search\Solr\Params')
+        $params = $this->getMockBuilder(\VuFind\Search\Solr\Params::class)
             ->disableOriginalConstructor()->getMock();
         $params->expects($this->any())->method('getDisplayQuery')
             ->will($this->returnValue($query));

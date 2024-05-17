@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OAI Module Controller
  *
@@ -25,7 +26,10 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
+
 namespace VuFind\Controller;
+
+use VuFindApi\Formatter\RecordFormatter;
 
 /**
  * OAIController Class
@@ -43,7 +47,7 @@ class OaiController extends AbstractBase
     /**
      * Display OAI server form.
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function homeAction()
     {
@@ -54,21 +58,21 @@ class OaiController extends AbstractBase
     /**
      * Standard OAI server.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     public function authserverAction()
     {
-        return $this->handleOAI('VuFind\OAI\Server\Auth');
+        return $this->handleOAI(\VuFind\OAI\Server\Auth::class);
     }
 
     /**
      * Standard OAI server.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     public function serverAction()
     {
-        return $this->handleOAI('VuFind\OAI\Server');
+        return $this->handleOAI(\VuFind\OAI\Server::class);
     }
 
     /**
@@ -76,7 +80,7 @@ class OaiController extends AbstractBase
      *
      * @param string $serverClass Class to load for handling OAI requests.
      *
-     * @return \Zend\Http\Response
+     * @return \Laminas\Http\Response
      */
     protected function handleOAI($serverClass)
     {
@@ -99,14 +103,13 @@ class OaiController extends AbstractBase
                 $this->getRequest()->getQuery()->toArray(),
                 $this->getRequest()->getPost()->toArray()
             );
-            $server = new $serverClass(
-                $this->serviceLocator->get('VuFind\Search\Results\PluginManager'),
-                $this->serviceLocator->get('VuFind\Record\Loader'),
-                $this->serviceLocator->get('VuFind\Db\Table\PluginManager'),
-                $config, $baseURL, $params
+            $server = $this->serviceLocator->get($serverClass);
+            $server->init($config, $baseURL, $params);
+            $server->setRecordLinkerHelper(
+                $this->getViewRenderer()->plugin('recordLinker')
             );
-            $server->setRecordLinkHelper(
-                $this->getViewRenderer()->plugin('recordLink')
+            $server->setRecordFormatter(
+                $this->serviceLocator->get(RecordFormatter::class)
             );
             $xml = $server->getResponse();
         } catch (\Exception $e) {

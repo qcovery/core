@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for instantiating SMS objects
  *
@@ -25,10 +26,11 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace VuFind\SMS;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Factory for instantiating SMS objects
@@ -54,30 +56,35 @@ class Factory implements FactoryInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $name,
+    public function __invoke(
+        ContainerInterface $container,
+        $name,
         array $options = null
     ) {
         // Load configurations:
-        $mainConfig = $container->get('VuFind\Config\PluginManager')->get('config');
-        $smsConfig = $container->get('VuFind\Config\PluginManager')->get('sms');
+        $configManager = $container->get(\VuFind\Config\PluginManager::class);
+        $mainConfig = $configManager->get('config');
+        $smsConfig = $configManager->get('sms');
 
         // Determine SMS type:
-        $type = isset($smsConfig->General->smsType)
-            ? $smsConfig->General->smsType : 'Mailer';
+        $type = $smsConfig->General->smsType ?? 'Mailer';
 
         // Initialize object based on requested type:
         switch (strtolower($type)) {
-        case 'clickatell':
-            $client = $container->get('VuFindHttp\HttpService')->createClient();
-            return new Clickatell($smsConfig, ['client' => $client]);
-        case 'mailer':
-            $options = ['mailer' => $container->get('VuFind\Mailer\Mailer')];
-            if (isset($mainConfig->Site->email)) {
-                $options['defaultFrom'] = $mainConfig->Site->email;
-            }
-            return new Mailer($smsConfig, $options);
-        default:
-            throw new \Exception('Unrecognized SMS type: ' . $type);
+            case 'clickatell':
+                $client = $container->get(\VuFindHttp\HttpService::class)
+                    ->createClient();
+                return new Clickatell($smsConfig, ['client' => $client]);
+            case 'mailer':
+                $options = [
+                    'mailer' => $container->get(\VuFind\Mailer\Mailer::class),
+                ];
+                if (isset($mainConfig->Site->email)) {
+                    $options['defaultFrom'] = $mainConfig->Site->email;
+                }
+                return new Mailer($smsConfig, $options);
+            default:
+                throw new \Exception('Unrecognized SMS type: ' . $type);
         }
     }
 }

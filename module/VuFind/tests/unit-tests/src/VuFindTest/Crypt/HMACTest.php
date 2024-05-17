@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HMAC Test Class
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
+
 namespace VuFindTest\Crypt;
 
 use VuFind\Crypt\HMAC;
@@ -38,7 +40,7 @@ use VuFind\Crypt\HMAC;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-class HMACTest extends \VuFindTest\Unit\TestCase
+class HMACTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test hashing.

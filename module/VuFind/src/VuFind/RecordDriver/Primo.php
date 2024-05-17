@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for Primo Central records.
  *
@@ -25,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
+
 namespace VuFind\RecordDriver;
 
 /**
@@ -55,8 +57,21 @@ class Primo extends DefaultRecord
      */
     public function getTitle()
     {
-        return isset($this->fields['title'])
-            ? $this->fields['title'] : '';
+        return $this->fields['title'] ?? '';
+    }
+
+    /**
+     * Get a highlighted title string, if available.
+     *
+     * @return string
+     */
+    public function getHighlightedTitle()
+    {
+        // Don't check for highlighted values if highlighting is disabled:
+        if (!$this->highlight) {
+            return '';
+        }
+        return $this->fields['highlightDetails']['title'][0] ?? '';
     }
 
     /**
@@ -77,8 +92,7 @@ class Primo extends DefaultRecord
      */
     public function getCreators()
     {
-        return isset($this->fields['creator'])
-            ? $this->fields['creator'] : [];
+        return $this->fields['creator'] ?? [];
     }
 
     /**
@@ -95,8 +109,7 @@ class Primo extends DefaultRecord
      */
     public function getAllSubjectHeadings($extended = false)
     {
-        $base = isset($this->fields['subjects'])
-            ? $this->fields['subjects'] : [];
+        $base = $this->fields['subjects'] ?? [];
         $callback = function ($str) use ($extended) {
             $s = array_map('trim', explode(' -- ', $str));
             return $extended
@@ -125,8 +138,7 @@ class Primo extends DefaultRecord
      */
     public function getContainerEndPage()
     {
-        return isset($this->fields['container_end_page'])
-            ? $this->fields['container_end_page'] : '';
+        return $this->fields['container_end_page'] ?? '';
     }
 
     /**
@@ -136,8 +148,7 @@ class Primo extends DefaultRecord
      */
     public function getFormats()
     {
-        return isset($this->fields['format'])
-            ? (array)$this->fields['format'] : [];
+        return (array)($this->fields['format'] ?? []);
     }
 
     /**
@@ -147,8 +158,7 @@ class Primo extends DefaultRecord
      */
     public function getIsPartOf()
     {
-        return isset($this->fields['ispartof'])
-            ? $this->fields['ispartof'] : '';
+        return $this->fields['ispartof'] ?? '';
     }
 
     /**
@@ -158,8 +168,7 @@ class Primo extends DefaultRecord
      */
     public function getDescription()
     {
-        return isset($this->fields['description'])
-            ? $this->fields['description'] : [];
+        return $this->fields['description'] ?? [];
     }
 
     /**
@@ -169,7 +178,7 @@ class Primo extends DefaultRecord
      */
     public function getSource()
     {
-        $base = isset($this->fields['source']) ? $this->fields['source'] : '';
+        $base = $this->fields['source'] ?? '';
         // Trim off unwanted image and any other tags:
         return strip_tags($base);
     }
@@ -191,7 +200,7 @@ class Primo extends DefaultRecord
     /**
      * Get the language associated with the record.
      *
-     * @return String
+     * @return array
      */
     public function getLanguages()
     {
