@@ -4,7 +4,7 @@
  */
 namespace DeliveryMicroform\View\Helper\DeliveryMicroform;
 
-class DeliveryMicroform extends \Zend\View\Helper\AbstractHelper
+class DeliveryMicroform extends \Laminas\View\Helper\AbstractHelper
 {
     protected $config;
 

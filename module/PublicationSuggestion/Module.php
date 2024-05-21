@@ -1,7 +1,7 @@
 <?php
 namespace PublicationSuggestion;
-use Zend\ModuleManager\ModuleManager,
-    Zend\Mvc\MvcEvent;
+use Laminas\ModuleManager\ModuleManager,
+    Laminas\Mvc\MvcEvent;
 
 class Module
 {
@@ -23,7 +23,7 @@ class Module
     public function getAutoloaderConfig()
     {
         return array(
-            'Zend\Loader\StandardAutoloader' => array(
+            'Laminas\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),

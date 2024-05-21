@@ -45,7 +45,7 @@ class PluginManager extends \VuFind\Resolver\Driver\PluginManager
         'VuFind\Resolver\Driver\Threesixtylink' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\Demo' =>
-            'Zend\ServiceManager\Factory\InvokableFactory',
+            'Laminas\ServiceManager\Factory\InvokableFactory',
         'VuFind\Resolver\Driver\Ezb' =>
             'VuFind\Resolver\Driver\DriverWithHttpClientFactory',
         'VuFind\Resolver\Driver\Sfx' =>

@@ -4,7 +4,7 @@
  */
 namespace AvailabilityFeedback\View\Helper\AvailabilityFeedback;
 
-class AvailabilityFeedback extends \Zend\View\Helper\AbstractHelper
+class AvailabilityFeedback extends \Laminas\View\Helper\AbstractHelper
 {
     protected $config;
 

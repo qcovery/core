@@ -1,7 +1,7 @@
 <?php
 namespace PublicationSuggestion\View\Helper\PublicationSuggestion;
 
-class PublicationSuggestion extends \Zend\View\Helper\AbstractHelper
+class PublicationSuggestion extends \Laminas\View\Helper\AbstractHelper
 {
     protected $config;
 

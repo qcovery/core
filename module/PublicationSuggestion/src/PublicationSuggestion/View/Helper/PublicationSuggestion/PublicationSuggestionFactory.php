@@ -2,7 +2,7 @@
 namespace PublicationSuggestion\View\Helper\PublicationSuggestion;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PublicationSuggestionFactory implements FactoryInterface
 {
