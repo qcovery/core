@@ -28,8 +28,8 @@
 namespace CaLief\Controller;
 //use VuFindSearch\Query\Query;
 //use VuFind\Search\Factory\SolrDefaultBackendFactory;
-//use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+//use Laminas\ServiceManager\ServiceLocatorAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use VuFind\Controller\AbstractBase;
 use VuFind\Controller\AbstractSearch;
 use CaLief\Order\DodOrder;
@@ -253,7 +253,7 @@ class CaLiefController extends AbstractBase
                 }
             }
             
-            $caliefUsers = $tableCaliefUsers->select(function (\Zend\Db\Sql\Select $select) {
+            $caliefUsers = $tableCaliefUsers->select(function (\Laminas\Db\Sql\Select $select) {
                  $select->order('authorized ASC');
             });
             
@@ -599,7 +599,7 @@ class CaLiefController extends AbstractBase
         
         $logger = new \VuFind\Log\Logger();
         $logger->setServiceLocator($this->serviceLocator);
-        $loggerConfig = new \Zend\Config\Config(array('Logging' => array('file' => $this->caliefConfig['global']['log_dir'].'/'.$this->caliefConfig['global']['log_file'].':notice')));
+        $loggerConfig = new \Laminas\Config\Config(array('Logging' => array('file' => $this->caliefConfig['global']['log_dir'].'/'.$this->caliefConfig['global']['log_file'].':notice')));
         $logger->setConfig($loggerConfig);
         $extraArray = array($userCalief->name.' '.$userCalief->lastname.' ('.$userCalief->card_number.')');
         $extraArray[] = $extra['transaction-group-qualifier'];
@@ -609,7 +609,7 @@ class CaLiefController extends AbstractBase
             $loggerEmail = new \Vufind\Log\Logger();
             $loggerEmail->setServiceLocator($this->serviceLocator);
             $filename = str_ireplace(':', '_', $extra['transaction-group-qualifier']) . '.log';
-            $loggerEmailConfig = new \Zend\Config\Config(array('Logging' => array('file' => $this->caliefConfig['global']['log_dir'].'/'.$filename.':notice')));
+            $loggerEmailConfig = new \Laminas\Config\Config(array('Logging' => array('file' => $this->caliefConfig['global']['log_dir'].'/'.$filename.':notice')));
             $loggerEmail->setConfig($loggerEmailConfig);
             $loggerEmail->log(5, $info, $extra);
         }

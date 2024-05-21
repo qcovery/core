@@ -51,7 +51,7 @@ class Loader extends \VuFind\Cover\Loader
     /**
      * Constructor
      *
-     * @param \Zend\Config\Config     $config      VuFind configuration
+     * @param \Laminas\Config\Config     $config      VuFind configuration
      * @param ApiManager              $manager     Plugin manager for API handlers
      * @param \VuFindTheme\ThemeInfo  $theme       VuFind theme tools
      * @param \VuFindHttp\HttpService $httpService HTTP client factory

@@ -28,7 +28,7 @@
  */
 namespace RelevancePicker\Search;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Manager for search backends.

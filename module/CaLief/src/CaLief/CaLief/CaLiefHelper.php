@@ -2,7 +2,7 @@
 
 namespace CaLief\CaLief;
 
-use \Zend\View\Helper\AbstractHelper;
+use \Laminas\View\Helper\AbstractHelper;
 use CaLief\Db\Table\UserCalief;
 use CaLief\Order\Available;
 use PAIA\ILS\Driver\PAIA;

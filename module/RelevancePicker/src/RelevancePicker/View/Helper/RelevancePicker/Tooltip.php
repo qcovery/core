@@ -4,7 +4,7 @@
  */
 namespace RelevancePicker\View\Helper\RelevancePicker;
 
-class ToolTip extends \Zend\View\Helper\AbstractHelper
+class ToolTip extends \Laminas\View\Helper\AbstractHelper
 {
     protected $explainData = [];
     protected $scores = [];

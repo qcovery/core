@@ -29,7 +29,7 @@
 namespace BeluginoCover\Cover;
 use VuFind\Code\ISBN,
     VuFind\Content\Covers\PluginManager as ApiManager,
-    Zend\Log\LoggerInterface;
+    Laminas\Log\LoggerInterface;
 
 /**
  * Book Cover Generator
@@ -41,7 +41,7 @@ use VuFind\Code\ISBN,
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/use_of_external_content Wiki
  */
-class Loader implements \Zend\Log\LoggerAwareInterface
+class Loader implements \Laminas\Log\LoggerAwareInterface
 {
     /**
      * filename constructed from ISBN
@@ -60,7 +60,7 @@ class Loader implements \Zend\Log\LoggerAwareInterface
     /**
      * property to hold VuFind configuration settings
      *
-     * @var \Zend\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -74,7 +74,7 @@ class Loader implements \Zend\Log\LoggerAwareInterface
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $client;
 
@@ -163,15 +163,15 @@ class Loader implements \Zend\Log\LoggerAwareInterface
     /**
      * Constructor
      *
-     * @param \Zend\Config\Config    $config  VuFind configuration
+     * @param \Laminas\Config\Config    $config  VuFind configuration
      * @param ApiManager             $manager Plugin manager for API handlers
      * @param \VuFindTheme\ThemeInfo $theme   VuFind theme tools
-     * @param \Zend\Http\Client      $client  HTTP client
+     * @param \Laminas\Http\Client      $client  HTTP client
      * @param string                 $baseDir Directory to store downloaded images
      * (set to system temp dir if not otherwise specified)
      */
     public function __construct($config, ApiManager $manager,
-        \VuFindTheme\ThemeInfo $theme, \Zend\Http\Client $client, $baseDir = null
+        \VuFindTheme\ThemeInfo $theme, \Laminas\Http\Client $client, $baseDir = null
     ) {
         $this->config = $config;
         $this->apiManager = $manager;

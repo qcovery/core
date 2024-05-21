@@ -52,7 +52,7 @@ class ListAdminController extends AbstractBase
             return $this->redirect()->toRoute('myresearch-home');
         }
 
-        $translator = $this->serviceLocator->get('Zend\Mvc\I18n\Translator');
+        $translator = $this->serviceLocator->get('Laminas\Mvc\I18n\Translator');
         $view = $this->createViewModel();
 
         $view->old_account = $this->params()->fromPost('old_account');

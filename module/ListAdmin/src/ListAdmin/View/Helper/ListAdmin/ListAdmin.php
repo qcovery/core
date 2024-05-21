@@ -4,7 +4,7 @@
  */
 namespace ListAdmin\View\Helper\ListAdmin;
 
-class ListAdmin extends \Zend\View\Helper\AbstractHelper
+class ListAdmin extends \Laminas\View\Helper\AbstractHelper
 {
     protected $config;
 

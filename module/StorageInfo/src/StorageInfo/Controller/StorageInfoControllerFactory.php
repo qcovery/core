@@ -3,7 +3,7 @@
 namespace StorageInfo\Controller;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class StorageInfoControllerFactory implements FactoryInterface
 {

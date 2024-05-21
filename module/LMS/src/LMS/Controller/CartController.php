@@ -2,8 +2,8 @@
 
 namespace LMS\Controller;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Session\Container;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Session\Container;
 
 class CartController extends \VuFind\Controller\CartController
 {

@@ -27,12 +27,12 @@
  */
 namespace CaLief\Db\Row;
 use VuFind\Db\Row\RowGateway;
-use Zend\Db\Sql\Expression,
-    Zend\Db\Sql\Predicate\Predicate,
-    Zend\Db\Sql\Sql,
-    Zend\Crypt\Symmetric\Mcrypt,
-    Zend\Crypt\Password\Bcrypt,
-    Zend\Crypt\BlockCipher as BlockCipher;
+use Laminas\Db\Sql\Expression,
+    Laminas\Db\Sql\Predicate\Predicate,
+    Laminas\Db\Sql\Sql,
+    Laminas\Crypt\Symmetric\Mcrypt,
+    Laminas\Crypt\Password\Bcrypt,
+    Laminas\Crypt\BlockCipher as BlockCipher;
 
 /**
  * Row Definition for user
@@ -51,7 +51,7 @@ class UserCalief extends RowGateway implements \VuFind\Db\Table\DbTableAwareInte
     /**
      * Constructor
      *
-     * @param \Zend\Db\Adapter\Adapter $adapter Database adapter
+     * @param \Laminas\Db\Adapter\Adapter $adapter Database adapter
      */
     public function __construct($adapter)
     {

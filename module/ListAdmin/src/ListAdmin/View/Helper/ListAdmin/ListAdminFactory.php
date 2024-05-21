@@ -28,7 +28,7 @@
 namespace ListAdmin\View\Helper\ListAdmin;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * SearchBox helper factory.

@@ -26,8 +26,8 @@
  * @link     https://github.com/dmj/vf2-proxy
  */
 namespace BeluginoCover;
-use Zend\ModuleManager\ModuleManager,
-    Zend\Mvc\MvcEvent;
+use Laminas\ModuleManager\ModuleManager,
+    Laminas\Mvc\MvcEvent;
 
 /**
  * Template for ZF2 module for storing local overrides.
@@ -58,7 +58,7 @@ class Module
     public function getAutoloaderConfig()
     {
         return array(
-            'Zend\Loader\StandardAutoloader' => array(
+            'Laminas\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),

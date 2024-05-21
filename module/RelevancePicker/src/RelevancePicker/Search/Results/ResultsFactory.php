@@ -28,7 +28,7 @@
 namespace RelevancePicker\Search\Results;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Generic factory for search results objects.

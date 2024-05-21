@@ -4,7 +4,7 @@
  */
 namespace FulltextFinder\View\Helper\FulltextFinder;
 
-class FulltextFinder extends \Zend\View\Helper\AbstractHelper
+class FulltextFinder extends \Laminas\View\Helper\AbstractHelper
 {
     protected $config;
 

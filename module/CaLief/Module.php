@@ -26,11 +26,11 @@
  * @link     https://github.com/dmj/vf2-proxy
  */
 namespace CaLief;
-use Zend\ModuleManager\ModuleManager,
-    Zend\Mvc\MvcEvent,
-    Zend\ModuleManager\Feature\ConfigProviderInterface,
-    Zend\Db\ResultSet\ResultSet,
-    Zend\Db\TableGateway\TableGateway;
+use Laminas\ModuleManager\ModuleManager,
+    Laminas\Mvc\MvcEvent,
+    Laminas\ModuleManager\Feature\ConfigProviderInterface,
+    Laminas\Db\ResultSet\ResultSet,
+    Laminas\Db\TableGateway\TableGateway;
 use CaLief\CaLief\CaLiefHelper;
 use CaLief\Db\Table\UserCalief;
 use CaLief\Model\UserCaliefModel;
@@ -67,7 +67,7 @@ class Module implements ConfigProviderInterface
     public function getAutoloaderConfig()
     {
         return array(
-            'Zend\Loader\StandardAutoloader' => array(
+            'Laminas\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
                 ),

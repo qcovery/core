@@ -33,8 +33,8 @@ use VuFind\Exception\ILS as ILSException;
 use VuFind\Exception\ListPermission as ListPermissionException;
 use VuFind\Exception\Mail as MailException;
 use VuFind\Search\RecommendListener;
-use Zend\Stdlib\Parameters;
-use Zend\View\Model\ViewModel;
+use Laminas\Stdlib\Parameters;
+use Laminas\View\Model\ViewModel;
 
 /**
  * Controller for the user account area.

@@ -3,7 +3,7 @@
 namespace StorageInfo\Controller;
 
 use VuFind\Controller\AbstractBase;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class StorageInfoController extends AbstractBase
 {

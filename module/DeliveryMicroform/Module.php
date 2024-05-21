@@ -26,8 +26,8 @@
  * @link     https://github.com/dmj/vf2-proxy
  */
 namespace DeliveryMicroform;
-use Zend\ModuleManager\ModuleManager,
-    Zend\Mvc\MvcEvent;
+use Laminas\ModuleManager\ModuleManager,
+    Laminas\Mvc\MvcEvent;
 
 /**
  * Template for ZF2 module for storing local overrides.

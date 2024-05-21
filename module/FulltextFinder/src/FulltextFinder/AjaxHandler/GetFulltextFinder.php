@@ -36,7 +36,7 @@ use VuFind\ILS\Connection;
 use VuFind\ILS\Logic\Holds;
 use VuFind\Session\Settings as SessionSettings;
 use VuFind\Crypt\HMAC;
-use Zend\Config\Config;
+use Laminas\Config\Config;
 use Zend\Mvc\Controller\Plugin\Params;
 use Zend\View\Renderer\RendererInterface;
 
