@@ -1,0 +1,152 @@
+<h1>Hilfe zu den Suchoperatoren</h1>
+
+<h3><a class="help-toggle-link" data-toggle-id="help-section-0">Suche mit Platzhaltern<span class="help-toggle-icon"><i class="bel-pfeil-u03"></i></span></a></h3>
+<div id="help-section-0" class="help-section">
+    <p>Als Platzhalter für ein beliebiges Zeichen verwenden Sie das Fragezeichen <strong>(?)</strong>.</p>
+    <p>Beispiel: Wenn Sie nach "Text" oder "Test" suchen wollen geben Sie </p>
+    <pre class="code">Te?t</pre>
+    <p>ein.</p>
+    <p>Als Platzhalter für 0 oder mehrere beliebige Zeichen verwenden Sie ein Sternchen
+        <strong>(*)</strong>.</p>
+    <p>Beispiel: Sie wollen nach "Test", "Tests" oder "Tester" suchen, dann geben
+        Sie:</p>
+    <pre class="code">Test*</pre>
+    <p>ein.</p>
+    <p>Sie können Platzhalter irgendwo platzieren:</p>
+    <pre class="code">Te*t</pre>
+</div>
+
+<h3><a class="help-toggle-link" data-toggle-id="help-section-1">Unscharfe Suche<span class="help-toggle-icon"><i class="bel-pfeil-u03"></i></span></a></h3>
+<div id="help-section-1" class="help-section">
+    <p>Verwenden Sie für die unscharfe Suche die Tilde <strong>(~)</strong> am
+        Ende eines Wortes.
+        Beispiel: Sie wollen ähnlich geschriebene Wörter zu "Raum" erhalten:</p>
+    <pre class="code">Raum~</pre>
+    <p>In diese Suche werden Wörter, wie "Baum" oder "Rahm" aufgenommen.</p>
+    <p>Sie können die Anzahl der Wörter erhöhen oder verringern, indem Sie
+        einen Wert zwischen 0 und 1 hinter der Tilde setzen.
+        Je kleiner der Wert, desto unschärfer ist die Suche. Wird der Wert auf 1
+        gesetzt, wird nur nach identisch geschriebenen Wörtern gesucht.
+        Beispiel:</p>
+    <pre class="code">Raum~0.8</pre>
+    <p>Wenn Sie nichts angeben, wird der Wert automatisch auf 0.5 gesetzt.</p>
+</div>
+
+<h3><a class="help-toggle-link" data-toggle-id="help-section-2">Suche nach ähnlichen Wörtern<span class="help-toggle-icon"><i class="bel-pfeil-u03"></i></span></a></h3>
+<div id="help-section-2" class="help-section">
+    <p>
+        Für die Bereichssuche verwenden Sie die Tilde <strong>(~)</strong>, die
+        Sie hinter eine Gruppe von Wörter setzen.
+        Beispiel: Um nach Ökonomie und Keynes, welche maximal 10 Wörter voneinander entfernt sind, zu
+        suchen, geben Sie Folgendes ein:
+    </p>
+    <pre class="code">"Ökonomie Keynes"~10</pre>
+</div>
+
+<h3><a class="help-toggle-link" data-toggle-id="help-section-3">Bereichssuche<span class="help-toggle-icon"><i class="bel-pfeil-u03"></i></span></a></h3>
+<div id="help-section-3" class="help-section">
+    <p>
+        Für die Bereichssuche verwenden Sie geschweifte Klammern <strong>({ })</strong>.
+        Beispiel: Sie wollen ein Wort, welches mit A, B oder C anfängt suchen:
+    </p>
+    <pre class="code">{A TO C}</pre>
+    <p>
+        Das gleiche können Sie mit Zahlen, wie z.B. Jahreszahlen machen:
+    </p>
+    <pre class="code">[2002 TO 2003]</pre>
+</div>
+
+<h3><a class="help-toggle-link" data-toggle-id="help-section-4">Worte unterschiedlich gewichten<span class="help-toggle-icon"><i class="bel-pfeil-u03"></i></span></a></h3>
+<div id="help-section-4" class="help-section">
+    <p>
+        Sie können Wörtern mehr Bedeutung zuweisen, indem Sie diese mit einer
+        Zahl gewichten. Verwenden Sie hierzu ein Dächchen <strong>(^)</strong>. Beispiel:
+    </p>
+    <pre class="code">Ökonomie Keynes^5</pre>
+    <p>Dadurch wird das Wort "Keynes" stärker gewichtet und dadurch bei der Suche
+        stärker beachtet.
+    </p>
+</div>
+
+<h3><a class="help-toggle-link" data-toggle-id="help-section-5">Boolesche Operatoren<span class="help-toggle-icon"><i class="bel-pfeil-u03"></i></span></a></h3>
+<div id="help-section-5" class="help-section">
+    <p>
+        Boolesche Operatoren erlauben es, Wörter logisch miteinander zu verknüpfen.
+        Folgende Operatoren sind erlaubt:
+        <strong>AND</strong>, <strong>+</strong>, <strong>OR</strong>,
+        <strong>NOT</strong> und <strong>-</strong>.
+    </p>
+    <p>Hinweis: Boolesche Operatoren müssen großgeschrieben werden!</p>
+    <div>
+        <h4>AND</h4>
+        <dd>
+            <p>Die Und-Verknüpfung <strong>(AND)</strong> ist der Standardoperator. Das
+                bedeutet, dass wenn zwischen zwei Wörtern kein Operator gesetzt wird,
+                die Und-Verknüpfung verwendet wird. Wenn Sie zwei Wörter mit AND verbinden,
+                erhalten Sie Treffer, in denen beide Wörter vorhanden sind.
+            </p>
+            <p>Beispiel: Sie suchen nach Titeln, in denen die Wörter
+                "Ökonomie" und "Keynes" enthalten sind:</p>
+            <pre class="code">Ökonomie Keynes</pre>
+            <p>oder</p>
+            <pre class="code">Ökonomie AND Keynes</pre>
+        </dd>
+        <h4>+</h4>
+        <dd>
+            <p>Indem Sie den <strong>+</strong>-Operator vor ein Wort setzen, erhalten Sie
+                nur Treffer, in denen dieses Wort vorkommt.
+            </p>
+            <p>Beispiel:</p>
+            <pre class="code">+Ökonomie +Keynes</pre>
+        </dd>
+        <h4>OR</h4>
+        <dd>
+            <p>Steht eine Oder-Verknüpfung <strong>(OR)</strong> zwischen zwei Wörtern, so
+                erhalten Sie Treffer, in denen eines oder beide Wörter gefunden wurden.
+            </p>
+            <p>Beispiel: Sie suchen nach Titeln, in denen die Phrasen "Ökonomie Keynes" oder
+                "Keynes" enthalten sind:</p>
+            <pre class="code">"Ökonomie Keynes" OR Keynes</pre>
+        </dd>
+        <h4>NOT</h4>
+        <dd>
+            <p>Indem Sie <strong>NOT</strong> vor ein Wort setzen, schließen Sie Treffer aus,
+                die dieses Wort enthalten.</p>
+            <p>Beispiel: Sie wollen nach Titeln suchen, welche das Wort "Ökonomie"
+                enthalten, aber nicht das Wort "Keynes":</p>
+            <pre class="code">Ökonomie NOT Keynes</pre>
+            <p>Hinweis: NOT muss mit mindestens zwei Wörtern verwendet werden.
+                Beispielsweise liefert folgende Suche keine Treffer:</p>
+            <pre class="code">NOT Ökonomie</pre>
+        </dd>
+        <h4>-</h4>
+        <dd>
+            <p>Wird der Operator <strong>(-)</strong> vor ein Wort gesetzt, so
+                werden alle Treffer ausgefiltert, die dieses Wort enthalten.</p>
+            <p>Beispiel:</p>
+            <pre class="code">Ökonomie -Keynes</pre>
+        </dd>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        jQuery('.help-toggle-link').each(function() {
+            let $link = jQuery(this);
+            $link.on('click', function(e) {
+                console.log('test');
+
+                e.preventDefault();
+                let helpSection = jQuery('#'+$link.data('toggle-id'));
+                if (helpSection.css('display') === 'none') {
+                    $link.find('.help-toggle-icon i').removeClass('bel-pfeil-u03');
+                    $link.find('.help-toggle-icon i').addClass('bel-pfeil-o03');
+                } else {
+                    $link.find('.help-toggle-icon i').removeClass('bel-pfeil-o03');
+                    $link.find('.help-toggle-icon i').addClass('bel-pfeil-u03');
+                }
+                helpSection.slideToggle(200);
+            });
+        });
+    });
+</script>

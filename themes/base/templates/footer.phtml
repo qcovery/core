@@ -1,0 +1,45 @@
+<footer class="hidden-print">
+  <div class="container">
+    <?php if($this->layout()->footer_links && sizeof($this->layout()->footer_links['links']) > 0): ?>
+      <div class="footer-container">
+        <div class="footer-column">
+          <?php $this->slot('footer-left')->start(); ?>
+            <div class="footer-column-inner">
+              <?=$this->layout()->footer_links['links_title'] ? '<h2>'.$this->transEsc($this->layout()->footer_links['links_title']).'</h2>' : ''?>
+              <ul>
+                <?php foreach($this->layout()->footer_links['links'] as $link): ?>
+                  <?php
+                  $target = '';
+                  $lightbox = '';
+                  if (isset($link['target']) && $link['target'] != '') {
+                      $target = ' target="'.$link['target'].'"';
+                  } else {
+                      if (isset($link['lightbox']) && $link['lightbox']) {
+                          $lightbox = ' data-lightbox';
+                      }
+                  }
+                  ?>
+                  <li>
+                      <a href="<?=$link['url']?>"<?=$lightbox?><?=$target?>><?=$this->transEsc($link['link_text'])?></a>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            </div>
+          <?=$this->slot('footer-left')->end(); ?>
+        </div>
+      </div>
+    <?php endif; ?>
+    <div class="poweredby">
+      <?=$this->layout()->poweredBy ?>
+      <ul class="footer-menu">
+        <li><a href="<?=$this->url('content-page', ['page' => 'contact']) ?>"><?=$this->transEsc('Contact')?></a></li>
+        <li><a href="<?=$this->url('content-page', ['page' => 'about']) ?>"><?=$this->transEsc('About')?></a></li>
+        <li><a href="<?=$this->url('content-page', ['page' => 'imprint']) ?>">Impressum</a></li>
+        <li><a href="<?=$this->url('content-page', ['page' => 'privacy']) ?>">Datenschutz</a></li>
+      </ul>
+    </div>
+    <div class="sponsor-note">
+        <a href="#" target="_blank"><span class="sponsor-text">Ein Angebot von:</span><img src="/vufind/themes/mpg_base/images/logo-sponsor-01.svg" alt="Sponsoren Name" height="100" /></a>  <a href="#" target="_blank"><span class="sponsor-text">Gefördert von:</span><img src="/vufind/themes/mpg_base/images/logo-sponsor-02.svg" alt="Sponsoren Name" height="100" /></a>
+    </div>
+  </div>
+</footer>

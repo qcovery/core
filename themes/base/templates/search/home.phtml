@@ -1,0 +1,37 @@
+<?php
+  // Set page title.
+  $this->headTitle($this->translate('Search Home'));
+  $this->layout()->breadcrumbs = false;
+  $this->layout()->searchbox = $this->render('search/searchbox.phtml');
+?>
+
+<div class="searchHomeContent">
+  <?php $this->slot('search-home-hero')->start() ?>
+    <section class="search-home-columnset">
+        <article class="home-column">
+            <div class="home-text-content">
+                <img class="teaser-image" src="/vufind/themes/mpg_base/images/question-03.jpg" alt="Question" />
+                <h2>Überschrift 1</h2>
+                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                <a href="#" class="btn-more">mehr erfahren</a>
+            </div>
+        </article>
+        <article class="home-column">
+            <div class="home-text-content">
+                <img class="teaser-image" src="/vufind/themes/mpg_base/images/question-02.jpg" alt="Question" />
+                <h2>Überschrift 2</h2>
+                <p>Lorem ipsum dolor sit amet, <a href="#" target="_blank">Digitalisate</a> adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                <a href="#" class="btn-more">mehr erfahren</a>
+            </div>
+        </article>
+        <article class="home-column">
+            <div class="home-text-content">
+                <img class="teaser-image" src="/vufind/themes/mpg_base/images/question-01.jpg" alt="Question" />
+                <h2>Überschrift 3</h2>
+                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.</p>
+                <a href="#" class="btn-more">mehr erfahren</a>
+            </div>
+        </article>
+    </section>
+  <?=$this->slot('search-home-hero')->end() ?>
+</div>
