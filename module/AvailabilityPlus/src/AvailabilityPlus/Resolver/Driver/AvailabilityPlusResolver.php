@@ -11,7 +11,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     /**
      * HTTP client
      *
-     * @var \Zend\Http\Client
+     * @var \Laminas\Http\Client
      */
     protected $httpClient;
 
@@ -31,9 +31,9 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
      * Constructor
      *
      * @param string            $baseUrl    Base URL for link resolver
-     * @param \Zend\Http\Client $httpClient HTTP client
+     * @param \Laminas\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Zend\Http\Client $httpClient, $additionalParams, $rules, HMAC $hmac, $resolverConfig)
+    public function __construct($baseUrl, \Laminas\Http\Client $httpClient, $additionalParams, $rules, HMAC $hmac, $resolverConfig)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;

@@ -3,7 +3,7 @@
 namespace AvailabilityPlus\Resolver\Driver;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DriverWithHttpClientFactory extends \VuFind\Resolver\Driver\DriverWithHttpClientFactory
 {

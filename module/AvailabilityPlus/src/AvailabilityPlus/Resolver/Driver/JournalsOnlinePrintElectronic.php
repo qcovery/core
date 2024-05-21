@@ -18,36 +18,29 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
     {
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
-        $freeAccess = false;
-        $licensedAccess = false;
         $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
         foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
             if(!empty($result->AccessURL)) {
                 $level = '';
                 $label = '';
-                $score = 0;
                 $url = $result->AccessURL->__toString();
                 if(!in_array($url, $urls)) {
                     switch ($result['state']) {
                         case 0:
-                            $freeAccess = true;
                             $level = "FreeAccess link_external";
                             $label = "FreeAccess";
                         case 2:
-                            $licensedAccess = true;
                             if($result['state'] != 0) {
                                 $level = "LicensedAccess link_external";
                                 $label = "LicensedAccess";
-                                $score = $score + 10;
                             }
                             $level .= " ".$result->AccessLevel;
                             $label .= "_".$result->AccessLevel;
-                            if($result->AccessLevel != 'article') $score = $score + 5;
                             $urls[] = $url;
                             break;
                     }
                     if(!empty($level)) {
-                        $record['score'] = $score;
+                        $record['score'] = 0;
                         $record['level'] = $level;
                         $record['label'] = $label;
                         $record['url'] = $url;
@@ -56,23 +49,6 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
                 }
             }
         }
-
-	if(!empty($this->doi)) {
-		if($freeAccess) {
-        	        $record['score'] = 0 - 1;
-	                $record['level'] = "FreeAccess link_external";
-                	$record['label'] = "FreeAccess";
-	                $record['url'] = 'https://dx.doi.org/'.$this->doi;
-        	        $records[] = $record;
-		} else if($licensedAccess) {
-	                $record['score'] = 10 - 1;
-                	$record['level'] = "LicensedAccess link_external";
-        	        $record['label'] = "LicensedAccess";
-	                $record['url'] = 'https://dx.doi.org/'.$this->doi;
-	                $records[] = $record;
-		}
-	}
-
         $response['data'] = $data_org;
         $this->parsed_data = $records;
         $this->applyCustomChanges();

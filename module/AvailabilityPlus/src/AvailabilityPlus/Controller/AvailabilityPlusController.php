@@ -28,7 +28,7 @@ class AvailabilityPlusController extends \VuFind\Controller\AbstractBase
     /**
      * Display Feedback home form.
      *
-     * @return \Zend\View\Model\ViewModel
+     * @return \Laminas\View\Model\ViewModel
      */
     public function homeAction()
     {

@@ -86,6 +86,7 @@ class DAIA extends AvailabilityPlusResolver
                         $record->service = $service_key;
                         switch($service_key) {
                             case 'openaccess':
+                                $record->daia_action = (object)''; 
                                 if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
                                     $record->daia_action->level = 'FreeAccess link_external';
                                     if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
@@ -105,6 +106,7 @@ class DAIA extends AvailabilityPlusResolver
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
                             case 'remote':
+                                $record->daia_action = (object)'';
                                 if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
                                     $record->daia_action->level = 'LicensedAccess link_external';
                                     if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
@@ -130,6 +132,9 @@ class DAIA extends AvailabilityPlusResolver
                                 }
                             case 'loan':
                             case 'presentation':
+                                $record->storage = (object)'';
+                                $record->daia_hint = (object)'';
+                                $record->daia_action = (object)'';
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote'])) {
                                     if($service_key == 'loan') {
                                         $record->score = 20;
@@ -184,6 +189,7 @@ class DAIA extends AvailabilityPlusResolver
                                         $record->daia_action->label = $service_content->service.'_default_action'.$limitation;
                                     }
                                     if(isset($service_content->queue)) {
+					$record->queue = (object)'';
                                         $record->queue->length = $service_content->queue;
                                         if($service_content->queue == 1) {
                                             $record->queue->label .=  'Recall';
@@ -203,6 +209,9 @@ class DAIA extends AvailabilityPlusResolver
                                     break;
                                 }
                             case 'fallback':
+				$record->storage = (object)'';
+                                $record->daia_hint = (object)'';
+                                $record->daia_action = (object)'';
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote']) && empty($item_services['available']['loan']) && empty($item_services['available']['presentation'])) {
                                     if(!empty($item->storage->id)){
                                         $record->storage->level = 'link_external';

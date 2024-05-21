@@ -19,7 +19,7 @@ return array (
     array (
       'availabilityplus-home' =>
       array (
-        'type' => 'Zend\\Router\\Http\\Literal',
+        'type' => 'Laminas\\Router\\Http\\Literal',
         'options' =>
         array (
           'route' => '/AvailabilityPlus/Home',
@@ -32,7 +32,7 @@ return array (
       ),
       'availabilityplus-testcases' =>
       array (
-        'type' => 'Zend\\Router\\Http\\Literal',
+        'type' => 'Laminas\\Router\\Http\\Literal',
         'options' =>
         array (
           'route' => '/AvailabilityPlus/TestCases',
@@ -45,7 +45,7 @@ return array (
       ),
       'availabilityplus-debug' =>
       array (
-        'type' => 'Zend\\Router\\Http\\Segment',
+        'type' => 'Laminas\\Router\\Http\\Segment',
         'options' =>
         array (
           'route' => '/AvailabilityPlus/Debug/[:id]',
@@ -87,7 +87,6 @@ return array (
           'AvailabilityPlus\\Resolver\\Driver\\DAIAJournal' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\DAIAHsH' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\DAIAKSF' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
-          'AvailabilityPlus\\Resolver\\Driver\\DAIAParent' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\DAIAplus' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\FulltextFinder' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
@@ -99,24 +98,32 @@ return array (
           'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintKSFPrint' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\Subito' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
           'AvailabilityPlus\\Resolver\\Driver\\SubitoISBN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
-          'AvailabilityPlus\\Resolver\\Driver\\SubitoISSN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory', 'AvailabilityPlus\\Resolver\\Driver\\Unpaywall' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory'
+          'AvailabilityPlus\\Resolver\\Driver\\SubitoISSN' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'AvailabilityPlus\\Resolver\\Driver\\Unpaywall' => 'AvailabilityPlus\\Resolver\\Driver\\DriverWithHttpClientFactory',
+          'VuFind\\Resolver\\Driver\\AvailabilityPlusResolver' => 'VuFind\\Resolver\\Driver\\DriverWithHttpClientFactory',
         ),
         'aliases' =>
         array (
           'VuFind\\Resolver\\Driver\\AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\AbstractBase',
+          'AvailabilityPlusResolver' => 'AvailabilityPlus\\Resolver\\Driver\\AvailabilityPlusResolver',
+          'DAIA' => 'AvailabilityPlus\\Resolver\\Driver\\DAIA',
+          'DAIAJournal' => 'AvailabilityPlus\\Resolver\\Driver\\DAIAJournal',
+          'DAIAHsH' => 'AvailabilityPlus\\Resolver\\Driver\\DAIAHsH',
+          'DAIAKSF' => 'AvailabilityPlus\\Resolver\\Driver\\DAIAKSF',
+          'FulltextFinder' => 'AvailabilityPlus\\Resolver\\Driver\\FulltextFinder',
+          'JournalsOnlinePrint' => 'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrint',
+          'JournalsOnlinePrintElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintElectronic',
+          'JournalsOnlinePrintHsHElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintHsHElectronic',
+          'JournalsOnlinePrintKSFElectronic' => 'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintKSFElectronic',
+          'JournalsOnlinePrintPrint' => 'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintPrint',
+          'JournalsOnlinePrintHsHPrint' => 'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintHsHPrint',
+          'JournalsOnlinePrintKSFPrint' => 'AvailabilityPlus\\Resolver\\Driver\\JournalsOnlinePrintKSFPrint',
+          'Subito' => 'AvailabilityPlus\\Resolver\\Driver\\Subito',
+          'SubitoISBN' => 'AvailabilityPlus\\Resolver\\Driver\\SubitoISBN',
+          'SubitoISSN' => 'AvailabilityPlus\\Resolver\\Driver\\SubitoISSN',
+          'Unpaywall' => 'AvailabilityPlus\\Resolver\\Driver\\Unpaywall'
         ),
       ),
-    ),
-  ),
-  'service_manager' =>
-  array (
-    'factories' =>
-    array (
-      'AvailabilityPlus\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\ServiceManager\\AbstractPluginManagerFactory',
-    ),
-    'aliases' =>
-    array (
-      'VuFind\\Resolver\\Driver\\PluginManager' => 'AvailabilityPlus\\Resolver\\Driver\\PluginManager',
     ),
   ),
 );

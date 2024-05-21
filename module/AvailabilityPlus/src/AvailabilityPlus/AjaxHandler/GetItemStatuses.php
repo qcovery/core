@@ -5,9 +5,9 @@ namespace AvailabilityPlus\AjaxHandler;
 use VuFind\Record\Loader;
 use VuFind\AjaxHandler\AbstractBase;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
-use Zend\Config\Config;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\View\Renderer\RendererInterface;
+use Laminas\Config\Config;
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\View\Renderer\RendererInterface;
 use VuFind\Resolver\Driver\PluginManager as ResolverManager;
 use VuFind\Resolver\Connection;
 
@@ -313,7 +313,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         return $label;
     }
 
-    private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url = '', $status_bool = false, $check_type){
+    private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, $status_bool, $check_type){
         if($status_bool) {
             $status['level'] = 'successful_check';
             $status['label'] = 'Check found a match!';
@@ -419,8 +419,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     }
 
     private function getResolverResponse($resolver) {
-        $start_date_time = date("Y-m-d H:i:s");
-        $curTime = microtime(true);
         $check_type = 'Resolver';
         $resolverType = $resolver;
         if (!$this->resolverManager->has($resolverType)) {
@@ -463,10 +461,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, '', $resolver_url, false, $check_type);
         }
 
-        $response['start'] = $start_date_time;
-        $response['end'] = date("Y-m-d H:i:s");
-        $timeConsumed = round(microtime(true) - $curTime,3)*1000;
-        $response['duration_in_miliseconds'] = $timeConsumed;
         $responses[] = $response;
 
         return $responses;
