@@ -1,60 +1,60 @@
 [submodule "module/AutocompleteTerms"]
 	path = module/AutocompleteTerms
-	url = git@github.com:qcovery/AutocompleteTerms.git
+	url = https://github.com/qcovery/AutocompleteTerms.git
 [submodule "module/BelugaConfig"]
 	path = module/BelugaConfig
-	url = git@github.com:qcovery/BelugaConfig.git
+	url = https://github.com/qcovery/BelugaConfig.git
 [submodule "module/DAIAplus"]
 	path = module/DAIAplus
-	url = git@github.com:qcovery/DAIAplus.git
+	url = https://github.com/qcovery/DAIAplus.git
 [submodule "module/Delivery"]
 	path = module/Delivery
-	url = git@github.com:qcovery/Delivery.git
+	url = https://github.com/qcovery/Delivery.git
 [submodule "module/DependentWorks"]
 	path = module/DependentWorks
-	url = git@github.com:qcovery/DependentWorks.git
+	url = https://github.com/qcovery/DependentWorks.git
 [submodule "module/DismaxMunge"]
 	path = module/DismaxMunge
-	url = git@github.com:qcovery/DismaxMunge.git
+	url = https://github.com/qcovery/DismaxMunge.git
 [submodule "module/ExtendedFacets"]
 	path = module/ExtendedFacets
-	url = git@github.com:qcovery/ExtendedFacets.git
+	url = https://github.com/qcovery/ExtendedFacets.git
 [submodule "module/ExtendedFeedback"]
 	path = module/ExtendedFeedback
-	url = git@github.com:qcovery/ExtendedFeedback.git
+	url = https://github.com/qcovery/ExtendedFeedback.git
 [submodule "module/FacetPrefix"]
 	path = module/FacetPrefix
-	url = git@github.com:qcovery/FacetPrefix.git
+	url = https://github.com/qcovery/FacetPrefix.git
 [submodule "module/Findex"]
 	path = module/Findex
-	url = git@github.com:qcovery/Findex.git
+	url = https://github.com/qcovery/Findex.git
 [submodule "module/HeadTitle"]
 	path = module/HeadTitle
-	url = git@github.com:qcovery/HeadTitle.git
+	url = https://github.com/qcovery/HeadTitle.git
 [submodule "module/HelpTooltips"]
 	path = module/HelpTooltips
-	url = git@github.com:qcovery/HelpTooltips.git
+	url = https://github.com/qcovery/HelpTooltips.git
 [submodule "module/Libraries"]
 	path = module/Libraries
-	url = git@github.com:qcovery/Libraries.git
+	url = https://github.com/qcovery/Libraries.git
 [submodule "module/LimitBatch"]
 	path = module/LimitBatch
-	url = git@github.com:qcovery/LimitBatch.git
+	url = https://github.com/qcovery/LimitBatch.git
 [submodule "module/PAIAplus"]
 	path = module/PAIAplus
-	url = git@github.com:qcovery/PAIAplus.git
+	url = https://github.com/qcovery/PAIAplus.git
 [submodule "module/RecordDriver"]
 	path = module/RecordDriver
-	url = git@github.com:qcovery/RecordDriver.git
+	url = https://github.com/qcovery/RecordDriver.git
 [submodule "module/ResultFeedback"]
 	path = module/ResultFeedback
-	url = git@github.com:qcovery/ResultFeedback.git
+	url = https://github.com/qcovery/ResultFeedback.git
 [submodule "module/RVK"]
 	path = module/RVK
-	url = git@github.com:qcovery/RVK.git
+	url = https://github.com/qcovery/RVK.git
 [submodule "module/SearchKeys"]
 	path = module/SearchKeys
-	url = git@github.com:qcovery/SearchKeys.git
+	url = https://github.com/qcovery/SearchKeys.git
 [submodule "module/UISettings"]
 	path = module/UISettings
-	url = git@github.com:qcovery/UISettings.git
+	url = https://github.com/qcovery/UISettings.git
