@@ -172,7 +172,7 @@
         <input class="clear-btn btn btn-default" type="button" value="<?= $this->transEscAttr('Clear')?>">
         <input class="btn btn-primary" type="submit" value="<?= $this->transEscAttr('Find')?>">
       </div>
-      <?php if (isset($this->extraAdvancedControls)): ?>
+      <?php if (isset($this->extraAdvancedControls) && $this->extraAdvancedControls): ?>
         <div class="clearfix">
           <?=$this->extraAdvancedControls ?>
         </div>
