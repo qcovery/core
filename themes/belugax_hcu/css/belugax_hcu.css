@@ -12767,6 +12767,7 @@ small.belugax-copy li img {
 .myresearch-menu a:hover,
 .myresearch-menu a:focus,
 .myresearch-menu a:active {
+    border: none;
     border-top: 1px solid #e4e4e4;
 }
 
@@ -14501,6 +14502,10 @@ th.tablesorter-headerDesc::after {
 }
 
 /* Base template adaptation */
+th {
+    font-weight: bold;
+}
+
 header {
     padding: 0;
 }
@@ -14769,8 +14774,23 @@ input.helpTooltipLink:hover {
     width: 5%;
 }
 
+.myresearch-menu {
+    margin: 0;
+}
+
+.template-dir-myresearch th,
+.template-dir-myresearch td,
+.template-dir-holds th,
+.template-dir-holds td,
+.template-name-history th,
+.template-name-history td,
+.template-dir-myresearch .toolbar tr,
 .template-dir-myresearch .toolbar td {
     border-top: none;
+}
+
+.template-dir-myresearch tbody tr, .template-dir-holds tbody tr, .template-name-history tbody tr {
+    border-top: solid 1px var(--lightgrey);
 }
 
 /* Belugino fix */
