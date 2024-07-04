@@ -14705,6 +14705,10 @@ input.helpTooltipLink:hover {
     display: block;
 }
 
+.template-name-advanced .mainbody h3 {
+    width: 100%;
+}
+
 @media (min-width:768px) {
     .template-name-advanced #content {
         width: 750px;
@@ -14746,7 +14750,8 @@ input.helpTooltipLink:hover {
     margin-top: 5px;
 }
 
-.adv-term-remove::after {
+.adv-term-remove::after,
+.add_search_link::before {
     content: none;
 }
 
@@ -14756,6 +14761,14 @@ input.helpTooltipLink:hover {
 #advSearchForm legend,
 #advSearchForm fieldset {
     box-shadow: none;
+}
+
+#advSearchForm fieldset {
+    margin: 0;
+}
+
+.adv-submit {
+    border-top: none;
 }
 
 .record .media-body h3 {
