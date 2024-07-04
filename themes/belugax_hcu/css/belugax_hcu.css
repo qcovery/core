@@ -14806,6 +14806,10 @@ input.helpTooltipLink:hover {
     border-top: solid 1px var(--lightgrey);
 }
 
+.form-cart-email input {
+    border: solid 1px var(--lightgrey);
+}
+
 /* Belugino fix */
 .template-name-results .belugino-icon-cover {
     margin-top: 5px;
