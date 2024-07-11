@@ -12,8 +12,7 @@ if ($mediatype == 'Journal' && $list) {
     $items = $data->document[0];
 
     if($mode == 'break_on_first' && $data->best_item) {
-	$items = (object)'';
-        $items->item[0] = $data->best_item;
+        $items = (object) array('item' => array($data->best_item));
     }
 
     foreach($items->item as $key => $item) {

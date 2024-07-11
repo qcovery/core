@@ -2,6 +2,7 @@
 
 namespace AvailabilityPlus\Resolver\Driver;
 
+use stdClass;
 use VuFind\Config\SearchSpecsReader;
 
 class DAIA extends AvailabilityPlusResolver
@@ -86,8 +87,10 @@ class DAIA extends AvailabilityPlusResolver
                         $record->service = $service_key;
                         switch($service_key) {
                             case 'openaccess':
-                                $record->daia_action = (object)''; 
                                 if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
+                                    if (!isset($record->daia_action)) {
+                                        $record->daia_action = new stdClass;
+                                    }
                                     $record->daia_action->level = 'FreeAccess link_external';
                                     if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                     $record->daia_action->label = 'FreeAccess';
@@ -106,8 +109,10 @@ class DAIA extends AvailabilityPlusResolver
                                     $this->parsed_data->document[0]->item[$key]->availabilityplus->daia_action_array[] = $record->daia_action;
                                 }
                             case 'remote':
-                                $record->daia_action = (object)'';
                                 if(!in_array($service_content->href, $urls) || !$this->resolverConfig->hide_url_duplicates) {
+                                    if (!isset($record->daia_action)) {
+                                        $record->daia_action = new stdClass;
+                                    }
                                     $record->daia_action->level = 'LicensedAccess link_external';
                                     if (!empty($service_content->title)) $record->daia_action->title = $service_content->title;
                                     $record->daia_action->label = 'LicensedAccess';
@@ -132,9 +137,6 @@ class DAIA extends AvailabilityPlusResolver
                                 }
                             case 'loan':
                             case 'presentation':
-                                $record->storage = (object)'';
-                                $record->daia_hint = (object)'';
-                                $record->daia_action = (object)'';
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote'])) {
                                     if($service_key == 'loan') {
                                         $record->score = 20;
@@ -142,40 +144,33 @@ class DAIA extends AvailabilityPlusResolver
                                         $record->score = 30;
                                     }
                                     if(!empty($item->storage->href)){
-                                        $record->storage->level = 'link_external';
-                                        $record->storage->label = $item->storage->content;
-                                        $record->storage->url = $item->storage->href;
+                                        $this->setStorage($record, 'link_external', $item->storage->content, $item->storage->href);
                                     } elseif(!empty($item->storage->id)){
-                                        $record->storage->level = 'link_external';
-                                        $record->storage->label = $item->storage->content;
-                                        $record->storage->url = $item->storage->id;
+                                        $this->setStorage($record, 'link_external', $item->storage->content, $item->storage->id);
                                     } else {
-                                        $record->storage->label = 'unknown_location';
+                                        $this->setStorage($record, null, 'unknown_location', null);
                                     }
                                     if(!empty($item->label)) $record->callnumber = $item->label;
                                     if(!empty($service_content->limitation[0]->id)) {
                                         $limitation = str_replace(' ','', substr($service_content->limitation[0]->id, strpos($service_content->limitation[0]->id, "#") + 1));
-                                        $record->daia_hint->level = $limitation;
-                                        $record->daia_hint->label = $service_content->service.$limitation;
+                                        $this->setDaiaHint($record, $limitation, $service_content->service.$limitation, null);
                                         $record->score += 5;
                                     } elseif(!empty($service_content->limitation[0]->content)) {
                                         $limitation = str_replace(' ','',$service_content->limitation[0]->content);
-                                        $record->daia_hint->level = $limitation;
-                                        $record->daia_hint->label = $service_content->service.$limitation;
+                                        $this->setDaiaHint($record, $limitation, $service_content->service.$limitation, null);
                                         $record->score += 5;
                                     } elseif(!empty($service_content->expected)) {
-                                        $record->daia_hint->level = "daia_orange";
                                         $date = date_create($service_content->expected);
-                                        $record->daia_hint->label = 'on_loan_until';
-                                        $record->daia_hint->label_date = date_format($date,"d.m.Y");
+                                        $this->setDaiaHint($record, "daia_orange", 'on_loan_until', date_format($date,"d.m.Y"));
                                         $record->score += 20;
                                     } elseif(isset($service_content->queue)) {
-                                        $record->daia_hint->level = "daia_orange";
-                                        $record->daia_hint->label = 'on_loan';
+                                        $this->setDaiaHint($record, "daia_orange", 'on_loan', null);
                                         $record->score += 20;
                                     }  else {
-                                        $record->daia_hint->level = "daia_green";
-                                        $record->daia_hint->label = $service_content->service;
+                                        $this->setDaiaHint($record, "daia_green", $service_content->service, null);
+                                    }
+                                    if (!isset($record->daia_action)) {
+                                        $record->daia_action = new stdClass;
                                     }
                                     if(!empty($service_content->href)) {
                                         $record->daia_action->level = 'internal_link';
@@ -189,7 +184,9 @@ class DAIA extends AvailabilityPlusResolver
                                         $record->daia_action->label = $service_content->service.'_default_action'.$limitation;
                                     }
                                     if(isset($service_content->queue)) {
-					$record->queue = (object)'';
+                                        if (!isset($record->queue)) {
+                                            $record->queue = new stdClass;
+                                        }
                                         $record->queue->length = $service_content->queue;
                                         if($service_content->queue == 1) {
                                             $record->queue->label .=  'Recall';
@@ -209,20 +206,14 @@ class DAIA extends AvailabilityPlusResolver
                                     break;
                                 }
                             case 'fallback':
-				$record->storage = (object)'';
-                                $record->daia_hint = (object)'';
-                                $record->daia_action = (object)'';
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote']) && empty($item_services['available']['loan']) && empty($item_services['available']['presentation'])) {
                                     if(!empty($item->storage->id)){
-                                        $record->storage->level = 'link_external';
-                                        $record->storage->label = $item->storage->content;
-                                        $record->storage->url = $item->storage->id;
+                                        $this->setStorage($record, 'link_external', $item->storage->content, $item->storage->id);
                                     } else {
-                                        $record->storage->label = 'unknown_location';
+                                        $this->setStorage($record, null, 'unknown_location', null);
                                     }
                                     if(!empty($item->label)) $record->callnumber = $item->label;
-                                    $record->daia_hint->level = 'daia_red';
-                                    $record->daia_hint->label = 'not_available';
+                                    $this->setDaiaHint($record, 'daia_red', 'not_available', null);
                                     if(!empty($item->about)) {
                                         $record->about = $item->about;
                                     }
@@ -248,6 +239,66 @@ class DAIA extends AvailabilityPlusResolver
         $this->determineBestItem();
         $response['parsed_data'] = $this->parsed_data;
         return $response;
+    }
+
+    /**
+     * Add `level`, `label` and `url` parameters to the `storage` property on the given object.
+     * Creates a new object and `storage` property if not present.
+     * `level`, `label` and `url` are only added to the object when the variables are set and not null, otherwise
+     * they are ignored.
+     * @param $obj stdClass The object that the storage will be added to.
+     * @param $level string
+     * @param $label string
+     * @param $url string
+     * @return void
+     */
+    private function setStorage($obj, $level, $label, $url): void
+    {
+        if (!isset($obj)) {
+            $obj = new stdClass;
+        }
+        if (!isset($obj->storage)) {
+            $obj->storage = new stdClass;
+        }
+        if (isset($level)) {
+            $obj->storage->level = $level;
+        }
+        if (isset($label)) {
+            $obj->storage->label = $label;
+        }
+        if (isset($url)) {
+            $obj->storage->url = $url;
+        }
+    }
+
+    /**
+     * Add `level`, `label` and `label_date` parameters to the `daia_hint` property on the given object.
+     * Creates a new object and `daia_hint` property if not present.
+     * `level`, `label` and `label_date` are only added to the object when the variables are set and not null, otherwise
+     * they are ignored.
+     * @param $obj stdClass The object that the storage will be added to.
+     * @param $level string
+     * @param $label string
+     * @param $label_date string
+     * @return void
+     */
+    private function setDaiaHint($obj, $level, $label, $label_date): void
+    {
+        if (!isset($obj)) {
+            $obj = new stdClass;
+        }
+        if (!isset($obj->daia_hint)) {
+            $obj->daia_hint = new stdClass;
+        }
+        if (isset($level)) {
+            $obj->daia_hint->level = $level;
+        }
+        if (isset($label)) {
+            $obj->daia_hint->label = $label;
+        }
+        if (isset($label_date)) {
+            $obj->daia_hint->url = $label_date;
+        }
     }
 
     protected function applyCustomChanges() {
