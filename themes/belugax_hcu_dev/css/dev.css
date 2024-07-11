@@ -20,14 +20,6 @@
     font-weight: bold;
 }
 
-.FreeAccess::after,
-.Access:after,
-.LicensedAccess:after,
-.UncertainAccess:after {
-    content: '';
-    margin-left: 0px;
-}
-
 .record .MultiVolumeWork,
 .record .MonographSeriesRecordView
 
