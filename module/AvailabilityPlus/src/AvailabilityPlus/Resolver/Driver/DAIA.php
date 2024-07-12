@@ -137,6 +137,15 @@ class DAIA extends AvailabilityPlusResolver
                                 }
                             case 'loan':
                             case 'presentation':
+                                if (!isset($record->storage)) {
+                                    $record->storage = new stdClass;
+                                }
+                                if (!isset($record->daia_hint)) {
+                                    $record->daia_hint = new stdClass;
+                                }
+                                if (!isset($record->daia_action)) {
+                                    $record->daia_action = new stdClass;
+                                }
                                 if(empty($item_services['available']['openaccess']) && empty($item_services['available']['remote'])) {
                                     if($service_key == 'loan') {
                                         $record->score = 20;
