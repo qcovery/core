@@ -297,7 +297,7 @@ class DAIA extends AvailabilityPlusResolver
             $obj->daia_hint->label = $label;
         }
         if (isset($label_date)) {
-            $obj->daia_hint->url = $label_date;
+            $obj->daia_hint->label_date = $label_date;
         }
     }
 
