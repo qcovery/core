@@ -17,37 +17,29 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://github.com/dmj/vf2-proxy
+ * @link     https://vufind.org/wiki/development
  */
 namespace CaLief;
-use Laminas\ModuleManager\ModuleManager,
-    Laminas\Mvc\MvcEvent,
-    Laminas\ModuleManager\Feature\ConfigProviderInterface,
-    Laminas\Db\ResultSet\ResultSet,
-    Laminas\Db\TableGateway\TableGateway;
-use CaLief\CaLief\CaLiefHelper;
-use CaLief\Db\Table\UserCalief;
-use CaLief\Model\UserCaliefModel;
-use CaLief\Db\Table\CaliefAdmin;
-use CaLief\Model\CaliefAdminModel;
-use VuFind\Db\Table\Gateway;
+
+use Laminas\ModuleManager\ModuleManager;
+use Laminas\Mvc\MvcEvent;
 
 /**
- * Template for ZF2 module for storing local overrides.
+ * Template for code module for storing local overrides.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://github.com/dmj/vf2-proxy
+ * @link     https://vufind.org/wiki/development
  */
-class Module implements ConfigProviderInterface
+class Module
 {
     /**
      * Get module configuration
@@ -66,13 +58,13 @@ class Module implements ConfigProviderInterface
      */
     public function getAutoloaderConfig()
     {
-        return array(
-            'Laminas\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            'Laminas\Loader\StandardAutoloader' => [
+                'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -81,6 +73,7 @@ class Module implements ConfigProviderInterface
      * @param ModuleManager $m Module manager
      *
      * @return void
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function init(ModuleManager $m)
@@ -93,12 +86,14 @@ class Module implements ConfigProviderInterface
      * @param MvcEvent $e Event
      *
      * @return void
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function onBootstrap(MvcEvent $e)
     {
     }
-    
+
+    /*
     public function getViewHelperConfig()
     {
         return array(
@@ -109,7 +104,9 @@ class Module implements ConfigProviderInterface
             ),
         );
     }
-    
+    */
+
+    /*
     public function getServiceConfig()
     {
         return array(
@@ -139,4 +136,5 @@ class Module implements ConfigProviderInterface
             ),
         );
     }
+    */
 }

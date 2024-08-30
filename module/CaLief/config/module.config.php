@@ -1,7 +1,7 @@
 <?php
 namespace CaLief\Module\Configuration;
 
-$config = array(
+$config = [
     'controllers' => [
         'factories' => [
             'CaLief\Controller\CaLiefController' => 'CaLief\Controller\AbstractBaseWithConfigFactory',
@@ -12,24 +12,35 @@ $config = array(
             'CaLief' => 'CaLief\Controller\CaLiefController',
         ],
     ],
-    'view_helpers' => array(
-        'invokables' => array(
-            //'calief' => 'CaLief\CaLief\CaLiefHelper',
-        )
-    ),
-    'service_manager' => [
-        'allow_override' => true,
-        'factories' => [
-            'CaLief\Db\Table\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-            'CaLief\Db\Row\PluginManager' => 'VuFind\ServiceManager\AbstractPluginManagerFactory',
-        ],
-        'aliases' => [
-            'VuFind\Db\Table\PluginManager' => 'CaLief\Db\Table\PluginManager',
-            'VuFind\Db\Row\PluginManager' => 'CaLief\Db\Row\PluginManager',
+    'vufind' => [
+        'plugin_managers' => [
+            'db_row' => [
+                'factories' => [
+                    'CaLief\Db\Row\CaliefAdmin' => 'VuFind\Db\Row\RowGatewayFactory',
+                    'CaLief\Db\Row\UserCalief' => 'VuFind\Db\Row\RowGatewayFactory',
+                    'CaLief\Db\Row\UserCaliefLog' => 'VuFind\Db\Row\RowGatewayFactory',
+                ],
+                'aliases' => [
+                    'usercalief' => 'CaLief\Db\Row\UserCalief',
+                    'usercalieflog' => 'CaLief\Db\Row\UserCaliefLog',
+                    'caliefadmin' => 'CaLief\Db\Row\CaliefAdmin',
+                ],
+            ],
+            'db_table' => [
+                'factories' => [
+                    'CaLief\Db\Table\CaliefAdmin' => 'VuFind\Db\Table\GatewayFactory',
+                    'CaLief\Db\Table\UserCalief' => 'VuFind\Db\Table\GatewayFactory',
+                    'CaLief\Db\Table\UserCaliefLog' => 'VuFind\Db\Table\GatewayFactory',
+                ],
+                'aliases' => [
+                    'caliefadmin' => 'CaLief\Db\Table\CaliefAdmin',
+                    'usercalief' => 'CaLief\Db\Table\UserCalief',
+                    'usercalieflog' => 'CaLief\Db\Table\UserCaliefLog',
+                ],
+            ],
         ],
     ],
-
-);
+];
 
 // Define static routes -- Controller/Action strings
 $staticRoutes = [
