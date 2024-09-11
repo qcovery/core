@@ -29,6 +29,7 @@ namespace RelevancePicker\Search\Solr;
 
 //use VuFind\Search\Solr\Params as BaseParams;
 use VuFind\Search\Solr\Results as BaseResults;
+use VuFindSearch\Command\SearchCommand;
 
 class Results extends BaseResults
 {
@@ -53,23 +54,15 @@ class Results extends BaseResults
         $params = $this->getParams()->getBackendParameters();
         $searchService = $this->getSearchService();
 
-        try {
-            $collection = $searchService
-                ->search($this->backendId, $query, $offset, $limit, $params);
-        } catch (\VuFindSearch\Backend\Exception\BackendException $e) {
-            // If the query caused a parser error, see if we can clean it up:
-            if ($e->hasTag('VuFind\Search\ParserError')
-                && $newQuery = $this->fixBadQuery($query)
-            ) {
-                // We need to get a fresh set of $params, since the previous one was
-                // manipulated by the previous search() call.
-                $params = $this->getParams()->getBackendParameters();
-                $collection = $searchService
-                    ->search($this->backendId, $newQuery, $offset, $limit, $params);
-            } else {
-                throw $e;
-            }
-        }
+        $command = new SearchCommand(
+            $this->backendId,
+            $query,
+            $offset,
+            $limit,
+            $params
+        );
+        $searchService->invoke($command);
+        $collection = $command->getResult();
 
         $this->responseFacets = $collection->getFacets();
         $this->resultTotal = $collection->getTotal();
