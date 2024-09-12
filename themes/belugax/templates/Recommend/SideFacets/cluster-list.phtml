@@ -13,6 +13,7 @@
     <? else: ?>
       <? $moreUrl = '#'; ?>
     <? endif; ?>
+    <? $moreUrl= $this->escapeHtmlAttr($moreUrl);?>
     <? if (($this->showMoreInLightbox && $this->showMoreInLightbox !== 'more') && $facetLightbox): ?>
       <a <?=$idAndClass ?> data-lightbox href="<?=$moreUrl ?>" rel="nofollow"><?=$this->transEsc('more')?> ...</a>
       <? break; ?>
