@@ -34,4 +34,12 @@ jQuery(document).ready(function() {
         document.getElementById('short_summary').style.display='block';
         document.getElementById('long_summary').style.display='none';
     });
+
+    /*
+     * Make transactions sortable on client side.
+     */
+    $('#checkedout_data').tablesorter({
+        dateFormat: "ddmmyyyy"
+    });
+
 });
