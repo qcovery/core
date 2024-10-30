@@ -22,13 +22,13 @@
           'facetexclude' => $this->allowExclude ? 1 : 0,
       ],
       '',
-      '&amp;'
+      '&'
   );
   $moreUrl = '#';
   if ($facetLightbox) {
-    $moreUrl = $this->url($facetLightbox) . $results->getUrlQuery()->getParams() . "&amp;$facetLightboxParams";
+    $moreUrl = $this->url($facetLightbox) . $results->getUrlQuery()->getParams() . "&$facetLightboxParams";
     if (!empty($this->baseUriExtra)) {
-      $moreUrl .= '&amp;baseUriExtra=' . urlencode($this->baseUriExtra);
+      $moreUrl .= '&baseUriExtra=' . urlencode($this->baseUriExtra);
     }
   }
 ?>
