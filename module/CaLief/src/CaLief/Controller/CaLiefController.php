@@ -95,7 +95,7 @@ class CaLiefController extends AbstractBase
 
         $view->userCalief = $userCalief;
 
-        $table = $this->getTable('calief_admin');
+        $table = $this->getTable('caliefadmin');
         $adminCalief = $table->getByUserId($user->id);
         $view->adminCalief = $adminCalief;
 
