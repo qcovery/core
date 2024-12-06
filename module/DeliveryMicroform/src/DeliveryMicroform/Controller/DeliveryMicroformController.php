@@ -205,13 +205,13 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
     private function getMarcValue($driver, $marcField) {
         $marcFieldArray = explode('|', $marcField);
         if (sizeof($marcFieldArray) == 2) {
-            return $driver->getMarcRecord()->getField($marcFieldArray[0])->getSubField($marcFieldArray[1])->getData();
+            return $driver->getMarcReader()->getField($marcFieldArray[0])->getSubField($marcFieldArray[1])->getData();
         }
         return '';
     }
 
     private function getMarcValues($driver, $marcField) {
-        return $driver->getMarcRecord()->getFields($marcField);
+        return $driver->getMarcReader()->getFields($marcField);
     }
 
     private function getFormValue($parameter) {
