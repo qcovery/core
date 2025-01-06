@@ -39,6 +39,7 @@ jQuery(document).ready(function() {
      * Make transactions sortable on client side.
      */
     $('#checkedout_data').tablesorter({
+        sortList: [[1,0]],
         dateFormat: "ddmmyyyy"
     });
 
