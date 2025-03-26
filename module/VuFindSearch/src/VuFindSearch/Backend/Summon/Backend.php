@@ -3,7 +3,7 @@
 /**
  * Summon backend.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -32,6 +32,7 @@ namespace VuFindSearch\Backend\Summon;
 use SerialsSolutions\Summon\Laminas as Connector;
 use SerialsSolutions_Summon_Exception as SummonException;
 use SerialsSolutions_Summon_Query as SummonQuery;
+use VuFind\Exception\RecordMissing as RecordMissingException;
 use VuFindSearch\Backend\AbstractBackend;
 use VuFindSearch\Backend\Exception\BackendException;
 use VuFindSearch\Feature\RetrieveBatchInterface;
@@ -39,6 +40,9 @@ use VuFindSearch\ParamBag;
 use VuFindSearch\Query\AbstractQuery;
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
 use VuFindSearch\Response\RecordCollectionInterface;
+
+use function count;
+use function in_array;
 
 /**
  * Summon backend.
@@ -68,15 +72,14 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
     /**
      * Constructor.
      *
-     * @param Connector                        $connector Summon connector
-     * @param RecordCollectionFactoryInterface $factory   Record collection factory
-     * (null for default)
+     * @param Connector                         $connector Summon connector
+     * @param ?RecordCollectionFactoryInterface $factory   Record collection factory (null for default)
      *
      * @return void
      */
     public function __construct(
         Connector $connector,
-        RecordCollectionFactoryInterface $factory = null
+        ?RecordCollectionFactoryInterface $factory = null
     ) {
         if (null !== $factory) {
             $this->setRecordCollectionFactory($factory);
@@ -91,7 +94,7 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
      * @param AbstractQuery $query  Search query
      * @param int           $offset Search offset
      * @param int           $limit  Search limit
-     * @param ParamBag      $params Search backend parameters
+     * @param ?ParamBag     $params Search backend parameters
      *
      * @return RecordCollectionInterface
      */
@@ -99,7 +102,7 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
         AbstractQuery $query,
         $offset,
         $limit,
-        ParamBag $params = null
+        ?ParamBag $params = null
     ) {
         $baseParams = $this->getQueryBuilder()->build($query);
         if (null !== $params) {
@@ -127,12 +130,13 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
     /**
      * Retrieve a single document.
      *
-     * @param string   $id     Document identifier
-     * @param ParamBag $params Search backend parameters
+     * @param string    $id     Document identifier
+     * @param ?ParamBag $params Search backend parameters
      *
      * @return RecordCollectionInterface
+     * @throws RecordMissingException
      */
-    public function retrieve($id, ParamBag $params = null)
+    public function retrieve($id, ?ParamBag $params = null)
     {
         $finalParams = $params ?: new ParamBag();
         // We normally look up by ID, but we occasionally need to use bookmarks:
@@ -146,6 +150,9 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
                 $e
             );
         }
+        if (empty($response['documents'])) {
+            throw new RecordMissingException('Record does not exist.');
+        }
         $collection = $this->createRecordCollection($response);
         $this->injectSourceIdentifier($collection);
         return $collection;
@@ -154,12 +161,12 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
     /**
      * Retrieve a batch of documents.
      *
-     * @param array    $ids    Array of document identifiers
-     * @param ParamBag $params Search backend parameters
+     * @param array     $ids    Array of document identifiers
+     * @param ?ParamBag $params Search backend parameters
      *
      * @return RecordCollectionInterface
      */
-    public function retrieveBatch($ids, ParamBag $params = null)
+    public function retrieveBatch($ids, ?ParamBag $params = null)
     {
         // Load 50 records at a time; this is the limit for Summon.
         $pageSize = 50;

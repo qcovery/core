@@ -8,7 +8,7 @@ $config = [
             'VuFindAdmin\Controller\AdminController' => 'VuFind\Controller\AbstractBaseFactory',
             'VuFindAdmin\Controller\ConfigController' => 'VuFind\Controller\AbstractBaseFactory',
             'VuFindAdmin\Controller\FeedbackController' => 'VuFind\Controller\AbstractBaseFactory',
-            'VuFindAdmin\Controller\MaintenanceController' => 'VuFind\Controller\AbstractBaseFactory',
+            'VuFindAdmin\Controller\MaintenanceController' => 'VuFindAdmin\Controller\MaintenanceControllerFactory',
             'VuFindAdmin\Controller\SocialstatsController' => 'VuFind\Controller\AbstractBaseFactory',
             'VuFindAdmin\Controller\TagsController' => 'VuFind\Controller\AbstractBaseFactory',
             'VuFindAdmin\Controller\OverdriveController' =>
@@ -33,6 +33,7 @@ $config = [
                     'defaults' => [
                         'controller' => 'Admin',
                         'action'     => 'Home',
+                        'admin_route' => true,
                     ],
                 ],
                 'may_terminate' => true,
@@ -57,6 +58,16 @@ $config = [
                             ],
                         ],
                     ],
+                    'feedback-details' => [
+                        'type' => 'Laminas\Router\Http\Segment',
+                        'options' => [
+                            'route'    => '/Feedback/Details/:id',
+                            'defaults' => [
+                                'controller' => 'AdminFeedback',
+                                'action'     => 'Details',
+                            ],
+                        ],
+                    ],
                     'feedback' => [
                         'type' => 'Laminas\Router\Http\Segment',
                         'options' => [
@@ -74,6 +85,16 @@ $config = [
                             'defaults' => [
                                 'controller' => 'AdminMaintenance',
                                 'action'     => 'Home',
+                            ],
+                        ],
+                    ],
+                    'script' => [
+                        'type' => 'Laminas\Router\Http\Segment',
+                        'options' => [
+                            'route'    => '/Script[/:name]',
+                            'defaults' => [
+                                'controller' => 'AdminMaintenance',
+                                'action'     => 'Script',
                             ],
                         ],
                     ],

@@ -3,7 +3,7 @@
 /**
  * Base class to enable sharing of common methods between SMS subclasses
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2009.
  *
@@ -43,16 +43,16 @@ abstract class AbstractBase implements SMSInterface
     /**
      * SMS configuration
      *
-     * @var \Laminas\Config\Config
+     * @var \VuFind\Config\Config
      */
     protected $smsConfig;
 
     /**
      * Constructor
      *
-     * @param \Laminas\Config\Config $config SMS configuration
+     * @param \VuFind\Config\Config $config SMS configuration
      */
-    public function __construct(\Laminas\Config\Config $config)
+    public function __construct(\VuFind\Config\Config $config)
     {
         $this->smsConfig = $config;
     }

@@ -3,7 +3,7 @@
 /**
  * IpAddressUtils Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) The National Library of Finland 2015.
  *
@@ -114,6 +114,46 @@ class IpAddressUtilsTest extends \PHPUnit\Framework\TestCase
                 '2001:db8::ef90:1',
                 ['2001:0db9']
             )
+        );
+    }
+
+    /**
+     * Test truncate()
+     *
+     * @return void
+     */
+    public function testTruncate()
+    {
+        $utils = new IpAddressUtils();
+
+        // IPv4 address
+        $address = '123.234.432.321';
+        $this->assertEquals(
+            '123.234',
+            $utils->truncate($address, 2, 1)
+        );
+        $this->assertEquals(
+            '123.234.432',
+            $utils->truncate($address, 3, 1)
+        );
+        $this->assertEquals(
+            '123.234.432.321',
+            $utils->truncate($address)
+        );
+
+        // IPv6 address
+        $address = '2001:0db8:0000:0000:0000:ff00:0042:8329';
+        $this->assertEquals(
+            '2001:0db8',
+            $utils->truncate($address, 1, 2)
+        );
+        $this->assertEquals(
+            '2001:0db8:0000',
+            $utils->truncate($address, 1, 3)
+        );
+        $this->assertEquals(
+            '2001:0db8:0000:0000:0000:ff00:0042:8329',
+            $utils->truncate($address)
         );
     }
 }

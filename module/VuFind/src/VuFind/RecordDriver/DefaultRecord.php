@@ -3,7 +3,7 @@
 /**
  * Default model for records
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -32,6 +32,12 @@ namespace VuFind\RecordDriver;
 use VuFind\View\Helper\Root\RecordLinker;
 use VuFindCode\ISBN;
 
+use function count;
+use function in_array;
+use function is_array;
+use function sprintf;
+use function strlen;
+
 /**
  * Default model for records
  *
@@ -55,11 +61,11 @@ class DefaultRecord extends AbstractBase
     /**
      * Constructor
      *
-     * @param \Laminas\Config\Config $mainConfig     VuFind main configuration (omit
+     * @param \VuFind\Config\Config $mainConfig     VuFind main configuration (omit
      * for built-in defaults)
-     * @param \Laminas\Config\Config $recordConfig   Record-specific configuration
+     * @param \VuFind\Config\Config $recordConfig   Record-specific configuration
      * file (omit to use $mainConfig as $recordConfig)
-     * @param \Laminas\Config\Config $searchSettings Search-specific configuration
+     * @param \VuFind\Config\Config $searchSettings Search-specific configuration
      * file
      */
     public function __construct(
@@ -85,7 +91,7 @@ class DefaultRecord extends AbstractBase
     }
 
     /**
-     * Get all subject headings associated with this record.  Each heading is
+     * Get all subject headings associated with this record. Each heading is
      * returned as an array of chunks, increasing from least specific to most
      * specific.
      *
@@ -116,6 +122,23 @@ class DefaultRecord extends AbstractBase
                 : [$i];
         };
         return array_map($callback, array_unique($headings));
+    }
+
+    /**
+     * Get the subject headings as a flat array of strings.
+     *
+     * @return array Subject headings
+     */
+    public function getAllSubjectHeadingsFlattened()
+    {
+        $headings = [];
+        $subjects = $this->getAllSubjectHeadings();
+        if (is_array($subjects)) {
+            foreach ($subjects as $subj) {
+                $headings[] = implode(' -- ', $subj);
+            }
+        }
+        return $headings;
     }
 
     /**
@@ -237,7 +260,7 @@ class DefaultRecord extends AbstractBase
      */
     public function getCallNumbers()
     {
-        return (array)($this->fields['callnumber-raw'] ?? []);
+        return array_unique((array)($this->fields['callnumber-raw'] ?? []));
     }
 
     /**
@@ -411,7 +434,7 @@ class DefaultRecord extends AbstractBase
 
     /**
      * Get the date coverage for a record which spans a period of time (i.e. a
-     * journal).  Use getPublicationDates for publication dates of particular
+     * journal). Use getPublicationDates for publication dates of particular
      * monographic items.
      *
      * @return array
@@ -535,7 +558,7 @@ class DefaultRecord extends AbstractBase
     public function getPrimaryAuthorsWithHighlighting()
     {
         $highlights = [];
-        // Create a map of de-highlighted valeus => highlighted values.
+        // Create a map of de-highlighted values => highlighted values.
         foreach ($this->getRawAuthorHighlights() as $current) {
             $dehighlighted = str_replace(
                 ['{{{{START_HILITE}}}}', '{{{{END_HILITE}}}}'],
@@ -676,14 +699,14 @@ class DefaultRecord extends AbstractBase
         // If there is a forward slash (/) in the string, remove it, and remove all
         // characters to the right of the forward slash.
         if (strpos($raw, '/') > 0) {
-            $tmpArray = explode("/", $raw);
+            $tmpArray = explode('/', $raw);
             $raw = $tmpArray[0];
         }
         /* If there is a hyphen in the string:
             a. Remove it.
             b. Inspect the substring following (to the right of) the (removed)
                hyphen. Then (and assuming that steps 1 and 2 have been carried out):
-                    i.  All these characters should be digits, and there should be
+                    i. All these characters should be digits, and there should be
                     six or less.
                     ii. If the length of the substring is less than 6, left-fill the
                     substring with zeros until  the length is six.
@@ -691,8 +714,8 @@ class DefaultRecord extends AbstractBase
         if (strpos($raw, '-') > 0) {
             // haven't checked for i. above. If they aren't all digits, there is
             // nothing that can be done, so might as well leave it.
-            $tmpArray = explode("-", $raw);
-            $raw = $tmpArray[0] . str_pad($tmpArray[1], 6, "0", STR_PAD_LEFT);
+            $tmpArray = explode('-', $raw);
+            $raw = $tmpArray[0] . str_pad($tmpArray[1], 6, '0', STR_PAD_LEFT);
         }
         return $raw;
     }
@@ -727,7 +750,7 @@ class DefaultRecord extends AbstractBase
         // If we have multiple formats, Book, Journal and Article are most
         // important...
         $formats = $this->getFormats();
-        if (in_array('Book', $formats)) {
+        if (in_array('Book', $formats) || in_array('eBook', $formats)) {
             return 'Book';
         } elseif (in_array('Article', $formats)) {
             return 'Article';
@@ -824,6 +847,10 @@ class DefaultRecord extends AbstractBase
         $publishers = $this->getPublishers();
         if (count($publishers) > 0) {
             $params['rft.pub'] = $publishers[0];
+        }
+        $placesOfPublication = $this->getPlacesOfPublication();
+        if (count($placesOfPublication) > 0) {
+            $params['rft.place'] = $placesOfPublication[0];
         }
         $params['rft.edition'] = $this->getEdition();
         $params['rft.isbn'] = (string)$this->getCleanISBN();
@@ -954,7 +981,7 @@ class DefaultRecord extends AbstractBase
                 $query[] = urlencode($key) . '=' . urlencode($sub);
             }
         }
-        return implode("&", $query);
+        return implode('&', $query);
     }
 
     /**
@@ -1180,7 +1207,7 @@ class DefaultRecord extends AbstractBase
     }
 
     /**
-     * Get an array of all series names containing the record.  Array entries may
+     * Get an array of all series names containing the record. Array entries may
      * be either the name string, or an associative array with 'name' and 'number'
      * keys.
      *
@@ -1582,7 +1609,7 @@ class DefaultRecord extends AbstractBase
 
     /**
      * Get an array of strings representing citation formats supported
-     * by this record's data (empty if none).  For possible legal values,
+     * by this record's data (empty if none). For possible legal values,
      * see /application/themes/root/helpers/Citation.php, getCitation()
      * method.
      *
@@ -1679,6 +1706,7 @@ class DefaultRecord extends AbstractBase
     public function getSchemaOrgFormatsArray()
     {
         $types = [];
+
         foreach ($this->getFormats() as $format) {
             switch ($format) {
                 case 'Book':
@@ -1702,6 +1730,14 @@ class DefaultRecord extends AbstractBase
                     $types['CreativeWork'] = 1;
             }
         }
+
+        // Check for functionality from IlsAwareTrait. If this record comes from a real ILS, we need
+        // to add a type of "Product" to support the system's use of https://schema.org/Offer to
+        // represent availability.
+        if ($this->tryMethod('hasILS') && isset($this->ils) && $this->ils->getOfflineMode() !== 'ils-none') {
+            $types['Product'] = 1;
+        }
+
         return array_keys($types);
     }
 
@@ -1711,6 +1747,8 @@ class DefaultRecord extends AbstractBase
      * itself if nothing else matches.
      *
      * @return string
+     *
+     * @deprecated Use \VuFind\View\Helper\Root\SchemaOrg::getRecordTypes()
      */
     public function getSchemaOrgFormats()
     {
@@ -1777,5 +1815,15 @@ class DefaultRecord extends AbstractBase
     public function getCoordinateLabels()
     {
         return (array)($this->fields['long_lat_label'] ?? []);
+    }
+
+    /**
+     * Get class name for RecordDataFormatter spec.
+     *
+     * @return ?string
+     */
+    public function getRecordDataFormatterSpecClass(): ?string
+    {
+        return \VuFind\RecordDataFormatter\Specs\DefaultRecord::class;
     }
 }

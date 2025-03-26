@@ -3,7 +3,7 @@
 /**
  * FacetList content block.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -29,7 +29,7 @@
 
 namespace VuFind\ContentBlock;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 use VuFind\Config\PluginManager as ConfigManager;
 use VuFind\Search\FacetCache\PluginManager as FacetCacheManager;
 

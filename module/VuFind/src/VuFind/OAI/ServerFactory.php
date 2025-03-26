@@ -3,7 +3,7 @@
 /**
  * OAI Server factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -63,15 +63,19 @@ class ServerFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
+        $servicePluginManager = $container->get(
+            \VuFind\Db\Service\PluginManager::class
+        );
         return new $requestedName(
             $container->get(\VuFind\Search\Results\PluginManager::class),
             $container->get(\VuFind\Record\Loader::class),
-            $container->get(\VuFind\Db\Table\PluginManager::class)
+            $servicePluginManager->get(\VuFind\Db\Service\ChangeTrackerServiceInterface::class),
+            $servicePluginManager->get(\VuFind\Db\Service\OaiResumptionServiceInterface::class)
         );
     }
 }

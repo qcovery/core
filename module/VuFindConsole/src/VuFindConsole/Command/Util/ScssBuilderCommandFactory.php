@@ -3,7 +3,7 @@
 /**
  * Factory for Util/ScssBuilder command.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -63,7 +63,7 @@ class ScssBuilderCommandFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $cacheManager = $container->get(\VuFind\Cache\Manager::class);
         $cacheDir = $cacheManager->getCacheDir() . 'scss/';

@@ -3,7 +3,7 @@
 /**
  * ResultFeed Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -45,6 +45,7 @@ class ResultFeedTest extends \PHPUnit\Framework\TestCase
     use \VuFindTest\Feature\LiveDetectionTrait;
     use \VuFindTest\Feature\LiveSolrTrait;
     use \VuFindTest\Feature\ViewTrait;
+    use \VuFindTest\Feature\TranslatorTrait;
 
     /**
      * Standard setup method.
@@ -65,61 +66,58 @@ class ResultFeedTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    protected function getPlugins()
+    protected function getPlugins(): array
     {
         $currentPath = $this->createMock(\VuFind\View\Helper\Root\CurrentPath::class);
-        $currentPath->expects($this->any())->method('__invoke')
-            ->will($this->returnValue('/test/path'));
+        $currentPath->expects($this->any())->method('__invoke')->willReturn('/test/path');
+
+        $record = $this->createMock(\VuFind\View\Helper\Root\Record::class);
+        $record->method('__invoke')->willReturn($record);
+        $record->method('getLinkDetails')->willReturn([['url' => 'http://driver-url']]);
 
         $recordLinker = $this->getMockBuilder(\VuFind\View\Helper\Root\RecordLinker::class)
             ->setConstructorArgs(
                 [
                     new \VuFind\Record\Router(
-                        new \Laminas\Config\Config([])
+                        new \VuFind\Config\Config([])
                     ),
                 ]
             )->getMock();
-        $recordLinker->expects($this->any())->method('getUrl')
-            ->will($this->returnValue('test/url'));
+        $recordLinker->expects($this->any())->method('getUrl')->willReturn('test/url');
 
         $serverUrl = $this->createMock(\Laminas\View\Helper\ServerUrl::class);
-        $serverUrl->expects($this->any())->method('__invoke')
-            ->will($this->returnValue('http://server/url'));
+        $serverUrl->expects($this->any())->method('__invoke')->willReturn('http://server/url');
 
-        return compact('currentPath', 'recordLinker') + ['serverurl' => $serverUrl];
+        return compact('currentPath', 'record', 'recordLinker') + ['serverurl' => $serverUrl];
     }
 
     /**
-     * Mock out the translator.
+     * Data provider for testRSS.
      *
-     * @return \Laminas\I18n\Translator\TranslatorInterface
+     * @return array[]
      */
-    protected function getMockTranslator()
+    public static function rssProvider(): array
     {
-        $translations = [
-            'Results for' => 'Results for',
-            'showing_results_of_html' => 'Showing <strong>%%start%% - %%end%%'
-                . '</strong> results of <strong>%%total%%</strong>',
+        $routeLink = 'http://server/url';
+        $driverLink = 'http://driver-url';
+        return [
+            'default options' => [[], $routeLink],
+            'prioritizeRecordDriverLinks = false' => [['prioritizeRecordDriverLinks' => false], $routeLink],
+            'prioritizeRecordDriverLinks = true' => [['prioritizeRecordDriverLinks' => true], $driverLink],
         ];
-        $mock = $this->getMockBuilder(\Laminas\I18n\Translator\TranslatorInterface::class)
-            ->getMock();
-        $mock->expects($this->any())->method('translate')
-            ->will(
-                $this->returnCallback(
-                    function ($str, $params, $default) use ($translations) {
-                        return $translations[$str] ?? $default ?? $str;
-                    }
-                )
-            );
-        return $mock;
     }
 
     /**
      * Test feed generation
      *
+     * @param array  $options      Options to pass to the ResultFeed object.
+     * @param string $expectedLink The link URL we expect to find in the first result in the feed.
+     *
      * @return void
+     *
+     * @dataProvider rssProvider
      */
-    public function testRSS()
+    public function testRSS(array $options, string $expectedLink): void
     {
         // Set up a request -- we'll sort by title to ensure a predictable order
         // for the result list (relevance or last_indexed may lead to unstable test
@@ -133,9 +131,18 @@ class ResultFeedTest extends \PHPUnit\Framework\TestCase
         $results = $this->getResultsObject();
         $results->getParams()->initFromRequest($request);
 
-        $helper = new ResultFeed();
+        $helper = new ResultFeed($options);
         $helper->registerExtensions(new \VuFindTest\Container\MockContainer($this));
-        $helper->setTranslator($this->getMockTranslator());
+        $translator = $this->getMockTranslator(
+            [
+                'default' => [
+                    'Results for' => 'Results for',
+                    'showing_results_of_html' => 'Showing <strong>%%start%% - %%end%%'
+                        . '</strong> results of <strong>%%total%%</strong>',
+                ],
+            ]
+        );
+        $helper->setTranslator($translator);
         $helper->setView($this->getPhpRenderer($this->getPlugins()));
         $feed = $helper($results, '/test/path');
         $this->assertIsObject($feed);
@@ -166,5 +173,6 @@ class ResultFeedTest extends \PHPUnit\Framework\TestCase
             . 'the journal of the Institute for Rational-Emotive Therapy.',
             $items[1]->getTitle()
         );
+        $this->assertEquals($expectedLink, $items[1]->getLink());
     }
 }

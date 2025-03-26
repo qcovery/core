@@ -3,7 +3,7 @@
 /**
  * UserList row gateway factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2017.
  *
@@ -62,7 +62,7 @@ class UserListFactory extends RowGatewayFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory!');
@@ -72,7 +72,7 @@ class UserListFactory extends RowGatewayFactory
         return parent::__invoke(
             $container,
             $requestedName,
-            [$container->get(\VuFind\Tags::class), $session]
+            [$container->get(\VuFind\Tags\TagsService::class), $session]
         );
     }
 }

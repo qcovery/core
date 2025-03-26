@@ -3,7 +3,7 @@
 /**
  * Primo Permission Handler.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2013.
  *
@@ -30,6 +30,9 @@
 namespace VuFind\Search\Primo;
 
 use LmcRbacMvc\Service\AuthorizationServiceAwareTrait;
+
+use function in_array;
+use function is_array;
 
 /**
  * Primo Permission Handler.
@@ -61,14 +64,14 @@ class PrimoPermissionHandler
     /**
      * Constructor.
      *
-     * @param Laminas\Config\Config|array $primoPermConfig Primo-Config for
+     * @param VuFind\Config\Config|array $primoPermConfig Primo-Config for
      * Institutions
      *
      * @return void
      */
     public function __construct($primoPermConfig)
     {
-        if ($primoPermConfig instanceof \Laminas\Config\Config) {
+        if ($primoPermConfig instanceof \VuFind\Config\Config) {
             $primoPermConfig = $primoPermConfig->toArray();
         }
         $this->primoConfig = is_array($primoPermConfig) ? $primoPermConfig : [];

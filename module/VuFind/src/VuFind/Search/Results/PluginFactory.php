@@ -3,7 +3,7 @@
 /**
  * Search results plugin factory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -56,7 +56,7 @@ class PluginFactory extends \VuFind\ServiceManager\AbstractPluginFactory
      *
      * @param ContainerInterface $container     Service container
      * @param string             $requestedName Name of service
-     * @param array              $extras        Extra options
+     * @param ?array             $extras        Extra options
      *
      * @return object
      *
@@ -65,7 +65,7 @@ class PluginFactory extends \VuFind\ServiceManager\AbstractPluginFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $extras = null
+        ?array $extras = null
     ) {
         $paramsService = preg_replace('/Results$/', 'Params', $requestedName);
         $params = $container->get(\VuFind\Search\Params\PluginManager::class)

@@ -3,7 +3,7 @@
 /**
  * CreateHierarchyTreesCommand test.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -140,7 +140,7 @@ class CreateHierarchyTreesCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * Get mock results manager.
      *
-     * @param Results $results Results object
+     * @param ?Results $results Results object
      *
      * @return PluginManager
      */
@@ -158,37 +158,19 @@ class CreateHierarchyTreesCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * Get command to test.
      *
-     * @param Loader        $loader  Record loader
-     * @param PluginManager $results Search results plugin manager
+     * @param ?Loader        $loader  Record loader
+     * @param ?PluginManager $results Search results plugin manager
      *
      * @return SuppressedCommand
      */
     protected function getCommand(
-        Loader $loader = null,
-        PluginManager $results = null
+        ?Loader $loader = null,
+        ?PluginManager $results = null
     ) {
         return new CreateHierarchyTreesCommand(
             $loader ?? $this->getMockRecordLoader(),
             $results ?? $this->getMockResultsManager()
         );
-    }
-
-    /**
-     * Test skipping everything.
-     *
-     * @return void
-     */
-    public function testSkippingEverything()
-    {
-        $command = $this->getCommand();
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            ['--skip-xml' => true, '--skip-json' => true, 'backend' => 'foo']
-        );
-        $this->assertEquals(0, $commandTester->getStatusCode());
-        $expectedText = "\tBuilding tree for recordid... 5 records\n"
-            . "\t\tJSON skipped.\n\t\tXML skipped.\n1 files\n";
-        $this->assertEquals($expectedText, $commandTester->getDisplay());
     }
 
     /**
@@ -201,8 +183,6 @@ class CreateHierarchyTreesCommandTest extends \PHPUnit\Framework\TestCase
         $tree = $this->getMockTreeSource();
         $tree->expects($this->once())->method('getJSON')
             ->with($this->equalTo('recordid'), $this->equalTo(['refresh' => true]));
-        $tree->expects($this->once())->method('getXML')
-            ->with($this->equalTo('recordid'), $this->equalTo(['refresh' => true]));
         $driver = $this->getMockHierarchyDriver();
         $driver->expects($this->any())->method('getTreeSource')
             ->will($this->returnValue($tree));
@@ -212,7 +192,7 @@ class CreateHierarchyTreesCommandTest extends \PHPUnit\Framework\TestCase
         $commandTester->execute(['backend' => 'foo']);
         $this->assertEquals(0, $commandTester->getStatusCode());
         $expectedText = "\tBuilding tree for recordid... 5 records\n"
-            . "\t\tJSON cache...\n\t\tXML cache...\n1 files\n";
+            . "1 files\n";
         $this->assertEquals($expectedText, $commandTester->getDisplay());
     }
 }

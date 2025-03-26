@@ -3,7 +3,7 @@
 /**
  * AJAX handler plugin manager
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -49,9 +49,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'checkRequestIsValid' => CheckRequestIsValid::class,
         'commentRecord' => CommentRecord::class,
         'deleteRecordComment' => DeleteRecordComment::class,
-        'doiLookup' => DoiLookup::class,
+        'identifierLinksLookup' => IdentifierLinksLookup::class,
         'getACSuggestions' => GetACSuggestions::class,
-        'getFacetData' => GetFacetData::class,
         'getIlsStatus' => GetIlsStatus::class,
         'getItemStatuses' => GetItemStatuses::class,
         'getLibraryPickupLocations' => GetLibraryPickupLocations::class,
@@ -65,6 +64,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'getResolverLinks' => GetResolverLinks::class,
         'getResultCount' => GetResultCount::class,
         'getSaveStatuses' => GetSaveStatuses::class,
+        'getSearchResults' => GetSearchResults::class,
         'getSideFacets' => GetSideFacets::class,
         'getUserFines' => GetUserFines::class,
         'getUserHolds' => GetUserHolds::class,
@@ -90,9 +90,8 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         CheckRequestIsValid::class => AbstractIlsAndUserActionFactory::class,
         CommentRecord::class => CommentRecordFactory::class,
         DeleteRecordComment::class => DeleteRecordCommentFactory::class,
-        DoiLookup::class => DoiLookupFactory::class,
+        IdentifierLinksLookup::class => IdentifierLinksLookupFactory::class,
         GetACSuggestions::class => GetACSuggestionsFactory::class,
-        GetFacetData::class => GetFacetDataFactory::class,
         GetIlsStatus::class => GetIlsStatusFactory::class,
         GetItemStatuses::class => GetItemStatusesFactory::class,
         GetLibraryPickupLocations::class => AbstractIlsAndUserActionFactory::class,
@@ -107,13 +106,13 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         GetResolverLinks::class => GetResolverLinksFactory::class,
         GetResultCount::class => GetResultCountFactory::class,
         GetSaveStatuses::class => GetSaveStatusesFactory::class,
+        GetSearchResults::class => GetSearchResultsFactory::class,
         GetSideFacets::class => GetSideFacetsFactory::class,
         GetUserFines::class => GetUserFinesFactory::class,
-        GetUserHolds::class => AbstractIlsAndUserActionFactory::class,
-        GetUserILLRequests::class => AbstractIlsAndUserActionFactory::class,
-        GetUserStorageRetrievalRequests::class =>
-            AbstractIlsAndUserActionFactory::class,
-        GetUserTransactions::class => AbstractIlsAndUserActionFactory::class,
+        GetUserHolds::class => AbstractIlsUserAndRendererActionFactory::class,
+        GetUserILLRequests::class => AbstractIlsUserAndRendererActionFactory::class,
+        GetUserStorageRetrievalRequests::class => AbstractIlsUserAndRendererActionFactory::class,
+        GetUserTransactions::class => AbstractIlsUserAndRendererActionFactory::class,
         GetVisData::class => GetVisDataFactory::class,
         KeepAlive::class => KeepAliveFactory::class,
         Recommend::class => RecommendFactory::class,

@@ -3,7 +3,7 @@
 /**
  * Factory for EDS search options objects.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -62,7 +62,7 @@ class OptionsFactory extends \VuFind\Search\Options\OptionsFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');

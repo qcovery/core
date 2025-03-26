@@ -3,7 +3,7 @@
 /**
  * SolrMarcRemote Record Driver Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -30,8 +30,8 @@
 namespace VuFindTest\RecordDriver;
 
 use Exception;
-use Laminas\Config\Config;
 use Laminas\Http\Response;
+use VuFind\Config\Config;
 use VuFind\RecordDriver\SolrMarcRemote;
 use VuFindHttp\HttpServiceInterface;
 

@@ -3,7 +3,7 @@
 /**
  * Search results plugin manager
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -51,12 +51,15 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'combined' => \VuFind\Search\Combined\Results::class,
         'eds' => \VuFind\Search\EDS\Results::class,
         'eit' => \VuFind\Search\EIT\Results::class,
+        'epf' => \VuFind\Search\EPF\Results::class,
         'emptyset' => \VuFind\Search\EmptySet\Results::class,
         'favorites' => \VuFind\Search\Favorites\Results::class,
         'libguides' => \VuFind\Search\LibGuides\Results::class,
+        'libguidesaz' => \VuFind\Search\LibGuidesAZ\Results::class,
         'mixedlist' => \VuFind\Search\MixedList\Results::class,
         'pazpar2' => \VuFind\Search\Pazpar2\Results::class,
         'primo' => \VuFind\Search\Primo\Results::class,
+        'proquestfsg' => \VuFind\Search\ProQuestFSG\Results::class,
         'search2' => \VuFind\Search\Search2\Results::class,
         'search2collection' => \VuFind\Search\Search2Collection\Results::class,
         'solr' => \VuFind\Search\Solr\Results::class,
@@ -69,6 +72,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'summon' => \VuFind\Search\Summon\Results::class,
         'tags' => \VuFind\Search\Tags\Results::class,
         'worldcat' => \VuFind\Search\WorldCat\Results::class,
+        'worldcat2' => \VuFind\Search\WorldCat2\Results::class,
     ];
 
     /**
@@ -83,13 +87,16 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         \VuFind\Search\Combined\Results::class => ResultsFactory::class,
         \VuFind\Search\EDS\Results::class => ResultsFactory::class,
         \VuFind\Search\EIT\Results::class => ResultsFactory::class,
+        \VuFind\Search\EPF\Results::class => ResultsFactory::class,
         \VuFind\Search\EmptySet\Results::class => ResultsFactory::class,
         \VuFind\Search\Favorites\Results::class =>
             \VuFind\Search\Favorites\ResultsFactory::class,
         \VuFind\Search\LibGuides\Results::class => ResultsFactory::class,
+        \VuFind\Search\LibGuidesAZ\Results::class => ResultsFactory::class,
         \VuFind\Search\MixedList\Results::class => ResultsFactory::class,
         \VuFind\Search\Pazpar2\Results::class => ResultsFactory::class,
         \VuFind\Search\Primo\Results::class => ResultsFactory::class,
+        \VuFind\Search\ProQuestFSG\Results::class => ResultsFactory::class,
         \VuFind\Search\Search2\Results::class =>
             \VuFind\Search\Search2\ResultsFactory::class,
         \VuFind\Search\Search2Collection\Results::class => ResultsFactory::class,
@@ -106,6 +113,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         \VuFind\Search\Tags\Results::class =>
             \VuFind\Search\Tags\ResultsFactory::class,
         \VuFind\Search\WorldCat\Results::class => ResultsFactory::class,
+        \VuFind\Search\WorldCat2\Results::class => ResultsFactory::class,
     ];
 
     /**

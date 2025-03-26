@@ -3,7 +3,7 @@
 /**
  * Factory for Blender search params objects.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) The National Library of Finland 2019-2022.
  *
@@ -62,7 +62,7 @@ class ParamsFactory extends \VuFind\Search\Params\ParamsFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Plugin Manager factory.
+ * HMAC factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -36,7 +36,7 @@ use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
 
 /**
- * Plugin Manager factory.
+ * HMAC factory.
  *
  * @category VuFind
  * @package  Crypt
@@ -63,7 +63,7 @@ class HMACFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');

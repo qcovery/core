@@ -3,7 +3,7 @@
 /**
  * Hierarchy interface.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -50,7 +50,7 @@ abstract class AbstractBase
     /**
      * Driver configuration
      *
-     * @var \Laminas\Config\Config
+     * @var \VuFind\Config\Config
      */
     protected $config;
 
@@ -85,13 +85,13 @@ abstract class AbstractBase
     /**
      * Constructor
      *
-     * @param \Laminas\Config\Config $config          Configuration
-     * @param DataManager            $dataManager     Tree data source plugin manager
-     * @param RendererManager        $rendererManager Tree renderer plugin manager
-     * @param array                  $options         Extra options (if any)
+     * @param \VuFind\Config\Config $config          Configuration
+     * @param DataManager           $dataManager     Tree data source plugin manager
+     * @param RendererManager       $rendererManager Tree renderer plugin manager
+     * @param array                 $options         Extra options (if any)
      */
     public function __construct(
-        \Laminas\Config\Config $config,
+        \VuFind\Config\Config $config,
         DataManager $dataManager,
         RendererManager $rendererManager,
         $options = []
@@ -134,25 +134,25 @@ abstract class AbstractBase
      * Render the tree for a given record.
      *
      * @param \VuFind\RecordDriver\AbstractBase $driver      Record driver
-     * @param string                            $context     Context in which the
-     * tree is being created
+     * @param string                            $context     Context in which the tree is being created
      * @param string                            $mode        Type of tree required
-     * @param string                            $hierarchyID Hierarchy ID to get
-     * the tree for
+     * @param string                            $hierarchyID Hierarchy ID to get the tree for
+     * @param array                             $options     Additional options for the renderer
      *
      * @return string
      */
     public function render(
         \VuFind\RecordDriver\AbstractBase $driver,
-        $context,
-        $mode,
-        $hierarchyID
+        string $context,
+        string $mode,
+        string $hierarchyID,
+        array $options
     ) {
         if (!$this->showTree()) {
             return false;
         }
         return $this->getTreeRenderer($driver)
-            ->render($context, $mode, $hierarchyID, $driver->getUniqueID());
+            ->render($context, $mode, $hierarchyID, $driver->getUniqueID(), $options);
     }
 
     /**
@@ -177,4 +177,25 @@ abstract class AbstractBase
      * @return string
      */
     abstract public function getTreeSourceType();
+
+    /**
+     * Check if sorting is enabled in the hierarchy Options
+     *
+     * @return bool
+     */
+    abstract public function treeSorting();
+
+    /**
+     * Get Collection Link Type
+     *
+     * @return string
+     */
+    abstract public function getCollectionLinkType();
+
+    /**
+     * Get tree cache time in seconds
+     *
+     * @return int
+     */
+    abstract public function getTreeCacheTime();
 }

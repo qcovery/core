@@ -3,7 +3,7 @@
 /**
  * Cart Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -30,6 +30,12 @@
 namespace VuFind;
 
 use VuFind\Cookie\CookieManager;
+
+use function array_slice;
+use function chr;
+use function count;
+use function in_array;
+use function ord;
 
 /**
  * Cart Class
@@ -321,36 +327,6 @@ class Cart
         $this->cookieManager->set(self::CART_COOKIE, $cookie, 0, false);
         $srcCookie = implode(self::CART_COOKIE_DELIM, $sources);
         $this->cookieManager->set(self::CART_COOKIE_SOURCES, $srcCookie, 0, false);
-    }
-
-    /**
-     * Get cookie domain context (null if unset).
-     *
-     * @return string
-     */
-    public function getCookieDomain()
-    {
-        return $this->cookieManager->getDomain();
-    }
-
-    /**
-     * Get cookie path ('/' if unset).
-     *
-     * @return string
-     */
-    public function getCookiePath()
-    {
-        return $this->cookieManager->getPath();
-    }
-
-    /**
-     * Get cookie SameSite attribute.
-     *
-     * @return string
-     */
-    public function getCookieSameSite()
-    {
-        return $this->cookieManager->getSameSite();
     }
 
     /**

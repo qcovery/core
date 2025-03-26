@@ -3,7 +3,7 @@
 /**
  * Container that produces mock objects.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -48,11 +48,11 @@ class MockContainer implements ServiceLocatorInterface
      * Alias for createMock(), needed to conform to ServiceLocatorInterface.
      *
      * @param string $name    Name of service to build
-     * @param array  $options Options
+     * @param ?array $options Options
      *
      * @return mixed
      */
-    public function build($name, array $options = null)
+    public function build($name, ?array $options = null)
     {
         return $this->createMock($name, $options ?? []);
     }

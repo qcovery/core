@@ -3,7 +3,7 @@
 /**
  * Map tab
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -31,6 +31,8 @@
 namespace VuFind\RecordTab;
 
 use VuFind\Config\PathResolver;
+
+use function count;
 
 /**
  * Map tab
@@ -82,23 +84,23 @@ class Map extends AbstractBase
     /**
      * Configuration file path resolver
      *
-     * @var PathResolver
+     * @var ?PathResolver
      */
     protected $pathResolver;
 
     /**
      * Constructor
      *
-     * @param bool         $mapTabDisplay  Display Map
-     * @param array        $basemapOptions basemap settings
-     * @param array        $mapTabOptions  MapTab settings
-     * @param PathResolver $pathResolver   Config file path resolver
+     * @param bool          $mapTabDisplay  Display Map
+     * @param array         $basemapOptions basemap settings
+     * @param array         $mapTabOptions  MapTab settings
+     * @param ?PathResolver $pathResolver   Config file path resolver
      */
     public function __construct(
         $mapTabDisplay = false,
         $basemapOptions = [],
         $mapTabOptions = [],
-        PathResolver $pathResolver = null
+        ?PathResolver $pathResolver = null
     ) {
         if ($mapTabDisplay) {
             $this->mapTabDisplay = $mapTabDisplay;
@@ -245,7 +247,7 @@ class Map extends AbstractBase
                 : \VuFind\Config\Locator::getConfigPath($mapLabelData[1]);
             if (file_exists($file)) {
                 $fp = fopen($file, 'r');
-                while (($line = fgetcsv($fp, 0, "\t")) !== false) {
+                while (($line = fgetcsv($fp, 0, "\t", escape: '\\')) !== false) {
                     if (count($line) > 1) {
                         $label_lookup[$line[0]] = $line[1];
                     }

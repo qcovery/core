@@ -3,7 +3,7 @@
 /**
  * Make link view helper
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -29,6 +29,8 @@
  */
 
 namespace VuFind\View\Helper\Root;
+
+use function is_array;
 
 /**
  * Make link view helper
@@ -89,7 +91,7 @@ class MakeLink extends \Laminas\View\Helper\AbstractHelper
      * - escapeContent: Default true, set to false to skip escaping (like for HTML).
      *
      * @param string       $contents Link contents (must be properly-formed HTML)
-     * @param string       $href     Link destination (null to skip)
+     * @param ?string      $href     Link destination (null to skip)
      * @param string|array $attrs    Link attributes (class name / associative array)
      * @param array        $options  Additional options
      *
@@ -97,7 +99,7 @@ class MakeLink extends \Laminas\View\Helper\AbstractHelper
      */
     public function __invoke(
         string $contents,
-        string $href = null,
+        ?string $href = null,
         $attrs = [],
         $options = []
     ) {

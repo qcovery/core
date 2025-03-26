@@ -3,7 +3,7 @@
 /**
  * AlphaBrowse Module Controller
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2011.
  *
@@ -30,10 +30,13 @@
 
 namespace VuFind\Controller;
 
-use Laminas\Config\Config;
 use Laminas\View\Model\ViewModel;
+use VuFind\Config\Config;
 use VuFind\Exception\BadRequest;
 use VuFindSearch\ParamBag;
+
+use function in_array;
+use function intval;
 
 /**
  * AlphabrowseController Class
@@ -174,11 +177,36 @@ class AlphabrowseController extends AbstractBase
                 $view->prevpage = $page - 1;
             }
         }
+
+        if ($view->source === 'topic') {
+            $this->applyTopicDelimiters($result);
+        }
+
         $view->result = $result;
 
         // set up highlighting: page 0 contains match location
         if ($highlighting && $page == 0 && isset($view->result['Browse'])) {
             $this->applyHighlighting($view, $rowsBefore);
+        }
+    }
+
+    /**
+     * Applies topic delimiters to the 'heading' field of each item in the browse results.
+     *
+     * @param array $result The result array containing 'Browse' items to be modified.
+     *
+     * @return void
+     */
+    protected function applyTopicDelimiters(&$result): void
+    {
+        $config = $this->getConfig();
+
+        foreach ($result['Browse']['items'] as &$item) {
+            $item['heading'] = str_replace(
+                "\u{2002}",
+                ($config->AlphaBrowse->topic_browse_separator ?? ' > '),
+                $item['heading']
+            );
         }
     }
 

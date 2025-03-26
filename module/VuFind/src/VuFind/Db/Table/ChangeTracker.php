@@ -3,7 +3,7 @@
 /**
  * Table Definition for change_tracker
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -57,7 +57,7 @@ class ChangeTracker extends Gateway
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
      * @param array         $cfg     Laminas configuration
-     * @param RowGateway    $rowObj  Row prototype object (null for default)
+     * @param ?RowGateway   $rowObj  Row prototype object (null for default)
      * @param string        $table   Name of database table to interface with
      */
     public function __construct(
@@ -77,7 +77,7 @@ class ChangeTracker extends Gateway
      * @param string $core The Solr core holding the record.
      * @param string $id   The ID of the record being indexed.
      *
-     * @return \VuFind\Db\Row\ChangeTracker|null
+     * @return ?\VuFind\Db\Row\ChangeTracker
      */
     public function retrieve($core, $id)
     {
@@ -93,6 +93,7 @@ class ChangeTracker extends Gateway
      * @param int    $offset  Record number to retrieve first.
      * @param int    $limit   Retrieval limit (null for no limit)
      * @param array  $columns Columns to retrieve (null for all)
+     * @param string $order   Sort order
      *
      * @return callable
      */
@@ -102,7 +103,8 @@ class ChangeTracker extends Gateway
         $until,
         $offset = 0,
         $limit = null,
-        $columns = null
+        $columns = null,
+        $order = null
     ) {
         return function ($select) use (
             $core,
@@ -110,7 +112,8 @@ class ChangeTracker extends Gateway
             $until,
             $offset,
             $limit,
-            $columns
+            $columns,
+            $order
         ) {
             if ($columns !== null) {
                 $select->columns($columns);
@@ -119,7 +122,9 @@ class ChangeTracker extends Gateway
                 ->equalTo('core', $core)
                 ->greaterThanOrEqualTo('deleted', $from)
                 ->lessThanOrEqualTo('deleted', $until);
-            $select->order('deleted');
+            if ($order !== null) {
+                $select->order($order);
+            }
             if ($offset > 0) {
                 $select->offset($offset);
             }
@@ -173,7 +178,9 @@ class ChangeTracker extends Gateway
             $from,
             $until,
             $offset,
-            $limit
+            $limit,
+            null,
+            'deleted'
         );
         return $this->select($callback);
     }

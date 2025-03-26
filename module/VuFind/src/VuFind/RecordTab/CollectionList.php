@@ -3,7 +3,7 @@
 /**
  * Collection list tab
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -118,6 +118,16 @@ class CollectionList extends AbstractBase
     }
 
     /**
+     * Is this tab active?
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        return parent::isActive() && $this->getRecordDriver()->tryMethod('isCollection');
+    }
+
+    /**
      * Get the processed search results.
      *
      * @return \VuFind\Search\SolrCollection\Results
@@ -129,8 +139,8 @@ class CollectionList extends AbstractBase
             $request = $this->getRequest()->getQuery()->toArray()
                 + $this->getRequest()->getPost()->toArray();
             $rManager = $this->recommendManager;
-            $cb = function ($runner, $params, $searchId) use ($driver, $rManager) {
-                $params->initFromRecordDriver($driver);
+            $cb = function ($runner, $params, $searchId) use ($driver, $rManager, $request) {
+                $params->initFromRecordDriver($driver, '' !== ($request['lookfor'] ?? ''));
                 $listener = new RecommendListener($rManager, $searchId);
                 $listener->setConfig(
                     $params->getOptions()->getRecommendationSettings()

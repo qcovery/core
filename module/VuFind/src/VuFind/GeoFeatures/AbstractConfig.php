@@ -3,7 +3,7 @@
 /**
  * Abstract Configuration Module
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -29,7 +29,7 @@
 
 namespace VuFind\GeoFeatures;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 
 /**
  * MapTab Configuration Class

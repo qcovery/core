@@ -3,7 +3,7 @@
 /**
  * Interval CAPTCHA (requires an interval between actions or from start of session).
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) The National Library of Finland 2021.
  *
@@ -29,11 +29,13 @@
 
 namespace VuFind\Captcha;
 
-use Laminas\Config\Config;
 use Laminas\Mvc\Controller\Plugin\Params;
 use Laminas\Session\Container as SessionContainer;
+use VuFind\Config\Config;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
 use VuFind\I18n\Translator\TranslatorAwareTrait;
+
+use function intval;
 
 /**
  * Interval CAPTCHA (requires an interval between actions or from start of session).

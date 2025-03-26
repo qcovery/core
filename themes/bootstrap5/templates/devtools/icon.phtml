@@ -1,0 +1,13 @@
+<?php
+  $title = $this->translate('Icons');
+  $titleEsc = $this->escapeHtml($title);
+  $this->headTitle($title);
+  $this->breadcrumbs()->set('Development Tools', $this->url('devtools-home'))
+    ->add($title, active: true);
+?>
+<h1><?=$titleEsc?></h1>
+<div>
+  <?php foreach ($aliases as $icon): ?>
+    <?=$this->icon($icon)?>: <?=$this->escapeHtml($icon)?><br>
+  <?php endforeach; ?>
+</div>

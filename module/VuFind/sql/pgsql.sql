@@ -90,7 +90,7 @@ DROP TABLE IF EXISTS "search";
 
 CREATE TABLE search (
 id BIGSERIAL,
-user_id int NOT NULL DEFAULT '0',
+user_id int DEFAULT NULL,
 session_id varchar(128),
 created timestamp NOT NULL DEFAULT '1970-01-01 00:00:00',
 title varchar(20) DEFAULT NULL,
@@ -175,6 +175,8 @@ UNIQUE (username),
 UNIQUE (cat_id)
 );
 
+CREATE INDEX user_email_idx ON "user" (email);
+CREATE INDEX user_verify_hash_idx ON "user" (verify_hash);
 
 -- --------------------------------------------------------
 
@@ -278,9 +280,11 @@ DROP TABLE IF EXISTS "oai_resumption";
 
 CREATE TABLE oai_resumption (
 id SERIAL,
+token varchar(255) DEFAULT NULL,
 params text,
 expires timestamp NOT NULL default '1970-01-01 00:00:00',
-PRIMARY KEY (id)
+PRIMARY KEY (id),
+UNIQUE(token)
 );
 
 -- --------------------------------------------------------
@@ -379,6 +383,27 @@ data text,
 revoked boolean NOT NULL DEFAULT '0',
 PRIMARY KEY (id, type)
 );
+
+--
+-- Table structure for table `login_token`
+--
+
+DROP TABLE IF EXISTS "login_token";
+
+CREATE TABLE login_token (
+  id SERIAL,
+  user_id int NOT NULL,
+  token varchar(255) NOT NULL,
+  series varchar(255) NOT NULL,
+  last_login timestamp NOT NULL,
+  browser varchar(255),
+  platform varchar(255),
+  expires int NOT NULL,
+  last_session_id varchar(255),
+  PRIMARY KEY (id)
+);
+CREATE INDEX login_token_user_id_idx ON login_token (user_id);
+CREATE INDEX login_token_series_idx ON login_token (series);
 
 -- --------------------------------------------------------
 

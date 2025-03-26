@@ -3,7 +3,7 @@
 /**
  * Class SortFacetListFactory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Moravian Library 2022.
  *
@@ -66,7 +66,7 @@ class SortFacetListFactory implements \Laminas\ServiceManager\Factory\FactoryInt
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $helper = new $requestedName();
         $helper->setSorter($container->get(\VuFind\I18n\Sorter::class));

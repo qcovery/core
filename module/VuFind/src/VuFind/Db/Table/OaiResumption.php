@@ -3,7 +3,7 @@
 /**
  * Table Definition for oai_resumption
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -30,7 +30,9 @@
 namespace VuFind\Db\Table;
 
 use Laminas\Db\Adapter\Adapter;
+use VuFind\Db\Entity\OaiResumptionEntityInterface;
 use VuFind\Db\Row\RowGateway;
+use VuFind\Db\Service\DbServiceAwareInterface;
 
 /**
  * Table Definition for oai_resumption
@@ -41,15 +43,17 @@ use VuFind\Db\Row\RowGateway;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
-class OaiResumption extends Gateway
+class OaiResumption extends Gateway implements DbServiceAwareInterface
 {
+    use \VuFind\Db\Service\DbServiceAwareTrait;
+
     /**
      * Constructor
      *
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
      * @param array         $cfg     Laminas configuration
-     * @param RowGateway    $rowObj  Row prototype object (null for default)
+     * @param ?RowGateway   $rowObj  Row prototype object (null for default)
      * @param string        $table   Name of database table to interface with
      */
     public function __construct(
@@ -82,11 +86,51 @@ class OaiResumption extends Gateway
      *
      * @param string $token The resumption token to retrieve.
      *
-     * @return \VuFind\Db\Row\OaiResumption|null
+     * @return     ?\VuFind\Db\Row\OaiResumption
+     * @deprecated Use OaiResumption::findWithId
      */
     public function findToken($token)
     {
-        return $this->select(['id' => $token])->current();
+        return $this->findWithId($token);
+    }
+
+    /**
+     * Retrieve a row from the database based on primary key; return null if it
+     * is not found.
+     *
+     * @param string $id Id used for the search.
+     *
+     * @return ?\VuFind\Db\Row\OaiResumption
+     */
+    public function findWithId(string $id): ?OaiResumptionEntityInterface
+    {
+        return $this->select(['id' => $id])->current();
+    }
+
+    /**
+     * Retrieve a row from the database based on primary key and where the token is null.
+     *
+     * @param int $id Id used for the search.
+     *
+     * @return ?\VuFind\Db\Row\OaiResumption
+     * @todo   In future, we should migrate data to prevent null token fields, which will make this method obsolete.
+     */
+    final public function findWithLegacyIdToken(int $id): ?OaiResumptionEntityInterface
+    {
+        return $this->select(['id' => $id, 'token' => null])->current();
+    }
+
+    /**
+     * Retrieve a row from the database based on token; return null if it
+     * is not found.
+     *
+     * @param string $token Token used for the search.
+     *
+     * @return ?OaiResumptionEntityInterface
+     */
+    public function findWithToken(string $token): ?OaiResumptionEntityInterface
+    {
+        return $this->select(['token' => $token])->current();
     }
 
     /**
@@ -96,13 +140,12 @@ class OaiResumption extends Gateway
      * @param int   $expire Expiration time for token (Unix timestamp).
      *
      * @return int          ID of new token
+     *
+     * @deprecated Use \VuFind\Db\Service\OaiResumptionService::createAndPersistToken()
      */
     public function saveToken($params, $expire)
     {
-        $row = $this->createRow();
-        $row->saveParams($params);
-        $row->expires = date('Y-m-d H:i:s', $expire);
-        $row->save();
-        return $row->id;
+        return $this->getDbService(\VuFind\Db\Service\OaiResumptionServiceInterface::class)
+            ->createAndPersistToken($params, $expire)->getId();
     }
 }

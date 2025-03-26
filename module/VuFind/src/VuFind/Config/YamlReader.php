@@ -3,7 +3,7 @@
 /**
  * VuFind YAML Configuration Reader
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  * Copyright (C) The National Library of Finland 2022.
@@ -33,6 +33,10 @@ namespace VuFind\Config;
 
 use Symfony\Component\Yaml\Yaml;
 
+use function array_key_exists;
+use function dirname;
+use function is_array;
+
 /**
  * VuFind YAML Configuration Reader
  *
@@ -45,6 +49,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlReader
 {
+    use \VuFind\Feature\MergeRecursiveTrait;
+
     /**
      * Cache directory name
      *
@@ -55,14 +61,14 @@ class YamlReader
     /**
      * Cache manager
      *
-     * @var \VuFind\Cache\Manager
+     * @var ?\VuFind\Cache\Manager
      */
     protected $cacheManager;
 
     /**
      * Config file path resolver
      *
-     * @var PathResolver
+     * @var ?PathResolver
      */
     protected $pathResolver;
 
@@ -76,13 +82,13 @@ class YamlReader
     /**
      * Constructor
      *
-     * @param \VuFind\Cache\Manager $cacheManager Cache manager (optional)
-     * @param PathResolver          $pathResolver Config file path resolver
+     * @param ?\VuFind\Cache\Manager $cacheManager Cache manager (optional)
+     * @param ?PathResolver          $pathResolver Config file path resolver
      * (optional; defaults to \VuFind\Config\Locator)
      */
     public function __construct(
-        \VuFind\Cache\Manager $cacheManager = null,
-        PathResolver $pathResolver = null
+        ?\VuFind\Cache\Manager $cacheManager = null,
+        ?PathResolver $pathResolver = null
     ) {
         $this->cacheManager = $cacheManager;
         $this->pathResolver = $pathResolver;
@@ -175,7 +181,7 @@ class YamlReader
     {
         // First load current file:
         $results = (!empty($file) && file_exists($file))
-            ? Yaml::parse(file_get_contents($file), Yaml::PARSE_CUSTOM_TAGS) : [];
+            ? Yaml::parse(file_get_contents($file)) : [];
 
         // Override default parent with explicitly-defined parent, if present:
         if (isset($results['@parent_yaml'])) {
@@ -209,7 +215,7 @@ class YamlReader
                     $resultElemRef
                         = &$this->getArrayElemRefByPath($results, $path, true);
                     $resultElemRef
-                        = array_merge_recursive($parentElem, $resultElemRef);
+                        = $this->mergeRecursive($parentElem, $resultElemRef);
                     unset($parentElem);
                     unset($resultElemRef);
                 }

@@ -3,7 +3,7 @@
 /**
  * Row Definition for oai_resumption
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -23,11 +23,15 @@
  * @category VuFind
  * @package  Db_Row
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Juha Luoma <juha.luoma@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
 
 namespace VuFind\Db\Row;
+
+use DateTime;
+use VuFind\Db\Entity\OaiResumptionEntityInterface;
 
 /**
  * Row Definition for oai_resumption
@@ -35,14 +39,16 @@ namespace VuFind\Db\Row;
  * @category VuFind
  * @package  Db_Row
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Juha Luoma <juha.luoma@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  *
  * @property int    $id
  * @property string $params
+ * @property string $token
  * @property string $expires
  */
-class OaiResumption extends RowGateway
+class OaiResumption extends RowGateway implements OaiResumptionEntityInterface
 {
     /**
      * Constructor
@@ -58,6 +64,8 @@ class OaiResumption extends RowGateway
      * Extract an array of parameters from the object.
      *
      * @return array Original saved parameters.
+     *
+     * @deprecated Use parse_str() instead
      */
     public function restoreParams()
     {
@@ -78,6 +86,8 @@ class OaiResumption extends RowGateway
      * @param array $params Parameters to save.
      *
      * @return void
+     *
+     * @deprecated Use \VuFind\Db\Service\OaiResumptionService::createAndPersistToken()
      */
     public function saveParams($params)
     {
@@ -87,5 +97,84 @@ class OaiResumption extends RowGateway
             $processedParams[] = urlencode($key) . '=' . urlencode($value);
         }
         $this->params = implode('&', $processedParams);
+    }
+
+    /**
+     * Id getter
+     *
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Resumption parameters setter
+     *
+     * @param ?string $params Resumption parameters.
+     *
+     * @return static
+     */
+    public function setResumptionParameters(?string $params): static
+    {
+        $this->params = $params;
+        return $this;
+    }
+
+    /**
+     * Get resumption parameters.
+     *
+     * @return ?string
+     */
+    public function getResumptionParameters(): ?string
+    {
+        return $this->params;
+    }
+
+    /**
+     * Set token used for identifying.
+     *
+     * @param string $token Generated token.
+     *
+     * @return static
+     */
+    public function setToken(string $token): static
+    {
+        $this->token = $token;
+        return $this;
+    }
+
+    /**
+     * Get token used for identifying.
+     *
+     * @return ?string
+     */
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    /**
+     * Expiry date setter.
+     *
+     * @param DateTime $dateTime Expiration date
+     *
+     * @return static
+     */
+    public function setExpiry(DateTime $dateTime): static
+    {
+        $this->expires = $dateTime->format('Y-m-d H:i:s');
+        return $this;
+    }
+
+    /**
+     * Get expiry date.
+     *
+     * @return DateTime
+     */
+    public function getExpiry(): DateTime
+    {
+        return DateTime::createFromFormat('Y-m-d H:i:s', $this->expires);
     }
 }

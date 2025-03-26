@@ -3,7 +3,7 @@
 /**
  * Factory for Util/CleanUpRecordCache command.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -34,6 +34,7 @@ use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
+use VuFind\Db\Service\RecordServiceInterface;
 
 /**
  * Factory for Util/CleanUpRecordCache command.
@@ -63,10 +64,10 @@ class CleanUpRecordCacheCommandFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         return new $requestedName(
-            $container->get(\VuFind\Db\Table\PluginManager::class)->get('Record'),
+            $container->get(\VuFind\Db\Service\PluginManager::class)->get(RecordServiceInterface::class),
             ...($options ?? [])
         );
     }

@@ -3,7 +3,7 @@
 /**
  * Factory for instantiating recommendation modules with search runner.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2019.
  *
@@ -38,11 +38,12 @@ use VuFind\Search\SearchRunner;
 /**
  * Factory for instantiating recommendation modules with search runner.
  *
- * @category VuFind
- * @package  Recommendations
- * @author   Demian Katz <demian.katz@villanova.edu>
- * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org/wiki/development Wiki
+ * @category   VuFind
+ * @package    Recommendations
+ * @author     Demian Katz <demian.katz@villanova.edu>
+ * @license    http://opensource.org/licenses/gpl-2.0.php GNU General Public License
+ * @link       https://vufind.org/wiki/development Wiki
+ * @deprecated Use AbstractSearchObjectFactory
  */
 class InjectSearchRunnerFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
 {
@@ -65,7 +66,7 @@ class InjectSearchRunnerFactory implements \Laminas\ServiceManager\Factory\Facto
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');

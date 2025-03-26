@@ -3,7 +3,7 @@
 /**
  * Interface for ILS Drivers
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2007.
  *
@@ -37,7 +37,7 @@ namespace VuFind\ILS\Driver;
  *
  * The parameters are of no major concern as you can define the purpose of the
  * parameters for each method for whatever purpose your driver needs.
- * The most important element here is what the method will return.  All methods
+ * The most important element here is what the method will return. All methods
  * may throw exceptions in case of errors.
  *
  * @category VuFind
@@ -112,7 +112,7 @@ interface DriverInterface
      * keys: id, availability (boolean), status, location, reserve, callnumber,
      * duedate, number, barcode.
      */
-    public function getHolding($id, array $patron = null, array $options = []);
+    public function getHolding($id, ?array $patron = null, array $options = []);
 
     /**
      * Get Purchase History

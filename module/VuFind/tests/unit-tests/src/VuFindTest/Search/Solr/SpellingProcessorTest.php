@@ -3,7 +3,7 @@
 /**
  * Unit tests for spelling processor.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2013.
  *
@@ -29,7 +29,7 @@
 
 namespace VuFindTest\Search\Solr;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 use VuFind\Search\Solr\SpellingProcessor;
 
 /**

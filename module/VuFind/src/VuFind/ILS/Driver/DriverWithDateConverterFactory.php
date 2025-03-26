@@ -3,7 +3,7 @@
 /**
  * Generic factory suitable for most ILS drivers.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -63,7 +63,7 @@ class DriverWithDateConverterFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         // Set up the driver with the date converter (and any extra parameters
         // passed in as options):

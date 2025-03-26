@@ -3,7 +3,7 @@
 /**
  * Simple JSON-based factory for record collection.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -31,6 +31,10 @@ namespace VuFindSearch\Backend\Solr\Response\Json;
 
 use VuFindSearch\Exception\InvalidArgumentException;
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
+
+use function gettype;
+use function is_array;
+use function sprintf;
 
 /**
  * Simple JSON-based factory for record collection.
@@ -97,8 +101,13 @@ class RecordCollectionFactory implements RecordCollectionFactoryInterface
             );
         }
         $collection = new $this->collectionClass($response);
+        $hlDetails = $response['highlighting'] ?? [];
         foreach ($response['response']['docs'] ?? [] as $doc) {
-            $collection->add(call_user_func($this->recordFactory, $doc), false);
+            // If highlighting details were provided, merge them into the record for future use:
+            if (isset($doc['id']) && ($hl = $hlDetails[$doc['id']] ?? [])) {
+                $doc['__highlight_details'] = $hl;
+            }
+            $collection->add(($this->recordFactory)($doc), false);
         }
         return $collection;
     }

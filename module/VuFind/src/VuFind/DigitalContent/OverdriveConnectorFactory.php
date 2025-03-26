@@ -3,7 +3,7 @@
 /**
  * Overdrive Connector factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -68,7 +68,7 @@ class OverdriveConnectorFactory implements
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if ($options !== null) {
             throw new \Exception('Unexpected options sent to factory!');
@@ -102,7 +102,7 @@ class OverdriveConnectorFactory implements
         $connector->setCacheStorage(
             $container->get(\VuFind\Cache\Manager::class)->getCache(
                 'object',
-                "Overdrive"
+                'Overdrive'
             )
         );
 

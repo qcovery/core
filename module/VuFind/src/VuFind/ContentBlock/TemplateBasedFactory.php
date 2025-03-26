@@ -3,7 +3,7 @@
 /**
  * Class TemplateBasedFactory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Moravian Library 2020.
  *
@@ -62,7 +62,7 @@ class TemplateBasedFactory implements \Laminas\ServiceManager\Factory\FactoryInt
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if ($options !== null) {
             throw new \Exception('Unexpected options sent to factory!');

@@ -3,7 +3,7 @@
 /**
  * GoogleTagManager view helper Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2022.
  *
@@ -52,8 +52,8 @@ class GoogleTagManagerTest extends \PHPUnit\Framework\TestCase
     public function testHeadCode(): void
     {
         $output = $this->renderGTMHeadCode('fakeContainerId');
-        $this->assertTrue(false !== strstr($output, 'gtm.js'));
-        $this->assertTrue(false !== strstr($output, 'fakeContainerId'));
+        $this->assertStringContainsString('gtm.js', $output);
+        $this->assertStringContainsString('fakeContainerId', $output);
     }
 
     /**
@@ -64,8 +64,8 @@ class GoogleTagManagerTest extends \PHPUnit\Framework\TestCase
     public function testBodyCode(): void
     {
         $output = $this->renderGTMBodyCode('fakeContainerId');
-        $this->assertTrue(false !== strstr($output, 'ns.html'));
-        $this->assertTrue(false !== strstr($output, 'fakeContainerId'));
+        $this->assertStringContainsString('ns.html', $output);
+        $this->assertStringContainsString('fakeContainerId', $output);
     }
 
     /**

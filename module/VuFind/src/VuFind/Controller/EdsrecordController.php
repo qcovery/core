@@ -3,7 +3,7 @@
 /**
  * EDS Record Controller
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -80,7 +80,12 @@ class EdsrecordController extends AbstractRecord
             }
             throw new ForbiddenException('Access denied.');
         }
-        return $this->redirect()->toUrl($driver->tryMethod($method));
+        $url = $driver->tryMethod($method);
+        if (!$url) {
+            $this->flashMessenger()->addErrorMessage($this->translate('error_accessing_full_text'));
+            return $this->redirect()->toRoute('edsrecord', ['id' => $this->params()->fromRoute('id')]);
+        }
+        return $this->redirect()->toUrl($url);
     }
 
     /**
@@ -111,18 +116,5 @@ class EdsrecordController extends AbstractRecord
     public function pdfAction()
     {
         return $this->redirectToEbook('ebook-pdf', 'getPdfLink');
-    }
-
-    /**
-     * Is the result scroller active?
-     *
-     * @return bool
-     */
-    protected function resultScrollerActive()
-    {
-        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
-            ->get('EDS');
-        return isset($config->Record->next_prev_navigation)
-            && $config->Record->next_prev_navigation;
     }
 }

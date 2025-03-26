@@ -3,7 +3,7 @@
 /**
  * Service class for ObalkyKnih
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Moravian Library 2019.
  *
@@ -28,6 +28,8 @@
  */
 
 namespace VuFind\Content;
+
+use function count;
 
 /**
  * Service class for ObalkyKnih
@@ -85,16 +87,16 @@ class ObalkyKnihService implements
     /**
      * Constructor
      *
-     * @param \Laminas\Config\Config $config Configuration for service
+     * @param \VuFind\Config\Config $config Configuration for service
      */
-    public function __construct(\Laminas\Config\Config $config)
+    public function __construct(\VuFind\Config\Config $config)
     {
         if (
             !isset($config->base_url) || count($config->base_url) < 1
             || !isset($config->books_endpoint)
         ) {
             throw new \Exception(
-                "Configuration for ObalkyKnih.cz service is not valid"
+                'Configuration for ObalkyKnih.cz service is not valid'
             );
         }
         $this->baseUrls = $config->base_url;
@@ -114,11 +116,11 @@ class ObalkyKnihService implements
     /**
      * Get an HTTP client
      *
-     * @param string $url URL for client to use
+     * @param ?string $url URL for client to use
      *
      * @return \Laminas\Http\Client
      */
-    protected function getHttpClient(string $url = null)
+    protected function getHttpClient(?string $url = null)
     {
         if (null === $this->httpService) {
             throw new \Exception('HTTP service missing.');
@@ -140,7 +142,7 @@ class ObalkyKnihService implements
      */
     protected function createCacheKey(array $ids)
     {
-        $key = $ids['recordid'];
+        $key = $ids['recordid'] ?? '';
         $key = !empty($key) ? $key
             : (isset($ids['isbn']) ? $ids['isbn']->get13() : null);
         $key = !empty($key) ? $key : sha1(json_encode($ids));
@@ -177,7 +179,7 @@ class ObalkyKnihService implements
      */
     protected function getFromService(array $ids): ?\stdClass
     {
-        $param = "multi";
+        $param = 'multi';
         $query = [];
         $isbn = null;
         if (!empty($ids['isbns'])) {
@@ -197,7 +199,7 @@ class ObalkyKnihService implements
         $nbn = $ids['nbn'] ?? $this->createLocalIdentifier($ids['recordid'] ?? '');
         $uuid = null;
         if (isset($ids['uuid'])) {
-            $uuid = (substr($ids['uuid'], 0, 5) === 'uuid:')
+            $uuid = str_starts_with($ids['uuid'], 'uuid:')
                 ? $ids['uuid']
                 : ('uuid:' . $ids['uuid']);
         }
@@ -212,13 +214,13 @@ class ObalkyKnihService implements
             $this->logWarning('All ObalkyKnih servers are down.');
             return null;
         }
-        $url .= $this->endpoints['books'] . "?";
+        $url .= $this->endpoints['books'] . '?';
         $url .= http_build_query([$param => json_encode([$query])]);
         $client = $this->getHttpClient($url);
         try {
             $response = $client->send();
         } catch (\Exception $e) {
-            $this->logError('Unexpected ' . get_class($e) . ': ' . $e->getMessage());
+            $this->logError('Unexpected ' . $e::class . ': ' . $e->getMessage());
             return null;
         }
         if ($response->isSuccess()) {
@@ -237,7 +239,7 @@ class ObalkyKnihService implements
      */
     protected function createLocalIdentifier(string $recordid): ?string
     {
-        if (strpos($recordid, '.') !== false) {
+        if (str_contains($recordid, '.')) {
             [, $recordid] = explode('.', $recordid, 2);
         }
         return (empty($this->sigla) || empty($recordid)) ? null :

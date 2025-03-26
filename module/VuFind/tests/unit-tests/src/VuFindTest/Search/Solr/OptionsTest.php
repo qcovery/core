@@ -3,7 +3,7 @@
 /**
  * Solr Search Object Options Test
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2021.
  *
@@ -48,12 +48,12 @@ class OptionsTest extends \PHPUnit\Framework\TestCase
     /**
      * Get Options object
      *
-     * @param PluginManager $configManager Config manager for Options object (null
+     * @param ?PluginManager $configManager Config manager for Options object (null
      * for new mock)
      *
      * @return Options
      */
-    protected function getOptions(PluginManager $configManager = null): Options
+    protected function getOptions(?PluginManager $configManager = null): Options
     {
         return new Options($configManager ?? $this->getMockConfigPluginManager([]));
     }

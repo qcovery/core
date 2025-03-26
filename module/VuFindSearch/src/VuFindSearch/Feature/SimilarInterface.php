@@ -3,7 +3,7 @@
 /**
  * MLT feature interface definition.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -45,10 +45,10 @@ interface SimilarInterface
     /**
      * Return similar records.
      *
-     * @param string   $id     Id of record to compare with
-     * @param ParamBag $params Search backend parameters
+     * @param string    $id     Id of record to compare with
+     * @param ?ParamBag $params Search backend parameters
      *
      * @return \VuFindSearch\Response\RecordCollectionInterface
      */
-    public function similar($id, ParamBag $params = null);
+    public function similar($id, ?ParamBag $params = null);
 }

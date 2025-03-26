@@ -3,7 +3,7 @@
 /**
  * Get autocomplete results from the EDS backend
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2021.
  *
@@ -70,7 +70,7 @@ class AutocompleteCommand extends CallMethodCommand
         string $backendId,
         string $query,
         string $domain,
-        ParamBag $params = null
+        ?ParamBag $params = null
     ) {
         $this->query = $query;
         $this->domain = $domain;

@@ -4,7 +4,7 @@
  * Factory for Solr-driven autocomplete plugins. Works for \VuFind\Autocomplete\Solr
  * and all of its subclasses.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2017.
  *
@@ -66,7 +66,7 @@ class SolrFactory implements \Laminas\ServiceManager\Factory\FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         return new $requestedName(
             $container->get(\VuFind\Search\Results\PluginManager::class)

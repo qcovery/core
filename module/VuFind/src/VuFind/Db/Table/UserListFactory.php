@@ -3,7 +3,7 @@
 /**
  * UserList table gateway factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -62,13 +62,11 @@ class UserListFactory extends GatewayFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory!');
         }
-        $sessionManager = $container->get(\Laminas\Session\SessionManager::class);
-        $session = new \Laminas\Session\Container('List', $sessionManager);
-        return parent::__invoke($container, $requestedName, [$session]);
+        return parent::__invoke($container, $requestedName, [null]);
     }
 }

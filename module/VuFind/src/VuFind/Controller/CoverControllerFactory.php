@@ -3,7 +3,7 @@
 /**
  * Cover controller factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -63,15 +63,18 @@ class CoverControllerFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
+        $config = $container->get(\VuFind\Config\PluginManager::class)->get('config');
+        $configArray = $config?->Content?->toArray() ?? [];
         return new $requestedName(
             $container->get(\VuFind\Cover\Loader::class),
             $container->get(\VuFind\Cover\CachingProxy::class),
-            $container->get(\VuFind\Session\Settings::class)
+            $container->get(\VuFind\Session\Settings::class),
+            $configArray
         );
     }
 }

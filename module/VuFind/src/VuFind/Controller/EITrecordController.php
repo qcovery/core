@@ -3,7 +3,7 @@
 /**
  * EIT Record Controller
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -59,18 +59,5 @@ class EITrecordController extends AbstractRecord
 
         // Call standard record controller initialization:
         parent::__construct($sm);
-    }
-
-    /**
-     * Is the result scroller active?
-     *
-     * @return bool
-     */
-    protected function resultScrollerActive()
-    {
-        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
-            ->get('EIT');
-        return isset($config->Record->next_prev_navigation)
-            && $config->Record->next_prev_navigation;
     }
 }

@@ -3,7 +3,7 @@
 /**
  * VuFind Config Plugin Factory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -29,10 +29,12 @@
 
 namespace VuFind\Config;
 
-use Laminas\Config\Config;
-use Laminas\Config\Reader\Ini as IniReader;
 use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 use Psr\Container\ContainerInterface;
+
+use function count;
+use function in_array;
+use function is_array;
 
 /**
  * VuFind Config Plugin Factory
@@ -45,25 +47,6 @@ use Psr\Container\ContainerInterface;
  */
 class PluginFactory implements AbstractFactoryInterface
 {
-    /**
-     * INI file reader
-     *
-     * @var IniReader
-     */
-    protected $iniReader;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        // Use ASCII 0 as a nest separator; otherwise some of the unusual key names
-        // we have (i.e. in WorldCat.ini search options) will get parsed in
-        // unexpected ways.
-        $this->iniReader = new IniReader();
-        $this->iniReader->setNestSeparator(chr(0));
-    }
-
     /**
      * Load the specified configuration file.
      *
@@ -83,16 +66,15 @@ class PluginFactory implements AbstractFactoryInterface
         // Retrieve and parse at least one configuration file, and possibly a whole
         // chain of them if the Parent_Config setting is used:
         do {
-            $configs[]
-                = new Config($this->iniReader->fromFile($filename), true);
+            $configs[] = parse_ini_file($filename, true);
 
             $i = count($configs) - 1;
-            if (isset($configs[$i]->Parent_Config->path)) {
-                $filename = $configs[$i]->Parent_Config->path;
-            } elseif (isset($configs[$i]->Parent_Config->relative_path)) {
+            if (isset($configs[$i]['Parent_Config']['path'])) {
+                $filename = $configs[$i]['Parent_Config']['path'];
+            } elseif (isset($configs[$i]['Parent_Config']['relative_path'])) {
                 $filename = pathinfo($filename, PATHINFO_DIRNAME)
                     . DIRECTORY_SEPARATOR
-                    . $configs[$i]->Parent_Config->relative_path;
+                    . $configs[$i]['Parent_Config']['relative_path'];
             } else {
                 $filename = false;
             }
@@ -105,21 +87,20 @@ class PluginFactory implements AbstractFactoryInterface
         // Now we'll pull all the children down one at a time and override settings
         // as appropriate:
         while (null !== ($child = array_pop($configs))) {
-            $overrideSections = isset($child->Parent_Config->override_full_sections)
+            $overrideSections = isset($child['Parent_Config']['override_full_sections'])
                 ? explode(
                     ',',
                     str_replace(
                         ' ',
                         '',
-                        $child->Parent_Config->override_full_sections
+                        $child['Parent_Config']['override_full_sections']
                     )
                 )
                 : [];
             foreach ($child as $section => $contents) {
                 // Check if arrays in the current config file should be merged with
                 // preceding arrays from config files defined as Parent_Config.
-                $mergeArraySettings
-                    = !empty($child->Parent_Config->merge_array_settings);
+                $mergeArraySettings = !empty($child['Parent_Config']['merge_array_settings']);
 
                 // Omit Parent_Config from the returned configuration; it is only
                 // needed during loading, and its presence will cause problems in
@@ -130,34 +111,33 @@ class PluginFactory implements AbstractFactoryInterface
                 }
                 if (
                     in_array($section, $overrideSections)
-                    || !isset($config->$section)
+                    || !isset($config[$section])
                 ) {
-                    $config->$section = $child->$section;
+                    $config[$section] = $child[$section];
                 } else {
-                    foreach (array_keys($contents->toArray()) as $key) {
+                    foreach (array_keys($contents) as $key) {
                         // If a key is defined as key[] in the config file the key
-                        // remains a Laminas\Config\Config object. If the current
+                        // remains a VuFind\Config\Config object. If the current
                         // section is not configured as an override section we try to
                         // merge the key[] values instead of overwriting them.
                         if (
-                            is_object($config->$section->$key)
-                            && is_object($child->$section->$key)
+                            is_array($config[$section][$key] ?? null)
+                            && is_array($child[$section][$key])
                             && $mergeArraySettings
                         ) {
-                            $config->$section->$key = array_merge(
-                                $config->$section->$key->toArray(),
-                                $child->$section->$key->toArray()
+                            $config[$section][$key] = array_merge(
+                                $config[$section][$key],
+                                $child[$section][$key]
                             );
                         } else {
-                            $config->$section->$key = $child->$section->$key;
+                            $config[$section][$key] = $child[$section][$key];
                         }
                     }
                 }
             }
         }
 
-        $config->setReadOnly();
-        return $config;
+        return new Config($config);
     }
 
     /**
@@ -190,7 +170,7 @@ class PluginFactory implements AbstractFactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $pathResolver = $container->get(PathResolver::class);
         return $this->loadConfigFile(

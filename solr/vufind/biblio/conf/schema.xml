@@ -84,7 +84,7 @@
         <tokenizer class="solr.PatternTokenizerFactory" pattern="^(\S*)\s*.*$" group="1"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.PatternReplaceFilterFactory" pattern="[^0-9x]" replacement="" replace="all"/>
-        <filter class="solr.LengthFilterFactory" min="1" max="100" />
+        <filter class="solr.LengthFilterFactory" min="4" max="100" />
       </analyzer>
     </fieldType>
     <!-- case-insensitive/whitespace-agnostic field type for callnumber searching -->
@@ -92,6 +92,18 @@
       <analyzer>
         <charFilter class="solr.PatternReplaceCharFilterFactory" pattern="(\s)" replacement=""/>
         <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.ICUFoldingFilterFactory"/>
+      </analyzer>
+    </fieldType>
+    <!-- Field for SolrPrefix autocomplete -->
+    <fieldType name="text_autocomplete" class="solr.TextField" positionIncrementGap="100" omitNorms="true">
+      <analyzer type="index">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.ICUFoldingFilterFactory"/>
+        <filter class="solr.EdgeNGramFilterFactory" minGramSize="1" maxGramSize="25" />
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <filter class="solr.ICUFoldingFilterFactory"/>
       </analyzer>
     </fieldType>
@@ -121,8 +133,8 @@
    <!-- Generic Fields -->
    <field name="language" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="format" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="author" type="textProper" indexed="true" stored="true" multiValued="true" termVectors="true"/>
-   <field name="author_variant" type="text" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+   <field name="author" type="textProper" indexed="true" stored="true" multiValued="true" termVectors="true" storeOffsetsWithPositions="true"/>
+   <field name="author_variant" type="text" indexed="true" stored="true" multiValued="true" termVectors="true" storeOffsetsWithPositions="true"/>
    <field name="author_role" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="author_facet" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="author_sort" type="string" indexed="true" stored="true"/>
@@ -142,7 +154,7 @@
    <field name="edition" type="string" indexed="true" stored="true"/>
    <field name="description" type="text" indexed="true" stored="true"/>
    <field name="contents" type="text" indexed="true" stored="true" multiValued="true"/>
-   <field name="url" type="string" indexed="false" stored="true" multiValued="true"/>
+   <field name="url" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="thumbnail" type="string" indexed="false" stored="true"/>
    <!-- Catalog Specific Fields -->
    <field name="lccn" type="string" indexed="true" stored="true"/>
@@ -152,7 +164,7 @@
    <field name="oclc_num" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="callnumber-first" type="string" indexed="true" stored="true"/>
    <field name="callnumber-subject" type="string" indexed="true" stored="true"/>
-   <field name="callnumber-label" type="string" indexed="true" stored="true"/>
+   <field name="callnumber-label" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="callnumber-sort" type="string" indexed="true" stored="true"/>
    <field name="callnumber-raw" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="callnumber-search" type="callnumberSearch" indexed="true" stored="true" multiValued="true" />
@@ -168,8 +180,6 @@
    <field name="author2_role" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="author_corporate" type="textProper" indexed="true" stored="true" multiValued="true"/>
    <field name="author_corporate_role" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="author_fuller" type="textProper" indexed="true" stored="true" multiValued="true" />
-   <field name="author2_fuller" type="textProper" indexed="true" stored="true" multiValued="true" />
    <field name="author_additional" type="textProper" indexed="true" stored="true" multiValued="true"/>
    <field name="title_alt" type="text" indexed="true" stored="true" multiValued="true"/>
    <field name="title_old" type="text" indexed="true" stored="true" multiValued="true"/>
@@ -211,7 +221,7 @@
    <field name="title_in_hierarchy" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="hierarchy_browse" type="string" indexed="true" stored="false" multiValued="true"/>
    <!-- Used for loading correct record driver -->
-   <field name="recordtype" type="string" indexed="false" stored="true"/>
+   <field name="record_format" type="string" indexed="true" stored="true"/>
    <!-- Tracking fields to keep track of oldest and most recent index times -->
    <field name="first_indexed" type="date" indexed="true" stored="true" docValues="true"/>
    <field name="last_indexed" type="date" indexed="true" stored="true" docValues="true"/>
@@ -232,6 +242,7 @@
    <dynamicField name="*_boolean" type="boolean" indexed="true" stored="true"/>
    <dynamicField name="*_geo" type="geo" indexed="true" stored="true" multiValued="false" />
    <dynamicField name="*_geo_mv" type="geo" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="*_autocomplete" type="text_autocomplete" indexed="true" stored="true" multiValued="false"/>
  </fields>
  <uniqueKey>id</uniqueKey>
  <!-- CopyFields for Spelling -->
@@ -254,7 +265,6 @@
  <copyField source="allfields" dest="allfields_unstemmed"/>
  <copyField source="fulltext" dest="fulltext_unstemmed"/>
  <!-- CopyFields for Alphabetic Browse -->
- <copyField source="topic" dest="topic_browse"/>
  <copyField source="author" dest="author_browse"/>
  <copyField source="author2" dest="author_browse"/>
  <copyField source="author_corporate" dest="author_browse"/>

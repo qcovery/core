@@ -3,7 +3,7 @@
 /**
  * Abstract options search model.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -23,14 +23,22 @@
  * @category VuFind
  * @package  Search_Base
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Juha Luoma <juha.luoma@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
 
 namespace VuFind\Search\Base;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 use VuFind\I18n\Translator\TranslatorAwareInterface;
+
+use function count;
+use function get_class;
+use function in_array;
+use function intval;
+use function is_array;
+use function is_string;
 
 /**
  * Abstract options search model.
@@ -40,6 +48,7 @@ use VuFind\I18n\Translator\TranslatorAwareInterface;
  * @category VuFind
  * @package  Search_Base
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Juha Luoma <juha.luoma@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Page
  */
@@ -53,6 +62,13 @@ abstract class Options implements TranslatorAwareInterface
      * @var array
      */
     protected $sortOptions = [];
+
+    /**
+     * Allowed hidden sort options
+     *
+     * @var array
+     */
+    protected $hiddenSortOptions = [];
 
     /**
      * Available sort options for facets
@@ -115,7 +131,14 @@ abstract class Options implements TranslatorAwareInterface
      *
      * @var bool
      */
-    protected $retainFiltersByDefault = true;
+    protected $retainFiltersByDefault;
+
+    /**
+     * Should we display a "Reset Filters" link regardless of retainFiltersByDefault?
+     *
+     * @var bool
+     */
+    protected $alwaysDisplayResetFilters;
 
     /**
      * Default filters to apply to new searches
@@ -137,6 +160,13 @@ abstract class Options implements TranslatorAwareInterface
      * @var array
      */
     protected $limitOptions = [];
+
+    /**
+     * If result scroller is used.
+     *
+     * @var bool
+     */
+    protected bool $resultScrollerActive = false;
 
     /**
      * Default view option
@@ -209,6 +239,13 @@ abstract class Options implements TranslatorAwareInterface
     protected $hierarchicalFacetSeparators = [];
 
     /**
+     * Hierarchical facet sort settings
+     *
+     * @var array
+     */
+    protected $hierarchicalFacetSortSettings = [];
+
+    /**
      * Spelling setting
      *
      * @var bool
@@ -258,6 +295,13 @@ abstract class Options implements TranslatorAwareInterface
     protected $autocompleteAutoSubmit = true;
 
     /**
+     * Autocomplete query formatting rules
+     *
+     * @var array
+     */
+    protected $autocompleteFormattingRules = [];
+
+    /**
      * Configuration file to read global settings from
      *
      * @var string
@@ -283,7 +327,7 @@ abstract class Options implements TranslatorAwareInterface
      *
      * @var string
      */
-    protected $listviewOption = "full";
+    protected $listviewOption = 'full';
 
     /**
      * Configuration loader
@@ -300,11 +344,68 @@ abstract class Options implements TranslatorAwareInterface
     protected $resultLimit = -1;
 
     /**
-     * Is the first/last navigation scroller enabled?
+     * Is first/last navigation supported by the backend?
      *
      * @var bool
      */
-    protected $firstlastNavigation = false;
+    protected $firstLastNavigationSupported = true;
+
+    /**
+     * Is the record page first/last navigation scroller enabled?
+     *
+     * @var bool
+     */
+    protected $recordPageFirstLastNavigation = false;
+
+    /**
+     * Should hierarchicalFacetFilters and hierarchicalExcludeFilters
+     * apply in advanced search
+     *
+     * @var bool
+     */
+    protected $filterHierarchicalFacetsInAdvanced = false;
+
+    /**
+     * Hierarchical exclude filters
+     *
+     * @var array
+     */
+    protected $hierarchicalExcludeFilters = [];
+
+    /**
+     * Hierarchical facet filters
+     *
+     * @var array
+     */
+    protected $hierarchicalFacetFilters = [];
+
+    /**
+     * Top pagination control style (none, simple or full)
+     *
+     * @var string
+     */
+    protected $topPaginatorStyle;
+
+    /**
+     * Is loading of results with JavaScript enabled?
+     *
+     * @var bool
+     */
+    protected $loadResultsWithJs;
+
+    /**
+     * Should we display citation search links in results?
+     *
+     * @var bool
+     */
+    protected $displayCitationLinksInResults;
+
+    /**
+     * Should we display a warning in restricted views?
+     *
+     * @var bool
+     */
+    protected bool $showRestrictedViewWarning;
 
     /**
      * Constructor
@@ -313,10 +414,10 @@ abstract class Options implements TranslatorAwareInterface
      */
     public function __construct(\VuFind\Config\PluginManager $configLoader)
     {
-        $this->limitOptions = [$this->defaultLimit];
         $this->setConfigLoader($configLoader);
 
         $id = $this->getSearchClassId();
+        $baseConfig = $configLoader->get('config');
         $facetSettings = $configLoader->get($this->facetsIni);
         if (isset($facetSettings->AvailableFacetSortOptions[$id])) {
             $sortArray = $facetSettings->AvailableFacetSortOptions[$id]->toArray();
@@ -328,6 +429,30 @@ abstract class Options implements TranslatorAwareInterface
                 }
             }
         }
+        $this->filterHierarchicalFacetsInAdvanced
+            = !empty($facetSettings->Advanced_Settings->enable_hierarchical_filters);
+        $this->hierarchicalExcludeFilters
+            = $facetSettings?->HierarchicalExcludeFilters?->toArray() ?? [];
+        $this->hierarchicalFacetFilters
+            = $facetSettings?->HierarchicalFacetFilters?->toArray() ?? [];
+
+        $searchSettings = $configLoader->get($this->searchIni);
+        $this->retainFiltersByDefault = $searchSettings->General->retain_filters_by_default ?? true;
+        $this->alwaysDisplayResetFilters = $searchSettings->General->always_display_reset_filters ?? false;
+        $this->resultScrollerActive = (bool)(
+            $searchSettings->Record->next_prev_navigation
+            ?? $baseConfig->Record->next_prev_navigation
+            ?? false
+        );
+        $this->loadResultsWithJs = (bool)($searchSettings->General->load_results_with_js ?? true);
+        $this->topPaginatorStyle = $searchSettings->General->top_paginator
+            ?? ($this->loadResultsWithJs ? 'simple' : false);
+
+        $this->initializeHiddenSortOptions($searchSettings);
+
+        $this->displayCitationLinksInResults
+            = (bool)($searchSettings->Results_Settings->display_citation_links ?? true);
+        $this->showRestrictedViewWarning = (bool)($searchSettings->General->show_restricted_view_warning ?? false);
     }
 
     /**
@@ -442,7 +567,20 @@ abstract class Options implements TranslatorAwareInterface
      */
     public function getLimitOptions()
     {
+        if (empty($this->limitOptions)) {
+            $this->limitOptions = [$this->getDefaultLimit()];
+        }
         return $this->limitOptions;
+    }
+
+    /**
+     * If result scroller is used.
+     *
+     * @return bool
+     */
+    public function resultScrollerActive(): bool
+    {
+        return $this->resultScrollerActive;
     }
 
     /**
@@ -506,6 +644,16 @@ abstract class Options implements TranslatorAwareInterface
     public function getSortOptions()
     {
         return $this->sortOptions;
+    }
+
+    /**
+     * Get an array of hidden sort options.
+     *
+     * @return array An array of associative arrays with keys 'label' and 'pattern'
+     */
+    public function getHiddenSortOptions()
+    {
+        return $this->hiddenSortOptions;
     }
 
     /**
@@ -728,6 +876,16 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
+     * Get hierarchical facet sort settings.
+     *
+     * @return array
+     */
+    public function getHierarchicalFacetSortSettings()
+    {
+        return $this->hierarchicalFacetSortSettings;
+    }
+
+    /**
      * Get current spellcheck setting and (optionally) change it.
      *
      * @param bool $bool True to enable, false to disable, null to leave alone
@@ -802,6 +960,16 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
+     * Get autocomplete query formatting rules.
+     *
+     * @return array
+     */
+    public function getAutocompleteFormattingRules(): array
+    {
+        return $this->autocompleteFormattingRules;
+    }
+
+    /**
      * Get a string of the listviewOption (full or tab).
      *
      * @return string
@@ -866,6 +1034,28 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
+     * Return the route name for the "cites" search action. Returns false to cover
+     * unimplemented support.
+     *
+     * @return string|bool
+     */
+    public function getCitesAction()
+    {
+        return false;
+    }
+
+    /**
+     * Return the route name for the "cited by" search action. Returns false to cover
+     * unimplemented support.
+     *
+     * @return string|bool
+     */
+    public function getCitedByAction()
+    {
+        return false;
+    }
+
+    /**
      * Does this search option support the cart/book bag?
      *
      * @return bool
@@ -894,6 +1084,16 @@ abstract class Options implements TranslatorAwareInterface
     public function getRetainFilterSetting()
     {
         return $this->retainFiltersByDefault;
+    }
+
+    /**
+     * Should the "Reset Filters" button be displayed?
+     *
+     * @return bool
+     */
+    public function shouldDisplayResetFilters()
+    {
+        return $this->alwaysDisplayResetFilters || $this->getRetainFilterSetting();
     }
 
     /**
@@ -935,8 +1135,7 @@ abstract class Options implements TranslatorAwareInterface
 
     /**
      * If there is a limit to how many search results a user can access, this
-     * method will return that limit.  If there is no limit, this will return
-     * -1.
+     * method will return that limit. If there is no limit, this will return -1.
      *
      * @return int
      */
@@ -964,7 +1163,7 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
-     * Load all recommendation settings from the relevant ini file.  Returns an
+     * Load all recommendation settings from the relevant ini file. Returns an
      * associative array where the key is the location of the recommendations (top
      * or side) and the value is the settings found in the file (which may be either
      * a single string or an array of strings).
@@ -1038,7 +1237,7 @@ abstract class Options implements TranslatorAwareInterface
         // Special case: if there's an unexpected number of parts, we may be testing
         // with a mock object; if so, that's okay, but anything else is unexpected.
         if (count($class) !== 4) {
-            if ('Mock_' === substr($className, 0, 5)) {
+            if (str_starts_with($className, 'Mock_') || str_starts_with($className, 'MockObject_')) {
                 return 'Mock';
             }
             throw new \Exception("Unexpected class name: {$className}");
@@ -1048,13 +1247,48 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
-     * Should we include first/last options in result scroller navigation?
+     * Get the search class ID for identifying search box options; this is normally
+     * the same as the current search class ID, but some "special purpose" search
+     * namespaces (e.g. SolrAuthor) need to point to a different ID for search box
+     * generation
+     *
+     * @return string
+     */
+    public function getSearchBoxSearchClassId(): string
+    {
+        return $this->getSearchClassId();
+    }
+
+    /**
+     * Should we include first/last options in record page navigation?
      *
      * @return bool
+     *
+     * @deprecated Use recordFirstLastNavigationEnabled instead
      */
     public function supportsFirstLastNavigation()
     {
-        return $this->firstlastNavigation;
+        return $this->recordFirstLastNavigationEnabled();
+    }
+
+    /**
+     * Is first/last navigation supported by the backend
+     *
+     * @return bool
+     */
+    public function firstLastNavigationSupported()
+    {
+        return $this->firstLastNavigationSupported;
+    }
+
+    /**
+     * Should we include first/last options in record page navigation?
+     *
+     * @return bool
+     */
+    public function recordFirstLastNavigationEnabled()
+    {
+        return $this->firstLastNavigationSupported() && $this->recordPageFirstLastNavigation;
     }
 
     /**
@@ -1069,6 +1303,26 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
+     * Should we load results with JavaScript?
+     *
+     * @return bool
+     */
+    public function loadResultsWithJsEnabled(): bool
+    {
+        return $this->loadResultsWithJs;
+    }
+
+    /**
+     * Get top paginator style
+     *
+     * @return string
+     */
+    public function getTopPaginatorStyle(): string
+    {
+        return $this->topPaginatorStyle;
+    }
+
+    /**
      * Return the callback used for normalization within this backend.
      *
      * @return callable
@@ -1079,19 +1333,13 @@ abstract class Options implements TranslatorAwareInterface
     }
 
     /**
-     * Configure autocomplete preferences from an .ini file.
+     * Should we display citation search links in results?
      *
-     * @param Config $searchSettings Object representation of .ini file
-     *
-     * @return void
+     * @return bool
      */
-    protected function configureAutocomplete(Config $searchSettings = null)
+    public function displayCitationLinksInResults(): bool
     {
-        // Only change settings from current values if they are defined in .ini:
-        $this->autocompleteEnabled = $searchSettings->Autocomplete->enabled
-            ?? $this->autocompleteEnabled;
-        $this->autocompleteAutoSubmit = $searchSettings->Autocomplete->auto_submit
-            ?? $this->autocompleteAutoSubmit;
+        return $this->displayCitationLinksInResults;
     }
 
     /**
@@ -1109,5 +1357,98 @@ abstract class Options implements TranslatorAwareInterface
         $delimiter = $facetSettings->Advanced_Settings->limitDelimiter ?? '::';
         $limitConf = $limits ? $limits->get($limit) : '';
         return array_map('trim', explode($delimiter, $limitConf ?? ''));
+    }
+
+    /**
+     * Are hierarchicalFacetFilters and hierarchicalExcludeFilters enabled in advanced search?
+     *
+     * @return bool
+     */
+    public function getFilterHierarchicalFacetsInAdvanced(): bool
+    {
+        return $this->filterHierarchicalFacetsInAdvanced;
+    }
+
+    /**
+     * Get hierarchical exclude filters.
+     *
+     * @param string|null $field Field to get or null for all values.
+     *                           Default is null.
+     *
+     * @return array
+     */
+    public function getHierarchicalExcludeFilters(?string $field = null): array
+    {
+        if ($field) {
+            return $this->hierarchicalExcludeFilters[$field] ?? [];
+        }
+        return $this->hierarchicalExcludeFilters;
+    }
+
+    /**
+     * Get hierarchical facet filters.
+     *
+     * @param string|null $field Field to get or null for all values.
+     *                           Default is null.
+     *
+     * @return array
+     */
+    public function getHierarchicalFacetFilters(?string $field = null): array
+    {
+        if ($field) {
+            return $this->hierarchicalFacetFilters[$field] ?? [];
+        }
+        return $this->hierarchicalFacetFilters;
+    }
+
+    /**
+     * Should we display a warning in restricted views?
+     *
+     * @return bool
+     */
+    public function showRestrictedViewWarning(): bool
+    {
+        return $this->showRestrictedViewWarning ?? false;
+    }
+
+    /**
+     * Configure autocomplete preferences from an .ini file.
+     *
+     * @param ?Config $searchSettings Object representation of .ini file
+     *
+     * @return void
+     */
+    protected function configureAutocomplete(?Config $searchSettings = null)
+    {
+        // Only change settings from current values if they are defined in .ini:
+        $this->autocompleteEnabled = $searchSettings->Autocomplete->enabled
+            ?? $this->autocompleteEnabled;
+        $this->autocompleteAutoSubmit = $searchSettings->Autocomplete->auto_submit
+            ?? $this->autocompleteAutoSubmit;
+        $formattingRules = $searchSettings->Autocomplete->formatting_rule ?? [];
+        if (!is_string($formattingRules) && count($formattingRules) > 0) {
+            $this->autocompleteFormattingRules = $formattingRules->toArray();
+        }
+    }
+
+    /**
+     * Initialize hidden sort options by combining the settings into a single array
+     *
+     * @param ?Config $searchSettings Search configuration
+     *
+     * @return void
+     */
+    protected function initializeHiddenSortOptions(?Config $searchSettings): void
+    {
+        $this->hiddenSortOptions = [];
+        $hiddenSortOptions = $searchSettings?->HiddenSorting?->pattern?->toArray() ?? [];
+        $hiddenSortOptionLabels = $searchSettings?->HiddenSorting?->label?->toArray() ?? [];
+        foreach ($hiddenSortOptions as $key => $pattern) {
+            $label = (string)($hiddenSortOptionLabels[$key] ?? $key);
+            $this->hiddenSortOptions[] = [
+                'label' => ctype_digit($label) ? null : $label,
+                'pattern' => $pattern,
+            ];
+        }
     }
 }

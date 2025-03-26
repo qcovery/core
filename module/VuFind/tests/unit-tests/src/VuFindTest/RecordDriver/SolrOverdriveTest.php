@@ -3,7 +3,7 @@
 /**
  * SolrOverdrive Record Driver Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -29,7 +29,7 @@
 
 namespace VuFindTest\RecordDriver;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 use VuFind\DigitalContent\OverdriveConnector;
 use VuFind\RecordDriver\SolrOverdrive;
 
@@ -234,46 +234,18 @@ class SolrOverdriveTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Test getRawData behavior in MARC mode
-     *
-     * @return void
-     */
-    public function testGetRawDataMarc(): void
-    {
-        $connector = $this->getMockConnector('{ "isMarc": true }');
-        $driver = $this->getDriver(null, null, $connector);
-        $raw = ['foo' => 'bar'];
-        $driver->setRawData($raw);
-        $this->assertEquals($raw, $driver->getRawData());
-    }
-
-    /**
-     * Test getRawData behavior in non-MARC mode
-     *
-     * @return void
-     */
-    public function testGetRawDataNonMarc(): void
-    {
-        $connector = $this->getMockConnector('{ "isMarc": false }');
-        $driver = $this->getDriver(null, null, $connector);
-        $raw = ['foo' => 'bar'];
-        $driver->setRawData(['fullrecord' => json_encode($raw)]);
-        $this->assertEquals($raw, $driver->getRawData());
-    }
-
-    /**
      * Get a record driver to test with.
      *
-     * @param Config             $config       Main configuration
-     * @param Config             $recordConfig Record configuration
-     * @param OverdriveConnector $connector    Overdrive connector
+     * @param ?Config             $config       Main configuration
+     * @param ?Config             $recordConfig Record configuration
+     * @param ?OverdriveConnector $connector    Overdrive connector
      *
      * @return SolrOverdrive
      */
     protected function getDriver(
-        Config $config = null,
-        Config $recordConfig = null,
-        OverdriveConnector $connector = null
+        ?Config $config = null,
+        ?Config $recordConfig = null,
+        ?OverdriveConnector $connector = null
     ): SolrOverdrive {
         return new SolrOverdrive(
             $config ?? new Config([]),

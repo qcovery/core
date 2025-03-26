@@ -3,7 +3,7 @@
 /**
  * SOLR SimilarBuilder.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  * Copyright (C) The National Library of Finland 2016.
@@ -34,6 +34,8 @@
 namespace VuFindSearch\Backend\Solr;
 
 use VuFindSearch\ParamBag;
+
+use function sprintf;
 
 /**
  * SOLR SimilarBuilder.
@@ -81,14 +83,13 @@ class SimilarBuilder implements SimilarBuilderInterface
     /**
      * Constructor.
      *
-     * @param \Laminas\Config\Config $searchConfig Search config
-     * @param string                 $uniqueKey    Solr field used to store unique
-     * identifier
+     * @param ?\VuFind\Config\Config $searchConfig Search config
+     * @param string                 $uniqueKey    Solr field used to store unique identifier
      *
      * @return void
      */
     public function __construct(
-        \Laminas\Config\Config $searchConfig = null,
+        ?\VuFind\Config\Config $searchConfig = null,
         $uniqueKey = 'id'
     ) {
         $this->uniqueKey = $uniqueKey;

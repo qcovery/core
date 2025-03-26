@@ -3,7 +3,7 @@
 /**
  * Table Definition for session
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  * Copyright (C) The National Library of Finland 2016.
@@ -35,6 +35,8 @@ use Laminas\Db\Adapter\Adapter;
 use VuFind\Db\Row\RowGateway;
 use VuFind\Exception\SessionExpired as SessionExpiredException;
 
+use function intval;
+
 /**
  * Table Definition for session
  *
@@ -55,7 +57,7 @@ class Session extends Gateway
      * @param Adapter       $adapter Database adapter
      * @param PluginManager $tm      Table manager
      * @param array         $cfg     Laminas configuration
-     * @param RowGateway    $rowObj  Row prototype object (null for default)
+     * @param ?RowGateway   $rowObj  Row prototype object (null for default)
      * @param string        $table   Name of database table to interface with
      */
     public function __construct(
@@ -149,7 +151,7 @@ class Session extends Gateway
      *
      * @param int $sess_maxlifetime Maximum session lifetime.
      *
-     * @return void
+     * @return int
      */
     public function garbageCollect($sess_maxlifetime)
     {
@@ -157,7 +159,7 @@ class Session extends Gateway
             $select->where
                 ->lessThan('last_used', time() - intval($sess_maxlifetime));
         };
-        $this->delete($callback);
+        return $this->delete($callback);
     }
 
     /**

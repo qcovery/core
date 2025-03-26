@@ -3,7 +3,7 @@
 /**
  * Cover image router
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2016.
  *
@@ -32,6 +32,9 @@ namespace VuFind\Cover;
 use VuFind\Cover\Loader as CoverLoader;
 use VuFind\RecordDriver\AbstractBase as RecordDriver;
 
+use function get_class;
+use function is_array;
+
 /**
  * Cover image router
  *
@@ -46,29 +49,17 @@ class Router implements \Laminas\Log\LoggerAwareInterface
     use \VuFind\Log\LoggerAwareTrait;
 
     /**
-     * Base URL for dynamic cover images.
-     *
-     * @var string
-     */
-    protected $dynamicUrl;
-
-    /**
-     * Cover loader
-     *
-     * @var CoverLoader
-     */
-    protected $coverLoader;
-
-    /**
      * Constructor
      *
-     * @param string      $url         Base URL for dynamic cover images.
+     * @param string      $dynamicUrl  Base URL for dynamic cover images.
      * @param CoverLoader $coverLoader Cover loader
+     * @param array       $config      Content config
      */
-    public function __construct($url, CoverLoader $coverLoader)
-    {
-        $this->dynamicUrl = $url;
-        $this->coverLoader = $coverLoader;
+    public function __construct(
+        protected string $dynamicUrl,
+        protected CoverLoader $coverLoader,
+        protected array $config = []
+    ) {
     }
 
     /**
@@ -134,6 +125,11 @@ class Router implements \Laminas\Log\LoggerAwareInterface
             return false;
         }
 
+        if (!($this->config['coverimagesBrowserCache'] ?? true)) {
+            // Add timestamp hash to avoid browser cache
+            $thumb['hash'] = md5(time());
+        }
+
         // Array? It's parameters to send to the cover generator:
         if (is_array($thumb)) {
             if (!$resolveDynamic) {
@@ -174,7 +170,7 @@ class Router implements \Laminas\Log\LoggerAwareInterface
                 }
             } catch (\Exception $e) {
                 $this->debug(
-                    get_class($e) . ' during processing of '
+                    $e::class . ' during processing of '
                     . get_class($handler['handler']) . ': ' . $e->getMessage()
                 );
             }

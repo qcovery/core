@@ -3,7 +3,7 @@
 /**
  * VuFind Config Manager
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -81,7 +81,7 @@ class PluginManager extends Base
      *
      * @param string $id Service identifier
      *
-     * @return \Laminas\Config\Config
+     * @return \VuFind\Config\Config
      */
     public function reload($id)
     {

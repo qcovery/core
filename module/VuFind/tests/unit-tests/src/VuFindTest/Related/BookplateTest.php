@@ -3,7 +3,7 @@
 /**
  * Bookplate Related Items Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2021.
  *
@@ -152,7 +152,7 @@ class BookplateTest extends \PHPUnit\Framework\TestCase
      *
      * @return Bookplate
      */
-    protected function getBookplate(MockContainer $container = null): Bookplate
+    protected function getBookplate(?MockContainer $container = null): Bookplate
     {
         $factory = new BookplateFactory();
         return $factory($container ?? $this->getContainer(), Bookplate::class);

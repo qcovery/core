@@ -3,7 +3,7 @@
 /**
  * Solr Search Object Parameters Test
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) The National Library of Finland 2022.
  *
@@ -164,14 +164,14 @@ class ParamsTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function sortValueProvider(): array
+    public static function sortValueProvider(): array
     {
-        return ['Test1' => ["year", "id", "publishDateSort desc,id asc"],
-                'Test2' => ["year", "id desc", "publishDateSort desc,id desc"],
-                'Test3' => ["year", "", "publishDateSort desc"],
-                'Test4' => ["year", "title desc,id asc", "publishDateSort desc,title_sort desc,id asc"],
-                'Test5' => ["year", "title desc,id", "publishDateSort desc,title_sort desc,id asc"],
-                'Test6' => ["year,id", "id desc", "publishDateSort desc,id asc"],
+        return ['Test1' => ['year', 'id', 'publishDateSort desc,id asc'],
+                'Test2' => ['year', 'id desc', 'publishDateSort desc,id desc'],
+                'Test3' => ['year', '', 'publishDateSort desc'],
+                'Test4' => ['year', 'title desc,id asc', 'publishDateSort desc,title_sort desc,id asc'],
+                'Test5' => ['year', 'title desc,id', 'publishDateSort desc,title_sort desc,id asc'],
+                'Test6' => ['year,id', 'id desc', 'publishDateSort desc,id asc'],
             ];
     }
 
@@ -204,16 +204,240 @@ class ParamsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Data provider for testSortList
+     *
+     * @return array
+     */
+    public static function sortListDataProvider(): array
+    {
+        $searchConfig = [
+            'Sorting' => [
+                'relevance' => 'Relevance',
+                'title' => 'Title',
+            ],
+            'HiddenSorting' => [
+                'pattern' => [
+                    '[Ff]irst',
+                    '[Ss]econd',
+                ],
+            ],
+        ];
+
+        $searchConfigKeyLabel = [
+            'Sorting' => [
+                'relevance' => 'Relevance',
+            ],
+            'HiddenSorting' => [
+                'pattern' => [
+                    'FIRST' => '[Ff]irst',
+                    'SECOND' => '[Ss]econd',
+                ],
+            ],
+        ];
+
+        $searchConfigLabel = [
+            'Sorting' => [
+                'relevance' => 'Relevance',
+            ],
+            'HiddenSorting' => [
+                'pattern' => [
+                    '[Ff]irst',
+                    '[Ss]econd',
+                ],
+                'label' => [
+                    'FIRST',
+                    'SECOND',
+                ],
+            ],
+        ];
+
+        return [
+            'relevance' => [
+                $searchConfig,
+                'relevance',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => true,
+                        'default' => true,
+                    ],
+                    'title' => [
+                        'desc' => 'Title',
+                        'selected' => false,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'title' => [
+                $searchConfig,
+                'title',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'title' => [
+                        'desc' => 'Title',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'invalid' => [
+                $searchConfig,
+                'foobar',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => true,
+                        'default' => true,
+                    ],
+                    'title' => [
+                        'desc' => 'Title',
+                        'selected' => false,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'first hidden' => [
+                $searchConfig,
+                'testfirst',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'title' => [
+                        'desc' => 'Title',
+                        'selected' => false,
+                        'default' => false,
+                    ],
+                    'testfirst' => [
+                        'desc' => 'unrecognized_sort_option',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'second hidden' => [
+                $searchConfig,
+                'testsecond',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'title' => [
+                        'desc' => 'Title',
+                        'selected' => false,
+                        'default' => false,
+                    ],
+                    'testsecond' => [
+                        'desc' => 'unrecognized_sort_option',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'first hidden with label in key' => [
+                $searchConfigKeyLabel,
+                'testfirst',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'testfirst' => [
+                        'desc' => 'FIRST',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'second hidden with label in key' => [
+                $searchConfigKeyLabel,
+                'testsecond',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'testsecond' => [
+                        'desc' => 'SECOND',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'first hidden with label in separate array' => [
+                $searchConfigLabel,
+                'firsttest',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'firsttest' => [
+                        'desc' => 'FIRST',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
+            'second hidden with label in separate array' => [
+                $searchConfigLabel,
+                'secondtest',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'secondtest' => [
+                        'desc' => 'SECOND',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Test sort option list handling
+     *
+     * @param array  $searchConfig     Search configuration
+     * @param string $sort             Selected sort option
+     * @param string $expectedSortList Expected sort list
+     *
+     * @return void
+     *
+     * @dataProvider sortListDataProvider
+     */
+    public function testSortList(array $searchConfig, string $sort, array $expectedSortList): void
+    {
+        $params = $this->getParams(mockConfig: $this->getMockConfigPluginManager(['searches' => $searchConfig]));
+        $params->setSort($sort);
+        $this->assertEquals($expectedSortList, $params->getSortList());
+    }
+
+    /**
      * Get Params object
      *
-     * @param Options       $options    Options object (null to create)
-     * @param PluginManager $mockConfig Mock config plugin manager (null to create)
+     * @param ?Options       $options    Options object (null to create)
+     * @param ?PluginManager $mockConfig Mock config plugin manager (null to create)
      *
      * @return Params
      */
     protected function getParams(
-        Options $options = null,
-        PluginManager $mockConfig = null
+        ?Options $options = null,
+        ?PluginManager $mockConfig = null
     ): Params {
         $mockConfig ??= $this->createMock(PluginManager::class);
         return new Params(

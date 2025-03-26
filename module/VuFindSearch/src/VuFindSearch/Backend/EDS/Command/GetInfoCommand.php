@@ -3,7 +3,7 @@
 /**
  * Get information from the EDS backend
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2021.
  *
@@ -52,7 +52,7 @@ class GetInfoCommand extends CallMethodCommand
      */
     public function __construct(
         string $backendId = 'EDS',
-        ParamBag $params = null
+        ?ParamBag $params = null
     ) {
         parent::__construct(
             $backendId,

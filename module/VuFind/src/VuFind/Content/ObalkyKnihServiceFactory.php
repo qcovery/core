@@ -3,7 +3,7 @@
 /**
  * Class ObalkyKnihCoversFactory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Moravian Library 2019.
  *
@@ -63,7 +63,7 @@ class ObalkyKnihServiceFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new ServiceNotCreatedException(

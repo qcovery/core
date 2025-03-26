@@ -3,7 +3,7 @@
 /**
  * Covers content loader plugin manager
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -56,6 +56,7 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         'buchhandel' => Buchhandel::class,
         'browzine' => BrowZine::class,
         'contentcafe' => ContentCafe::class,
+        'demo' => Demo::class,
         'google' => Google::class,
         'koha' => Koha::class,
         'librarything' => LibraryThing::class,
@@ -79,8 +80,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
         BrowZine::class => BrowZineFactory::class,
         Buchhandel::class => BuchhandelFactory::class,
         ContentCafe::class => ContentCafeFactory::class,
+        Demo::class => DemoFactory::class,
         Deprecated::class => InvokableFactory::class,
-        Google::class => InvokableFactory::class,
+        Google::class => GoogleFactory::class,
         Koha::class => KohaFactory::class,
         LibraryThing::class => InvokableFactory::class,
         LocalFile::class => InvokableFactory::class,

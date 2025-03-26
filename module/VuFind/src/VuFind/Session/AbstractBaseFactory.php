@@ -3,7 +3,7 @@
 /**
  * Generic factory for instantiating session handlers
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2019.
  *
@@ -65,7 +65,7 @@ class AbstractBaseFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
@@ -73,6 +73,10 @@ class AbstractBaseFactory implements FactoryInterface
 
         $config = $container->get(\VuFind\Config\PluginManager::class)
             ->get('config');
-        return new $requestedName($config->Session ?? null);
+        $service = new $requestedName($config->Session ?? null);
+        $service->setDbServiceManager(
+            $container->get(\VuFind\Db\Service\PluginManager::class)
+        );
+        return $service;
     }
 }

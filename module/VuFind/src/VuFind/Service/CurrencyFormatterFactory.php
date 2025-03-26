@@ -3,7 +3,7 @@
 /**
  * CurrencyFormatter Factory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -63,13 +63,16 @@ class CurrencyFormatterFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
         $config = $container->get(\VuFind\Config\PluginManager::class)
             ->get('config');
-        return new $requestedName($config->Site->defaultCurrency ?? null);
+        return new $requestedName(
+            $config->Site->defaultCurrency ?? null,
+            $config->Site->locale ?? null
+        );
     }
 }

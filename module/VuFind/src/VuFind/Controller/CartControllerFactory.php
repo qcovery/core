@@ -3,7 +3,7 @@
 /**
  * Cart controller factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -62,7 +62,7 @@ class CartControllerFactory extends AbstractBaseFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
@@ -71,9 +71,8 @@ class CartControllerFactory extends AbstractBaseFactory
             'cart_followup',
             $container->get(\Laminas\Session\SessionManager::class)
         );
-        return $this->applyPermissions(
-            $container,
-            new $requestedName($container, $session)
-        );
+        $configLoader = $container->get(\VuFind\Config\PluginManager::class);
+        $export = $container->get(\VuFind\Export::class);
+        return parent::__invoke($container, $requestedName, [$session, $configLoader, $export]);
     }
 }

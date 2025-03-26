@@ -3,7 +3,7 @@
 /**
  * Factory for SolrDefault record drivers.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -62,7 +62,7 @@ class SolrDefaultFactory extends SolrDefaultWithoutSearchServiceFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $driver = parent::__invoke($container, $requestedName, $options);
         $driver->attachSearchService($container->get(\VuFindSearch\Service::class));

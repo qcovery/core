@@ -3,7 +3,7 @@
 /**
  * ILS Authenticator factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -29,11 +29,13 @@
 
 namespace VuFind\Auth;
 
+use Closure;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
+use VuFind\Crypt\BlockCipher;
 
 /**
  * ILS Authenticator factory.
@@ -63,28 +65,28 @@ class ILSAuthenticatorFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        // Construct the ILS authenticator as a lazy loading value holder so that
-        // the object is not instantiated until it is called. This helps break a
-        // potential circular dependency with the MultiBackend driver as well as
-        // saving on initialization costs in cases where the authenticator is not
-        // actually utilized.
-        $callback = function (&$wrapped, $proxy) use ($container, $requestedName) {
-            // Generate wrapped object:
-            $auth = $container->get(\VuFind\Auth\Manager::class);
-            $catalog = $container->get(\VuFind\ILS\Connection::class);
-            $emailAuth = $container->get(\VuFind\Auth\EmailAuthenticator::class);
-            $wrapped = new $requestedName($auth, $catalog, $emailAuth);
-
-            // Indicate that initialization is complete to avoid reinitialization:
-            $proxy->setProxyInitializer(null);
-        };
-        $cfg = $container->get(\ProxyManager\Configuration::class);
-        $factory = new \ProxyManager\Factory\LazyLoadingValueHolderFactory($cfg);
-        return $factory->createProxy($requestedName, $callback);
+        $service = new $requestedName(
+            // Use a callback to retrieve authentication manager to break a circular reference:
+            Closure::fromCallable(
+                function () use ($container) {
+                    return $container->get(\VuFind\Auth\Manager::class);
+                }
+            ),
+            // Use a callback to build BlockCipher objects:
+            Closure::fromCallable(
+                function (string $algo) use ($container) {
+                    return $container->get(BlockCipher::class)->setAlgorithm($algo);
+                }
+            ),
+            $container->get(\VuFind\ILS\Connection::class),
+            $container->get(\VuFind\Auth\EmailAuthenticator::class),
+            $container->get(\VuFind\Config\PluginManager::class)->get('config')
+        );
+        return $service;
     }
 }

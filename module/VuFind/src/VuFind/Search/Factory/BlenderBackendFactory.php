@@ -3,7 +3,7 @@
 /**
  * Factory for Blender backend.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) The National Library of Finland 2022.
  *
@@ -91,7 +91,7 @@ class BlenderBackendFactory implements FactoryInterface
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $sm, $name, array $options = null)
+    public function __invoke(ContainerInterface $sm, $name, ?array $options = null)
     {
         $this->container = $sm;
         $this->config = $sm->get(\VuFind\Config\PluginManager::class);
@@ -130,12 +130,12 @@ class BlenderBackendFactory implements FactoryInterface
         $manager = $this->container->get('SharedEventManager');
 
         $manager->attach(
-            'VuFind\Search',
+            \VuFindSearch\Service::class,
             \VuFindSearch\Service::EVENT_PRE,
             [$backend, 'onSearchPre']
         );
         $manager->attach(
-            'VuFind\Search',
+            \VuFindSearch\Service::class,
             \VuFindSearch\Service::EVENT_POST,
             [$backend, 'onSearchPost']
         );

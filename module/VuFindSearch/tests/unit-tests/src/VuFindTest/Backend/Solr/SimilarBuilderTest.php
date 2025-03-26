@@ -3,7 +3,7 @@
 /**
  * Unit tests for SOLR similar records query builder
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  * Copyright (C) The National Library of Finland 2016.
@@ -87,13 +87,13 @@ class SimilarBuilderTest extends \PHPUnit\Framework\TestCase
                 'count' => 10,
             ],
         ];
-        $sb = new SimilarBuilder(new \Laminas\Config\Config($config));
+        $sb = new SimilarBuilder(new \VuFind\Config\Config($config));
         $response = $sb->build('testrecord');
         $rows = $response->get('rows');
         $this->assertEquals(10, $rows[0]);
 
         $config['MoreLikeThis']['useMoreLikeThisHandler'] = true;
-        $sb = new SimilarBuilder(new \Laminas\Config\Config($config));
+        $sb = new SimilarBuilder(new \VuFind\Config\Config($config));
         $response = $sb->build('testrecord');
         $rows = $response->get('rows');
         $this->assertEquals(10, $rows[0]);
@@ -107,7 +107,7 @@ class SimilarBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $qt);
 
         $config['MoreLikeThis']['params'] = 'qf=title,topic';
-        $sb = new SimilarBuilder(new \Laminas\Config\Config($config));
+        $sb = new SimilarBuilder(new \VuFind\Config\Config($config));
         $response = $sb->build('testrecord');
         $q = $response->get('q');
         $this->assertEquals('{!mlt qf=title,topic}testrecord', $q[0]);

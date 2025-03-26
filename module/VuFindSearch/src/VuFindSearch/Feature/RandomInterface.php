@@ -3,7 +3,7 @@
 /**
  * Random record retrieval feature interface definition.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -48,13 +48,13 @@ interface RandomInterface
      *
      * @param AbstractQuery $query  Search query
      * @param int           $limit  Search limit
-     * @param ParamBag      $params Search backend parameters
+     * @param ?ParamBag     $params Search backend parameters
      *
      * @return \VuFindSearch\Response\RecordCollectionInterface
      */
     public function random(
         AbstractQuery $query,
         $limit,
-        ParamBag $params = null
+        ?ParamBag $params = null
     );
 }

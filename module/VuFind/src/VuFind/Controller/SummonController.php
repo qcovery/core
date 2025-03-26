@@ -3,7 +3,7 @@
 /**
  * Summon Controller
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -55,19 +55,6 @@ class SummonController extends AbstractSearch
     }
 
     /**
-     * Is the result scroller active?
-     *
-     * @return bool
-     */
-    protected function resultScrollerActive()
-    {
-        $config = $this->serviceLocator->get(\VuFind\Config\PluginManager::class)
-            ->get('Summon');
-        return isset($config->Record->next_prev_navigation)
-            && $config->Record->next_prev_navigation;
-    }
-
-    /**
      * Use preDispatch event to add Summon message.
      *
      * @param MvcEvent $e Event object
@@ -109,8 +96,8 @@ class SummonController extends AbstractSearch
         $view = parent::advancedAction();
 
         // Set up facet information:
-        $facets = $this->serviceLocator
-            ->get(\VuFind\Search\FacetCache\PluginManager::class)->get('Summon')
+        $facets = $this->getService(\VuFind\Search\FacetCache\PluginManager::class)
+            ->get('Summon')
             ->getList('Advanced');
         $view->facetList = $this->processAdvancedFacets($facets, $view->saved);
         $specialFacets = $this->parseSpecialFacetsSetting(

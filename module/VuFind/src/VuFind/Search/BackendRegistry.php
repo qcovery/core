@@ -3,7 +3,7 @@
 /**
  * Registry for search backends.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2017.
  *
@@ -52,6 +52,7 @@ class BackendRegistry extends \VuFind\ServiceManager\AbstractPluginManager
         'reserves' => 'SolrReserves',
         // Legacy:
         'VuFind' => 'Solr',
+        'WorldCat' => 'WorldCat2',
     ];
 
     /**
@@ -64,9 +65,12 @@ class BackendRegistry extends \VuFind\ServiceManager\AbstractPluginManager
         'BrowZine' => Factory\BrowZineBackendFactory::class,
         'EDS' => Factory\EdsBackendFactory::class,
         'EIT' => Factory\EITBackendFactory::class,
+        'EPF' => Factory\EPFBackendFactory::class,
         'LibGuides' => Factory\LibGuidesBackendFactory::class,
+        'LibGuidesAZ' => Factory\LibGuidesAZBackendFactory::class,
         'Pazpar2' => Factory\Pazpar2BackendFactory::class,
         'Primo' => Factory\PrimoBackendFactory::class,
+        'ProQuestFSG' => Factory\ProQuestFSGBackendFactory::class,
         'Search2' => Factory\Search2BackendFactory::class,
         'Search2Collection' => Factory\Search2BackendFactory::class,
         'Solr' => Factory\SolrDefaultBackendFactory::class,
@@ -74,7 +78,7 @@ class BackendRegistry extends \VuFind\ServiceManager\AbstractPluginManager
         'SolrReserves' => Factory\SolrReservesBackendFactory::class,
         'SolrWeb' => Factory\SolrWebBackendFactory::class,
         'Summon' => Factory\SummonBackendFactory::class,
-        'WorldCat' => Factory\WorldCatBackendFactory::class,
+        'WorldCat2' => Factory\WorldCat2BackendFactory::class,
     ];
 
     /**

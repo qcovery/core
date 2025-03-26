@@ -3,7 +3,7 @@
 /**
  * Trait containing methods for building shared listeners.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2022.
  *
@@ -29,7 +29,7 @@
 
 namespace VuFind\Search\Factory;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 use VuFind\Search\Base\HideFacetValueListener;
 use VuFindSearch\Backend\BackendInterface;
 

@@ -3,7 +3,7 @@
 /**
  * Unit tests for ContentCafe cover loader.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -29,7 +29,7 @@
 
 namespace VuFindTest\Content\Covers;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 use VuFind\Content\Covers\ContentCafe;
 use VuFindCode\ISBN;
 

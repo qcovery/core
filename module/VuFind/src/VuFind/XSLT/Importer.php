@@ -3,7 +3,7 @@
 /**
  * VuFind XSLT importer
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -31,8 +31,13 @@ namespace VuFind\XSLT;
 
 use DOMDocument;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use VuFind\Service\GetServiceTrait;
 use VuFindSearch\Backend\Solr\Document\RawXMLDocument;
 use XSLTProcessor;
+
+use function count;
+use function in_array;
+use function is_array;
 
 /**
  * VuFind XSLT importer
@@ -45,12 +50,7 @@ use XSLTProcessor;
  */
 class Importer
 {
-    /**
-     * Service locator
-     *
-     * @var ServiceLocatorInterface
-     */
-    protected $serviceLocator;
+    use GetServiceTrait;
 
     /**
      * Constructor
@@ -84,7 +84,7 @@ class Importer
 
         // Save the results (or just display them, if in test mode):
         if (!$testMode) {
-            $solr = $this->serviceLocator->get(\VuFind\Solr\Writer::class);
+            $solr = $this->getService(\VuFind\Solr\Writer::class);
             $solr->save($index, new RawXMLDocument($xml));
         }
         return $xml;
@@ -102,7 +102,7 @@ class Importer
     protected function generateXML($xmlFile, $properties)
     {
         // Load properties file:
-        $resolver = $this->serviceLocator->get(\VuFind\Config\PathResolver::class);
+        $resolver = $this->getService(\VuFind\Config\PathResolver::class);
         $properties = $resolver->getConfigPath($properties, 'import');
         if (!file_exists($properties)) {
             throw new \Exception("Cannot load properties file: {$properties}.");
@@ -136,9 +136,33 @@ class Importer
         // Process and return the XML through the style sheet
         $result = $xsl->transformToXML($xml);
         if (!$result) {
-            throw new \Exception("Problem transforming XML.");
+            throw new \Exception('Problem transforming XML.');
         }
         return $result;
+    }
+
+    /**
+     * Throw a helpful exception if a custom class does not exist.
+     *
+     * @param string $class Class that does not exist.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    protected function throwMissingClassException(string $class): void
+    {
+        $parts = explode('\\', ltrim($class, '\\'));
+        $namespace = count($parts) > 1 ? array_shift($parts) : null;
+        $localModules = ($localModulesEnv = getenv('VUFIND_LOCAL_MODULES'))
+            ? array_map('trim', explode(',', $localModulesEnv)) : [];
+        if (empty($localModules)) {
+            $extraMsg = 'Did you forget to set VUFIND_LOCAL_MODULES?';
+        } elseif ($namespace && $namespace !== 'VuFind' && !in_array($namespace, $localModules)) {
+            $extraMsg = "Did you forget to add $namespace to VUFIND_LOCAL_MODULES?";
+        } else {
+            $extraMsg = '';
+        }
+        throw new \Exception(trim("Class $class does not exist. $extraMsg"));
     }
 
     /**
@@ -173,8 +197,12 @@ class Importer
             $truncate = $options['General']['truncate_custom_class'] ?? true;
             foreach ($classes as $class) {
                 // Add a default namespace if none was provided:
-                if (false === strpos($class, '\\')) {
+                if (!str_contains($class, '\\')) {
                     $class = 'VuFind\XSLT\Import\\' . $class;
+                }
+                // Fail now if the custom class does not exist:
+                if (!class_exists($class)) {
+                    $this->throwMissingClassException($class);
                 }
                 // If necessary, dynamically generate the truncated version of the
                 // requested class:

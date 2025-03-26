@@ -3,7 +3,7 @@
 /**
  * ThemeInfo Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -110,7 +110,9 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
         $ti = $this->getThemeInfo();
         $ti->setTheme('child');
         $expectedChild = include "{$this->fixturePath}/child/theme.config.php";
+        $expectedChild['themeName'] = 'child';
         $expectedParent = include "{$this->fixturePath}/parent/theme.config.php";
+        $expectedParent['themeName'] = 'parent';
         $this->assertEquals('parent', $expectedChild['extends']);
         $this->assertEquals(false, $expectedParent['extends']);
         $this->assertEquals(
@@ -129,10 +131,12 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
         $ti = $this->getThemeInfo();
         $ti->setTheme('mixin_user');
         $expectedChild = include "{$this->fixturePath}/child/theme.config.php";
+        $expectedChild['themeName'] = 'child';
         $expectedParent = include "{$this->fixturePath}/parent/theme.config.php";
+        $expectedParent['themeName'] = 'parent';
         $expectedMixin = include "{$this->fixturePath}/mixin/mixin.config.php";
-        $expectedMixinUser
-            = include "{$this->fixturePath}/mixin_user/theme.config.php";
+        $expectedMixinUser = include "{$this->fixturePath}/mixin_user/theme.config.php";
+        $expectedMixinUser['themeName'] = 'mixin_user';
         $this->assertEquals('parent', $expectedChild['extends']);
         $this->assertEquals(false, $expectedParent['extends']);
         $this->assertEquals(
@@ -307,7 +311,7 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
         $config = $ti->getMergedConfig();
         $this->assertEquals('HTML5', $config['doctype']);
         $this->assertEqualsCanonicalizing(
-            ['doctype', 'extends', 'js', 'helpers'],
+            ['doctype', 'extends', 'js', 'helpers', 'themeName'],
             array_keys($config)
         );
     }
@@ -326,7 +330,7 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
     {
         $ti = $this->getThemeInfo();
 
-        $merged = $this->callMethod($ti, 'mergeWithoutOverride', $test);
+        $merged = $this->callMethod($ti, 'mergeRecursive', $test);
 
         $this->assertEquals($expected, $merged);
     }
@@ -342,8 +346,8 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
             // string
             [
                 [
-                    'original',
                     'override',
+                    'original',
                 ],
                 'original',
             ],
@@ -351,8 +355,8 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
             // array
             [
                 [
-                    ['original'],
                     ['override'],
+                    ['original'],
                 ],
                 ['override', 'original'],
             ],
@@ -360,8 +364,8 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
             // string-keyed arrays
             [
                 [
-                    ['array' => [1], 'string' => 'original', 'sub' => ['a' => 1]],
                     ['array' => [2], 'string' => 'override', 'sub' => ['a' => 2]],
+                    ['array' => [1], 'string' => 'original', 'sub' => ['a' => 1]],
                 ],
                 ['array' => [2, 1], 'string' => 'original', 'sub' => ['a' => 1]],
             ],
@@ -369,8 +373,8 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
             // string-keyed arrays: missing
             [
                 [
-                    ['shared' => [1], 'parent' => 'only'],
                     ['shared' => [1], 'child' => 'only'],
+                    ['shared' => [1], 'parent' => 'only'],
                 ],
                 ['shared' => [1, 1], 'parent' => 'only', 'child' => 'only'],
             ],
@@ -378,8 +382,8 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
             // string-keyed string -> array
             [
                 [
-                    ['mixed' => ['array']],
                     ['mixed' => 'string'],
+                    ['mixed' => ['array']],
                 ],
                 ['mixed' => ['string', 'array']],
             ],
@@ -387,8 +391,8 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
             // string-keyed array -> string
             [
                 [
-                    ['mixed' => 'string'],
                     ['mixed' => ['array']],
+                    ['mixed' => 'string'],
                 ],
                 ['mixed' => ['array', 'string']],
             ],
@@ -396,8 +400,8 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
             // arrays and strings
             [
                 [
-                    ['mixed' => ['array']],
                     'not an array',
+                    ['mixed' => ['array']],
                 ],
                 [
                     'mixed' => ['array'],

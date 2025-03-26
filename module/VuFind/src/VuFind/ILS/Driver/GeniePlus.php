@@ -3,7 +3,7 @@
 /**
  * GeniePlus API driver
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2022.
  *
@@ -30,6 +30,9 @@
 namespace VuFind\ILS\Driver;
 
 use VuFind\Exception\ILS as ILSException;
+
+use function count;
+use function in_array;
 
 /**
  * GeniePlus API driver
@@ -179,12 +182,12 @@ class GeniePlus extends AbstractAPI
      * @return \Laminas\Http\Response
      */
     protected function callApiWithToken(
-        $method = "GET",
-        $path = "/",
+        $method = 'GET',
+        $path = '/',
         $params = [],
         $headers = []
     ) {
-        $headers[] = "Accept: application/json";
+        $headers[] = 'Accept: application/json';
         if (null === $this->token) {
             $this->renewAccessToken();
         }
@@ -393,7 +396,7 @@ class GeniePlus extends AbstractAPI
      * record.
      *
      * @param string $id      The record id to retrieve the holdings for
-     * @param array  $patron  Patron data
+     * @param ?array $patron  Patron data
      * @param array  $options Extra options (not currently used)
      *
      * @return mixed     On success, an associative array with the following keys:
@@ -402,7 +405,7 @@ class GeniePlus extends AbstractAPI
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getHolding($id, array $patron = null, array $options = [])
+    public function getHolding($id, ?array $patron = null, array $options = [])
     {
         return $this->getStatus($id);
     }

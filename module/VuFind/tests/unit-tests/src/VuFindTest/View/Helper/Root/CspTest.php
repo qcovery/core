@@ -3,7 +3,7 @@
 /**
  * Csp View Helper Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2021.
  *
@@ -47,7 +47,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
      */
     public function testDisablePolicyWithCspEnabled(): void
     {
-        $config = new \Laminas\Config\Config(
+        $config = new \VuFind\Config\Config(
             [
                 'CSP' => [
                     'use_nonce' => true,
@@ -77,7 +77,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
         $added = $headers->get('Content-Security-Policy');
         $this->assertEquals(1, $added->count());
 
-        $csp = new \VuFind\View\Helper\Root\Csp($response);
+        $csp = new \VuFind\View\Helper\Root\Csp($response, $nonceGenerator->getNonce());
         $csp->disablePolicy();
         $this->assertFalse($headers->get('Content-Security-Policy'));
     }
@@ -89,7 +89,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
      */
     public function testDisablePolicyWithCspReportOnly(): void
     {
-        $config = new \Laminas\Config\Config(
+        $config = new \VuFind\Config\Config(
             [
                 'CSP' => [
                     'use_nonce' => true,
@@ -119,7 +119,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
         $added = $headers->get('Content-Security-Policy-Report-Only');
         $this->assertFalse(is_iterable($added));
 
-        $csp = new \VuFind\View\Helper\Root\Csp($response);
+        $csp = new \VuFind\View\Helper\Root\Csp($response, $nonceGenerator->getNonce());
         $csp->disablePolicy();
         $this->assertFalse($headers->get('Content-Security-Policy-Report-Only'));
     }
@@ -131,7 +131,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
      */
     public function testDisablePolicyWithCspDisabled(): void
     {
-        $config = new \Laminas\Config\Config(
+        $config = new \VuFind\Config\Config(
             [
                 'CSP' => [
                     'use_nonce' => true,
@@ -151,11 +151,10 @@ class CspTest extends \PHPUnit\Framework\TestCase
             = new \VuFind\Security\CspHeaderGenerator($config, $nonceGenerator);
 
         $response = new \Laminas\Http\Response();
-        $headers = $response->getHeaders();
         $header = $cspHeaderGenerator->getHeader();
         $this->assertNull($header);
 
-        $csp = new \VuFind\View\Helper\Root\Csp($response);
+        $csp = new \VuFind\View\Helper\Root\Csp($response, $nonceGenerator->getNonce());
         $csp->disablePolicy();
     }
 }

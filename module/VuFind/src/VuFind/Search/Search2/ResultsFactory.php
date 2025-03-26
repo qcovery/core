@@ -3,7 +3,7 @@
 /**
  * Factory for Search2 results objects.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -62,7 +62,7 @@ class ResultsFactory extends \VuFind\Search\Results\ResultsFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $solr = parent::__invoke($container, $requestedName, $options);
         $config = $container->get(\VuFind\Config\PluginManager::class)

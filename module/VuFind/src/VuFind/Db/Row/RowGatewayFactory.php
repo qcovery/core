@@ -3,7 +3,7 @@
 /**
  * Generic row gateway factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2017.
  *
@@ -62,7 +62,7 @@ class RowGatewayFactory implements \Laminas\ServiceManager\Factory\FactoryInterf
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $adapter = $container->get(\Laminas\Db\Adapter\Adapter::class);
         return new $requestedName($adapter, ...($options ?? []));

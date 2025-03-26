@@ -3,7 +3,7 @@
 /**
  * NormalizedSearch unit tests.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2022.
  *
@@ -63,9 +63,10 @@ class NormalizedSearchTest extends \PHPUnit\Framework\TestCase
      */
     protected function getResults(): Results
     {
+        $allMethods = get_class_methods(\VuFind\Search\Solr\Results::class);
         $results = $this->getMockBuilder(\VuFind\Search\Solr\Results::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getUrlQuery', 'getUrlQueryHelperFactory'])
+            ->onlyMethods(array_diff($allMethods, ['getUrlQuery', 'getUrlQueryHelperFactory', 'minify', 'deminify']))
             ->getMock();
         $results->expects($this->any())
             ->method('getParams')
@@ -80,7 +81,7 @@ class NormalizedSearchTest extends \PHPUnit\Framework\TestCase
      *
      * @return NormalizedSearch
      */
-    protected function getNormalizedSearch(Results $results = null): NormalizedSearch
+    protected function getNormalizedSearch(?Results $results = null): NormalizedSearch
     {
         $finalResults = $results ?? $this->getResults();
         $manager = $this->getResultsManager();

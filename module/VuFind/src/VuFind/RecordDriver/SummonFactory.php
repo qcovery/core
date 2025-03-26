@@ -3,7 +3,7 @@
 /**
  * Factory for Summon record drivers.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -62,7 +62,7 @@ class SummonFactory extends NameBasedConfigFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $driver = parent::__invoke($container, $requestedName, $options);
         $driver->setDateConverter($container->get(\VuFind\Date\Converter::class));

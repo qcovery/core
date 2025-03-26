@@ -3,7 +3,7 @@
 /**
  * EBSCO API Exception class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) EBSCO Industries 2013
  *
@@ -28,6 +28,9 @@
  */
 
 namespace VuFindSearch\Backend\EDS;
+
+use function count;
+use function is_array;
 
 /**
  * EBSCO API Exception class
@@ -83,7 +86,7 @@ class ApiException extends \VuFindSearch\Backend\Exception\BackendException
             $this->apiErrorDetails['ErrorCode'] = $message['ErrorNumber'];
             $this->apiErrorDetails['Description'] = $message['ErrorDescription'];
             $this->apiErrorDetails['DetailedDescription']
-                = $message['DetailedErrorDescription'];
+                = $message['DetailedErrorDescription'] ?? '-';
         } elseif (
             is_array($message['errors'] ?? null)
             && count($message['errors']) > 0

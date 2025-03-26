@@ -3,7 +3,7 @@
 /**
  * EDS API Options
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) EBSCO Industries 2013
  * Copyright (C) The National Library of Finland 2022
@@ -31,6 +31,10 @@
 
 namespace VuFind\Search\EDS;
 
+use function count;
+use function in_array;
+use function is_callable;
+
 /**
  * EDS API Options
  *
@@ -43,6 +47,9 @@ namespace VuFind\Search\EDS;
  */
 class Options extends \VuFind\Search\Base\Options
 {
+    use \VuFind\Config\Feature\ExplodeSettingTrait;
+    use \VuFind\Search\Options\ViewOptionsTrait;
+
     /**
      * Default limit option
      *
@@ -144,7 +151,7 @@ class Options extends \VuFind\Search\Base\Options
     /**
      * Search configuration
      *
-     * @var \Laminas\Config\Config
+     * @var \VuFind\Config\Config
      */
     protected $searchSettings;
 
@@ -162,13 +169,6 @@ class Options extends \VuFind\Search\Base\Options
         $this->searchIni = $this->facetsIni = 'EDS';
         $this->searchSettings = $configLoader->get($this->searchIni);
         parent::__construct($configLoader);
-        // 2015-06-30 RF - Changed to unlimited
-        //$this->resultLimit = 100;
-        $this->viewOptions = [
-            'list|title' => 'Title View',
-            'list|brief' => 'Brief View',
-            'list|detailed' => 'Detailed View',
-        ];
         // If we get the API info as a callback, defer until it's actually needed to
         // avoid calling the API:
         if (is_callable($apiInfo)) {
@@ -188,6 +188,8 @@ class Options extends \VuFind\Search\Base\Options
                 $facetConf->Advanced_Facet_Settings->translated_facets->toArray()
             );
         }
+        // Make sure first-last navigation is never enabled since we cannot support:
+        $this->firstLastNavigationSupported = false;
     }
 
     /**
@@ -304,14 +306,13 @@ class Options extends \VuFind\Search\Base\Options
     }
 
     /**
-     * Return the view associated with this configuration
+     * Return the view type to request from the EDS API.
      *
      * @return string
      */
     public function getEdsView()
     {
-        $viewArr = explode('|', $this->getApiProperty('defaultView'));
-        return (1 < count($viewArr)) ? $viewArr[1] : $this->defaultView;
+        return $this->getDefaultViewPart(1);
     }
 
     /**
@@ -471,26 +472,20 @@ class Options extends \VuFind\Search\Base\Options
             $this->defaultLimit = $this->searchSettings->General->default_limit;
         }
         if (isset($this->searchSettings->General->limit_options)) {
-            $this->limitOptions
-                = explode(",", $this->searchSettings->General->limit_options);
+            $this->limitOptions = $this->explodeListSetting($this->searchSettings->General->limit_options);
         }
 
         // Set up highlighting preference
         if (isset($this->searchSettings->General->highlighting)) {
-            $this->highlight = $this->searchSettings->General->highlighting;
-        }
-
-        // Load search preferences:
-        if (isset($this->searchSettings->General->retain_filters_by_default)) {
-            $this->retainFiltersByDefault
-                = $this->searchSettings->General->retain_filters_by_default;
+            // For legacy config compatibility, support the "n" value to disable highlighting:
+            $falsyStrings = ['n', 'false'];
+            $this->highlight = in_array(strtolower($this->searchSettings->General->highlighting), $falsyStrings)
+                ? false
+                : (bool)$this->searchSettings->General->highlighting;
         }
 
         // View preferences
-        if (isset($this->searchSettings->General->default_view)) {
-            $this->defaultView
-                = 'list|' . $this->searchSettings->General->default_view;
-        }
+        $this->initViewOptions($this->searchSettings);
 
         // Load list view for result (controls AJAX embedding vs. linking)
         if (isset($this->searchSettings->List->view)) {
@@ -506,10 +501,7 @@ class Options extends \VuFind\Search\Base\Options
         $this->configureAutocomplete($this->searchSettings);
 
         if (isset($this->searchSettings->General->advanced_limiters)) {
-            $this->advancedLimiters = array_map(
-                'trim',
-                explode(',', $this->searchSettings->General->advanced_limiters)
-            );
+            $this->advancedLimiters = $this->explodeListSetting($this->searchSettings->General->advanced_limiters);
         }
     }
 
@@ -526,7 +518,7 @@ class Options extends \VuFind\Search\Base\Options
             case 'Date Newest':
                 return 'sort_year';
             case 'Date Oldest':
-                return 'sort_year asc';
+                return 'sort_year_asc';
             default:
                 return 'sort_' . strtolower($label);
         }
@@ -722,7 +714,7 @@ class Options extends \VuFind\Search\Base\Options
         $this->defaultLimit ??= $settings['ResultsPerPage'] ?? 20;
 
         // default view
-        $this->defaultView ??= 'list|' . ($settings['ResultListView'] ?? 'brief');
+        $this->defaultView ??= 'list_' . ($settings['ResultListView'] ?? 'brief');
     }
 
     /**
@@ -794,8 +786,7 @@ class Options extends \VuFind\Search\Base\Options
      */
     public function getDefaultView()
     {
-        $viewArr = explode('|', $this->getApiProperty('defaultView'));
-        return $viewArr[0];
+        return $this->getDefaultViewPart(0, 'list');
     }
 
     /**
@@ -825,5 +816,25 @@ class Options extends \VuFind\Search\Base\Options
             }
         }
         return $this->defaultFilters;
+    }
+
+    /**
+     * Extract a component from the defaultView API property.
+     *
+     * The defaultView API property takes the form vufindSetting_ebscoSetting -- the first component
+     * of the underscore-delimited string is the view name used by VuFind (e.g. list or grid).
+     * However, for EDS only list is suggested to be used. The second component is the format
+     * requested from the EDS API (e.g. title, brief or detailed).
+     *
+     * @param int     $index   Index of part to extract from the property
+     * @param ?string $default Default to use as a fallback if the property does not contain delimited values
+     *
+     * @return string
+     */
+    protected function getDefaultViewPart(int $index, ?string $default = null): string
+    {
+        $apiDefaultView = $this->getApiProperty('defaultView');
+        $viewArr = explode('_', $apiDefaultView);
+        return (count($viewArr) > 1) ? $viewArr[$index] : ($default ?? $apiDefaultView);
     }
 }

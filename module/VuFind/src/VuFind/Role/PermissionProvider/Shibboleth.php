@@ -3,7 +3,7 @@
 /**
  * Shibboleth permission provider for VuFind.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2007.
  *
@@ -64,8 +64,8 @@ class Shibboleth extends ServerParam
     /**
      * Constructor
      *
-     * @param Request                $request Request object
-     * @param \Laminas\Config\Config $config  VuFind configuration
+     * @param Request               $request Request object
+     * @param \VuFind\Config\Config $config  VuFind configuration
      */
     public function __construct(Request $request, $config)
     {

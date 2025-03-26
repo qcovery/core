@@ -3,7 +3,7 @@
 /**
  * Shared factory for route generator commands.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -63,7 +63,7 @@ class AbstractRouteCommandFactory extends AbstractCommandFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $generator = new RouteGenerator();
         return parent::__invoke(

@@ -3,7 +3,7 @@
 /**
  * Related record plugin factory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2021.
  *
@@ -55,7 +55,7 @@ class BookplateFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $configManager = $container->get(\VuFind\Config\PluginManager::class);
         return new $requestedName($configManager);

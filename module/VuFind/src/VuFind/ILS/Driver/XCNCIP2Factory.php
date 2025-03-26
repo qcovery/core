@@ -3,7 +3,7 @@
 /**
  * Factory for XCNCIP2 ILS driver.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) The National Library of Finland 2022.
  *
@@ -62,7 +62,7 @@ class XCNCIP2Factory extends DriverWithDateConverterFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         return parent::__invoke(
             $container,

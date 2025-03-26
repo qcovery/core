@@ -3,7 +3,7 @@
 /**
  * Factory for autocomplete suggester.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2017.
  *
@@ -64,7 +64,7 @@ class SuggesterFactory implements \Laminas\ServiceManager\Factory\FactoryInterfa
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         return new $requestedName(
             $container->get(\VuFind\Autocomplete\PluginManager::class),

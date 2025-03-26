@@ -3,7 +3,7 @@
 /**
  * Generic factory suitable for most resolver drivers.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018.
  *
@@ -62,7 +62,7 @@ class DriverWithHttpClientFactory extends AbstractBaseFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $client = $container->get(\VuFindHttp\HttpService::class)->createClient();
         if ($options) {

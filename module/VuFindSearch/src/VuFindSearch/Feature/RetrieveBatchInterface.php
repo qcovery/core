@@ -3,7 +3,7 @@
 /**
  * Optional backend feature: retrieve batch of records.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -45,10 +45,10 @@ interface RetrieveBatchInterface
     /**
      * Retrieve a batch of documents.
      *
-     * @param array    $ids    Array of document identifiers
-     * @param ParamBag $params Search backend parameters
+     * @param array     $ids    Array of document identifiers
+     * @param ?ParamBag $params Search backend parameters
      *
      * @return \VuFindSearch\Response\RecordCollectionInterface
      */
-    public function retrieveBatch($ids, ParamBag $params = null);
+    public function retrieveBatch($ids, ?ParamBag $params = null);
 }

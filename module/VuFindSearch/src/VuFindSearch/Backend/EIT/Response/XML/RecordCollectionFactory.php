@@ -3,7 +3,7 @@
 /**
  * Simple XML-based factory for record collection.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -32,6 +32,11 @@ namespace VuFindSearch\Backend\EIT\Response\XML;
 
 use VuFindSearch\Exception\InvalidArgumentException;
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
+
+use function gettype;
+use function is_array;
+use function is_callable;
+use function sprintf;
 
 /**
  * Simple XML-based factory for record collection.
@@ -96,7 +101,7 @@ class RecordCollectionFactory implements RecordCollectionFactoryInterface
         }
         $collection = new $this->collectionClass($response);
         foreach ($response['docs'] as $doc) {
-            $collection->add(call_user_func($this->recordFactory, $doc), false);
+            $collection->add(($this->recordFactory)($doc), false);
         }
         return $collection;
     }

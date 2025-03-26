@@ -3,7 +3,7 @@
 /**
  * Factory for helpers relying on asset pipeline configuration.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2019.
  *
@@ -29,12 +29,14 @@
 
 namespace VuFindTheme\View\Helper;
 
-use Laminas\Config\Config;
 use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
+use VuFind\Config\Config;
+
+use function count;
 
 /**
  * Factory for helpers relying on asset pipeline configuration.
@@ -93,7 +95,7 @@ class PipelineInjectorFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');

@@ -3,7 +3,7 @@
 /**
  * Caching downloader.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2022.
  *
@@ -31,6 +31,7 @@ namespace VuFind\Http;
 
 use Laminas\Cache\Storage\StorageInterface;
 use VuFind\Cache\Manager as CacheManager;
+use VuFind\Config\PluginManager as ConfigManager;
 use VuFind\Exception\HttpDownloadException;
 
 /**
@@ -45,13 +46,6 @@ use VuFind\Exception\HttpDownloadException;
 class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
 {
     use \VuFindHttp\HttpServiceAwareTrait;
-
-    /**
-     * CacheManager to update caches if necessary.
-     *
-     * @var CacheManager
-     */
-    protected $cacheManager;
 
     /**
      * Cache to use for downloads
@@ -77,21 +71,28 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
     /**
      * Constructor
      *
-     * @param string $cacheManager Base directory for cache
+     * @param CacheManager  $cacheManager  VuFind Cache Manager
+     * @param ConfigManager $configManager VuFind Config Manager
+     * @param bool          $cacheEnabled  Main toggle for enabling caching
      */
-    public function __construct(CacheManager $cacheManager)
-    {
-        $this->cacheManager = $cacheManager;
+    public function __construct(
+        protected CacheManager $cacheManager,
+        protected ConfigManager $configManager,
+        protected bool $cacheEnabled = true
+    ) {
         $this->setUpCache('default');
     }
 
     /**
      * Get cache and initialize it, if necessary.
      *
-     * @return StorageInterface
+     * @return ?StorageInterface Cache storage interface or null if disabled
      */
-    protected function getDownloaderCache()
+    protected function getDownloaderCache(): ?StorageInterface
     {
+        if (!$this->cacheEnabled) {
+            return null;
+        }
         if ($this->cache == null) {
             $cacheName = $this->cacheManager->addDownloaderCache(
                 $this->cacheId,
@@ -105,16 +106,22 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
     /**
      * Set up a different cache.
      *
-     * @param string $cacheId      Cache ID
-     * @param array  $cacheOptions Cache Options
+     * @param string  $cacheId             Cache ID
+     * @param ?string $cacheOptionsSection Cache Options Section
+     * @param ?string $cacheOptionsFile    Config file defining the cache options
      *
      * @return void
      */
-    public function setUpCache(string $cacheId, array $cacheOptions = [])
+    public function setUpCache(string $cacheId, ?string $cacheOptionsSection = null, ?string $cacheOptionsFile = null)
     {
         $this->cache = null;
         $this->cacheId = $cacheId;
-        $this->cacheOptions = $cacheOptions;
+
+        if (!empty($cacheOptionsSection)) {
+            $fullCacheOptionsSection = 'Cache_' . $cacheOptionsSection;
+            $section = $this->configManager->get($cacheOptionsFile ?? 'config')->$fullCacheOptionsSection;
+            $this->cacheOptions = !empty($section) ? $section->toArray() : [];
+        }
     }
 
     /**
@@ -130,58 +137,60 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
     public function download(
         $url,
         $params = [],
-        callable $decodeCallback = null
+        ?callable $decodeCallback = null
     ) {
         $cache = $this->getDownloaderCache();
         $cacheItemKey = md5($url . http_build_query($params));
 
-        // Add new item to cache if not exists
-        if (!$cache->hasItem($cacheItemKey)) {
-            try {
-                $response = $this->httpService->get($url, $params);
-            } catch (\Exception $e) {
-                throw new HttpDownloadException(
-                    'HttpService download failed (error)',
-                    $url,
-                    null,
-                    null,
-                    null,
-                    $e
-                );
-            }
-            if (!$response->isOk()) {
-                throw new HttpDownloadException(
-                    'HttpService download failed (not ok)',
-                    $url,
-                    $response->getStatusCode(),
-                    $response->getHeaders(),
-                    $response->getBody()
-                );
-            }
-
-            if ($decodeCallback !== null) {
-                $cache->addItem($cacheItemKey, $decodeCallback($response, $url));
-            } else {
-                $cache->addItem($cacheItemKey, $response->getBody());
-            }
+        if ($cache && $cache->hasItem($cacheItemKey)) {
+            return $cache->getItem($cacheItemKey);
         }
 
-        return $cache->getItem($cacheItemKey);
+        // Add new item to cache if not exists
+        try {
+            $response = $this->httpService->get($url, $params);
+        } catch (\Exception $e) {
+            throw new HttpDownloadException(
+                'HttpService download failed (error)',
+                $url,
+                null,
+                null,
+                null,
+                $e
+            );
+        }
+        if (!$response->isOk()) {
+            throw new HttpDownloadException(
+                'HttpService download failed (not ok)',
+                $url,
+                $response->getStatusCode(),
+                $response->getHeaders(),
+                $response->getBody()
+            );
+        }
+
+        $finalValue = $decodeCallback !== null
+            ? $decodeCallback($response, $url) : $response->getBody();
+        if ($cache) {
+            $cache->addItem($cacheItemKey, $finalValue);
+        }
+        return $finalValue;
     }
 
     /**
      * Download a resource using the cache in the background,
      * including decoding for JSON.
      *
-     * @param string $url    URL
-     * @param array  $params Request parameters (e.g. additional headers)
+     * @param string    $url         URL
+     * @param array     $params      Request parameters (e.g. additional headers)
+     * @param bool|null $associative Sent to json_decode
      *
-     * @return stdClass
+     * @return \stdClass|array
      */
-    public function downloadJson($url, $params = [])
+    public function downloadJson($url, $params = [], $associative = null)
     {
-        $decodeJson = function (\Laminas\Http\Response $response, $url) {
-            $decodedJson = json_decode($response->getBody());
+        $decodeJson = function (\Laminas\Http\Response $response, $url) use ($associative) {
+            $decodedJson = json_decode($response->getBody(), $associative);
             if ($decodedJson === null) {
                 throw new HttpDownloadException(
                     'Invalid response body',

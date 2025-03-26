@@ -3,7 +3,7 @@
 /**
  * Factory for theme generator command.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -62,7 +62,7 @@ class ThemeCommandFactory extends AbstractCommandFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         $config = $container->get(\VuFind\Config\PluginManager::class)
             ->get('config');

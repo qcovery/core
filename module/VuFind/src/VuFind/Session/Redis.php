@@ -6,7 +6,7 @@
  * Note: Using phpredis extension (see https://github.com/phpredis/phpredis) is
  * optional, this class use Credis in standalone mode by default
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Moravian Library 2019.
  * Copyright (C) The National Library of Finland 2023.
@@ -35,7 +35,7 @@
 
 namespace VuFind\Session;
 
-use Laminas\Config\Config;
+use VuFind\Config\Config;
 
 /**
  * Redis session handler
@@ -70,10 +70,10 @@ class Redis extends AbstractBase
      * Constructor
      *
      * @param \Credis_Client $connection Redis connection object
-     * @param Config         $config     Session configuration ([Session] section of
+     * @param ?Config        $config     Session configuration ([Session] section of
      * config.ini)
      */
-    public function __construct(\Credis_Client $connection, Config $config = null)
+    public function __construct(\Credis_Client $connection, ?Config $config = null)
     {
         parent::__construct($config);
         $this->redisVersion = (int)($config->redis_version ?? 3);

@@ -3,7 +3,7 @@
 /**
  * Icon View Helper Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2021.
  *
@@ -32,6 +32,7 @@ namespace VuFindTest\View\Helper\Root;
 use Laminas\Cache\Storage\Adapter\BlackHole;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\View\Helper\EscapeHtmlAttr;
+use VuFind\Escaper\Escaper;
 use VuFind\View\Helper\Root\Icon;
 use VuFindTheme\View\Helper\ImageLink;
 
@@ -70,11 +71,15 @@ class IconTest extends \PHPUnit\Framework\TestCase
                     'template' => 'svg-sprite',
                     'src' => 'mysprites.svg',
                 ],
+                'Unicode' => [
+                    'template' => 'unicode',
+                ],
             ],
             'aliases' => [
                 'bar' => 'Fugue:baz.png',
                 'bar-rtl' => 'Fugue:zab.png',
                 'ltronly' => 'Fugue:ltronly.png',
+                'quoted' => 'Fugue:"quoted".png',
                 'xyzzy' => 'FakeSprite:sprite',
                 'same' => 'Alias:foo',
                 'illegal' => 'Alias:criminal',
@@ -82,6 +87,10 @@ class IconTest extends \PHPUnit\Framework\TestCase
                 'foolish' => 'Alias:foolish',
                 'classy' => 'FontAwesome:spinner:extraClass',
                 'extraClassy' => 'Fugue:zzz.png:weird:class foo',
+                'smile' => 'Unicode:1F600',
+                'wrySmile' => 'Unicode:1F600:wry',
+                'classyWrySmile' => 'Unicode:1F600:wry:classy smile',
+                'oddGlyph' => 'Unicode:c<de',
             ],
         ];
     }
@@ -106,24 +115,31 @@ class IconTest extends \PHPUnit\Framework\TestCase
     /**
      * Get an Icon helper
      *
-     * @param array            $config  Icon helper configuration array
-     * @param StorageInterface $cache   Cache storage adapter (null for BlackHole)
-     * @param array            $plugins Array of extra plugins for renderer
-     * @param bool             $rtl     Are we in right-to-left mode?
+     * @param ?array            $config  Icon helper configuration array
+     * @param ?StorageInterface $cache   Cache storage adapter (null for BlackHole)
+     * @param array             $plugins Array of extra plugins for renderer
+     * @param bool              $rtl     Are we in right-to-left mode?
      *
      * @return Icon
      */
     protected function getIconHelper(
-        array $config = null,
-        StorageInterface $cache = null,
+        ?array $config = null,
+        ?StorageInterface $cache = null,
         array $plugins = [],
         $rtl = false
     ): Icon {
+        $escaper = new Escaper();
         $icon = new Icon(
             $config ?? $this->getDefaultTestConfig(),
             $cache ?? new BlackHole(),
-            new EscapeHtmlAttr(),
+            new EscapeHtmlAttr($escaper),
             $rtl
+        );
+        $plugins = array_merge(
+            [
+                'escapeHtmlAttr' => new EscapeHtmlAttr($escaper),
+            ],
+            $plugins
         );
         $icon->setView($this->getPhpRenderer($plugins));
         return $icon;
@@ -137,7 +153,7 @@ class IconTest extends \PHPUnit\Framework\TestCase
     public function testFontIcon(): void
     {
         $helper = $this->getIconHelper();
-        $expected = '<span class="icon icon--font fa&#x20;fa-foo" '
+        $expected = '<span class="icon icon--font fa fa-foo" '
             . 'role="img" aria-hidden="true"></span>';
         $this->assertEquals($expected, trim($helper('foo')));
     }
@@ -150,7 +166,7 @@ class IconTest extends \PHPUnit\Framework\TestCase
     public function testFontIconWithExtraClass(): void
     {
         $helper = $this->getIconHelper();
-        $expected = '<span class="icon icon--font fa&#x20;fa-spinner extraClass" '
+        $expected = '<span class="icon icon--font fa fa-spinner extraClass" '
             . 'role="img" aria-hidden="true"></span>';
         $this->assertEquals($expected, trim($helper('classy')));
     }
@@ -163,16 +179,110 @@ class IconTest extends \PHPUnit\Framework\TestCase
     public function testFontIconWithExtras(): void
     {
         $helper = $this->getIconHelper();
-        $expected = '<span class="icon icon--font fa&#x20;fa-foo" '
+        $expected = '<span class="icon icon--font fa fa-foo" '
             . 'bar="baz" role="img" aria-hidden="true"></span>';
         $this->assertEquals($expected, trim($helper('foo', ['bar' => 'baz'])));
 
         // Add class to class
-        $expected = '<span class="icon icon--font fa&#x20;fa-foo foo-bar" role="img" aria-hidden="true"></span>';
+        $expected = '<span class="icon icon--font fa fa-foo foo-bar" '
+            . 'role="img" aria-hidden="true"></span>';
         $this->assertEquals($expected, trim($helper('foo', ['class' => 'foo-bar'])));
 
         // Shortcut
         $this->assertEquals($expected, trim($helper('foo', 'foo-bar')));
+    }
+
+    /**
+     * Data provider for testUnicodeIcons
+     *
+     * @return array
+     */
+    public static function unicodeIconProvider(): array
+    {
+        return [
+            [
+                '',
+                '',
+                '1F600',
+                'smile',
+                '',
+            ],
+            [
+                'wry',
+                '',
+                '1F600',
+                'wrySmile',
+                '',
+            ],
+            [
+                'super wry',
+                '',
+                '1F600',
+                'wrySmile',
+                'super',
+            ],
+            [
+                'super wry',
+                '',
+                '1F600',
+                'wrySmile',
+                ['class' => 'super'],
+            ],
+            [
+                'wry',
+                'foo="b+r"',
+                '1F600',
+                'wrySmile',
+                [
+                    'foo' => 'b+r',
+                ],
+            ],
+            [
+                'super wry',
+                'foo="b+r"',
+                '1F600',
+                'wrySmile',
+                [
+                    'class' => 'super',
+                    'foo' => 'b+r',
+                ],
+            ],
+            [
+                '',
+                '',
+                'c&lt;de',
+                'oddGlyph',
+                '',
+            ],
+        ];
+    }
+
+    /**
+     * Test that we can generate a Unicode icons.
+     *
+     * @param string       $expectedClasses Expected extra classes
+     * @param string       $expectedAttrs   Expected extra attributes
+     * @param string       $expectedIcon    Expected icon code
+     * @param string       $icon            Icon alias
+     * @param string|array $attrs           Classes or attributes
+     *
+     * @dataProvider unicodeIconProvider
+     *
+     * @return void
+     */
+    public function testUnicodeIcons(
+        string $expectedClasses,
+        string $expectedAttrs,
+        string $expectedIcon,
+        string $icon,
+        string|array $attrs
+    ): void {
+        $helper = $this->getIconHelper();
+        $expected = '<span class="icon icon--font icon--unicode'
+            . ($expectedClasses ? " $expectedClasses" : '') . '"'
+            . ($expectedAttrs ? " $expectedAttrs" : '')
+            . ' role="img" aria-hidden="true" data-icon="&#x' . $expectedIcon . ';"></span>';
+        $this->assertEquals($expected, trim($helper($icon, $attrs)));
     }
 
     /**
@@ -182,7 +292,7 @@ class IconTest extends \PHPUnit\Framework\TestCase
      */
     public function testCaching(): void
     {
-        $expected = '<span class="icon icon--font fa&#x20;fa-foo" '
+        $expected = '<span class="icon icon--font fa fa-foo" '
             . 'bar="baz" role="img" aria-hidden="true"></span>';
         $key = 'foo+c0dc783820069fb9337be7366f7945bf';
 
@@ -215,6 +325,20 @@ class IconTest extends \PHPUnit\Framework\TestCase
         $expected = '<img class="icon icon--img" src="baz.png" aria-hidden="true"'
             . ' alt="">';
         $this->assertEquals($expected, $helper('bar'));
+    }
+
+    /**
+     * Test that we can generate an image-based icon where the icon contains a special character.
+     *
+     * @return void
+     */
+    public function testImageIconWithSpecialChars(): void
+    {
+        $plugins = ['imageLink' => $this->getMockImageLink('icons/"quoted".png')];
+        $helper = $this->getIconHelper(null, null, $plugins);
+        $expected = '<img class="icon icon--img" src="&quot;quoted&quot;.png" aria-hidden="true"'
+            . ' alt="">';
+        $this->assertEquals($expected, $helper('quoted'));
     }
 
     /**
@@ -278,7 +402,7 @@ class IconTest extends \PHPUnit\Framework\TestCase
     public function testAlias(): void
     {
         $helper = $this->getIconHelper();
-        $expected = '<span class="icon icon--font fa&#x20;fa-foo" '
+        $expected = '<span class="icon icon--font fa fa-foo" '
             . 'role="img" aria-hidden="true"></span>';
         // same is an alias for foo!
         $this->assertEquals($expected, $helper('same'));

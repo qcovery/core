@@ -3,7 +3,7 @@
 /**
  * Trait for tests involving Laminas Views.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -50,12 +50,12 @@ trait ViewTrait
      *
      * @return \Laminas\View\Renderer\PhpRenderer
      */
-    protected function getPhpRenderer($plugins = [], $theme = 'bootstrap3')
+    protected function getPhpRenderer($plugins = [], $theme = 'bootstrap5')
     {
         $resolver = new \Laminas\View\Resolver\TemplatePathStack();
 
         // This assumes that all themes will be testing inherit directly
-        // from root with no intermediate themes.  Probably safe for most
+        // from root with no intermediate themes. Probably safe for most
         // test situations, though other scenarios are possible.
         $resolver->setPaths(
             [

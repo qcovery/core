@@ -3,7 +3,7 @@
 /**
  * Class HierarchicalFacetHelperFactory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Moravian Library 2022.
  *
@@ -65,13 +65,14 @@ class HierarchicalFacetHelperFactory implements
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
         $helper = new $requestedName();
         $helper->setSorter($container->get(\VuFind\I18n\Sorter::class));
+        $helper->setViewRenderer($container->get('ViewRenderer'));
         return $helper;
     }
 }

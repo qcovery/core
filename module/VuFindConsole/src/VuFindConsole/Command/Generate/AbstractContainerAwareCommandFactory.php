@@ -3,7 +3,7 @@
 /**
  * Factory for console generator commands that rely on a service container.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2020.
  *
@@ -62,7 +62,7 @@ class AbstractContainerAwareCommandFactory extends AbstractCommandFactory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         return parent::__invoke(
             $container,

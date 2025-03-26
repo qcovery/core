@@ -3,7 +3,7 @@
 /**
  * Locale Detector Delegator Factory
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2018,
  *               Leipzig University Library <info@ub.uni-leipzig.de> 2018.
@@ -41,6 +41,8 @@ use SlmLocale\LocaleEvent;
 use SlmLocale\Strategy\QueryStrategy;
 use VuFind\Cookie\CookieManager;
 
+use function call_user_func;
+
 /**
  * Locale Detector Delegator Factory
  *
@@ -71,7 +73,7 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
         ContainerInterface $container,
         $name,
         callable $callback,
-        array $options = null
+        ?array $options = null
     ) {
         $detector = call_user_func($callback);
         $settings = $container->get(LocaleSettings::class);
@@ -105,7 +107,7 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
      *
      * @return \Generator
      */
-    protected function getStrategies(LocaleSettings $settings = null): \Generator
+    protected function getStrategies(?LocaleSettings $settings = null): \Generator
     {
         yield new LocaleDetectorParamStrategy();
 

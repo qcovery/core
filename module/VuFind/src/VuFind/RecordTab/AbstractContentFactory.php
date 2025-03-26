@@ -3,7 +3,7 @@
 /**
  * Abstract factory for building AbstractContent tabs.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2019.
  *
@@ -35,6 +35,8 @@ use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
 use VuFind\Config\PluginManager as ConfigManager;
 use VuFind\Content\PluginManager as ContentManager;
+
+use function in_array;
 
 /**
  * Abstract factory for building AbstractContent tabs.
@@ -73,7 +75,7 @@ abstract class AbstractContentFactory implements \Laminas\ServiceManager\Factory
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
@@ -90,11 +92,11 @@ abstract class AbstractContentFactory implements \Laminas\ServiceManager\Factory
      * Support method for construction of AbstractContent objects -- should we
      * hide this tab if it is empty?
      *
-     * @param \Laminas\Config\Config $config VuFind configuration
+     * @param \VuFind\Config\Config $config VuFind configuration
      *
      * @return bool
      */
-    protected function getHideSetting(\Laminas\Config\Config $config)
+    protected function getHideSetting(\VuFind\Config\Config $config)
     {
         $setting = $config->Content->hide_if_empty ?? false;
         if (

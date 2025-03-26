@@ -3,7 +3,7 @@
 /**
  * Factory for building the UserComments tab.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2019.
  *
@@ -64,7 +64,7 @@ class UserCommentsFactory implements \Laminas\ServiceManager\Factory\FactoryInte
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
@@ -74,7 +74,7 @@ class UserCommentsFactory implements \Laminas\ServiceManager\Factory\FactoryInte
             ->get('config');
         $captchaConfig = $config->Captcha->forms ?? '';
         $useCaptcha = trim($captchaConfig) === '*'
-            || strpos($captchaConfig, 'userComments') !== false;
+            || str_contains($captchaConfig, 'userComments');
         return new $requestedName(
             'enabled' === $capabilities->getCommentSetting(),
             $useCaptcha

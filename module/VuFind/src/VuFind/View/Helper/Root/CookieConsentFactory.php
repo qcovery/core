@@ -3,7 +3,7 @@
 /**
  * CookieConsent helper factory.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) The National Library of Finland 2022.
  *
@@ -63,7 +63,7 @@ class CookieConsentFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        array $options = null
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
@@ -76,7 +76,8 @@ class CookieConsentFactory implements FactoryInterface
             $config->toArray(),
             $consentConfig['CookieConsent'] ?? [],
             $container->get(\VuFind\Cookie\CookieManager::class),
-            $container->get(\VuFind\Date\Converter::class)
+            $container->get(\VuFind\Date\Converter::class),
+            $container->get(\VuFind\Auth\LoginTokenManager::class)
         );
     }
 }

@@ -3,7 +3,7 @@
 /**
  * SideFacets recommendation module Test Class
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -30,7 +30,6 @@
 namespace VuFindTest\Recommend;
 
 use VuFind\Recommend\SideFacets;
-use VuFind\Search\Solr\HierarchicalFacetHelper;
 use VuFind\Search\Solr\Params;
 use VuFind\Search\Solr\Results;
 
@@ -78,44 +77,9 @@ class SideFacetsTest extends \PHPUnit\Framework\TestCase
             [],
             $this->once()
         );
-        $sf = $this->getSideFacets($configLoader, null, '', null, null);
+        $sf = $this->getSideFacets($configLoader, null, '', null);
         $this->assertEquals(['format'], $sf->getHierarchicalFacets());
         $this->assertEquals(['a', 'b', 'c'], $sf->getHierarchicalFacetSortOptions());
-    }
-
-    /**
-     * Test missing hierarchical facet helper
-     *
-     * @return void
-     */
-    public function testMissingHierarchicalFacetHelper(): void
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage(
-            'VuFind\\Recommend\\SideFacets: hierarchical facet helper unavailable'
-        );
-
-        $configLoader = $this->getMockConfigPluginManager(
-            [
-                'facets' => [
-                    'Results' => [
-                        'format' => 'Format',
-                    ],
-                    'SpecialFacets' => [
-                        'hierarchical' => ['format'],
-                    ],
-                ],
-            ],
-            [],
-            $this->once()
-        );
-        $results = $this->getMockResults();
-        $response = ['format' => ['dummy']];
-        $results->expects($this->once())->method('getFacetList')
-            ->with($this->equalTo(['format' => 'Format']))
-            ->will($this->returnValue($response));
-        $sf = $this->getSideFacets($configLoader, $results, '', null, null);
-        $sf->getFacetSet();
     }
 
     /**
@@ -243,7 +207,7 @@ class SideFacetsTest extends \PHPUnit\Framework\TestCase
         ];
         $results = $this->getMockResults();
         $results->getParams()->expects($this->any())->method('getRawFilters')
-            ->will($this->returnValue($filters));
+            ->willReturn($filters);
         $sf = $this->getSideFacets($configLoader, $results);
         $expected = [
             'date' => ['type' => 'date', 'values' => ['1900', '1905']],
@@ -322,7 +286,7 @@ class SideFacetsTest extends \PHPUnit\Framework\TestCase
         $params = $results->getParams();
         $params->expects($this->once())->method('getCheckboxFacets')
             ->with($this->equalTo([]), $this->equalTo(true))
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $params->expects($this->never())->method('addCheckboxFacet');
         $sf = $this->getSideFacets(null, $results);
         $this->assertEquals([], $sf->getCheckboxFacetSet());
@@ -344,16 +308,22 @@ class SideFacetsTest extends \PHPUnit\Framework\TestCase
             [],
             $this->once()
         );
-        $checkboxData = ['fake result'];
+        $checkboxData = [
+            [
+                'filter' => 'fake result:1',
+            ],
+        ];
         $results = $this->getMockResults();
         $params = $results->getParams();
         $params->expects($this->once())->method('getCheckboxFacets')
             ->with($this->equalTo(['foo']), $this->equalTo(true))
-            ->will($this->returnValue($checkboxData));
+            ->willReturn($checkboxData);
         $params->expects($this->once())->method('addCheckboxFacet')
             ->with($this->equalTo('foo'), $this->equalTo('bar'));
         $sf = $this->getSideFacets($configLoader, $results, ':Checkboxes');
-        $this->assertEquals($checkboxData, $sf->getCheckboxFacetSet());
+        $expected = $checkboxData;
+        $expected[0]['count'] = null;
+        $this->assertEquals($expected, $sf->getCheckboxFacetSet());
     }
 
     /**
@@ -372,45 +342,45 @@ class SideFacetsTest extends \PHPUnit\Framework\TestCase
             [],
             $this->once()
         );
-        $checkboxData = ['fake result'];
+        $checkboxData = [
+            [
+                'filter' => 'fake result:1',
+            ],
+        ];
         $results = $this->getMockResults();
         $params = $results->getParams();
         $params->expects($this->once())->method('getCheckboxFacets')
             ->with($this->equalTo(['foo']), $this->equalTo(false))
-            ->will($this->returnValue($checkboxData));
+            ->willReturn($checkboxData);
         $params->expects($this->once())->method('addCheckboxFacet')
             ->with($this->equalTo('foo'), $this->equalTo('bar'));
         $settings = 'Results:Checkboxes:facets:false';
         $sf = $this->getSideFacets($configLoader, $results, $settings);
-        $this->assertEquals($checkboxData, $sf->getCheckboxFacetSet());
+        $expected = $checkboxData;
+        $expected[0]['count'] = null;
+        $this->assertEquals($expected, $sf->getCheckboxFacetSet());
     }
 
     /**
      * Get a fully configured module
      *
-     * @param \VuFind\Config\PluginManager $configLoader config loader
-     * @param Results                      $results      results object
-     * @param string                       $settings     settings
-     * @param \Laminas\Stdlib\Parameters   $request      request
-     * @param HierarchicalFacetHelper      $facetHelper  hierarchical facet helper
-     * (true to build default, null to omit)
+     * @param ?\VuFind\Config\PluginManager $configLoader config loader
+     * @param ?Results                      $results      results object
+     * @param string                        $settings     settings
+     * @param ?\Laminas\Stdlib\Parameters   $request      request
      *
      * @return SideFacets
      */
     protected function getSideFacets(
-        \VuFind\Config\PluginManager $configLoader = null,
-        Results $results = null,
+        ?\VuFind\Config\PluginManager $configLoader = null,
+        ?Results $results = null,
         string $settings = '',
-        \Laminas\Stdlib\Parameters $request = null,
-        $facetHelper = true
+        ?\Laminas\Stdlib\Parameters $request = null
     ): SideFacets {
         if (null === $results) {
             $results = $this->getMockResults();
         }
-        $sf = new SideFacets(
-            $configLoader ?? $this->getMockConfigPluginManager([]),
-            true === $facetHelper ? new HierarchicalFacetHelper() : $facetHelper
-        );
+        $sf = new SideFacets($configLoader ?? $this->getMockConfigPluginManager([]));
         $sf->setConfig($settings);
         $sf->init(
             $results->getParams(),
@@ -423,30 +393,36 @@ class SideFacetsTest extends \PHPUnit\Framework\TestCase
     /**
      * Get a mock results object.
      *
-     * @param Params $params Params to include in container.
+     * @param ?Params $params Params to include in container.
      *
      * @return Results
      */
-    protected function getMockResults(Params $params = null): Results
+    protected function getMockResults(?Params $params = null): Results
     {
         if (null === $params) {
             $params = $this->getMockParams();
         }
+        $options = $this->createMock(\VuFind\Search\Solr\Options::class);
+        $params->expects($this->any())->method('getOptions')
+            ->willReturn($options);
+
         $results = $this->getMockBuilder(\VuFind\Search\Solr\Results::class)
             ->disableOriginalConstructor()->getMock();
         $results->expects($this->any())->method('getParams')
-            ->will($this->returnValue($params));
+            ->willReturn($params);
+        $results->expects($this->any())->method('getOptions')
+            ->willReturn($options);
         return $results;
     }
 
     /**
      * Get a mock params object.
      *
-     * @param \VuFindSearch\Query\Query $query Query to include in container.
+     * @param ?\VuFindSearch\Query\Query $query Query to include in container.
      *
      * @return Params
      */
-    protected function getMockParams(\VuFindSearch\Query\Query $query = null): Params
+    protected function getMockParams(?\VuFindSearch\Query\Query $query = null): Params
     {
         if (null === $query) {
             $query = new \VuFindSearch\Query\Query('foo', 'bar');
@@ -454,7 +430,7 @@ class SideFacetsTest extends \PHPUnit\Framework\TestCase
         $params = $this->getMockBuilder(\VuFind\Search\Solr\Params::class)
             ->disableOriginalConstructor()->getMock();
         $params->expects($this->any())->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
         return $params;
     }
 }
