@@ -74,7 +74,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->recordLoader = $loader;
         $this->config = $config;
         $this->resolverConfig = $resolverConfig->toArray();
-        $this->checks = $this->config->get('RecordView');
+        $this->checks = $this->config->toArray()['RecordView'];
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
         $this->resolverManager = $rm;
@@ -112,7 +112,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                     $this->mediatype = $mediatype;
                     $this->setChecks($mediatype);
-                    $this->driver->addSolrMarcYaml($this->config->get('General')->get('availabilityplus_yaml'), false);
+                    $this->driver->addSolrMarcYaml($this->config->toArray()['General']['availabilityplus_yaml'], false);
                     $responses = [];
                     $response = [];
                     foreach($this->checks as $check => $this->current_mode) {
@@ -158,7 +158,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $debug_info['mediatype'] = $mediatype;
             $debug_info['AvailabilityPlusConfig'] = 'availabilityplus.ini';
             $debug_info['SolrMarcYml'] = 'solrmarc.yml';
-            $debug_info['SolrMarcYmlAvailabilityPlus'] = $this->config->get('General')->get('availabilityplus_yaml');
+            $debug_info['SolrMarcYmlAvailabilityPlus'] = $this->config->toArray['General']['availabilityplus_yaml'];
             $debug_info['checkRoute_in_AvailabilityPlusConfig'] = $this->checkRoute;
             $debug_info['checks'] = $this->checks;
             $responses[0][0]['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $debug_info ]).$responses[0][0]['html'];
@@ -172,17 +172,17 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $mediatype = str_replace(array(' ', '+'),array('',''), $mediatype);
         $checks = 'RecordView';
         if($list) $checks = 'ResultList';
-        if(!empty($this->config->get($this->source.$checks.'-'.$mediatype))) {
-            $this->checks = $this->config->get($this->source.$checks.'-'.$mediatype);
+        if(!empty($this->config->toArray()[$this->source.$checks.'-'.$mediatype])) {
+            $this->checks = $this->config->toArray()[$this->source.$checks.'-'.$mediatype];
             $this->checkRoute = $this->source.$checks.'-'.$mediatype;
-        } else if(!empty($this->config->get($checks.'-'.$mediatype))) {
-            $this->checks = $this->config->get($checks.'-'.$mediatype);
+        } else if(!empty($this->config->toArray()[$checks.'-'.$mediatype])) {
+            $this->checks = $this->config->toArray()[$checks.'-'.$mediatype];
             $this->checkRoute = $checks.'-'.$mediatype;
-        } else if(!empty($this->config->get($this->source.$checks))) {
-            $this->checks = $this->config->get($this->source.$checks);
+        } else if(!empty($this->config->toArray()[$this->source.$checks])) {
+            $this->checks = $this->config->toArray()[$this->source.$checks];
             $this->checkRoute =$this->source.$checks;
         } else {
-            $this->checks = $this->config->get($checks);
+            $this->checks = $this->config->toArray()[$checks];
             $this->checkRoute = $checks;
         }
     }
