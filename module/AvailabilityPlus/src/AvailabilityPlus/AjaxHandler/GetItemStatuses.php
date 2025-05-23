@@ -233,8 +233,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $break = false;
         foreach ($solrMarcKeys as $solrMarcKey) {
             $data = $this->driver->getMarcData($solrMarcKey);
-            $level = $this->getLevel($data[0], $check, $solrMarcKey);
-            $label = $this->getLabel($data[0], $check);
+            $level = $this->getLevel(array_key_exists(0, $data) ? $data[0] : null, $check, $solrMarcKey);
+            $label = $this->getLabel(array_key_exists(0, $data) ? $data[0] : null, $check);
             if(!empty($data) && $this->checkConditions($data)) {
                 $template = $this->getTemplate($data);
                 foreach ($data as $date) {
@@ -267,7 +267,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                 }
             } else {
-                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, false, $check_type);
+                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template ?? '', $data, $url ?? '', false, $check_type);
                 $responses[] = $response;
             }
             if($break) break;
@@ -303,12 +303,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     private function getLevel($date, $level, $solrMarcKey) {
         if($level != $solrMarcKey) $level = $level.' '.$solrMarcKey;
-            if(!empty($date['level']['data'][0])) $level = $date['level']['data'][0];
+            if(is_array($date) && !empty($date['level']['data'][0])) $level = $date['level']['data'][0];
         return $level;
     }
 
     private function getLabel($date, $label) {
-        if(!empty($date['label']['data'][0])) $label = $date['label']['data'][0];
+        if(is_array($date) && !empty($date['label']['data'][0])) $label = $date['label']['data'][0];
         return $label;
     }
 
