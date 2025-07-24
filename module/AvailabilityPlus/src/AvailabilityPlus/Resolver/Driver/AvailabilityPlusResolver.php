@@ -107,7 +107,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     protected function applyCustomChanges() {
 
         $specsReader = new SearchSpecsReader();
-        $rules = $specsReader->get($this->rules);
+        $rules = $specsReader->get($this->rules) ?? [];
         foreach($this->parsed_data as $key => $item) {
             $rules_applied = [];
             foreach($rules as $rule_key => $rule) {

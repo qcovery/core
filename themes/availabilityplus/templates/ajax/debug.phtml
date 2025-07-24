@@ -1,9 +1,9 @@
 <?php
     echo '<button class="accordion">';
-    if($debug['check_type']) echo $debug['check_type'].' - ';
-    echo $debug['check'];
-    if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) echo ' - SorlMarcKey: '.$debug['SolrMarcKey'];
-    if(!empty($debug['status'])) echo ' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span>';
+    if(isset($debug['check_type'])) echo $debug['check_type'].' - ';
+    if(isset($debug['check'])) echo $debug['check'];
+    if(isset($debug['SolrMarcKey']) && !empty($debug['SolrMarcKey']) && isset($debug['check']) && $debug['check'] !== $debug['SolrMarcKey']) echo ' - SorlMarcKey: '.$debug['SolrMarcKey'];
+    if(isset($debug['status']) && !empty($debug['status']) && array_key_exists('level', $debug['status']) && array_key_exists('label', $debug['status'])) echo ' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span>';
     echo '</button>';
 
     echo '<div class="panel">';

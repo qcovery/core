@@ -15,9 +15,11 @@ class Unpaywall extends AvailabilityPlusResolver
      */
     public function getResolverUrl($params)
     {
-        $doi = str_replace('?doi=','',$params);
-        if($doi)  $url = $this->baseUrl.'/'.$doi.'?is_oa=boolean'.$this->additionalParams;
-        return $url;
+        $doi = str_replace('?doi=', '', $params);
+        if(strlen($doi) > 0) {
+            $url = $this->baseUrl.'/'.$doi.'?is_oa=boolean'.$this->additionalParams;
+        }
+        return $url ?? '';
     }
 
     /**
@@ -32,11 +34,10 @@ class Unpaywall extends AvailabilityPlusResolver
      */
     public function parseLinks($data_org)
     {
-        $urls = []; // to check for duplicate urls
         $links = []; // array to return
         $data = json_decode($data_org);
 
-        if(isset($data->is_oa) && $data->is_oa == true && isset($data->best_oa_location->version) && $data->best_oa_location->version == 'publishedVersion'){
+        if (isset($data->is_oa) && $data->is_oa == true && isset($data->best_oa_location->version) && $data->best_oa_location->version == 'publishedVersion') {
             $links[0]['url'] = $data->best_oa_location->url;
             $links[0]['label'] = 'FreeAccess';
             $links[0]['level'] = 'FreeAccess Unpaywall';
@@ -49,4 +50,3 @@ class Unpaywall extends AvailabilityPlusResolver
         return $response;
     }
 }
-

@@ -1,67 +1,69 @@
 <?php
 
-$items = $data->document[0];
+$items = $data->document[0] ?? (object) array('item' => []);
 
-if(in_array($mode, array('break_on_first', 'break_on_first_next', 'always_break_on_first')) && $data->best_item) {
+if(in_array($mode, array('break_on_first', 'break_on_first_next', 'always_break_on_first')) && isset($data->best_item)) {
     unset($items);
     $items = (object) array('item' => array($data->best_item));
 }
 
 foreach($items->item as $key => $item) {
-    if(!empty($item->availabilityplus)) {
+    if(isset($item->availabilityplus) && !empty($item->availabilityplus)) {
         $result = $item->availabilityplus;
     } else {
         break;
     }
+
     if(!empty($result)) {
-        if(!$list) echo '<div class="daia_item">';
+        if(!isset($list) || !$list) echo '<div class="daia_item">';
         echo '<div class="delimiter"></div>';
     }
     echo '<div class="daia_storage_callnumber">';
-    if(!empty($result->storage)) {
-        if(!empty($result->storage->url)) {
-            echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result->storage->url.'" class="'.$result->storage->level.'" title="'.$result->storage->label.'" target="_blank">'.$this->translate($result->storage->label).'</a></span>';
+    if(isset($result->storage) && !empty($result->storage) && isset($result->storage->label) && !empty($result->storage->label)) {
+        if(isset($result->storage->url) && !empty($result->storage->url)) {
+            echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').' </span><a href="'.$result->storage->url.'" class="'.($result->storage->level ?? '').'" title="'.$this->translate($result->storage->label).'" target="_blank">'.$this->translate($result->storage->label).'</a></span>';
         } else {
             echo '<span class="storage_link"><span class="storage_prefix">'.$this->translate('department').'</span> '.$this->translate($result->storage->label).'</span>';
         }
 
     }
-    if(!empty($result->callnumber)) {
         echo ' <span class="item_label">' . $result->callnumber . '</span>';
+    if(isset($result->callnumber) && !empty($result->callnumber)) {
     }
     echo '</div>';
-    if(!empty($result->daia_hint)) {
-        echo '<span class="daia_hint"><span class="'.$result->daia_hint->level.'">'.$this->translate($result->daia_hint->label);
-        if(!empty($result->daia_hint->label_date)) echo ' '.$result->daia_hint->label_date;
+    if(isset($result->daia_hint) && !empty($result->daia_hint)) {
+        echo '<span class="daia_hint"><span class="'.($result->daia_hint->level ?? '').'">'.$this->translate($result->daia_hint->label ?? '');
+        if(isset($result->daia_hint->label_date) && !empty($result->daia_hint->label_date)) echo ' '.$result->daia_hint->label_date;
         echo '</span></span>';
     }
-    if(!empty($result->daia_hint) && !empty($result->daia_action)) {
+    if(isset($result->daia_hint) && !empty($result->daia_hint) && isset($result->daia_action) && !empty($result->daia_action)) {
         echo '<span class="daia_arrow"> ➝ </span>';
     }
-    if(!empty($result->daia_action)) {
-        if(!empty($result->daia_action->url)) {
-            echo '<span class="daia_action"><a href="'.$result->daia_action->url.'" class="'.$result->daia_action->level.' link_external" title="'.$result->daia_action->label.'" target="_blank">'.$this->translate($result->daia_action->label).'</a></span>';
+    if(isset($result->daia_action) && !empty($result->daia_action) && isset($result->daia_action->label) && !empty($result->daia_action->label)) {
+        if(isset($result->daia_action->url) && !empty($result->daia_action->url)) {
+            echo '<span class="daia_action"><a href="'.$result->daia_action->url.'" class="'.($result->daia_action->level ?? '').' link_external" title="'.$result->daia_action->label.'" target="_blank">'.$this->translate($result->daia_action->label).'</a></span>';
         } else {
             echo '<span class="daia_action">'.$this->translate($result->daia_action->label).'</span>';
         }
     }
-    if(!$list){
-        if(!empty($result->queue)) {
-            echo '<div class="service_queue">'.$result->queue->length.' '.$this->translate($result->queue->label).'</div>';
+    if(!isset($list) || !$list){
+        if(isset($result->queue) && !empty($result->queue)) {
+            echo '<div class="service_queue">'.($result->queue->length ?? '0').' '.$this->translate($result->queue->label ?? '').'</div>';
         }
-        if(!empty($result->about)) {
+        if(isset($result->about) && !empty($result->about)) {
             if($mediatype == 'Journal') {
                 echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('volume_issue').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
             } else {
                 echo '<div class="item_about"><span class="item_about_prefix">'.$this->translate('item_about').': </span>'.str_replace("<br />",". – ", nl2br($result->about)).'</div>';
-            }        }
-        if(!empty($result->chronology)) {
+            }
+        }
+        if(isset($result->chronology) && !empty($result->chronology)) {
             echo '<div class="item_chronology"><span class="item_chronology_prefix">'.$this->translate('Inventory Information').': </span>'.$result->chronology.'</div>';
         }
     }
-    if (!empty($result->order_hint)) echo '<div class="order_hint">'.$this->translate($result->order_hint).'</div>';
+    if (isset($result->order_hint) && !empty($result->order_hint)) echo '<div class="order_hint">'.$this->translate($result->order_hint).'</div>';
     if(!empty($result)) {
-        if($list && count($data->document[0]->item) > 1 && !empty($result->storage)) {
+        if(isset($list) && !empty($list) && isset($result->storage) && !empty($result->storage)) {
 
             if($this->source == 'Search2') {
                 $recordRoute = 'Search2Record';
@@ -71,10 +73,9 @@ foreach($items->item as $key => $item) {
 
             echo '<div class="additional_copies"><a href="/vufind/'.$recordRoute.'/'.$id.'">'.$this->transEsc('additional_copies').'...</a></div>';
         }
-        if(!$list) echo '</div>';
+        if(!isset($list) || !$list) echo '</div>';
     }
     if($mode == 'break_on_first') break;
 }
-
 
 ?>

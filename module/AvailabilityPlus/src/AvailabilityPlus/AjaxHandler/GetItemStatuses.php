@@ -120,7 +120,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                             $results = $this->performAvailabilityCheck($check);
                             foreach($results as $result) {
                                 if(!empty($result)) {
-                                    if(!empty($result['html'])) $check_mode = $this->current_mode;
+                                    if(isset($result['html']) && !empty($result['html'])) $check_mode = $this->current_mode;
                                     if($this->debug) {
                                         $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
                                     }
@@ -153,15 +153,16 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
 
         if($this->debug) {
-            $debug_info = [];
-            $debug_info['check'] = 'Debug Info';
-            $debug_info['mediatype'] = $mediatype;
-            $debug_info['AvailabilityPlusConfig'] = 'availabilityplus.ini';
-            $debug_info['SolrMarcYml'] = 'solrmarc.yml';
-            $debug_info['SolrMarcYmlAvailabilityPlus'] = $this->config->toArray['General']['availabilityplus_yaml'];
-            $debug_info['checkRoute_in_AvailabilityPlusConfig'] = $this->checkRoute;
-            $debug_info['checks'] = $this->checks;
-            $responses[0][0]['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $debug_info ]).$responses[0][0]['html'];
+            $debug_info = [
+                'check' => 'Debug Info',
+                'mediatype' => $mediatype,
+                'AvailabilityPlusConfig' => 'availabilityplus.ini',
+                'SolrMarcYml' => 'solrmarc.yml',
+                'SolrMarcYmlAvailabilityPlus' => $this->config->toArray()['General']['availabilityplus_yaml'] ?? '',
+                'checkRoute_in_AvailabilityPlusConfig' => $this->checkRoute,
+                'checks' => $this->checks
+            ];
+            $responses[0][0]['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $debug_info ]).($responses[0][0]['html'] ?? '');
         }
 
         return $this->formatResponse(['statuses' => $responses]);
@@ -171,14 +172,14 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $list = $this->list;
         $mediatype = str_replace(array(' ', '+'),array('',''), $mediatype);
         $checks = 'RecordView';
-        if($list) $checks = 'ResultList';
-        if(!empty($this->config->toArray()[$this->source.$checks.'-'.$mediatype])) {
+        if(!empty($list)) $checks = 'ResultList';
+        if(isset($this->config->toArray()[$this->source.$checks.'-'.$mediatype])) {
             $this->checks = $this->config->toArray()[$this->source.$checks.'-'.$mediatype];
             $this->checkRoute = $this->source.$checks.'-'.$mediatype;
-        } else if(!empty($this->config->toArray()[$checks.'-'.$mediatype])) {
+        } else if(isset($this->config->toArray()[$checks.'-'.$mediatype])) {
             $this->checks = $this->config->toArray()[$checks.'-'.$mediatype];
             $this->checkRoute = $checks.'-'.$mediatype;
-        } else if(!empty($this->config->toArray()[$this->source.$checks])) {
+        } else if(isset($this->config->toArray()[$this->source.$checks])) {
             $this->checks = $this->config->toArray()[$this->source.$checks];
             $this->checkRoute =$this->source.$checks;
         } else {
@@ -233,10 +234,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $break = false;
         foreach ($solrMarcKeys as $solrMarcKey) {
             $data = $this->driver->getMarcData($solrMarcKey);
-            $level = $this->getLevel($data[0], $check, $solrMarcKey);
-            $label = $this->getLabel($data[0], $check);
+            $level = $this->getLevel($data[0] ?? [], $check, $solrMarcKey);
+            $label = $this->getLabel($data[0] ?? [], $check);
+            $template = $this->getTemplate($data);
             if(!empty($data) && $this->checkConditions($data)) {
-                $template = $this->getTemplate($data);
                 foreach ($data as $date) {
                     if (!empty($date['url']['data'][0])) {
                         foreach ($date['url']['data'] as $url) {
@@ -267,7 +268,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     }
                 }
             } else {
-                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, false, $check_type);
+                $response = $this->generateResponse($check, $solrMarcKey, $level, $label, $template, $data, '', false, $check_type);
                 $responses[] = $response;
             }
             if($break) break;
@@ -281,17 +282,19 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $numberofconditions = 0;
 
         foreach($data as $date) {
-            if(!empty($date['requirednumberofconditions']['data'][0])) {
+            if(isset($date['requirednumberofconditions']['data'][0])) {
                 $requirednumberofconditions = $date['requirednumberofconditions']['data'][0];
             }
         }
 
         foreach($data as $date) {
-            if(!empty($date['condition_true']['data'][0])) {
-                if($date['condition_true']['data'][0] != 'true') $check = false;
+            if(isset($date['condition_true']['data'][0]) && $date['condition_true']['data'][0] != 'true') {
+                $check = false;
                 $numberofconditions += 1;
-            } elseif(!empty($date['condition_false']['data'][0])) {
-                if($date['condition_false']['data'][0] != 'false') $check = false;
+            } elseif(isset($date['condition_false']['data'][0]) && $date['condition_false']['data'][0] != 'false') {
+                $check = false;
+                $numberofconditions += 1;
+            } elseif(isset($date['condition_true']['data'][0]) || isset($date['condition_false']['data'][0])) {
                 $numberofconditions += 1;
             }
         }
@@ -303,13 +306,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     private function getLevel($date, $level, $solrMarcKey) {
         if($level != $solrMarcKey) $level = $level.' '.$solrMarcKey;
-            if(!empty($date['level']['data'][0])) $level = $date['level']['data'][0];
-        return $level;
+        return $date['level']['data'][0] ?? $level;
     }
 
     private function getLabel($date, $label) {
-        if(!empty($date['label']['data'][0])) $label = $date['label']['data'][0];
-        return $label;
+        return $date['label']['data'][0] ?? $label;
     }
 
     private function generateResponse($check, $solrMarcKey, $level, $label, $template, $data, $url, $status_bool, $check_type){
@@ -351,9 +352,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @return string
      */
     private function getTemplate($data) {
-        $template = $this->default_template;
-        if(!empty($data['view-method'])) $template = $data['view-method'];
-        return $template;
+        return $data['view-method'] ?? $this->default_template;
     }
 
     /**
@@ -379,9 +378,11 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $template = 'ajax/link-parent.phtml';
         $responses = [];
         $parentData = $this->driver->getMarcData('ArticleParentId');
+        $parentId = '';
+        $url = '';
         $response = $this->generateResponse($check, 'ArticleParentId', '', '', $template, '', '', false, $check_type);
         foreach ($parentData as $parentDate) {
-            if (!empty(($parentDate['id']['data'][0]))) {
+            if (isset($parentDate['id']['data'][0]) && !empty($parentDate['id']['data'][0])) {
                 $parentId = $parentDate['id']['data'][0];
                 break;
             }
@@ -398,7 +399,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     $ilnMatch = $this->driver->getMarcData('ILN');
                 }
 
-                if (!empty($ilnMatch[0]['iln']['data'][0])) {
+                if (isset($ilnMatch[0]['iln']['data'][0]) && !empty($ilnMatch[0]['iln']['data'][0])) {
                     $url = '/vufind/Record/' . $parentId;
                 }
             } catch (\Exception $e) {
@@ -407,12 +408,12 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
         if (!empty($url)) {
             $level = 'ParentWorkILNSolr';
-            $label = 'Go to parent work (local holding)';
+            $label = 'Go to parent work';
             $response = $this->generateResponse($check, 'ArticleParentId', $level, $label, $template, $parentData, $url, true, $check_type);
             $response['html'] = $this->renderer->render($template , $response);
         }
-        $response['ilnMarcSpecs'] = $ilnMarcSpecs;
-        $response['ilnMatch'] = $ilnMatch;
+        $response['ilnMarcSpecs'] = $ilnMarcSpecs ?? [];
+        $response['ilnMatch'] = $ilnMatch ?? [];
         $responses[] = $response;
         return $responses;
     }
@@ -435,8 +436,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         if(!empty($resolver_url) && !empty($marc_data)) {
             try {
                 $resolver_data = $resolverHandler->fetchLinks($params);
-                $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'], $resolver_url, true, $check_type);
-                $response['resolverConfig'] = $this->resolverConfig[$resolver];
+                $response = $this->generateResponse($resolver, $resolver, $resolver, $resolver, $template, $resolver_data['parsed_data'] ?? [], $resolver_url, true, $check_type);
+                $response['resolverConfig'] = $this->resolverConfig[$resolver] ?? [];
                 $response['html'] = $this->applyTemplate($template, $response);
                 if(empty($response['html'])) {
                     $response['status']['level'] = 'unsuccessful_check';
@@ -446,7 +447,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $response['resolver_rule_file'] = $resolverHandler->getRulesFile();
             } catch (\Exception $e) {
                 $template = 'ajax/default.phtml';
-                $response = $this->generateResponse($resolver, $resolver, 'resolver_error', 'resolver_error', $template, $resolver_data['parsed_data'], $resolver_url, false, 'Resolver-EXCEPTION');
+                $response = $this->generateResponse($resolver, $resolver, 'resolver_error', 'resolver_error', $template, $resolver_data['parsed_data'] ?? [], $resolver_url, false, 'Resolver-EXCEPTION');
                 $response['status']['label'] = 'EXCEPTION occured during processing';
                 $response['url'] = '';
                 $response['html'] = $this->applyTemplate($template, $response);
@@ -485,7 +486,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                     $url = "/vufind/Record/".$this->id;
                 }
             }
-            $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);
+            $response = $this->generateResponse($check, '', $level, $label, $template, [], $url ?? '', true, $check_type);
             $response['html'] = $this->renderer->render($template, $response);
             $responses[] = $response;
         }
@@ -495,19 +496,17 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     private function prepareResolverParams($resolverData) {
         $used_params = [];
         $params = '';
-        if(!empty($resolverData)) {
-            if(is_array($resolverData)) {
-                foreach ($resolverData as $resolverDate) {
-                    if (is_array($resolverDate)) {
-                        foreach ($resolverDate as $key => $value) {
-                            if (!in_array($key, $used_params)) {
-                                if (empty($params)) {
-                                    $params .= '?' . $key . '=' . urlencode($value['data'][0]);
-                                } else {
-                                    $params .= '&' . $key . '=' . urlencode($value['data'][0]);
-                                }
-                                $used_params[] = $key;
+        if(!empty($resolverData) && is_array($resolverData)) {
+            foreach ($resolverData as $resolverDate) {
+                if (is_array($resolverDate)) {
+                    foreach ($resolverDate as $key => $value) {
+                        if (!in_array($key, $used_params)) {
+                            if (empty($params)) {
+                                $params .= '?' . $key . '=' . urlencode($value['data'][0] ?? '');
+                            } else {
+                                $params .= '&' . $key . '=' . urlencode($value['data'][0] ?? '');
                             }
+                            $used_params[] = $key;
                         }
                     }
                 }

@@ -19,7 +19,7 @@ class JournalsOnlinePrintElectronic extends JournalsOnlinePrint
         $urls = []; // to check for duplicate urls
         $records = []; // array to return
         $data = @simplexml_load_string($data_org, "SimpleXMLElement", LIBXML_COMPACT);
-        foreach($data->Full->ElectronicData->ResultList->Result AS $result) {
+        foreach($data->Full->ElectronicData->ResultList->Result as $result) {
             if(!empty($result->AccessURL)) {
                 $level = '';
                 $label = '';
