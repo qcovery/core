@@ -27,8 +27,8 @@ foreach($items->item as $key => $item) {
         }
 
     }
-        echo ' <span class="item_label">' . $result->callnumber . '</span>';
     if(isset($result->callnumber) && !empty($result->callnumber)) {
+        echo ' <span class="item_label">' . $this->transEsc($result->callnumber) . '</span>';
     }
     echo '</div>';
     if(isset($result->daia_hint) && !empty($result->daia_hint)) {
