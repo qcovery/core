@@ -3,7 +3,7 @@
 # Format is:
 # -------------
 # <id>: # id of record in index
-#  driver: '<driver to load record>' # required, Solr, Search2, ...
+#  source: '<source to load record>' # required, Solr, Search2, ...
 #  description: '<short description of test case>' # optional, text
 #  expected: # definition of expected results, optional, array
 #    description: '<description of what is expected to appear as availability>' # optional, text
@@ -30,7 +30,7 @@
 # Example:
 # -------------
 # 123456789:
-#  driver: 'Solr'
+#  source: 'Solr'
 #  description: 'sample description'
 #  expected:
 #    resultlist:

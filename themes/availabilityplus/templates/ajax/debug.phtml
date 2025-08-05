@@ -1,30 +1,42 @@
-<?php
-    echo '<button class="accordion">';
-    if($debug['check_type']) echo $debug['check_type'].' - ';
-    echo $debug['check'];
-    if(!empty($debug['SolrMarcKey']) && $debug['check'] !== $debug['SolrMarcKey']) echo ' - SorlMarcKey: '.$debug['SolrMarcKey'];
-    if(!empty($debug['status'])) echo ' - <span class="'.$debug['status']['level'].'">'.$this->transEsc($debug['status']['label']).'</span>';
-    echo '</button>';
+<button class="accordion">
+    <?php if (!empty($debug['check_type'])): ?>
+        <?=$debug['check_type']?>
+        -
+    <?php endif; ?>
+    <?=$debug['check']?>
+    <?php if (!empty($debug['SolrMarcKey'])): ?>
+        - SorlMarcKey:
+        <?=$debug['SolrMarcKey']?>
+    <?php endif; ?>
+    <?php if (!empty($debug['status']['level'])): ?>
+        -
+        <span class="<?=$debug['status']['level']?>">
+            <?=$this->transEsc("AvailabilityPlus::{$debug['status']['label']}")?>
+        </span>
+    <?php endif; ?>
+</button>
 
-    echo '<div class="panel">';
-    print "<pre>";
-    print_r($debug);
-    print "</pre>";
-    echo '</div>';
-?>
+<div class="panel">
+    <?php
+        print '<pre>';
+        print_r($debug);
+        print '</pre>';
+    ?>
+</div>
+
 <script>
-    var acc = document.getElementsByClassName("accordion");
+    var acc = document.getElementsByClassName('accordion');
     var i;
 
     for (i = 0; i < acc.length; i++) {
         acc[i].outerHTML = acc[i].outerHTML; //removes all EventListeners
-        acc[i].addEventListener("click", function () {
-            this.classList.toggle("active");
+        acc[i].addEventListener('click', function () {
+            this.classList.toggle('active');
             var panel = this.nextElementSibling;
-            if (panel.style.display === "block") {
-                panel.style.display = "none";
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
             } else {
-                panel.style.display = "block";
+                panel.style.display = 'block';
             }
         });
     }

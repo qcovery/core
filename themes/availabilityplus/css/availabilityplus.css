@@ -1,204 +1,211 @@
-.daia-loading{
-  font-weight: bold;
+.daia-loading {
+    font-weight: bold;
 }
 
-.daia-loading::before{
-  content: url(../images/ajax-loader.gif);
+.daia-loading::before {
+    content: url(../images/ajax-loader.gif);
 }
 
-.daia_item,
+.daia-item,
 .availability_item,
 .daiaplus-title {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
-.delimiter{
-  border-top: 1px dashed #000000;
-  color: #FFFFFF;
-  background-color: #FFFFFF;
-  height: 1px;
-  margin-bottom: 2px;
-  margin-top: 2px;
+
+.delimiter {
+    border-top: 1px dashed #000000;
+    color: #ffffff;
+    background-color: #ffffff;
+    height: 1px;
+    margin-bottom: 2px;
+    margin-top: 2px;
 }
 
 .doi {
-  font-size: 0;
+    font-size: 0;
 }
 
 .group_label {
-  margin-top: 10px;
-  border-bottom: 1px solid #888;
-  font-weight: bold;
-  font-size: 22px;
-  margin-bottom: 10px;
+    margin-top: 10px;
+    border-bottom: 1px solid #888;
+    font-weight: bold;
+    font-size: 22px;
+    margin-bottom: 10px;
 }
 
 .availabilityplus_storage_label .storage_link {
-  display: none;
+    display: none;
 }
 
-.delimiter{
-  border: none;
-  border-top: 1px dashed #E00060;
-  color: #FFFFFF;
-  background-color: #FFFFFF;
-  height: 1px;
-  margin-bottom: 2px;
-  margin-top: 2px;
+.delimiter {
+    border: none;
+    border-top: 1px dashed #e00060;
+    color: #ffffff;
+    background-color: #ffffff;
+    height: 1px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+}
+
+.daia_order {
+    display: flex;
+}
+
+.daia_arrow,
+.daia_further_informatoin {
+    margin: 0 5px;
 }
 
 .daia_action {
-  font-weight: bold;
-  display: block;
+    font-weight: bold;
+    display: block;
 }
 
 .daia_green,
 .ApprovalRequired {
-  color: #3DA22D;
-  font-weight: bold;
+    color: #3da22d;
+    font-weight: bold;
 }
 
 .daia_orange,
 .ShortLoan {
-  color: #EB8E12;
-  font-weight: bold;
+    color: #eb8e12;
+    font-weight: bold;
 }
 
 .daia_red {
-  color: #FF0000;
-  font-weight: bold;
+    color: #ff0000;
+    font-weight: bold;
 }
 
 .link_internal,
 .link_external {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .FreeAccess::after {
-  content: url("../images/checkmark_green.png") " " url("../images/OpenAccess_Logo.png");
-  margin-left: 5px;
+    content: url('../images/checkmark_green.png') ' ' url('../images/OpenAccess_Logo.png');
+    margin-left: 5px;
 }
 
 .Access:after,
 .LicensedAccess::after,
 .PubPharmProxy::after {
-  content: url("../images/checkmark_green.png");
-  margin-left: 5px;
+    content: url('../images/checkmark_green.png');
+    margin-left: 5px;
 }
 
 .UncertainAccess::after,
 .FullTextFallbackUrls::after {
-  content: url("../images/checkmark_orange.png");
-  margin-left: 5px;
+    content: url('../images/checkmark_orange.png');
+    margin-left: 5px;
 }
 
 .UnknownAccess::after {
-  margin-left: 5px;
+    margin-left: 5px;
 }
 
 .storage_prefix,
 .item_label,
 .item_about_prefix {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .AvailabilityPlusDebug,
 .AvailabilityPlusTestCases {
-  background-color: white;
+    background-color: white;
 }
 
 .AvailabilityPlusTestCases {
-  width: 98vw;
-  position: relative;
-  left: calc(-49vw + 49%);
-  margin: 0 20px 0 20px;
+    width: 98vw;
+    position: relative;
+    left: calc(-49vw + 49%);
+    margin: 0 20px 0 20px;
 }
 
 .AvailabilityPlusTestCases table {
-  width: 100%;
+    width: 100%;
 }
 
 .AvailabilityPlusTestCases tr,
 .AvailabilityPlusTestCases th,
-.AvailabilityPlusTestCases td
-{
-  border: 1px solid black;
+.AvailabilityPlusTestCases td {
+    border: 1px solid black;
 }
 
 .AvailabilityPlusTestCases tr {
-  vertical-align: top;
+    vertical-align: top;
 }
 
 .AvailabilityPlusTestCases th,
 .AvailabilityPlusTestCases td {
-  padding: 5px;
+    padding: 5px;
 }
 
 #tc_expectedresult,
 #tc_actualresult,
 #tc_info {
-  min-width: 400px;
+    min-width: 400px;
 }
 
-.AvailabilityPlusDebug {
-  padding: 5px;
+.testcase_status_green {
+    background-color: green;
+    display: block;
+    width: 100%;
 }
 
-.testcase_status_green{
-  background-color: green;
-  display: block;
-  width: 100%;
+.testcase_status_red {
+    background-color: red;
+    display: block;
+    width: 100%;
 }
 
-.testcase_status_red{
-  background-color: red;
-  display: block;
-  width: 100%;
+.testcase_views {
+    white-space: nowrap;
 }
 
-.testcase_views{
-  white-space: nowrap;
-}
-
-.successful_check{
-  color: green;
+.successful_check {
+    color: green;
 }
 
 .unsuccessful_check {
-  color: red;
+    color: red;
 }
 
 /* Style the buttons that are used to open and close the accordion panel */
-.accordion {
-  background-color: #eee;
-  color: #444;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  outline: none;
-  transition: 0.4s;
+.availabilityItem .accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+    margin-bottom: 10px;
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.active, .accordion:hover {
-  background-color: #ccc;
+.availabilityItem .active,
+.availabilityItem .accordion:hover {
+    background-color: #ccc;
 }
 
 /* Style the accordion panel. Note: hidden by default */
-.panel {
-  padding: 0 18px;
-  background-color: white;
-  display: none;
-  overflow: hidden;
+.availabilityItem .panel {
+    padding: 0 18px;
+    background-color: white;
+    display: none;
+    overflow: hidden;
 }
 
 .MultiVolumeWork,
 .MonographSeriesRecordView,
 .MonographSeriesResultList {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .availabilityplus_epn .group_label {
-  display: none !important;
+    display: none !important;
 }

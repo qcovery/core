@@ -1,6 +1,6 @@
 <?php
     // Set up page title:
-	$this->headTitle($this->transEsc('AvailabilityPlus Test Cases'));
+	$this->headTitle($this->transEsc('AvailabilityPlus::AvailabilityPlus Test Cases'));
 
 	//Load Cases
     $specsReader = new \VuFind\Config\SearchSpecsReader();
@@ -8,120 +8,133 @@
 
     // Variables:
     $list = 1;
-    if(isset($_GET["list"]) && $_GET["list"] === '0') $list = 0;
+    if (isset($_GET['list']) && $_GET['list'] === '0') $list = 0;
     $view_name = 'ResultList';
-    if($list == 0) $view_name = 'RecordView';
+    if ($list == 0) $view_name = 'RecordView';
     $counter = 1;
-
 ?>
+
 <div class="AvailabilityPlusTestCases">
-<?php if(!empty($cases)) { ?>
-    <?=$this->transEsc('Links To TestCase Views')?>: <a href="/vufind/AvailabilityPlus/TestCases?list=1"><?=$this->transEsc('TestCases ResultList')?></a> | <a href="/vufind/AvailabilityPlus/TestCases?list=0"><?=$this->transEsc('TestCases RecordView')?></a>
-    <h3><?=$this->transEsc('TestCases '.$view_name)?></h3>
-    <table>
-		<tr>
-			<th id="tc_ncounter"><?=$this->transEsc('#')?></th>
-			<th id="tc_id"><?=$this->transEsc('ID')?></th>
-			<th id="tc_status"><?=$this->transEsc('Status')?></th>
-			<th id="tc_driver"><?=$this->transEsc('Driver')?></th>
-			<th id="tc_description"><?=$this->transEsc('Description')?></th>
-			<th id="tc_expectedresult"><?=$this->transEsc('ExpectedResult')?></th>
-			<th id="tc_actualresult"><?=$this->transEsc('ActualResult')?></th>
-			<th id="tc_viewlinks"><?=$this->transEsc('ViewLinks')?></th>
-			<th id="tc_info"><?=$this->transEsc('Info')?></th>
-		</tr>
-		<?php foreach ($cases AS $key => $case) { ?>
-            <?php if(!empty($key) && !empty($case['driver'])) { ?>
-                <?php
-                    $id = $key;
-                    $driver = $case['driver'];
-                    $description = '';
-                    $expected = '';
-                    $reason = '';
-                    $title = '';
-                    $date = '';
-                    $creator = '';
-                    $detailsLink = '';
-                    $rules = '';
+    <?php if (!empty($cases)): ?>
+        <h3><?=$this->transEsc('AvailabilityPlus::Links To TestCase Views')?></h3>
+        <a href="<?=$this->url('availabilityplus-testcases', [], ['query' => ['list' => '1']])?>"><?=$this->transEsc('AvailabilityPlus::TestCases ResultList')?></a>
+        |
+        <a href="<?=$this->url('availabilityplus-testcases', [], ['query' => ['list' => '0']])?>"><?=$this->transEsc('AvailabilityPlus::TestCases RecordView')?></a>
+        <h3><?=$this->transEsc("AvailabilityPlus::TestCases {$view_name}")?></h3>
+        <table>
+            <tr>
+                <th id="tc_ncounter"><?=$this->transEsc('AvailabilityPlus::#')?></th>
+                <th id="tc_id"><?=$this->transEsc('AvailabilityPlus::ID')?></th>
+                <th id="tc_status"><?=$this->transEsc('AvailabilityPlus::Status')?></th>
+                <th id="tc_source"><?=$this->transEsc('AvailabilityPlus::Source')?></th>
+                <th id="tc_description"><?=$this->transEsc('AvailabilityPlus::Description')?></th>
+                <th id="tc_expectedresult"><?=$this->transEsc('AvailabilityPlus::ExpectedResult')?></th>
+                <th id="tc_actualresult"><?=$this->transEsc('AvailabilityPlus::ActualResult')?></th>
+                <th id="tc_viewlinks"><?=$this->transEsc('AvailabilityPlus::ViewLinks')?></th>
+                <th id="tc_info"><?=$this->transEsc('AvailabilityPlus::Info')?></th>
+            </tr>
+            <?php foreach ($cases AS $key => $case): ?>
+                <?php if (!empty($key) && !empty($case['source'])): ?>
+                    <?php
+                        $id = $key;
+                        $encodedId = urlencode($id);
+                        $source = $case['source'];
+                        $description = '';
+                        $expected = '';
+                        $reason = '';
+                        $title = '';
+                        $date = '';
+                        $creator = '';
+                        $detailsLink = '';
+                        $rules = '';
 
-                    if(!empty($case['description'])) $description = $case['description'];
-                    $testcase_expected_result_class = 'testcase_expected_result';
-                    if(!empty($case['expected'][strtolower($view_name)]['html_'.$this->layout()->userLang])) {
-                        $expected = $case['expected'][strtolower($view_name)]['html_'.$this->layout()->userLang];
-                        $testcase_expected_result_class = 'testcase_expected_result_html';
-                    } else if(!empty($case['expected'][strtolower($view_name)]['html'])) {
-                        $expected = $case['expected'][strtolower($view_name)]['html'];
-                        $testcase_expected_result_class = 'testcase_expected_result_html';
-                    } else if(!empty($case['expected'][strtolower($view_name)]['description_'.$this->layout()->userLang])) {
-                        $expected = $case['expected'][strtolower($view_name)]['description_'.$this->layout()->userLang];
-                    } else if(!empty($case['expected'][strtolower($view_name)]['description'])) {
-                        $expected = $case['expected'][strtolower($view_name)]['description'];
-                    } else if(!empty($case['expected']['html_'.$this->layout()->userLang])) {
-                        $expected = $case['expected']['html_'.$this->layout()->userLang];
-                        $testcase_expected_result_class = 'testcase_expected_result_html';
-                    } else if(!empty($case['expected']['html'])) {
-                        $expected = $case['expected']['html'];
-                        $testcase_expected_result_class = 'testcase_expected_result_html';
-                    } else if(!empty($case['expected']['description_'.$this->layout()->userLang])) {
-                        $expected = $case['expected']['description_'.$this->layout()->userLang];
-                    } else if(!empty($case['expected']['description'])) {
-                        $expected = $case['expected']['description'];
-                    }
-                    if(!empty($case['title'])) $title = $case['title'];
-                    if(!empty($case['reason'])) $reason = $case['reason'];
-                    if(!empty($case['date'])) $date = $case['date'];
-                    if(!empty($case['creator'])) $creator = $case['creator'];
-                    if(!empty($case['detailsLink'])) $detailsLink = $case['detailsLink'];
-                    if(!empty($case['rules'])) $rules = $case['rules'];
+                        if (!empty($case['description'])) $description = $case['description'];
+                        $testcase_expected_result_class = 'testcase_expected_result';
+                        if (!empty($case['expected'][strtolower($view_name)]['html_' . $this->layout()->userLang])) {
+                            $expected = $case['expected'][strtolower($view_name)]['html_' . $this->layout()->userLang];
+                            $testcase_expected_result_class = 'testcase_expected_result_html';
+                        } else if (!empty($case['expected'][strtolower($view_name)]['html'])) {
+                            $expected = $case['expected'][strtolower($view_name)]['html'];
+                            $testcase_expected_result_class = 'testcase_expected_result_html';
+                        } else if (!empty($case['expected'][strtolower($view_name)]['description_' . $this->layout()->userLang])) {
+                            $expected = $case['expected'][strtolower($view_name)]['description_' . $this->layout()->userLang];
+                        } else if (!empty($case['expected'][strtolower($view_name)]['description'])) {
+                            $expected = $case['expected'][strtolower($view_name)]['description'];
+                        } else if (!empty($case['expected']['html_' . $this->layout()->userLang])) {
+                            $expected = $case['expected']['html_' . $this->layout()->userLang];
+                            $testcase_expected_result_class = 'testcase_expected_result_html';
+                        } else if (!empty($case['expected']['html'])) {
+                            $expected = $case['expected']['html'];
+                            $testcase_expected_result_class = 'testcase_expected_result_html';
+                        } else if (!empty($case['expected']['description_' . $this->layout()->userLang])) {
+                            $expected = $case['expected']['description_' . $this->layout()->userLang];
+                        } else if (!empty($case['expected']['description'])) {
+                            $expected = $case['expected']['description'];
+                        }
+                        if (!empty($case['title'])) $title = $case['title'];
+                        if (!empty($case['reason'])) $reason = $case['reason'];
+                        if (!empty($case['date'])) $date = $case['date'];
+                        if (!empty($case['creator'])) $creator = $case['creator'];
+                        if (!empty($case['detailsLink'])) $detailsLink = $case['detailsLink'];
+                        if (!empty($case['rules'])) $rules = $case['rules'];
 
-                    if($driver == 'Search2') {
-                        $recordRoute = 'Search2Record';
-                        $searchRoute = 'Search2';
-                    } else {
-                        $recordRoute = 'Record';
-                        $searchRoute = 'Search';
-                    }
-                ?>
-                <tr id="<?=$id?>">
-                    <td id="testcase_counter_<?=$id?>" class="testcase_counter"><?=$counter?></td>
-                    <td id="testcase_id_<?=$id?>" class="testcase_id"><a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$id?></a></td>
-                    <td id="testcase_status_<?=$id?>" class="testcase_status"></td>
-                    <td id="testcase_driver_<?=$id?>" class="testcase_driver"><?=$driver?></td>
-                    <td id="testcase_description_<?=$id?>" class="testcase_description"><?=$description?></td>
-                    <td id="<?=$testcase_expected_result_class?>_<?=$id?>" class="<?=$testcase_expected_result_class?>>"><?=$expected?></td>
-                    <td id="testcase_actual_result_<?=$id?>" class="testcase_actual_result"><?=$this->render('availabilityplus/item.phtml', ['id' => $id, 'driver' => $driver, 'list' => $list ]) ?></td>
-                    <td id="testcase_views_<?=$id?>" class="testcase_views">
-                        <a href="/vufind/<?=$searchRoute?>/Results?lookfor=id:<?=$id?>" target="_blank"><?=$this->transEsc('ResultList')?></a><br>
-                        <a href="/vufind/<?=$recordRoute?>/<?=$id?>" target="_blank"><?=$this->transEsc('RecordView')?></a><br>
-                        <a href="/vufind/AvailabilityPlus/Debug/<?=$id?>?list=<?=$list?>&driver=<?=$driver?>" target="_blank"><?=$this->transEsc('DebugView')?></a><br>
-                    </td>
-                    <td id="testcase_infos_<?=$id?>" class="testcase_infos">
-                        <?php if(!empty($title)) { ?>
-                            <?=$this->transEsc('title')?>: <?=$title?><br>
-                        <?php } ?>
-                        <?php if(!empty($reason)) { ?>
-                            <?=$this->transEsc('reason')?>: <?=$reason?><br>
-                        <?php } ?>
-                        <?php if(!empty($creator)) { ?>
-                            <?=$this->transEsc('created by')?>: <?=$creator?><br>
-                        <?php } ?>
-                        <?php if(!empty($date)) { ?>
-                            <?=$this->transEsc('date')?>: <?=$date?><br>
-                        <?php } ?>
-                        <?php if(!empty($detailsLink)) { ?>
-                            <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('link to more details')?></a><br>
-                        <?php } ?>
-                        <?php if(!empty($rules)) { ?>
-                            <?=$this->transEsc('Checked rule(s)')?>: <?=$rules?><br>
-                        <? } ?>
-                    </td>
-                </tr>
-            <?php } ?>
-            <?php $counter = $counter + 1; ?>
-        <?php } ?>
-	</table>
-<?php } else { ?>
-        <div><?=$this->transEsc('no TestCases defined')?></div>
-<?php } ?>
+                        if ($source == 'Search2') {
+                            $recordRoute = 'Search2Record';
+                            $searchRoute = 'Search2';
+                        } else {
+                            $recordRoute = 'Record';
+                            $searchRoute = 'Search';
+                        }
+                    ?>
+                    <tr id="<?=$id?>">
+                        <td id="testcase_counter_<?=$id?>" class="testcase_counter"><?=$counter?></td>
+                        <td id="testcase_id_<?=$id?>" class="testcase_id"><a href="<?=$this->url('home')?><?=$recordRoute?>/<?=$encodedId?>" target="_blank"><?=$id?></a></td>
+                        <td id="testcase_status_<?=$id?>" class="testcase_status"></td>
+                        <td id="testcase_source_<?=$id?>" class="testcase_source"><?=$source?></td>
+                        <td id="testcase_description_<?=$id?>" class="testcase_description"><?=$description?></td>
+                        <td id="<?=$testcase_expected_result_class?>_<?=$id?>" class="<?=$testcase_expected_result_class?>>"><?=$expected?></td>
+                        <td id="testcase_actual_result_<?=$id?>" class="testcase_actual_result">
+                            <div class="availabilityItem" data-id="<?=$id?>" data-list="<?=$list?>" data-src="<?=$source?>" data-language="<?=$this->layout()->userLang; ?>" data-testcase="true">
+                                <span class="status ajax-availability hidden">
+                                    <?=$this->icon('spinner')?>
+                                    <?=$this->transEsc('loading_ellipsis')?>
+                                </span>
+                            </div>
+                        </td>
+                        <td id="testcase_views_<?=$id?>" class="testcase_views">
+                            <a href="<?=$this->url('home')?><?=$searchRoute?>/Results?lookfor=id:<?=$encodedId?>" target="_blank"><?=$this->transEsc('AvailabilityPlus::ResultList')?></a>
+                            <br>
+                            <a href="<?=$this->url('home')?><?=$recordRoute?>/<?=$encodedId?>" target="_blank"><?=$this->transEsc('AvailabilityPlus::RecordView')?></a>
+                            <br>
+                            <a href="<?=$this->url('home')?>AvailabilityPlus/Debug/<?=$encodedId?>?source=<?=$source?>&list=<?=$list?>" target="_blank"><?=$this->transEsc('AvailabilityPlus::DebugView')?></a>
+                            <br>
+                        </td>
+                        <td id="testcase_infos_<?=$id?>" class="testcase_infos">
+                            <?php if(!empty($title)): ?>
+                                <?=$this->transEsc('AvailabilityPlus::title')?>: <?=$title?><br>
+                            <?php endif; ?>
+                            <?php if(!empty($reason)): ?>
+                                <?=$this->transEsc('AvailabilityPlus::reason')?>: <?=$reason?><br>
+                            <?php endif; ?>
+                            <?php if(!empty($creator)): ?>
+                                <?=$this->transEsc('AvailabilityPlus::created by')?>: <?=$creator?><br>
+                            <?php endif; ?>
+                            <?php if(!empty($date)): ?>
+                                <?=$this->transEsc('AvailabilityPlus::date')?>: <?=$date?><br>
+                            <?php endif; ?>
+                            <?php if(!empty($detailsLink)): ?>
+                                <a href="<?=$detailsLink?>" target="_blank"><?=$this->transEsc('AvailabilityPlus::link to more details')?></a><br>
+                            <?php endif; ?>
+                            <?php if(!empty($rules)): ?>
+                                <?=$this->transEsc('AvailabilityPlus::Checked rule(s)')?>: <?=$rules?><br>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+                <?php $counter = $counter + 1; ?>
+            <?php endforeach; ?>
+        </table>
+    <?php else: ?>
+            <div><?=$this->transEsc('AvailabilityPlus::no TestCases defined')?></div>
+    <?php endif; ?>
 </div>
-
