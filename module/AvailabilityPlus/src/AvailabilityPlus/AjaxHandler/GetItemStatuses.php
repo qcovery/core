@@ -57,6 +57,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
     protected $language;
 
+    protected $urlPath = '/vufind/';
+
     /**
      * Resolver driver plugin manager
      *
@@ -79,6 +81,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $this->renderer = $renderer;
         $this->default_template = 'ajax/default.phtml';
         $this->resolverManager = $rm;
+        if (isset($this->config['General']['url_path'])) {
+            $this->urlPath = $this->config['General']['url_path'];
+        }
     }
 
     /**
@@ -400,7 +405,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 }
 
                 if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                    $url = '/vufind/Record/' . $parentId;
+                    $url = $this->urlPath.'Record/' . $parentId;
                 }
             } catch (\Exception $e) {
                 $url = '';
@@ -481,9 +486,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $label = 'MultiVolumeWork';
             if($this->list) {
                 if($this->source == "Search2") {
-                    $url = "/vufind/Search2Record/".$this->id;
+                    $url = $this->urlPath."Search2Record/".$this->id;
                 } else {
-                    $url = "/vufind/Record/".$this->id;
+                    $url = $this->urlPath."Record/".$this->id;
                 }
             }
             $response = $this->generateResponse($check, '', $level, $label, $template, $parentData, $url, true, $check_type);

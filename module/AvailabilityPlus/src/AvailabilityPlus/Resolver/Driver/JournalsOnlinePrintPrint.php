@@ -27,9 +27,9 @@ class JournalsOnlinePrintPrint extends JournalsOnlinePrint
                     $level = "PrintAccess";
                     $label = "PrintAccess";
                     if(!empty($result->Signature)) {
-                        $url = '/vufind/Search/Results?lookfor='.$result->Signature.'&type=Signature';
+                        $url = $this->urlPath.'Search/Results?lookfor='.$result->Signature.'&type=Signature';
                     } else {
-                        $url = '/vufind/Search/Results?lookfor='.$result->Title.'&type=Title';
+                        $url = $this->urlPath.'Search/Results?lookfor='.$result->Title.'&type=Title';
                     }
 
                     if(!in_array($url, $urls)) {

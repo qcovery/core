@@ -5,6 +5,7 @@ namespace AvailabilityPlus\Resolver\Driver;
 use VuFind\Config\SearchSpecsReader;
 use VuFind\Crypt\HMAC;
 use VuFind\Record\Loader;
+use Laminas\Config\Config;
 
 class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 {
@@ -27,13 +28,17 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $language;
 
+    protected $availabilityplusConfig;
+
+    protected $urlPath = '/vufind/';
+
     /**
      * Constructor
      *
      * @param string            $baseUrl    Base URL for link resolver
      * @param \Laminas\Http\Client $httpClient HTTP client
      */
-    public function __construct($baseUrl, \Laminas\Http\Client $httpClient, $additionalParams, $rules, HMAC $hmac, $resolverConfig)
+    public function __construct($baseUrl, \Laminas\Http\Client $httpClient, $additionalParams, $rules, HMAC $hmac, $resolverConfig, Config $availabilityplusConfig)
     {
         parent::__construct($baseUrl);
         $this->httpClient = $httpClient;
@@ -42,6 +47,10 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $this->hmac = $hmac;
         $this->resolverConfig = $resolverConfig;
         $this->setLanguage();
+        $this->availabilityplusConfig = $availabilityplusConfig->toArray();;
+        if (isset($this->availabilityplusConfig['General']['url_path'])) {
+            $this->urlPath = $this->availabilityplusConfig['General']['url_path'];
+        }
     }
 
     /**
