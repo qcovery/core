@@ -42,7 +42,7 @@
             <?php endforeach; ?>
           <?php endif; ?>
 
-          <?php $journalTitle = $this->driver->getContainerTitleResultList(); $summDate = $this->driver->getPublicationDates(); ?>
+          <?php $journalTitle = $this->driver->getContainerTitle(); $summDate = $this->driver->getPublicationDates(); ?>
           <?php if (!empty($journalTitle)): ?>
             <?=!empty($summAuthor) ? '<br>' : ''?>
             <?php $containerSource = $this->driver->getSourceIdentifier(); ?>
@@ -77,9 +77,9 @@
         <?php endif; ?>
       <?php endif; ?>
 
-      <?php if($this->driver->getTypeOfContent()): ?>
+      <?php /*if($this->driver->getTypeOfContent()): ?>
           <div>Art des Inhalts: <?=$this->driver->getTypeOfContent()?></div>
-      <?php endif; ?>
+      <?php endif;*/ ?>
 
       <?php
       /* Display information on duplicate records if available */
@@ -131,8 +131,9 @@
         // Display an OpenURL link if configured to do so:
         $openUrl = $this->openUrl($this->driver, 'results');
         $openUrlActive = $openUrl->isActive();
-        $doi = $this->doi($this->driver, 'results');
-        $doiActive = $doi->isActive();
+        //$doi = $this->doi($this->driver, 'results');
+        //$doiActive = $doi->isActive();
+	$doiActive = false;
         // Account for replace_other_urls setting
         $urls = $this->record($this->driver)->getLinkDetails($openUrlActive);
 
