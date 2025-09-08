@@ -87,9 +87,15 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
                 unset($this->results['fields-phrase'][$term]);
             }
         }
-        $this->results['all']['fields-terms'] = array('percent' => round(100 * $allFieldTerms / $all));
-        $this->results['all']['fields-phrase'] = array('percent' => round(100 * $allFieldPhrase / $all));
-        $this->results['all']['fields-all'] = array('percent' => round(100 * $allFields / $all));
+        if ($all > 0) {
+            $this->results['all']['fields-terms'] = array('percent' => round(100 * $allFieldTerms / $all));
+            $this->results['all']['fields-phrase'] = array('percent' => round(100 * $allFieldPhrase / $all));
+            $this->results['all']['fields-all'] = array('percent' => round(100 * $allFields / $all));
+        } else {
+            $this->results['all']['fields-terms'] = array('percent' => 0);
+            $this->results['all']['fields-phrase'] = array('percent' => 0);
+            $this->results['all']['fields-all'] = array('percent' => 0);
+        }
 
         return $this->results;
     }
