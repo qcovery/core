@@ -136,7 +136,7 @@
                     <span class="storage_link">
                         <span class="storage_prefix"><?=$this->transEsc('AvailabilityPlus::department')?> </span>
                         <a href="<?=$result['storage']['url']?>" class="<?=$result['storage']['level']?>" title='<?=$this->transEsc("AvailabilityPlus::{$result['storage']['label']}")?>' target="_blank">
-                            1<?=$this->transEsc("AvailabilityPlus::{$result['storage']['label']}")?>
+                            <?=$this->transEsc("AvailabilityPlus::{$result['storage']['label']}")?>
                         </a>
                     </span>
                 <?php else: ?>
