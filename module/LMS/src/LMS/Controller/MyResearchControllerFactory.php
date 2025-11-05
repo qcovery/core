@@ -29,6 +29,7 @@ namespace LMS\Controller;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use VuFind\Controller\AbstractBaseFactory;
 
 /**
  * Generic controller factory.
@@ -39,7 +40,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class MyResearchControllerFactory implements FactoryInterface
+class MyResearchControllerFactory extends AbstractBaseFactory
 {
     /**
      * Create an object
@@ -61,6 +62,13 @@ class MyResearchControllerFactory implements FactoryInterface
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        return new $requestedName($container);
+        $session = new \Laminas\Session\Container(
+            'cart_followup',
+            $container->get(\Laminas\Session\SessionManager::class)
+        );
+        $configLoader = $container->get(\VuFind\Config\PluginManager::class);
+        $export = $container->get(\VuFind\Export::class);
+        return parent::__invoke($container, $requestedName, [$session, $configLoader, $export]);
+
     }
 }
