@@ -75,7 +75,6 @@
             <li><a class="sp-advanced" href="<?=$this->url($advSearch) . (($this->searchId ?? false) ? '?edit=' . $this->escapeHtmlAttr($this->searchId) : $hiddenFilterParams) ?>" rel="nofollow"><?=$this->transEsc("Advanced Search")?></a></li>
             <?php endif; ?>
             <li><a class="sp-history" href="<?=$this->url('search-history')?>"><?=$this->transEsc('Search History')?></a></li>
-            <li><a class="sp-browsing" href="<?=$this->url('content-page', ['page' => 'browsing']) ?>" rel="nofollow"><?=$this->transEsc('Browsing')?></a></li>
             <?php if ($geoUrl = $this->geocoords()->getSearchUrl($options)) : ?>
             <li><a class="sp-geographic" href="<?=$geoUrl ?>" rel="nofollow"><?=$this->transEsc('Geographic Search')?></a></li>
             <?php endif; ?>

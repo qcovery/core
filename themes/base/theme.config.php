@@ -17,7 +17,7 @@ return [
         'factories' => [
             'UISettings\View\Helper\UISettings\UISettings' => 'UISettings\View\Helper\UISettings\UISettingsFactory',
             'HeadTitle\View\Helper\Root\HeadTitle' => 'HeadTitle\View\Helper\Root\HeadTitleFactory',
-            'VuFind\View\Helper\Root\RecordDataFormatter' => 'MPG\View\Helper\Root\RecordDataFormatterFactory',
+            'VuFind\View\Helper\Root\RecordDataFormatter' => 'VuFind\View\Helper\Root\RecordDataFormatterFactory',
         ],
         'aliases' => [
             'uisettings' => 'UISettings\View\Helper\UISettings\UISettings',

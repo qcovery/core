@@ -30,8 +30,32 @@
 ?>
 <button class="close-offcanvas btn btn-link" data-toggle="offcanvas"><?=$this->transEsc('navigate_back') ?></button>
 
+<?php if ($results->getResultTotal() > 0 || $hasVisibleCheckboxes): ?>
+  <h2><?=$this->transEsc($this->slot('side-facet-caption')->get('Refine Results')) ?></h2>
+  <span class="sr-only"><?=$this->transEscAttr('page_reload_on_select_hint') ?></span>
+<?php endif; ?>
+
 <?=$this->render('search/controls/limit.phtml')?>
 <?=$this->render('search/controls/sort.phtml')?>
+
+<?php
+  $checkboxFilters = $this->recommend->getCheckboxFacetSet();
+  $hasVisibleCheckboxes = false;
+  if (count($checkboxFilters) > 0) {
+    foreach ($checkboxFilters as $current) {
+      if ($results->getResultTotal() > 0 || $current['alwaysVisible']) {
+        $hasVisibleCheckboxes = true;
+        break;
+      }
+    }
+  }
+?>
+
+<?php if ($hasVisibleCheckboxes): ?>
+    <div class="checkboxFilter">
+      <?=$this->context($this)->renderInContext('Recommend/SideFacets/checkbox-filters.phtml', ['checkboxFilters' => $checkboxFilters, 'results' => $results]); ?>
+    </div>
+<?php endif; ?>
 
 <!-- E-Ressourcenfilter -->
 <?php
@@ -50,27 +74,6 @@
 ?>
 <!-- E-Ressourcenfilter -->
 
-<?php
-  $checkboxFilters = $this->recommend->getCheckboxFacetSet();
-  $hasVisibleCheckboxes = false;
-  if (count($checkboxFilters) > 0) {
-    foreach ($checkboxFilters as $current) {
-      if ($results->getResultTotal() > 0 || $current['alwaysVisible']) {
-        $hasVisibleCheckboxes = true;
-        break;
-      }
-    }
-  }
-?>
-<?php if ($results->getResultTotal() > 0 || $hasVisibleCheckboxes): ?>
-  <h2><?=$this->transEsc($this->slot('side-facet-caption')->get('Refine Results')) ?></h2>
-  <span class="sr-only"><?=$this->transEscAttr('page_reload_on_select_hint') ?></span>
-<?php endif; ?>
-<?php if ($hasVisibleCheckboxes): ?>
-    <div class="checkboxFilter">
-      <?=$this->context($this)->renderInContext('Recommend/SideFacets/checkbox-filters.phtml', ['checkboxFilters' => $checkboxFilters, 'results' => $results]); ?>
-    </div>
-<?php endif; ?>
 <?php $extraFilters = isset($this->extraSideFacetFilters) ? $this->extraSideFacetFilters : []; ?>
 <?php $collapsedFacets = $this->recommend->getCollapsedFacets() ?>
 <?php $filterList = array_merge($results->getParams()->getFilterList(true), $extraFilters); ?>
@@ -90,11 +93,13 @@
     <?php $collapsed = in_array($title, $collapsedFacets); ?>
     <?php // Data-title attribute is for analytics use.  Do not remove. ?>
     <div class="facet-group" id="side-panel-<?=$this->escapeHtmlAttr($title) ?>" data-title="<?=$this->escapeHtmlAttr($cluster['label']) ?>">
-      <button class="title<?php if ($collapsed): ?> collapsed<?php endif ?>" data-toggle="collapse" data-target="#side-collapse-<?=$this->escapeHtmlAttr($title) ?>" >
-        <span class="facet-title"><?=$this->transEsc($cluster['label'])?></span>
-        <?=$this->icon('collapse', 'facet-title-icon') ?>
-      </button>
-      <div id="side-collapse-<?=$this->escapeHtmlAttr($title) ?>" role="listbox" aria-expanded="<?=$collapsed ? 'false' : 'true'?>" class="collapse<?php if (!$collapsed): ?> in<?php endif ?>"<?php if (in_array($title, $forceUncollapsedFacets)): ?> data-force-in="1"<?php endif ?>>
+      <h3 class="facet-title">
+        <button class="title<?php if ($collapsed): ?> collapsed<?php endif ?>" data-bs-toggle="collapse" data-bs-target="#side-collapse-<?=$this->escapeHtmlAttr($title) ?>" >
+          <span class="facet-title"><?=$this->transEsc($cluster['label'])?></span>
+          <?=$this->icon('collapse', 'facet-title-icon') ?>
+        </button>
+      </h3>
+      <div id="side-collapse-<?=$this->escapeHtmlAttr($title) ?>" role="listbox" class="collapse<?php if (!$collapsed): ?> show<?php endif ?>"<?php if (in_array($title, $forceUncollapsedFacets)): ?> data-force-uncollapsed="1"<?php endif ?>>
         <?=
           $this->context($this)->renderInContext(
               'Recommend/SideFacets/facet.phtml',

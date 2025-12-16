@@ -1,7 +1,8 @@
 /*----------------------------------------------------------------------
-build in: 08 2022
+last update: 12 2025
 copyright: effective webwork GmbH – www.effective-webwork.de
 ----------------------------------------------------------------------*/
+
 
 /*----------------------------------------------------------------------
 colors
@@ -17,6 +18,8 @@ colors
     --activestate: #BA001B;
     --hoverstate: #CB3A47;
     --focusstate: #CB3A47;
+    
+    --borderradiusnormal: 5px;
     }
 
 
@@ -24,35 +27,24 @@ colors
 fonts
 ----------------------------------------------------------------------*/
 
-/* lato-regular - latin */
+/* open-sans-regular - latin */
 @font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../fonts/lato-v20-latin-regular.eot'); /* IE9 Compat Modes */
-  src: local(''),
-       url('../fonts/lato-v20-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../fonts/lato-v20-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../fonts/lato-v20-latin-regular.woff') format('woff'), /* Modern Browsers */
-       url('../fonts/lato-v20-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../fonts/lato-v20-latin-regular.svg#Lato') format('svg'); /* Legacy iOS */
-}
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/open-sans-v44-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+    }
 
-/* lato-700 - latin */
+/* open-sans-700 - latin */
 @font-face {
-  font-family: 'Lato';
-  font-style: normal;
-  font-weight: 700;
-  src: url('../fonts/lato-v20-latin-700.eot'); /* IE9 Compat Modes */
-  src: local(''),
-       url('../fonts/lato-v20-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('../fonts/lato-v20-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
-       url('../fonts/lato-v20-latin-700.woff') format('woff'), /* Modern Browsers */
-       url('../fonts/lato-v20-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('../fonts/lato-v20-latin-700.svg#Lato') format('svg'); /* Legacy iOS */
-}
-
-
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../fonts/open-sans-v44-latin-700.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+    }
+    
 
 /*----------------------------------------------------------------------
 global structure & normalize
@@ -63,7 +55,7 @@ body {
     border: 0 none;
     padding: 0;
     color: var(--black);
-    font-family: 'Lato', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-weight: 400;
     font-size: 18px;
     line-height: 28px;
@@ -127,7 +119,7 @@ table {
 mark {
     color: inherit;
     padding: 1px 5px;
-    border-radius: 10px;
+    border-radius: var(--borderradiusnormal);
     border: 1px solid var(--lightgrey);
     background: transparent;
     }
@@ -243,7 +235,7 @@ select {
     color: var(--white);
     vertical-align: middle;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 input[type=button]:hover,
@@ -260,6 +252,7 @@ select:hover {
 
 input[type="text"],
 input[type="email"],
+input[type="number"],
 input[type="url"],
 input[type="tel"],
 input[type="date"],
@@ -268,7 +261,7 @@ input[type="password"] {
     padding: 8px 15px;
     box-shadow: 0px 0px 0px transparent;
     border: 0px none;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     vertical-align: middle;
     }
     
@@ -282,6 +275,7 @@ textarea {
 
 input[type="text"]:hover,
 input[type="email"]:hover,
+input[type="number"]:hover,
 input[type="url"]:hover,
 input[type="tel"]:hover,
 input[type="date"]:hover,
@@ -403,6 +397,15 @@ header .navbar-collapse	{
     font-weight: 700;
     }
 
+.navbar-brand, .navbar-brand:hover {
+    display: inline-block;
+    background: url(../images/discovery-logo.svg) no-repeat;
+    background-size: cover;
+    color: transparent !important;
+    width: 200px;
+    height: 65px;
+    }
+
 .languageHighlight {
     font-weight: 400;
     }
@@ -429,7 +432,7 @@ header .nav-tabs li a {
     display: block;
     border: 1px solid var(--white);
 	padding: 5px 15px;
-	border-radius: 3px 3px 0 0;
+	border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
 	}
 
 header .nav-tabs li.active a {
@@ -470,7 +473,7 @@ header .nav-tabs li.active a {
 	
 #searchForm_lookfor {
 	width: calc(100% - 300px);
-	border-radius: 3px 0px 0px 3px;
+	border-radius: var(--borderradiusnormal) 0px 0px var(--borderradiusnormal);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 	}
 	
@@ -481,7 +484,7 @@ header .nav-tabs li.active a {
 
 select.searchForm_type {
 	background: var(--white);
-	border-radius: 0 3px 3px 0;
+	border-radius: 0 var(--borderradiusnormal) var(--borderradiusnormal) 0;
 	border-left: 1px solid var(--lightgrey);
 	color: var(--darkgrey);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
@@ -492,7 +495,7 @@ select.searchForm_type {
 	text-align: left;
 	font-size: 0;
 	padding: 8px 5px;
-	border-radius: 3px;
+	border-radius: var(--borderradiusnormal);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 	}
 	
@@ -587,7 +590,7 @@ select.searchForm_type {
 
 .active-filters {
     background: var(--light);
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .active-filters .title {
@@ -734,7 +737,7 @@ modal, window-overlay
     }
 
 .modal input {
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .modal .back-to-login,
@@ -824,9 +827,10 @@ main
     }
 
 #content input[type="text"],
+#content input[type="number"],
 #content input[type="password"] {
     border: 1px solid var(--lightgrey);
-    border-radius: 8px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .record-list {
@@ -919,11 +923,11 @@ main
 	}
 	
 .template-name-results .result:first-child {
-	border-radius: 3px 3px 0 0;
+	border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
 	}
 
 .template-name-results .result:last-child {
-	border-radius: 0 0 3px 3px;
+	border-radius: 0 0 var(--borderradiusnormal) var(--borderradiusnormal);
 	border-bottom: 1px solid var(--lightgrey);
 	}
 
@@ -982,11 +986,11 @@ main
     -webkit-hyphens: auto;
     -ms-hyphens: auto;
     hyphens: auto;
-    border-radius: 3px 3px 0 0;
+    border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
 	}
 
 .template-name-results .title.collapsed {
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     border-bottom: 1px solid transparent;
 	}
 
@@ -998,7 +1002,7 @@ main
     background: var(--foggrey);
     padding: 8px 15px;
     display: inline-block;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     margin: 0 0 5px 0;
     text-decoration: none;
     }
@@ -1011,7 +1015,7 @@ main
     position: relative;
     background: var(--activestate) !important;
     color: var(--white) !important;
-    border-radius: 3px 3px 0 0;
+    border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
     margin: 0;
     padding: 8px 15px 13px 15px;
     }
@@ -1066,18 +1070,6 @@ main
 	display: none;
 	}
 	
-.mainbody .nav-tabs {
-    list-style: none;
-    margin: 0 0 -1px 0;
-    }	
-
-.mainbody .nav-tabs li {
-    border: 1px solid var(--lightgrey);
-    padding: 15px;
-    border: 3px 3px 0 0;
-    display: inline-block;
-    }	
-	
 .search-header {
 	padding: 0;
 	}
@@ -1088,7 +1080,7 @@ main
 
 .search-controls select {
     width: 40%;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .top-facets-contents {
@@ -1097,6 +1089,12 @@ main
 
 .facet-group {
     margin: 15px 0 0 0;
+    border: 1px solid var(--lightgrey);
+    border-radius: var(--borderradiusnormal);
+    }
+
+#content h3.facet-title {
+    margin: 0;
     }
 
 .facet-group button.title {
@@ -1141,11 +1139,17 @@ main
     display: none;
     }
 
-.facet-group .collapse.in {
+.facet-group .collapse.show {
     display: block;
     }
 
-.facet-group .facet {
+.checkboxFilter {
+    border: 1px solid var(--lightgrey);
+    border-radius: var(--borderradiusnormal);
+    }
+
+.facet-group .facet,
+.checkboxFilter .facet {
     display: block;
     border-top: 1px solid var(--lightgrey);
     padding: 10px 15px;
@@ -1155,11 +1159,13 @@ main
     hyphens: auto;
     }
     
-.facet-group .facet:hover {
+.facet-group .facet:hover,
+.checkboxFilter .facet:hover {
     background: var(--light);
     }
 
-.facet-group .facet:first-child {
+.facet-group .facet:first-child,
+.checkboxFilter .facet:first-child {
     border-top: 0px;
     }
 
@@ -1191,12 +1197,14 @@ main
     content: "\e914";
     font-size: 30px;
     float: left;
-    }    
-    
+    }
+
 .button-quick-filter {
-    border-radius: 3px;
-    background: var(--lightgrey);
+    border: 1px solid var(--lightgrey);
+    border-radius: var(--borderradiusnormal);
+    background: var(--light);
     padding: 8px 15px;
+    margin: 15px 0 0 0;
     }    
     
 .pagination {
@@ -1209,18 +1217,18 @@ main
 	margin: 0 3px 6px 0;
 	}
 
-.pagination li span {
+.pagination li > span {
 	display: block;
 	border: 1px solid var(--lightgrey);
 	padding: 5px 10px;
-	border-radius: 3px;
+	border-radius: var(--borderradiusnormal);
 	}
 
 .pagination li a {
 	display: block;
 	border: 1px solid var(--lightgrey);
 	padding: 5px 10px;
-	border-radius: 3px;
+	border-radius: var(--borderradiusnormal);
 	}
 
 .pagination li a:hover {
@@ -1233,29 +1241,42 @@ main
 	}
 
 .template-name-view .media-body {
-	border-radius: 3px;
+	border-radius: var(--borderradiusnormal);
 	border: 1px solid var(--lightgrey);
 	padding: 30px;
 	}
 
-.template-name-view .media-body table {
+.template-name-view .media-body table,
+.template-name-view .tab-content table {
     width: 100%;
     }
     
-.template-name-view .media-body tr {
-	border-bottom: 1px solid var(--lightgrey);
+.template-name-view .media-body tr,
+.template-name-view .tab-content tr {
+	border-top: 1px solid var(--lightgrey);
 	}    
 
-.template-name-view .media-body th {
+.template-name-view .media-body th,
+.template-name-view .tab-content th {
     text-align: left;
+    vertical-align: top;
+    padding: 10px 10px 10px 0;
+    width: 200px;
+    }
+
+.template-name-view .media-body td,
+.template-name-view .tab-content td {
     vertical-align: top;
     padding: 10px 0;
     }
 
-.template-name-view .media-body td {
-    vertical-align: top;
-    padding: 10px 0;
-    }
+.template-name-view .media-body caption,
+.template-name-view .tab-content table caption {
+	text-align: left;
+    font-size: 150%;
+    line-height: 100%;
+    margin: 0 0 15px 0;
+	}  
 
 .template-name-view #staffview-header {
 	text-align: right;
@@ -1280,7 +1301,7 @@ main
 	padding: 8px 15px;
 	border: 1px solid var(--lightgrey);
 	margin: 0 2px 5px 0;
-	border-radius: 3px;	
+	border-radius: var(--borderradiusnormal);	
 	}
 
 .template-name-view .record-nav  ul.action-toolbar li.dropdown ul {
@@ -1307,7 +1328,7 @@ main
     margin: 0 3px -1px 0;
     padding: 8px 15px;
     border: 1px solid var(--lightgrey);
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     margin: 0 0 5px 0;
     text-decoration: none;
     }
@@ -1319,7 +1340,7 @@ main
 .template-name-view .result-table-toggle-active {
     position: relative;
     background: var(--lightgrey) !important;
-    border-radius: 3px 3px 0 0;
+    border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
     padding: 8px 15px 13px 15px;
     margin: 0;
     }
@@ -1377,7 +1398,7 @@ main
 	display: inline-block;
 	margin: 0 3px -1px 0;
 	padding: 8px 15px;
-	border-radius: 3px 3px 0 0;
+	border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
 	border: 1px solid var(--lightgrey);
 	}
 
@@ -1427,6 +1448,10 @@ main
 
 select#alphaBrowseForm_source {
     margin: 0 0 15px 0;
+    }
+
+.myresearch-menu ul {
+    list-style: none;
     }
 
 .myresearch-menu {
@@ -1559,7 +1584,7 @@ select#alphaBrowseForm_source {
     width: calc(33.33% - 30px);
     margin: 30px 30px 0 0;
     background: var(--white);
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     box-shadow: 0 5px 30px rgba(0,0,0,0.2);
     }
 
@@ -1584,7 +1609,7 @@ select#alphaBrowseForm_source {
     display: inline-block;
     margin: 15px 0 0 0;
     border: 1px solid var(--activestate);
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     padding: 8px 15px;
     }
 
@@ -1595,17 +1620,26 @@ select#alphaBrowseForm_source {
 .teaser-image {
 	margin: -30px -30px 30px -30px;
 	max-width: calc(100% + 60px);
-	border-radius: 3px 3px 0 0;
+	border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
 	}
-
-.date-fields input {
-    border: 1px solid var(--lightgrey);
-    }
     
-.slider.slider-horizontal {
-    width: calc(100% - 30px) !important;
+.slider-container {
     margin: 15px 15px 30px 15px;
-    }    
+    }
+
+.slider-container .noUi-connect {
+    background-color: var(--foggrey);
+    }
+
+.slider-container .noUi-handle::after,
+.slider-container .noUi-handle::before {
+    background: var(--lightgrey);
+    }
+
+.slider-container .noUi-handle:hover::after,
+.slider-container .noUi-handle:hover::before {
+    background: var(--activestate);
+    }
 
 .slider-handle {
     background-image: none !important;
@@ -1625,7 +1659,7 @@ select#alphaBrowseForm_source {
     list-style: none;
     margin: 0 0 30px 0;
     padding: 15px 15px 10px 15px;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     border: 1px solid var(--lightgrey);
     }
 
@@ -1638,7 +1672,7 @@ select#alphaBrowseForm_source {
     display: inline-block;
     border: 1px solid var(--activestate);
     padding: 8px 15px;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .sidebar .pager a:hover {
@@ -1651,9 +1685,9 @@ select#alphaBrowseForm_source {
 
 .template-name-view .sidebar nav {	
 	border: 1px solid var(--lightgrey);
-	border-radius: 3px;
+	border-radius: var(--borderradiusnormal);
 	padding: 30px 15px;
-	margin: 0 0 30px 0;
+	margin: 0 0 15px 0;
 	}
 
 .template-name-view .sidebar .pager {
@@ -1674,7 +1708,7 @@ select#alphaBrowseForm_source {
 .sidebar .availabilityItem {
     border: 1px solid var(--activestate);
     padding: 15px;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .home-facet {
@@ -1691,7 +1725,7 @@ select#alphaBrowseForm_source {
     padding: 20px 15px;
     display: table;
     border: 1px solid var(--lightgrey);
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .not-found-contact i {
@@ -1741,7 +1775,7 @@ advanced Search
     display: flex;
     flex-wrap: wrap;
     -ms-flex-wrap: wrap;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     padding: 30px;
     margin: 0 0 15px 0;
 	border: 0px;
@@ -1821,7 +1855,7 @@ advanced Search
     display: block;
     margin: 15px 0;
     padding: 15px 30px;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
 	border: 0px;
 	background: var(--white);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);    
@@ -1868,7 +1902,7 @@ advanced Search
 	padding: 15px;
 	background: var(--white);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-	border-radius: 3px;    
+	border-radius: var(--borderradiusnormal);
     }    
 
 #groupJoin select {
@@ -1895,7 +1929,7 @@ advanced Search
 	padding: 15px;
 	background: var(--white);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-	border-radius: 3px;
+	border-radius: var(--borderradiusnormal);
     }    
 
 .template-name-advanced .mainbody.right,
@@ -1931,7 +1965,7 @@ advanced Search
     font-weight: 400;
     background: var(--white);
     color: var(--activestate);
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     }
 
 .bulkActionButtons button:hover {
@@ -1951,7 +1985,7 @@ advanced Search
     }
 
 #advSearchForm fieldset {
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
   	margin: 30px 0 0 0;
 	border: 0px;
 	background: var(--white);
@@ -1960,7 +1994,7 @@ advanced Search
 
 #advSearchForm legend {
     padding: 3px 10px;
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     font-weight: 700;
 	border: 0px;
 	background: var(--white);
@@ -2012,7 +2046,6 @@ advanced Search
     }
 
 
-
 /*----------------------------------------------------------------------
 footer
 ----------------------------------------------------------------------*/
@@ -2046,7 +2079,7 @@ footer {
     display: block;
     margin: 15px 0 0 0;
     border: 1px solid var(--activestate);
-    border-radius: 3px;
+    border-radius: var(--borderradiusnormal);
     padding: 8px 15px;
     }
 	
@@ -2168,6 +2201,7 @@ Small Desktop
 
 }
 
+
 /*----------------------------------------------------------------------
 Tiny Desktop
 ----------------------------------------------------------------------*/
@@ -2178,6 +2212,7 @@ Tiny Desktop
         width: calc(50% - 30px);
         }
 }
+
 
 /*----------------------------------------------------------------------
 Tablet-Styles (Landscape)
@@ -2239,7 +2274,7 @@ Tablet-Styles (Landscape)
         display: block;
         width: calc(100% - 30px);
         margin: 0 0 15px 0;
-        border-radius: 3px;
+        border-radius: var(--borderradiusnormal);
         }
 
     .search-filter-toggle::after {
@@ -2280,7 +2315,7 @@ Tablet-Styles (Landscape)
         display: block;
         margin: 0 -1px 5px 0;
         letter-spacing: 0;
-        border-radius: 3px 0 0 3px;
+        border-radius: var(--borderradiusnormal) 0 0 var(--borderradiusnormal);
         }
         
     .record-tabs .tab-content {
@@ -2313,7 +2348,7 @@ Tablet-Styles (Landscape)
 
     #advSearchForm input,
     #advSearchForm select {
-        border-radius: 3px;
+        border-radius: var(--borderradiusnormal);
         }
 
     #groupJoin {
@@ -2321,7 +2356,7 @@ Tablet-Styles (Landscape)
         width: calc(100% - 30px);
         border: 1px solid var(--lightgrey);
         padding: 15px;
-        border-radius: 3px;
+        border-radius: var(--borderradiusnormal);
         }    
 
     .modal-body {
@@ -2351,7 +2386,7 @@ Tablet-Styles (Landscape)
         font-weight: 400;
         background: var(--white);
         color: var(--activestate);
-        border-radius: 3px;
+        border-radius: var(--borderradiusnormal);
         }
     
     .template-name-results .cart-add:hover,
@@ -2412,7 +2447,7 @@ Smartphone (Landscape)
     	display: block;
     	padding: 0;
     	z-index: 996;
-    	border-radius: 3px;
+    	border-radius: var(--borderradiusnormal);
     	}
 
     .navbar-toggle i {
@@ -2480,16 +2515,17 @@ Smartphone (Landscape)
     #searchForm_lookfor {
     	width: 100%;
     	margin: 0 0 5px 0;
-    	border-radius: 3px;
+    	padding: 8px 15px;
+    	border-radius: var(--borderradiusnormal);
     	}	
 	
     #searchForm_type {
-    	width: calc(100% - 135px);
-    	border-radius: 3px;
+    	width: calc(100% - 145px);
+    	border-radius: var(--borderradiusnormal);
     	}        
         
     .search-container button {
-        width: 130px;
+        width: 140px;
         font-size: 18px;
         padding: 8px 20px 8px 5px;
         }
@@ -2506,7 +2542,7 @@ Smartphone (Landscape)
         
     .record-tabs li a {
         margin: 0 0 5px 0;
-        border-radius: 3px;
+        border-radius: var(--borderradiusnormal);
         }
 
     .record-tabs .tab-content {
@@ -2539,7 +2575,7 @@ Smartphone (Landscape)
         }
 
     header .nav-tabs li a {
-        border-radius: 3px;
+        border-radius: var(--borderradiusnormal);
         padding: 8px 15px;
         }
 
@@ -2638,7 +2674,16 @@ Smartphone (Landscape)
         padding: 0 0 10px 0;
         }     
 
+    .template-name-view .media-body th,
+    .template-name-view .tab-content th {
+        display: block;
+        padding: 10px 0 0 0;
+        font-weight: 700;
+        width: auto;
+        }
+
     .template-name-view .media-body td,
+    .template-name-view .tab-content td,
     .details-tab td {
         display: block;
         border: 0;
