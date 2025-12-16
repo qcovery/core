@@ -640,7 +640,7 @@ modal, window-overlay
 	background-color: rgba(0, 0, 0, 0.6);
 	}	
 	
-#modal.in {
+#modal.show {
     display: block;
 	}	
 
@@ -660,7 +660,7 @@ modal, window-overlay
 	box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.7);
 	}
 
-#modal.in .modal-content {
+#modal.show .modal-content {
     display: block;
     top: 10%;
 	}
@@ -2584,7 +2584,7 @@ Smartphone (Landscape)
         max-width: calc(100% - 30px);
     	}
 
-    #modal.in .modal-content {
+    #modal.show .modal-content {
         top: 60px;
     	}
 
