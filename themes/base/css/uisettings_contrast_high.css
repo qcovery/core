@@ -1,14 +1,4 @@
 /*----------------------------------------------------------------------
-global structure & normalize
-----------------------------------------------------------------------*/
-
-body {
-    color: var(--white);
-    background: var(--black);
-    }
-
-
-/*----------------------------------------------------------------------
 colors
 ----------------------------------------------------------------------*/
 
@@ -23,7 +13,16 @@ colors
     --hoverstate: #EDD3B4;
     --focusstate: #EDD3B4;
     }
-    
+
+
+/*----------------------------------------------------------------------
+global structure & normalize
+----------------------------------------------------------------------*/
+
+body {
+    color: var(--white);
+    background: var(--black);
+    }
     
 /*----------------------------------------------------------------------
 others
@@ -56,6 +55,12 @@ header {
     background: var(--white);
     }
 
+header .navbar-brand,
+.sponsor-note img,
+.teaser-image {
+    filter: grayscale(100%);
+    }
+
 header .nav-tabs {
     border-bottom: 1px solid var(--lightgrey);
     }
@@ -84,7 +89,8 @@ header .nav-tabs li a:hover {
     border-bottom: 1px solid var(--white);
     }
 
-.template-name-advanced .main {
+.template-name-advanced .main,
+.template-name-results .result {
     background: var(--black);
     }
 
@@ -124,9 +130,6 @@ header .nav-tabs li a:hover {
     border-radius: 8px;
     }
 
-.template-name-results .result,
-.mainbody .nav-tabs li,
-.facet-group .collapse.in,
 .not-found-contact,
 .sidebar .availabilityItem {
     background: var(--darkgrey);    
@@ -137,9 +140,7 @@ header .nav-tabs li a:hover {
     background: var(--darkgrey) !important;
     }
 
-.template-name-view .media-body,
 .sidebar nav,
-.sidebar .search-sort,
 .pagination li,
 .fidrom-footer,
 .action-toolbar,
@@ -149,7 +150,6 @@ header .nav-tabs li a:hover {
 .template-name-advanced #groupPlaceHolder,
 .template-name-advanced #advSearchForm legend,
 .template-name-advanced .facet-group,
-.template-name-history .mainbody,
 .template-name-advanced .sidebar,
 .browsing-column,
 .fid-copyright {

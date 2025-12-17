@@ -61,6 +61,7 @@ body {
     line-height: 28px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
     }
 
 p, form, img, legend, ul, ol, li, h1, h2, h3, h4, h5, h6, dl, dt, dd {
@@ -99,12 +100,22 @@ a {
     text-decoration: none;
     }
 
-a:hover, a:focus {
+a:hover {
     color: var(--hoverstate);
     outline-width: 0;
     text-decoration: underline;
     }
-    
+
+a:focus {
+    color: var(--hoverstate);
+    outline-offset: 2px;
+    outline-style: solid;
+    outline-width: 2px;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-style: solid;
+    }
+
 a:active {
     color: var(--focusstate);
     outline-width: 0;
@@ -248,6 +259,22 @@ button:hover,
 select:hover {
     background: var(--hoverstate);
     color: var(--white);
+    text-decoration: underline;
+    }
+
+input[type=button]:focus,
+input[type=submit]:focus,
+button:focus,
+.btn-default:focus,
+.search-filter-toggle:focus,
+.btn-group .btn:focus,
+.search-controls .btn:focus,
+select:focus {
+    background: var(--hoverstate);
+    color: var(--white);
+    outline-style: solid;
+    outline-width: 2px;
+    outline-color: var(--hoverstate);
     }
 
 input[type="text"],
@@ -472,7 +499,7 @@ header .nav-tabs li.active a {
     }
 	
 #searchForm_lookfor {
-	width: calc(100% - 300px);
+	width: calc(100% - 375px);
 	border-radius: var(--borderradiusnormal) 0px 0px var(--borderradiusnormal);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 	}
@@ -491,9 +518,8 @@ select.searchForm_type {
 	}
 
 .search-container button {
-    width: 55px;
+    width: 130px;
 	text-align: left;
-	font-size: 0;
 	padding: 8px 5px;
 	border-radius: var(--borderradiusnormal);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
@@ -640,7 +666,7 @@ modal, window-overlay
 	background-color: rgba(0, 0, 0, 0.6);
 	}	
 	
-#modal.show {
+#modal.in {
     display: block;
 	}	
 
@@ -651,7 +677,7 @@ modal, window-overlay
 	
 #modal .modal-content	{
     position: absolute;
-    top: -105%;
+    top: 60px;
     left: 0;
     right: 0;
     margin: 0px auto;
@@ -660,7 +686,7 @@ modal, window-overlay
 	box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.7);
 	}
 
-#modal.show .modal-content {
+#modal.in .modal-content {
     display: block;
     top: 10%;
 	}
@@ -779,15 +805,22 @@ modal, window-overlay
     margin: 0 !important;
     }
     
+.cart-control-btns {
+    list-style: none;
+    }
+
+.cart-control-btns li {
+    display: inline-block;
+    vertical-align: middle;
+    }
+
 .cart-controls button {
     margin: 0 4px 5px 0;
     vertical-align: middle;
     }
     
-.modal #cartDelete {
-    float: left;
-    vertical-align: middle;
-    margin: 0 4px 5px 0;
+.modal #cartDelete .btn-group {
+    margin: 0;
     }
 
 
@@ -1182,7 +1215,7 @@ main
     border: 1px solid var(--lightgrey);
     font-size: 15px;
     line-height: 21px;
-    color: var(--darkgrey);
+    color: var(--black);
     }
     
 .more-facets::after {
@@ -2104,7 +2137,11 @@ footer {
     }
 
 .footer-menu li a {
-	color: var(--darkgrey);
+	color: var(--black);
+    }
+
+.footer-menu li a:hover {
+	color: var(--activestate);
     }
     
 .footer-menu li:not(:last-child)::after {
@@ -2132,8 +2169,8 @@ footer {
 	
 .sponsor-text {
 	display: inline-block;
+	color: var(--black);
 	font-size: 70%;
-	color: var(--darkgrey);
 	margin: 0 0 5px 0;
 	}
 		
@@ -2465,7 +2502,7 @@ Smartphone (Landscape)
         text-align: left;
         }
 
-     .navbar-collapse.collapse.in {
+     .navbar-collapse.collapse.show {
         top: 55px;
         }
     
@@ -2584,7 +2621,7 @@ Smartphone (Landscape)
         max-width: calc(100% - 30px);
     	}
 
-    #modal.show .modal-content {
+    #modal.in .modal-content {
         top: 60px;
     	}
 
