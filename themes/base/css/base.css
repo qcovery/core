@@ -327,7 +327,6 @@ textarea:hover {
 
 .btn-group .dropdown-menu {
     display: none;
-    list-style: none;
     z-index: 995;
     }
 
@@ -335,7 +334,7 @@ textarea:hover {
     cursor: pointer;
     }
 
-.btn-group.open .dropdown-menu {
+.btn-group .dropdown-menu.show {
     display: block;
     position: absolute;
     top: 20px;
@@ -1435,12 +1434,12 @@ main
 	border: 1px solid var(--lightgrey);
 	}
 
-.record-tabs li.active a {
+.record-tabs li a.active {
 	position: relative;
 	background: var(--lightgrey);
 	}
 
-.record-tabs li.active a:after {
+.record-tabs li a.active:after {
 	content: '';
 	position: absolute;
 	left: calc(50% - 10px);
