@@ -1,10 +1,5 @@
 <div class="searchtools hidden-print">
   <strong><?=$this->transEsc('Search Tools')?>:</strong>
-  <a class="icon-link" href="<?=$this->results->getUrlQuery()->setViewParam('rss')?>">
-    <i class="bel-rss" aria-hidden="true"></i>
-    <span class="icon-link__label"><?=$this->transEsc('Get RSS Feed')?></span>
-  </a>
-  &ndash;
   <a class="icon-link mailSearch" href="<?=$this->url('search-email')?>" data-lightbox id="mailSearch<?=$this->escapeHtmlAttr($this->results->getSearchId())?>">
     <i class="bel-brief02" aria-hidden="true"></i>
     <span class="icon-link__label"><?=$this->transEsc('Email this Search')?></span>
