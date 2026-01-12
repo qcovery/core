@@ -19,6 +19,8 @@ colors
     --hoverstate: #CB3A47;
     --focusstate: #CB3A47;
     
+    --font-weight-normal: 400;
+    --font-weight-bold: 700;
     --borderradiusnormal: 5px;
     }
 
@@ -50,15 +52,20 @@ fonts
 global structure & normalize
 ----------------------------------------------------------------------*/
 
+html {
+    font-size: 10px;
+    line-height: 1.6;
+    scroll-behavior: smooth;
+    }
+
 body {
     margin: 0 auto;
     border: 0 none;
     padding: 0;
     color: var(--black);
     font-family: 'Open Sans', sans-serif;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
+    font-weight: var(--font-weight-normal);
+    font-size: 1.8rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -104,22 +111,22 @@ a:hover {
     color: var(--hoverstate);
     outline-width: 0;
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     }
 
-a:focus {
+a:focus-visible {
     color: var(--hoverstate);
-    outline-offset: 2px;
-    outline-style: solid;
-    outline-width: 2px;
-    text-decoration-line: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-style: solid;
+    outline-offset: 5px;
+    outline: 1px solid var(--hoverstate);
     }
 
 a:active {
     color: var(--focusstate);
     outline-width: 0;
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     }
 
 table {
@@ -151,39 +158,39 @@ sup {
     }
 
 h1 {
-	font-size: 150%;
+	font-size: 3.0rem;
 	line-height: 100%;
-	font-weight: 400;
+	font-weight: var(--font-weight-normal);
 	}
 
 h2 {
-	font-size: 150%;
+	font-size: 2.7rem;
 	line-height: 100%;
-	font-weight: 400;
+	font-weight: var(--font-weight-normal);
 	}
 
 h3 {
-	font-size: 130%;
+	font-size: 2.3rem;
 	line-height: 100%;
-	font-weight: 700;
+	font-weight: var(--font-weight-bold);
 	}
 
 h4 {
-	font-size: 130%;
+	font-size: 2.0rem;
 	line-height: 100%;
-	font-weight: 400;
+	font-weight: var(--font-weight-normal);
 	}
 
 h5 {
-	font-size: 120%;
+	font-size: 1.8rem;
 	line-height: 100%;
-	font-weight: 700;
+	font-weight: var(--font-weight-bold);
 	}
 
 h6 {
-	font-size: 120%;
+	font-size: 1.8rem;
 	line-height: 100%;
-	font-weight: 400;
+	font-weight: var(--font-weight-normal);
 	}
     
 .container {
@@ -240,7 +247,7 @@ select {
     display: inline-block;
     padding: 8px 15px;
     border: 0px none;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-decoration: none;
     background: var(--activestate);
     color: var(--white);
@@ -260,6 +267,8 @@ select:hover {
     background: var(--hoverstate);
     color: var(--white);
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     }
 
 input[type=button]:focus,
@@ -270,11 +279,8 @@ button:focus,
 .btn-group .btn:focus,
 .search-controls .btn:focus,
 select:focus {
-    background: var(--hoverstate);
-    color: var(--white);
-    outline-style: solid;
-    outline-width: 2px;
-    outline-color: var(--hoverstate);
+    outline-offset: 5px;
+    outline: 1px solid var(--hoverstate);
     }
 
 input[type="text"],
@@ -341,7 +347,27 @@ textarea:hover {
     left: 0;
 	background: var(--light);
 	box-shadow: 5px 5px 20px var(--black);
+	border-radius: var(--borderradiusnormal);
 	padding: 15px;
+	width: 200px;
+    }
+
+.btn-group .dropdown-menu.show .dropdown-header {
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 10px 0;
+    display: inline-block;
+    }
+
+.btn-group .dropdown-menu.show a {
+    display: inline-block;
+    border: 1px solid var(--activestate);
+    border-radius: var(--borderradiusnormal);
+    margin: 0 4px 5px 0;
+    padding: 8px 15px;
+    }
+
+.btn-group .dropdown-menu.show a:hover {
+    border: 1px solid var(--hoverstate);
     }
 
 .search-filter-toggle {
@@ -420,7 +446,7 @@ header .navbar-collapse	{
 
 .navbar-collapse li.language {
     color: var(--black);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     }
 
 .navbar-brand, .navbar-brand:hover {
@@ -433,7 +459,7 @@ header .navbar-collapse	{
     }
 
 .languageHighlight {
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
     }
 
 .navbar-toggle {
@@ -528,6 +554,7 @@ select.searchForm_type {
     font-family: 'belugino';
     content: "\e919";
     font-size: 45px;
+    line-height: 28px;
     float: left;
     }
 	
@@ -549,7 +576,7 @@ select.searchForm_type {
 	
 .search-primeaddons a {
 	padding: 0 0 10px 0;
-	font-weight: 700;
+	font-weight: var(--font-weight-bold);
 	border-bottom: 0px solid transparent;
 	opacity: 0.5;
 	}	
@@ -627,7 +654,7 @@ select.searchForm_type {
     }
 
 .reset-filters-btn {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     }
     
 .reset-filters-btn::before {
@@ -693,15 +720,19 @@ modal, window-overlay
 #modal .modal-content .close	{
     position: absolute;
     top: 15px;
-	right: -60px;
+	right: -50px;
 	background: transparent;
 	padding: 0;
 	color: var(--white);
     box-shadow: 0px 0px 0px transparent;
+    border-radius: 50px;
+    width: 30px;
+    height: 30px;
 	}	
 
 #modal .modal-content .close	i {
 	font-size: 60px;
+    margin-left: -15px;
 	}
 
 #modal .modal-content .close	i:hover {
@@ -717,7 +748,7 @@ modal, window-overlay
 	}	
 
 .modal-body dt {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 	margin: 30px 0 0 0;
 	}	
 
@@ -775,6 +806,7 @@ modal, window-overlay
     font-family: 'belugino';
     content: "\e90c";
     font-size: 60px;
+    line-height: 28px;
     float: left;
     }
     
@@ -782,6 +814,7 @@ modal, window-overlay
     font-family: 'belugino';
     content: "\e9e3";
     font-size: 60px;
+    line-height: 28px;
     float: left;
     }
 
@@ -845,16 +878,12 @@ main
 
 #content h1 {
     margin: 0 0 30px 0;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
     hyphens: auto; 
     }
 
 #content h2,
 #content h3 {
     margin: 0 0 15px 0;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
     hyphens: auto;
     }
 
@@ -1014,9 +1043,7 @@ main
 	}
 
 .template-name-results .title {
-	font-weight: 700;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
+	font-weight: var(--font-weight-bold);
     hyphens: auto;
     border-radius: var(--borderradiusnormal) var(--borderradiusnormal) 0 0;
 	}
@@ -1037,10 +1064,6 @@ main
     border-radius: var(--borderradiusnormal);
     margin: 0 0 5px 0;
     text-decoration: none;
-    }
-
-.template-name-results .result-table-toggle:hover {
-    text-decoration: underline;
     }
 
 .template-name-results .result-table-toggle-active {
@@ -1077,7 +1100,7 @@ main
 .template-name-results .result-details-items th {
     text-align: left;
     vertical-align: top;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     padding: 0 15px 0 0;
     width: 20%;
     }
@@ -1090,7 +1113,7 @@ main
 .result-availability-items th {
     text-align: left;
     vertical-align: top;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     }
 
 .result-availability-items td label {
@@ -1185,9 +1208,6 @@ main
     display: block;
     border-top: 1px solid var(--lightgrey);
     padding: 10px 15px;
-    text-decoration: none;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
     hyphens: auto;
     }
     
@@ -1212,7 +1232,7 @@ main
     padding: 2px 5px;
     border-radius: 20px;
     border: 1px solid var(--lightgrey);
-    font-size: 15px;
+    font-size: 1.5rem;
     line-height: 21px;
     color: var(--black);
     }
@@ -1305,7 +1325,7 @@ main
 .template-name-view .media-body caption,
 .template-name-view .tab-content table caption {
 	text-align: left;
-    font-size: 150%;
+    font-size: 2.7rem;
     line-height: 100%;
     margin: 0 0 15px 0;
 	}  
@@ -1365,8 +1385,11 @@ main
     text-decoration: none;
     }
 
+.template-name-results .result-table-toggle:hover,
 .template-name-view .result-table-toggle:hover {
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     }
 
 .template-name-view .result-table-toggle-active {
@@ -1405,7 +1428,7 @@ main
     }
 
 .template-name-view .responsive-table-details th {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     width: 30%;
     }
     
@@ -1568,6 +1591,7 @@ select#alphaBrowseForm_source {
     font-family: 'belugino';
     content: "\e9e3";
     font-size: 60px;
+    line-height: 28px;
     float: left;
     }
 
@@ -1575,6 +1599,7 @@ select#alphaBrowseForm_source {
     font-family: 'belugino';
     content: "\e90c";
     font-size: 60px;
+    line-height: 28px;
     float: left;
     }
 
@@ -1625,7 +1650,6 @@ select#alphaBrowseForm_source {
     }
 
 .search-home-columnset .home-text-content h2 {
-    font-size: 30px;
     margin: 0 0 15px 0;
     }
 
@@ -1712,7 +1736,14 @@ select#alphaBrowseForm_source {
     }
 
 .sidebar .pager [class^="bel-"] {
-	line-height: inherit;
+	line-height: 28px;
+	}
+
+.sidebar .pager [class^="bel-"]:hover {
+    text-decoration: underline;
+    text-decoration-thickness: auto;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
 	}
 
 .template-name-view .sidebar nav {	
@@ -1774,11 +1805,11 @@ select#alphaBrowseForm_source {
 
 .not-found-message a {
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     }
 
 #content .not-found-message h3 {
-    font-size: 20px;
-    font-weight: 700;
     color: var(--activestate);
     padding: 0;
     margin: 0 0 5px 0;
@@ -1852,8 +1883,7 @@ advanced Search
 
 .adv-term-remove {
     width: 10%;
-    height: 20px;
-    margin: 20px 0 0 0;
+    position: relative;
     }
 
 .adv-term-remove:hover,
@@ -1865,6 +1895,8 @@ advanced Search
     font-family: 'belugino';
     content: "\e914";
     font-size: 60px;
+    position: absolute;
+    top: 50%;
     }
 
 .add_search_link::before {
@@ -1917,7 +1949,7 @@ advanced Search
 	margin: 0 auto;
 	color: var(--white);
 	padding: 30px 0 15px 0;
-	font-weight: 700;
+	font-weight: var(--font-weight-bold);
 	}
 
 .search.container .adv_search_links {
@@ -1994,7 +2026,7 @@ advanced Search
     display: block;
     border: 1px solid var(--lightgrey);
     padding: 5px 10px;
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
     background: var(--white);
     color: var(--activestate);
     border-radius: var(--borderradiusnormal);
@@ -2004,6 +2036,8 @@ advanced Search
     border: 1px solid var(--hoverstate);
     color: var(--hoverstate);
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     }
 
 .popover {
@@ -2027,7 +2061,7 @@ advanced Search
 #advSearchForm legend {
     padding: 3px 10px;
     border-radius: var(--borderradiusnormal);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 	border: 0px;
 	background: var(--white);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
@@ -2169,7 +2203,7 @@ footer {
 .sponsor-text {
 	display: inline-block;
 	color: var(--black);
-	font-size: 70%;
+	font-size: 1.2rem;
 	margin: 0 0 5px 0;
 	}
 		
@@ -2401,8 +2435,6 @@ Tablet-Styles (Landscape)
 
     .search-home-columnset {
         padding: 0;
-        -webkit-hyphens: auto;
-        -ms-hyphens: auto;
         hyphens: auto;
         margin: 0;
         }
@@ -2419,7 +2451,7 @@ Tablet-Styles (Landscape)
         border: 1px solid var(--lightgrey);
         padding: 5px 15px 5px 10px;
         margin: 0 0 5px 0;
-        font-weight: 400;
+        font-weight: var(--font-weight-normal);
         background: var(--white);
         color: var(--activestate);
         border-radius: var(--borderradiusnormal);
@@ -2431,6 +2463,8 @@ Tablet-Styles (Landscape)
         border: 1px solid var(--hoverstate);
         color: var(--hoverstate);
         text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
         }
 
     .footer-container {
@@ -2450,6 +2484,11 @@ Smartphone (Landscape)
 ----------------------------------------------------------------------*/
 
 @media only screen and (max-width: 800px) {
+
+    html {
+        font-size: 9px;
+        line-height: 1.5;
+        }
 
     header {
         padding: 15px 0 0 0;
@@ -2562,7 +2601,7 @@ Smartphone (Landscape)
         
     .search-container button {
         width: 140px;
-        font-size: 18px;
+        font-size: 2rem;
         padding: 8px 20px 8px 5px;
         }
 
@@ -2595,6 +2634,10 @@ Smartphone (Landscape)
         margin: 5px 0 0 0;
         }
 
+    .adv-term-remove {
+        width: 30%;
+        }
+
 	.solr-adv-facet {
 		width: 100%;
 		margin: 0 0 15px 0;
@@ -2625,8 +2668,8 @@ Smartphone (Landscape)
     	}
 
     #modal .modal-content .close	{
-        top: -40px;
-    	right: -15px;
+        top: -45px;
+    	right: 0;
     	}
 
     .modal .form-group {
@@ -2677,7 +2720,7 @@ Smartphone (Landscape)
 
     .result-availability-items td label {
         display: inline;
-        font-weight: 700;
+        font-weight: var(--font-weight-bold);
         padding: 0 5px 0 0;
         }
 
@@ -2714,7 +2757,7 @@ Smartphone (Landscape)
     .template-name-view .tab-content th {
         display: block;
         padding: 10px 0 0 0;
-        font-weight: 700;
+        font-weight: var(--font-weight-bold);
         width: auto;
         }
 
@@ -2798,7 +2841,7 @@ Print Styles
     
     /* Show link destinations in brackets after the link text */
     .result-body a.title[href] {
-        font-weight: 700;
+        font-weight: bold;
         text-decoration: underline;
         color: #000;
         border: none;
