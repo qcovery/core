@@ -1180,7 +1180,12 @@ main
     border-radius: var(--borderradiusnormal);
     }
 
-.facet-group .facet,
+.facet__list .facet__list__item,
+.facet__list .more-less-btn-wrapper {
+    list-style: none;
+    }
+
+.facet__list .facet__list__item,
 .checkboxFilter .facet {
     display: block;
     border-top: 1px solid var(--lightgrey);
@@ -1190,13 +1195,13 @@ main
     -ms-hyphens: auto;
     hyphens: auto;
     }
-    
-.facet-group .facet:hover,
+
+.facet__list .facet__list__item:hover,
 .checkboxFilter .facet:hover {
     background: var(--light);
     }
 
-.facet-group .facet:first-child,
+.facet__list .facet__list__item:first-child,
 .checkboxFilter .facet:first-child {
     border-top: 0px;
     }
