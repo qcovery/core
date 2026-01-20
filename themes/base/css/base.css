@@ -1204,6 +1204,7 @@ main
     }
 
 .facet__list .facet__list__item,
+.facet__list li,
 .facet__list .more-less-btn-wrapper {
     list-style: none;
     }
