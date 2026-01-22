@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------
-last update: 12 2025
+last update: 01 2026
 copyright: effective webwork GmbH – www.effective-webwork.de
 ----------------------------------------------------------------------*/
 
@@ -525,6 +525,7 @@ header .nav-tabs li.active a {
 	
 #searchForm_lookfor {
 	width: calc(100% - 375px);
+    padding: 8px 15px;
 	border-radius: var(--borderradiusnormal) 0px 0px var(--borderradiusnormal);
 	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 	}
@@ -1150,6 +1151,7 @@ main
 
 #content h3.facet-title {
     margin: 0;
+    font-size: 1.8rem;
     }
 
 .facet-group button.title {
@@ -1209,8 +1211,8 @@ main
     list-style: none;
     }
 
-.facet__list .facet__list__item,
-.checkboxFilter .facet {
+.checkboxFilter .facet,
+.js-facet-item.facetAND {
     display: block;
     border-top: 1px solid var(--lightgrey);
     padding: 10px 15px;
@@ -1233,6 +1235,13 @@ main
     border-radius: 0;
     }
 
+.narrow-toggle.all-facets,
+.js-facet-next-page {
+    display: block;
+    border-top: 1px solid var(--lightgrey);
+    padding: 10px 15px;
+    }
+
 .facet-group .badge {
     float: right;
     padding: 2px 5px;
@@ -1242,7 +1251,11 @@ main
     line-height: 21px;
     color: var(--black);
     }
-    
+
+.facet-range-form {
+    padding: 20px;
+    }
+
 .more-facets::after {
     font-family: 'belugino';
     content: "\e913";
@@ -1845,7 +1858,7 @@ advanced Search
     flex-wrap: wrap;
     -ms-flex-wrap: wrap;
     border-radius: var(--borderradiusnormal);
-    padding: 30px;
+    padding: 15px;
     margin: 0 0 15px 0;
 	border: 0px;
 	background: var(--white);
@@ -1910,7 +1923,7 @@ advanced Search
     content: "\e913";
     font-size: 30px;
     text-decoration: none;
-    float: left;
+    vertical-align: middle;
     }
     
 .adv-group-close::before {
@@ -1918,13 +1931,13 @@ advanced Search
     content: "\e931";
     font-size: 30px;
     text-decoration: none;
-    float: left;
+    vertical-align: middle;
     }
 
 #groupPlaceHolder {
     display: block;
     margin: 15px 0;
-    padding: 15px 30px;
+    padding: 15px;
     border-radius: var(--borderradiusnormal);
 	border: 0px;
 	background: var(--white);
@@ -2103,9 +2116,15 @@ advanced Search
   margin: 0 0 15px 0;
   }
 
-.template-name-advanced .checkbox-select-all {
-    margin: 15px 0 15px 15px;
-    }
+.template-name-advanced .facet-group .facet {
+  display: block;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--lightgrey);
+  }
+
+.template-name-advanced .facet-group .facet:last-child {
+  border-bottom: 0 transparent;
+  }
 
 .template-name-advanced .facet-group .title {
     width: calc(100% - 30px);
@@ -2115,6 +2134,15 @@ advanced Search
     background: var(--foggrey);
     color: var(--black);
     margin: 0 0 -1px 0;
+    }
+
+.template-name-advanced .checkbox-select-all {
+    margin: 15px 0 15px 15px;
+    }
+
+.template-name-advanced label.facet.checkbox {
+    display: block;
+    padding: 10px 0 10px 15px;
     }
 
 
@@ -2596,7 +2624,6 @@ Smartphone (Landscape)
     #searchForm_lookfor {
     	width: 100%;
     	margin: 0 0 5px 0;
-    	padding: 8px 15px;
     	border-radius: var(--borderradiusnormal);
     	}	
 	
