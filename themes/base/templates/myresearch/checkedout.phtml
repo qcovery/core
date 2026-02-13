@@ -54,7 +54,7 @@
             <?=$this->transEsc('select_page')?>
           </label>
           <div class="btn-group">
-            <input type="submit" id="renewSelected" name="renewSelected" value="<?=$this->transEscAttr('renew_selected')?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-lightbox-ignore>
+            <input type="submit" id="renewSelected" name="renewSelected" value="<?=$this->transEscAttr('renew_selected')?>" class="btn btn-default dropdown-toggle" data-bs-toggle="dropdown" data-lightbox-ignore>
             <ul class="dropdown-menu">
               <li class="disabled"><a><?=$this->transEsc('confirm_renew_selected_text')?></a></li>
               <li><a href="#" id="confirm_renew_selected_yes"><?=$this->transEsc('confirm_dialog_yes')?></a></li>
@@ -63,7 +63,7 @@
           </div>
           <?php if ($renewAll): ?>
             <div class="btn-group">
-              <input type="submit" id="renewAll" name="renewAll" value="<?=$this->transEscAttr('renew_all')?>" class="btn btn-default dropdown-toggle" data-toggle="dropdown" data-lightbox-ignore>
+              <input type="submit" id="renewAll" name="renewAll" value="<?=$this->transEscAttr('renew_all')?>" class="btn btn-default dropdown-toggle" data-bs-toggle="dropdown" data-lightbox-ignore>
               <ul class="dropdown-menu">
                 <li class="disabled"><a><?=$this->transEsc('confirm_renew_all_text')?></a></li>
                 <li><a href="#" id="confirm_renew_all_yes"><?=$this->transEsc('confirm_dialog_yes')?></a></li>
