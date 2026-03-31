@@ -462,7 +462,7 @@ header .navbar-collapse	{
     font-weight: var(--font-weight-normal);
     }
 
-.navbar-toggle {
+.navbar-toggler {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -1212,7 +1212,7 @@ main
     }
 
 .checkboxFilter .facet,
-.js-facet-item.facetAND {
+.js-facet-item {
     display: block;
     border-top: 1px solid var(--lightgrey);
     padding: 10px 15px;
@@ -2549,7 +2549,7 @@ Smartphone (Landscape)
         width: 50%;
         }
 
-    .navbar-toggle {
+    .navbar-toggler {
     	position: absolute;
     	top: 0;
     	right: 0;
@@ -2559,7 +2559,7 @@ Smartphone (Landscape)
     	border-radius: var(--borderradiusnormal);
     	}
 
-    .navbar-toggle i {
+    .navbar-toggler i {
     	font-size: 50px;
     	line-height: 50px;
     	}
