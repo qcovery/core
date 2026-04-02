@@ -5,7 +5,7 @@
  *
  * PHP version 8
  *
- * Copyright (C) The National Library of Finland 2015-2022.
+ * Copyright (C) The National Library of Finland 2015-2026.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * @category VuFind
  * @package  Search_Blender
@@ -29,6 +29,7 @@
 
 namespace VuFind\Search\Blender;
 
+use VuFind\Config\ConfigManagerInterface;
 use VuFind\Search\Base\Params as BaseParams;
 use VuFind\Search\Solr\HierarchicalFacetHelper;
 use VuFindSearch\ParamBag;
@@ -82,16 +83,16 @@ class Params extends \VuFind\Search\Solr\Params
     /**
      * Constructor
      *
-     * @param \VuFind\Search\Base\Options  $options       Options to use
-     * @param \VuFind\Config\PluginManager $configLoader  Config loader
-     * @param HierarchicalFacetHelper      $facetHelper   Hierarchical facet helper
-     * @param array                        $searchParams  Search params for backends
-     * @param \VuFind\Config\Config        $blenderConfig Blender configuration
-     * @param array                        $mappings      Blender mappings
+     * @param \VuFind\Search\Base\Options $options       Options to use
+     * @param ConfigManagerInterface      $configManager Config manager
+     * @param HierarchicalFacetHelper     $facetHelper   Hierarchical facet helper
+     * @param array                       $searchParams  Search params for backends
+     * @param \VuFind\Config\Config       $blenderConfig Blender configuration
+     * @param array                       $mappings      Blender mappings
      */
     public function __construct(
         \VuFind\Search\Base\Options $options,
-        \VuFind\Config\PluginManager $configLoader,
+        ConfigManagerInterface $configManager,
         HierarchicalFacetHelper $facetHelper,
         array $searchParams,
         \VuFind\Config\Config $blenderConfig,
@@ -104,7 +105,7 @@ class Params extends \VuFind\Search\Solr\Params
 
         parent::__construct(
             $options,
-            $configLoader,
+            $configManager,
             $facetHelper
         );
     }
@@ -483,12 +484,14 @@ class Params extends \VuFind\Search\Solr\Params
      */
     protected function addDefaultFilters(BaseParams $params, string $backendId): void
     {
+        // Get the initial filter list before applying any defaults so that we can compare against it and apply multiple
+        // defaults as required:
+        $filterList = $params->getFilterList();
         foreach ($this->mappings['Facets']['Fields'] ?? [] as $fieldConfig) {
             $mappings = $fieldConfig['Mappings'][$backendId] ?? [];
             $defaultValue = $mappings['DefaultValue'] ?? null;
             if (null !== $defaultValue) {
                 $translatedField = $mappings['Field'];
-                $filterList = $params->getFilterList();
                 $found = false;
                 foreach ($filterList as $filters) {
                     foreach ($filters as $filter) {

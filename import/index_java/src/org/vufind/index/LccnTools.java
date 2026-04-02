@@ -14,13 +14,12 @@ package org.vufind.index;
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  */
 
 import org.marc4j.marc.Record;
 import org.solrmarc.index.SolrIndexer;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -63,9 +62,9 @@ public class LccnTools
      * @param fieldSpec
      * @return Set of normalized LCCNs
      */
-    public Set getNormalizedLCCNs(Record record, String fieldSpec) {
+    public Set<String> getNormalizedLCCNs(Record record, String fieldSpec) {
         // Initialize return value:
-        Set result = new LinkedHashSet();
+        Set<String> result = new LinkedHashSet<String>();
 
         // Loop through relevant fields and normalize everything:
         for (String raw : SolrIndexer.instance().getFieldList(record, fieldSpec)) {
@@ -84,7 +83,7 @@ public class LccnTools
      * @param record
      * @return Set of normalized LCCNs
      */
-    public Set getNormalizedLCCNs(Record record) {
+    public Set<String> getNormalizedLCCNs(Record record) {
         // Send in a default fieldSpec if none was provided by the user:
         return getNormalizedLCCNs(record, "010a");
     }

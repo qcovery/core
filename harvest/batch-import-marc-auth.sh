@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Make sure VUFIND_HOME is set:
 if [ -z "$VUFIND_HOME" ]
@@ -113,7 +113,7 @@ else
 fi
 
 # Process all the files in the target directory:
-find $BASEPATH -maxdepth 1 \( -iname "*.xml" -o -iname "*.mrc" -o -iname "*.marc" \) -type f -print0 | \
+find -L $BASEPATH -maxdepth 1 \( -iname "*.xml" -o -iname "*.mrc" -o -iname "*.marc" \) -type f -print0 | sort -z | \
   while read -d $'\0' file
 do
   # Logging output handled by log() function

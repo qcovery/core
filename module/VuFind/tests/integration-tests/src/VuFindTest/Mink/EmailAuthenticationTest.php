@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * @category VuFind
  * @package  Tests
@@ -112,9 +112,8 @@ final class EmailAuthenticationTest extends \VuFindTest\Integration\MinkTestCase
      * Test the (non-ILS) email authentication process with invalid email address.
      *
      * @return void
-     *
-     * @depends testEmailAuthentication
      */
+    #[\PHPUnit\Framework\Attributes\Depends('testEmailAuthentication')]
     public function testEmailAuthenticationBadEmail(): void
     {
         $this->setUpDatabaseEmailConfig();
@@ -151,6 +150,7 @@ final class EmailAuthenticationTest extends \VuFindTest\Integration\MinkTestCase
                 'config' => [
                     'Authentication' => [
                         'method' => 'ILS',
+                        'recover_interval' => 0,
                     ],
                     'Catalog' => [
                         'driver' => 'Demo',
@@ -175,17 +175,20 @@ final class EmailAuthenticationTest extends \VuFindTest\Integration\MinkTestCase
         $session->visit($this->getVuFindUrl());
         $page = $session->getPage();
 
-        // Request login:
-        $this->clickCss($page, '#loginOptions a');
-        $this->findCssAndSetValue($page, '.modal-body [name="username"]', 'catuser@vufind.org');
-        $this->clickCss($page, '.modal-body .btn.btn-primary');
-        $this->assertEquals(
-            'We have sent a login link to your email address. It may take a few moments for the link to arrive.'
-            . " If you don't receive the link shortly, please check also your spam filter.",
-            $this->findCssAndGetText($page, '.alert-success')
-        );
+        // Request login three times to ensure that repeated requests work:
+        for ($i = 1; $i <= 3; $i++) {
+            $this->clickCss($page, '#loginOptions a');
+            $this->findCssAndSetValue($page, '.modal-body [name="username"]', 'catuser@vufind.org');
+            $this->clickCss($page, '.modal-body .btn.btn-primary');
+            $this->assertEquals(
+                'We have sent a login link to your email address. It may take a few moments for the link to arrive.'
+                . " If you don't receive the link shortly, please check also your spam filter.",
+                $this->findCssAndGetText($page, '.alert-success')
+            );
+            $this->closeLightbox($page);
+        }
 
-        // Extract the link from the provided message:
+        // Extract the link from the first provided message:
         $email = $this->getLoggedEmail();
         $headers = $email->getHeaders();
         $body = $email->getBody()->getBody();

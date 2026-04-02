@@ -11,12 +11,13 @@
     ->add($this->translate($currPage), active: true);
 
   // Load Javascript dependencies into header:
-  $this->headScript()->appendFile('check_item_statuses.js');
+  $this->assetManager()->appendScriptLink('check_item_statuses.js');
 
   // Load Javascript only if list view parameter is NOT full:
   if ($this->params->getOptions()->getListViewOption() != 'full') {
-    $this->headScript()->appendFile('record.js');
-    $this->headScript()->appendFile('embedded_record.js');
+    $this->assetManager()->appendScriptLink('record.js');
+    $this->assetManager()->appendScriptLink('channels.js');
+    $this->assetManager()->appendScriptLink('embedded_record.js');
   }
 
   $recordTotal = $this->results->getResultTotal();
@@ -93,7 +94,7 @@
       <input class="hidden all-ids-global" type="text" name="all_ids_global" value="<?= $this->escapeHtmlAttr(json_encode($this->results->getAllIds())) ?>">
       <ul class="record-list">
         <?php foreach ($this->results->getResults() as $i => $current): ?>
-          <?=$this->record($current)->getListEntry($list, $user)?>
+          <?=$this->record($current)->getListEntry($list, $user, $this->results->getStartRecord() + $i)?>
         <?php endforeach; ?>
       </ul>
       <?=$this->context($this)->renderInContext('myresearch/bulk-action-buttons.phtml', ['isBottom' => true, 'list' => $list ?? null, 'account' => $this->account])?>

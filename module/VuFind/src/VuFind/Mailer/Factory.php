@@ -18,8 +18,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * @category VuFind
  * @package  Mailer
@@ -76,8 +76,8 @@ class Factory implements FactoryInterface
         $protocol = ($config['Mail']['secure'] ?? false) ? 'smtps' : 'smtp';
         $dsn = "$protocol://";
         if (
-            ($username = $config['Mail']['username'] ?? null)
-            && ($password = $this->getSecretFromConfig($config['Mail'], 'password'))
+            ('' !== ($username = rawurlencode($config['Mail']['username'] ?? '')))
+            && ('' !== ($password = rawurlencode($this->getSecretFromConfig($config['Mail'], 'password') ?? '')))
         ) {
             $dsn .= "$username:$password@";
         }
@@ -124,7 +124,7 @@ class Factory implements FactoryInterface
         }
 
         // Load configurations:
-        $config = $container->get(\VuFind\Config\PluginManager::class)->get('config')->toArray();
+        $config = $container->get(\VuFind\Config\ConfigManagerInterface::class)->getConfigArray('config');
 
         // Create service:
         $class = new $requestedName(

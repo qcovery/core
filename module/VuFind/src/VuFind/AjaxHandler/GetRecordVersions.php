@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * @category VuFind
  * @package  AJAX
@@ -101,7 +101,7 @@ class GetRecordVersions extends \VuFind\AjaxHandler\AbstractBase
      */
     protected function getVersionsLinkForRecord($id, $source, $searchId)
     {
-        $driver = $this->recordLoader->load($id, $source, $searchId);
+        $driver = $this->recordLoader->load($id, $source);
         $tabs = $this->tabManager->getTabsForRecord($driver);
         $full = true;
 
@@ -128,17 +128,18 @@ class GetRecordVersions extends \VuFind\AjaxHandler\AbstractBase
 
         if (!is_array($id)) {
             return $this->formatResponse(
-                $this->getVersionsLinkForRecord($id, $source, $searchId)
+                $this->getVersionsLinkForRecord($id, $source ?? DEFAULT_SEARCH_BACKEND, $searchId)
             );
         }
 
         $htmlByRecord = [];
         for ($i = 0; $i < count($id); $i++) {
-            $key = $source[$i] . '|' . $id[$i];
+            $currentSource = $source[$i] ?? DEFAULT_SEARCH_BACKEND;
+            $key = $currentSource . '|' . $id[$i];
 
             $htmlByRecord[$key] = $this->getVersionsLinkForRecord(
                 $id[$i],
-                $source[$i],
+                $currentSource,
                 $searchId
             );
         }

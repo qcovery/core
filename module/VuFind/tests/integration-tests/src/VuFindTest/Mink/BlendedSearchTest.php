@@ -5,7 +5,7 @@
  *
  * PHP version 8
  *
- * Copyright (C) The National Library of Finland 2022-2023.
+ * Copyright (C) The National Library of Finland 2022-2026.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * @category VuFind
  * @package  Tests
@@ -63,6 +63,9 @@ class BlendedSearchTest extends \VuFindTest\Integration\MinkTestCase
                     'SolrAuth',
                 ],
                 'blockSize' => 7,
+            ],
+            'Record' => [
+                'next_prev_navigation' => true,
             ],
             'Basic_Searches' => [
                 'AllFields' => 'adv_search_all',
@@ -148,10 +151,9 @@ class BlendedSearchTest extends \VuFindTest\Integration\MinkTestCase
      * @param array  $queryParams Query parameters
      * @param string $path        URL path
      *
-     * @dataProvider getSearchData
-     *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getSearchData')]
     public function testSearch(array $queryParams, string $path): void
     {
         $expectedLabels = $this->getExpectedLabels($queryParams['page']);
@@ -196,6 +198,35 @@ class BlendedSearchTest extends \VuFindTest\Integration\MinkTestCase
             'Blended',
             $this->findCssAndGetText($page, '.searchbox li a.active')
         );
+
+        if (1 === $queryParams['page']) {
+            // Test next/prev navigation:
+            // Next record:
+            $this->clickCss($page, '.pager a', index: 1);
+            $this->assertStringContainsStringWithTimeout(
+                '/Record/0000183626-1',
+                fn () => $session->getCurrentUrl()
+            );
+            // Next record:
+            $this->clickCss($page, '.pager a', index: 1);
+            $this->assertStringContainsStringWithTimeout(
+                'AuthorityRecord/vtls000001429',
+                fn () => $session->getCurrentUrl()
+            );
+            // Back to previous record (using history because author record doesn't show navigation):
+            $session->back();
+            $this->assertStringContainsStringWithTimeout(
+                '/Record/0000183626-1',
+                fn () => $session->getCurrentUrl()
+            );
+            // Then once more back with pager:
+            $this->clickCss($page, '.pager a');
+            $this->waitForPageLoad($page);
+            $this->assertStringContainsStringWithTimeout(
+                '/Record/0000183626-0',
+                fn () => $session->getCurrentUrl()
+            );
+        }
     }
 
     /**
@@ -335,6 +366,64 @@ class BlendedSearchTest extends \VuFindTest\Integration\MinkTestCase
         $page = $session->getPage();
 
         $this->unFindCss($page, '.advanced-search-link');
+    }
+
+    /**
+     * Test facet default values.
+     *
+     * @return void
+     */
+    public function testFacetDefaultValues(): void
+    {
+        $this->changeConfigs(
+            [
+                'config' => [
+                    'SearchTabs' => [
+                        'Solr' => 'Catalog',
+                        'Blender' => 'Blended',
+                    ],
+                ],
+                'Blender' => $this->getBlenderIniOverrides(),
+            ],
+            ['Blender']
+        );
+        $this->changeYamlConfigs(
+            [
+                'BlenderMappings' => [
+                    'Facets' => [
+                        'Fields' => [
+                            'def1' => [
+                                'Mappings' => [
+                                    'Solr' => [
+                                        'Field' => 'format',
+                                        'DefaultValue' => 'Book',
+                                    ],
+                                ],
+                            ],
+                            'def2' => [
+                                'Mappings' => [
+                                    'Solr' => [
+                                        'Field' => 'format',
+                                        'DefaultValue' => 'Manuscript',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $session = $this->getMinkSession();
+        $session->visit($this->getVuFindUrl('/Blender/Results?filter%5B%5D=blender_backend%3ASolr'));
+        $page = $session->getPage();
+
+        $text = $this->findCssAndGetText($page, '.search-stats strong');
+        [$start, $limit] = explode(' - ', $text);
+        $this->assertSame(1, intval($start));
+        $this->assertSame(2, intval($limit));
+        $this->assertSame('old1', $this->findCss($page, '#result0 .hiddenId')->getValue());
+        $this->assertSame('old2', $this->findCss($page, '#result1 .hiddenId')->getValue());
     }
 
     /**

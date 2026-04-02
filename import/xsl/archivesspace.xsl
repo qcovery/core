@@ -130,7 +130,7 @@
                         <xsl:value-of select="dc:title[normalize-space()]"/>
                     </field>
                     <field name="title_sort">
-                        <xsl:value-of select="php:function('VuFind::stripArticles', string(dc:title[normalize-space()]))"/>
+                        <xsl:value-of select="php:function('VuFind::titleSortLower', php:function('VuFind::stripArticles', string(dc:title[normalize-space()])))"/>
                     </field>
                 </xsl:if>
 
@@ -144,6 +144,9 @@
                 <!-- PUBLISHDATE -->
                 <xsl:if test="dc:date">
                     <field name="publishDate">
+                        <xsl:value-of select="php:function('VuFind::extractBestDateOrRange', dc:date)"/>
+                    </field>
+                    <field name="publishDateRange">
                         <xsl:value-of select="php:function('VuFind::extractBestDateOrRange', dc:date)"/>
                     </field>
                     <field name="publishDateSort">

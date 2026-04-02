@@ -1,7 +1,4 @@
 <?php
-    // Set page title.
-    $this->headTitle($this->translate('request_place_text') . ': ' . $this->driver->getBreadcrumb());
-
     // Set up breadcrumbs:
     $this->breadcrumbs()->reset();
     if ($url = $this->searchMemory()->getLastSearchUrl()) {
@@ -9,16 +6,19 @@
     }
     $this->breadcrumbs()->add(...$this->recordLinker()->getBreadcrumbParams($this->driver))
       ->add($this->translate('request_place_text'), active: true);
+
+    $enumchronRaw = $this->gatheredDetails['requestedItem']['enumchron'] ?? '';
+    $enumchron = $enumchronRaw !== '' ? " ($enumchronRaw)" : '';
 ?>
-<h2><?=$this->transEsc('request_place_text')?></h2>
+<?=$this->component('page-title', ['title' => $this->translate('request_place_text'), 'headTitle' => $this->translate('request_place_text') . ': ' . $this->driver->getBreadcrumb()]);?>
 <?php if ($this->helpTextHtml): ?>
   <p class="helptext"><?=$this->helpTextHtml?></p>
 <?php endif; ?>
 
 <form class="form-record-hold" method="post" name="placeHold" data-clear-account-cache="holds">
   <?=$this->flashmessages()?>
-  <label class="form-label"><?=$this->transEsc('Title')?></label>
-  <p class="form-control-static"><?=$this->driver->getBreadcrumb() ?></p>
+  <label class="form-label"><?=$this->transEsc('Title')?>:</label>
+  <p class="form-control-static"><?=$this->escapeHtml($this->driver->getBreadcrumb() . $enumchron) ?></p>
   <?php if (in_array('comments', $this->extraHoldFields)): ?>
     <div class="form-group hold-comment">
       <label class="form-label"><?=$this->transEsc('Comments')?>:</label>
@@ -89,12 +89,14 @@
     ?>
     <?php if ($this->requestGroupNeeded): ?>
       <div class="form-group hold-pickup-location">
-        <label id="pickUpLocationLabel" class="form-label"><?=$this->icon('spinner', 'loading-icon hidden')?> <?=$this->transEsc('pick_up_location')?>:
+        <label id="pickUpLocationLabel" class="form-label">
+          <span class="pick-up-location-label-text"><?=$this->transEsc('pick_up_location')?></span>:
+          <?=$this->icon('spinner', 'loading-icon hidden')?>
           <?php if (in_array('requestGroup', $this->extraHoldFields)): ?>
             <noscript> (<?=$this->transEsc('Please enable JavaScript.')?>)</noscript>
           <?php endif; ?>
         </label>
-        <select id="pickUpLocation" name="gatheredDetails[pickUpLocation]" data-default="<?=$this->escapeHtmlAttr($selected)?>" class="form-control">
+        <select id="pickUpLocation" name="gatheredDetails[pickUpLocation]" data-default="<?=$this->escapeHtmlAttr($selected)?>" class="form-select">
           <?php if ($selected === false): ?>
           <option value="" selected="selected">
             <?=$this->transEsc('select_pickup_location')?>
@@ -146,7 +148,7 @@
 
 <?php
     // Set up hold script; we do this inline instead of in the header for lightbox compatibility:
-    $this->inlineScript()->appendFile('hold.js');
+    echo $this->assetManager()->outputInlineScriptLink('hold.js');
 
     $js = <<<JS
         if ($.isReady) {
@@ -158,5 +160,5 @@
         }
         JS;
 
-    echo $this->inlineScript()->appendScript($js);
+    echo $this->assetManager()->outputInlineScriptString($js);
 ?>

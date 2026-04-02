@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * @category VuFind
  * @package  Tests
@@ -133,12 +133,11 @@ class RecordCoverImageTest extends \VuFindTest\Integration\MinkTestCase
      * @param bool    $ajaxcovers            Should we use AJAX covers?
      * @param string  $expectedImage         Expected image URL (minus base path)
      * @param ?string $expectedBacklink      Expected backlink text (null for none)
-     * @param string  $noCoverAvailableImage Image to load if unavaiable (empty for none)
+     * @param string  $noCoverAvailableImage Image to load if unavailable (empty for none)
      *
      * @return void
-     *
-     * @dataProvider coverLoadingProvider
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('coverLoadingProvider')]
     public function testCoverLoading(
         string $id,
         bool $includeBacklink,
@@ -184,6 +183,19 @@ class RecordCoverImageTest extends \VuFindTest\Integration\MinkTestCase
         }
 
         // Confirm the expected status of the image (most importantly, should it be visible or hidden?):
+        $coverContainer = $this->findCss($page, '.record-cover-container');
+        if ($noCoverAvailableImage) {
+            $this->assertStringNotContainsString(
+                'hidden',
+                $coverContainer?->getAttribute('class') ?? ''
+            );
+        } else {
+            $this->assertStringContainsString(
+                'hidden',
+                $coverContainer?->getAttribute('class') ?? ''
+            );
+        }
+
         $expectedClasses = 'recordcover'
             . ($ajaxcovers ? ' ajax' : '')
             . (empty($noCoverAvailableImage) ? ' hidden' : '');
@@ -203,7 +215,7 @@ class RecordCoverImageTest extends \VuFindTest\Integration\MinkTestCase
 
         // Verify query except timestamp hash for deactivated browser cache
         $imageSrcQuery = explode('&', explode('?', $imageSrc)[1] ?? '');
-        $imageSrcQuery = array_filter($imageSrcQuery, fn ($part) => !str_starts_with($part, 'hash'));
+        $imageSrcQuery = array_filter($imageSrcQuery, fn ($part) => !str_starts_with($part, 'browser_cache_hash'));
         $expectedQuery = explode('&', $expectedImageParts[1] ?? '');
         sort($expectedQuery);
         sort($imageSrcQuery);

@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * along with this program; if not, see
+ * <https://www.gnu.org/licenses/>.
  *
  * @category VuFind
  * @package  Tests
@@ -106,10 +106,9 @@ class BasicSearchTest extends \VuFindTest\Integration\MinkTestCase
      *
      * @param bool $jsResults Whether to update search results with JS
      *
-     * @dataProvider topPaginationProvider
-     *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('topPaginationProvider')]
     public function testDefaultTopPagination(bool $jsResults): void
     {
         // Change configuration:
@@ -144,10 +143,9 @@ class BasicSearchTest extends \VuFindTest\Integration\MinkTestCase
      *
      * @param bool $jsResults Whether to update search results with JS
      *
-     * @dataProvider topPaginationProvider
-     *
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('topPaginationProvider')]
     public function testSimpleTopPagination(bool $jsResults): void
     {
         $config = [
@@ -178,6 +176,17 @@ class BasicSearchTest extends \VuFindTest\Integration\MinkTestCase
         $this->waitForPageLoad($page);
         $this->assertShowingResults($page, '21 - 40');
         $this->scrollToResults();
+
+        // Switch language to ensure that query params are not lost:
+        $dropdown = $this->findCss($page, '.nav-item.language .dropdown__item', index: 1);
+        $this->clickCss($dropdown, '.dropdown__link');
+        $this->waitForPageLoad($page);
+        $this->assertEquals('Sprache', $this->findCssAndGetText($page, '.nav-item.language .dropdown-toggle'));
+        // ...and back:
+        $this->clickCss($page, '.nav-item.language .dropdown__link');
+        $this->waitForPageLoad($page);
+        $this->assertShowingResults($page, '21 - 40');
+        $this->assertEquals('Language', $this->findCssAndGetText($page, '.nav-item.language .dropdown-toggle'));
 
         // Prev page now present, click it:
         $this->clickCss($page, '.search-header .pagination-simple .page-prev');
