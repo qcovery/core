@@ -61,3 +61,6 @@
 [submodule "module/SearchTools"]
 	path = module/SearchTools
 	url = https://github.com/qcovery/SearchTools.git
+[submodule "module/SemesterApparatus"]
+	path = module/SemesterApparatus
+	url = https://github.com/qcovery/SemesterApparatus
