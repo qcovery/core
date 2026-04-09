@@ -93,6 +93,21 @@ class CleanUpUserDataCommand extends Command
     }
 
     /**
+     * Clean up user data.
+     *
+     * @return void
+     */
+    public function cleanup()
+    {
+        $this->userTable->update(['firstname' => '']);
+        $this->userTable->update(['lastname' => '']);
+        $this->userTable->update(['cat_pass_enc' => '']);
+        $this->userTable->update(['created' => '2000-01-01 00:00:00']);
+        $this->userTable->update(['last_language' => '']);
+        $this->userTable->update(['email' => '']);
+    }
+
+    /**
      * Run the command.
      *
      * @param InputInterface  $input  Input object

@@ -44,18 +44,14 @@ use CleanUpUserData\Command\Util\CleanUpUserDataCommand;
 class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Build a fully-populated mock user row.
+     * Build a \VuFind\Db\Row\User object.
      *
      * @param int $id Numeric user ID
      *
      * @return \VuFind\Db\Row\User
      */
-    protected function buildMockUser(int $id): \VuFind\Db\Row\User
+    protected function buildPopulatedUserRow(int $id): \VuFind\Db\Row\User
     {
-        $user = $this->getMockBuilder(\VuFind\Db\Row\User::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $data = [
             'id'                  => $id,
             'username'            => "user$id",
@@ -64,61 +60,95 @@ class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
             'firstname'           => "Firstname$id",
             'lastname'            => "Lastname$id",
             'email'               => "user$id@example.com",
-            'email_verified'      => '2023-01-0' . $id . ' 10:00:00',
+            'email_verified'      => "2023-01-0$id 10:00:00",
             'pending_email'       => '',
             'user_provided_email' => 1,
             'cat_id'              => "cat_id_$id",
             'cat_username'        => "cat_user$id",
             'cat_password'        => "cat_pass$id",
-            'cat_pass_enc'        => null,
+            'cat_pass_enc'        => "cat_pass$id",
             'college'             => "College$id",
             'major'               => "Major$id",
             'home_library'        => "Library$id",
-            'created'             => '2022-01-0' . $id . ' 08:00:00',
+            'created'             => "2022-01-0$id 08:00:00",
             'verify_hash'         => md5("verify$id"),
-            'last_login'          => '2023-06-0' . $id . ' 12:00:00',
+            'last_login'          => "2023-06-0 $id 12:00:00",
             'auth_method'         => 'Database',
             'last_language'       => 'de',
         ];
 
-        $user->method('__get')->willReturnCallback(
-            function ($key) use ($data) {
-                return $data[$key] ?? null;
-            }
-        );
+        $adapter = $this->getMockBuilder(\Laminas\Db\Adapter\Adapter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $user = $this->getMockBuilder(\VuFind\Db\Row\User::class)
+            ->setConstructorArgs([$adapter])
+            ->onlyMethods(['save'])
+            ->getMock();
+
+        $user->populate($data, true);
 
         return $user;
     }
 
     /**
-     * Test that the five mock users have the expected IDs.
+     * Test that the cleanup() method calls update on the user table with selected values set to ''.
      *
      * @return void
      */
-    public function testUserIds()
+    public function testCleanup()
     {
+        // Build user rows with non-empty values beforehand (mock database).
         $users = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $users[] = $this->buildMockUser($i);
+        for ($i = 1; $i <= 3; $i++) {
+            $users[] = $this->buildPopulatedUserRow($i);
+        }
+
+        // Verify that fields have values before cleanup.
+        foreach ($users as $index => $user) {
+            $id = $index + 1;
+            $this->assertEquals("Firstname$id", $user['firstname']);
+            $this->assertEquals("Lastname$id", $user['lastname']);
+            $this->assertEquals("cat_pass$id", $user['cat_pass_enc']);
+            $this->assertEquals("user$id@example.com", $user['email']);
+            $this->assertEquals("2022-01-0$id 08:00:00", $user['created']);
+            $this->assertEquals("de", $user['last_language']);
         }
 
         $table = $this->getMockBuilder(\VuFind\Db\Table\User::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getById'])
+            ->onlyMethods(['update', 'select'])
             ->getMock();
-        $table->method('getById')
-            ->willReturnCallback(
-                function ($id) use ($users) {
-                    return $users[$id - 1] ?? null;
-                }
-            );
 
-        $expectedIds = [1, 2, 3, 4, 5];
-        $actualIds = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $actualIds[] = $table->getById($i)->id;
+        // update() applies the given field changes to all rows in the mock database.
+        $table->method('update')
+            ->willReturnCallback(function ($data) use (&$users) {
+                foreach ($users as $user) {
+                    foreach ($data as $field => $value) {
+                        $user[$field] = $value;
+                    }
+                }
+            });
+
+        // select() returns the current state of the mock database.
+        $table->method('select')
+            ->willReturnCallback(function () use (&$users) {
+                return $users;
+            });
+
+        $command = new CleanUpUserDataCommand($table);
+        $command->cleanup();
+
+        // Fetch users via select and verify fields are cleared afterwards.
+        $result = $table->select([]);
+        foreach ($result as $user) {
+            $this->assertEquals('', $user['firstname']);
+            $this->assertEquals('', $user['lastname']);
+            $this->assertEquals('', $user['cat_pass_enc']);
+            $this->assertEquals('', $user['email']);
+            $this->assertEquals('2000-01-01 00:00:00', $user['created']);
+            $this->assertEquals('', $user['last_language']);
         }
-        $this->assertEquals($expectedIds, $actualIds);
     }
 
     /**
@@ -126,11 +156,11 @@ class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    /* public function testBasicOperation()
+    public function testBasicOperation()
     {
         $users = [];
         for ($i = 1; $i <= 5; $i++) {
-            $users[] = $this->buildMockUser($i);
+            $users[] = $this->buildPopulatedUserRow($i);
         }
 
         $table = $this->getMockBuilder(\VuFind\Db\Table\User::class)
@@ -148,5 +178,5 @@ class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
         $expected = "5 records deleted.\n";
         $this->assertEquals($expected, $commandTester->getDisplay());
         $this->assertEquals(0, $commandTester->getStatusCode());
-    } */
+    }
 }
