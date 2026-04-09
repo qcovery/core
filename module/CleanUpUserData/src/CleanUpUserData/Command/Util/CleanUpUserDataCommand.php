@@ -29,6 +29,7 @@
 
 namespace CleanUpUserData\Command\Util;
 
+use Laminas\Config\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -61,15 +62,30 @@ class CleanUpUserDataCommand extends Command
     protected $userTable;
 
     /**
+     * Main framework configuration
+     *
+     * @var array
+     */
+    protected $mainConfig;
+
+    /**
+     * Hours to keep user data.
+     *
+     * @var int
+     */
+    protected $hours;
+
+    /**
      * Constructor
      *
      * @param User        $table Record table object
+     * @param Config      $mainConfig Main framework configuration
      * @param string|null $name  The name of the command; passing null means it
      * must be set in configure()
      */
-    public function __construct(User $table, $name = null)
-    {
+    public function __construct(User $table, Config $mainConfig, string $name = null) {
         $this->userTable = $table;
+        $this->mainConfig = $mainConfig;
         parent::__construct($name);
     }
 
@@ -78,8 +94,7 @@ class CleanUpUserDataCommand extends Command
      *
      * @return void
      */
-    protected function configure()
-    {
+    protected function configure() {
         $this
             ->setDescription('User data cleaner')
             ->setHelp('Removes unneeded user data records from the database.')
@@ -97,14 +112,27 @@ class CleanUpUserDataCommand extends Command
      *
      * @return void
      */
-    public function cleanup()
-    {
+    public function cleanup() {
         $this->userTable->update(['firstname' => '']);
         $this->userTable->update(['lastname' => '']);
         $this->userTable->update(['cat_pass_enc' => '']);
         $this->userTable->update(['created' => '2000-01-01 00:00:00']);
         $this->userTable->update(['last_language' => '']);
         $this->userTable->update(['email' => '']);
+    }
+
+    /**
+     * Get the default hours to keep user data.
+     *
+     * @return int hours to keep user data
+     */
+    private function getDefaultHours() {
+        $defaultHours = 24;
+        if (isset($this->mainConfig['Global']['default_hours'])
+            && !empty($this->mainConfig['Global']['default_hours'])) {
+            $defaultHours = $this->mainConfig['Global']['default_hours'];
+        }
+        return $defaultHours;
     }
 
     /**
@@ -117,13 +145,10 @@ class CleanUpUserDataCommand extends Command
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $hours = $input->getOption('hours') ?? 24;
-
-        $deleted = $this->userTable->cleanup($hours);
-        $count = count($deleted);
-        $output->writeln("$count records deleted.");
+    protected function execute(InputInterface $input, OutputInterface $output) {
+        $this->hours = $input->getOption('hours') ?? $this->getDefaultHours();
+        $this->cleanup();
+        $output->writeln("Users cleaned up successfully. ({$this->hours} hours)");
         return 0;
     }
 }

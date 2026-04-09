@@ -65,8 +65,10 @@ class CleanUpUserDataCommandFactory implements FactoryInterface
         $requestedName,
         array $options = null
     ) {
+        $configLoader = $container->get(\VuFind\Config\PluginManager::class);
         return new $requestedName(
             $container->get(\VuFind\Db\Table\PluginManager::class)->get('User'),
+            $configLoader->get('CleanUpUserData'),
             ...($options ?? [])
         );
     }
