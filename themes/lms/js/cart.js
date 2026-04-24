@@ -5,27 +5,11 @@ VuFind.register('cart', function Cart() {
   var _COOKIE = 'vufind_cart';
   var _COOKIE_SOURCES = 'vufind_cart_src';
   var _COOKIE_DELIM = "\t";
-  var _COOKIE_DOMAIN = false;
-  var _COOKIE_PATH = '/';
-  var _COOKIE_SAMESITE = 'Lax';
   var _COOKIE_LMS_ID = 'vufind_cart_lms_id';
   var _COOKIE_LMS_URL = 'vufind_cart_lms_url';
 
-  function setDomain(domain) {
-    _COOKIE_DOMAIN = domain;
-  }
-
-  function setCookiePath(path) {
-    _COOKIE_PATH = path;
-  }
-
-  function setCookieSameSite(sameSite) {
-    _COOKIE_SAMESITE = sameSite;
-  }
-
-  function _getCookieParams() {
-    return { path: _COOKIE_PATH, domain: _COOKIE_DOMAIN, SameSite: _COOKIE_SAMESITE };
-  }
+  var _popover = null;
+  var _popoverTimeout = false;
 
   function _uniqueArray(op) {
     var ret = [];
@@ -38,14 +22,14 @@ VuFind.register('cart', function Cart() {
   }
 
   function _getItems() {
-    var items = window.Cookies.get(_COOKIE);
+    var items = VuFind.cookie.get(_COOKIE);
     if (items) {
       return items.split(_COOKIE_DELIM);
     }
     return [];
   }
   function _getSources() {
-    var items = window.Cookies.get(_COOKIE_SOURCES);
+    var items = VuFind.cookie.get(_COOKIE_SOURCES);
     if (items) {
       return items.split(_COOKIE_DELIM);
     }
@@ -107,11 +91,11 @@ VuFind.register('cart', function Cart() {
       // Add source to source cookie
       cartItems[cartItems.length] = String.fromCharCode(65 + cartSources.length) + id;
       cartSources[cartSources.length] = source;
-      window.Cookies.set(_COOKIE_SOURCES, cartSources.join(_COOKIE_DELIM), _getCookieParams());
+      VuFind.cookie.set(_COOKIE_SOURCES, cartSources.join(_COOKIE_DELIM));
     } else {
       cartItems[cartItems.length] = String.fromCharCode(65 + sIndex) + id;
     }
-    window.Cookies.set(_COOKIE, _uniqueArray(cartItems).join(_COOKIE_DELIM), _getCookieParams());
+    VuFind.cookie.set(_COOKIE, _uniqueArray(cartItems).join(_COOKIE_DELIM));
     updateCount();
     return true;
   }
@@ -146,11 +130,11 @@ VuFind.register('cart', function Cart() {
         }
       }
       if (cartItems.length > 0) {
-        window.Cookies.set(_COOKIE, _uniqueArray(cartItems).join(_COOKIE_DELIM), _getCookieParams());
-        window.Cookies.set(_COOKIE_SOURCES, _uniqueArray(cartSources).join(_COOKIE_DELIM), _getCookieParams());
+        VuFind.cookie.set(_COOKIE, _uniqueArray(cartItems).join(_COOKIE_DELIM));
+        VuFind.cookie.set(_COOKIE_SOURCES, _uniqueArray(cartSources).join(_COOKIE_DELIM));
       } else {
-        window.Cookies.remove(_COOKIE, _getCookieParams());
-        window.Cookies.remove(_COOKIE_SOURCES, _getCookieParams());
+        VuFind.cookie.remove(_COOKIE);
+        VuFind.cookie.remove(_COOKIE_SOURCES);
       }
       updateCount();
       return true;
@@ -158,25 +142,35 @@ VuFind.register('cart', function Cart() {
     return false;
   }
 
-  var _cartNotificationTimeout = false;
+  function _showPopover(el, msg) {
+    if (_popoverTimeout !== false) {
+      clearTimeout(_popoverTimeout);
+    }
+    if (_popover) {
+      _popover.hide();
+    }
+    _popover = new bootstrap.Popover(el, {
+      title: VuFind.translate('bookbag'),
+      content: msg,
+      html: true,
+      trigger: 'manual',
+      placement: $(document.body).hasClass('rtl') ? 'left' : 'right'
+    });
+    _popover.show();
+
+    _popoverTimeout = setTimeout(function notificationHide() {
+      _popover.hide();
+      _popover = null;
+    }, 5000);
+  }
+
   function _registerUpdate(_form) {
     var $form = typeof _form === 'undefined'
       ? $('form[name="bulkActionForm"]')
       : $(_form);
-    $("#updateCart, #bottom_updateCart").unbind('click').click(function cartUpdate() {
-      var elId = this.id;
-      var selected = [];
-      var addToSelected = function processCartFormValues() {
-        if (-1 === selected.indexOf(this.value)) {
-          selected.push(this.value);
-        }
-      };
-      var selectedInForm = $form.find('input[name="ids[]"]:checked');
-      var selectedFormAttr = $('input[form="' + $form.attr('id') + '"][name="ids[]"]:checked');
-      $(selectedInForm).each(addToSelected);
-      $(selectedFormAttr).each(addToSelected);
+    $("#updateCart, #bottom_updateCart").off("click").on("click", function cartUpdate() {
+      var selected = VuFind.listItemSelection.getAllSelected($form[0]);
       if (selected.length > 0) {
-        var msg = "";
         var orig = getFullItems();
         $(selected).each(function cartCheckedItemsAdd() {
           var data = this.split('|');
@@ -185,60 +179,70 @@ VuFind.register('cart', function Cart() {
         var updated = getFullItems();
         var added = updated.length - orig.length;
         var inCart = selected.length - added;
-        msg += VuFind.translate('itemsAddBag', {'%%count%%': added});
+        var msgs = [
+          VuFind.translate('itemsAddBag', {'%%count%%': added})
+        ];
         if (updated.length >= parseInt(VuFind.translate('bookbagMax'), 10)) {
-          msg += "<br/>" + VuFind.translate('bookbagFull');
+          msgs.push(VuFind.translate('bookbagFull'));
         }
         if (inCart > 0 && orig.length > 0) {
-          msg += "<br/>" + VuFind.translate('itemsInBag', {'%%count%%': inCart});
+          msgs.push(VuFind.translate('itemsInBag', {'%%count%%': inCart}));
         }
-        $('#' + elId).data('bs.popover').options.content = msg;
+        var msg = '';
+        if (msgs.length > 1) {
+          var ul = document.createElement('ul');
+          msgs.forEach((current) => {
+            var li = document.createElement('li');
+            li.textContent = current;
+            ul.appendChild(li);
+          });
+          msg = ul.outerHTML;
+        } else {
+          msg = msgs.pop();
+        }
+        _showPopover(this, msg);
         $('#cartItems strong').html(updated.length);
       } else {
-        $('#' + elId).data('bs.popover').options.content = VuFind.translate('bulk_noitems_advice');
+        _showPopover(this, VuFind.translate('bulk_noitems_advice'));
       }
-      $('#' + elId).popover('show');
-      if (_cartNotificationTimeout !== false) {
-        clearTimeout(_cartNotificationTimeout);
-      }
-      _cartNotificationTimeout = setTimeout(function notificationHide() {
-        $('#' + elId).popover('hide');
-      }, 5000);
+
       return false;
     });
   }
 
-  function _registerToggles() {
-    var $toggleBtns = $('.btn-bookbag-toggle');
+  function registerToggles(_container) {
+    var container = typeof _container !== 'undefined' ? $(_container) : $(document);
+    var $toggleBtns = container.find('.btn-bookbag-toggle');
     if ($toggleBtns.length > 0) {
       $toggleBtns.each(function cartIdEach() {
         var $this = $(this);
         var currentId = $this.data('cart-id');
         var currentSource = $this.data('cart-source');
         $this.find('.correct').removeClass('correct hidden');
-        $this.find('.cart-add').click(function cartAddClick(e) {
+        $this.find('.cart-add').on('click', function cartAddClick(e) {
           e.preventDefault();
           if (addItem(currentId, currentSource)) {
             $this.find('.cart-add').addClass('hidden');
-            $this.find('.cart-remove').removeClass('hidden');
+            $this.find('.cart-remove').removeClass('hidden').trigger('focus');
           } else {
-            $this.popover({content: VuFind.translate('bookbagFull')});
-            setTimeout(function recordCartFullHide() {
-              $this.popover('hide');
-            }, 5000);
+            _showPopover(this, VuFind.translate('bookbagFull'));
           }
         });
-        $this.find('.cart-remove').click(function cartRemoveClick(e) {
+        $this.find('.cart-remove').on('click', function cartRemoveClick(e) {
           e.preventDefault();
           removeItem(currentId, currentSource);
-          $this.find('.cart-add').removeClass('hidden');
+          $this.find('.cart-add').removeClass('hidden').trigger('focus');
           $this.find('.cart-remove').addClass('hidden');
         });
       });
     }
   }
 
-  function getUrlParameter(sParam) {
+  function updateContainer(params) {
+    registerToggles(params.container);
+  }
+
+    function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1),
         sURLVariables = sPageURL.split('&'),
         sParameterName,
@@ -257,24 +261,19 @@ VuFind.register('cart', function Cart() {
     var lmsUrl = getUrlParameter('lmsurl');
 
     if (lmsId && lmsUrl) {
-      window.Cookies.set(_COOKIE_LMS_ID, lmsId, _getCookieParams());
-      window.Cookies.set(_COOKIE_LMS_URL, lmsId, _getCookieParams());
+      VuFind.cookie.set(_COOKIE_LMS_ID, lmsId);
+      VuFind.cookie.set(_COOKIE_LMS_URL, lmsId);
     }
   }
 
   function init() {
     // Record buttons
-    _registerToggles();
+    registerToggles();
     // Search results
     _registerUpdate();
-    $("#updateCart, #bottom_updateCart").popover({
-      content: '',
-      html: true,
-      trigger: 'manual',
-      placement: $(document.body).hasClass('rtl') ? 'left' : 'right'
-    });
     checkImsActivation();
     updateCount();
+    VuFind.listen('results-init', updateContainer);
   }
 
   // Reveal
@@ -284,29 +283,38 @@ VuFind.register('cart', function Cart() {
     getFullItems: getFullItems,
     hasItem: hasItem,
     removeItem: removeItem,
-    setCookiePath: setCookiePath,
-    setDomain: setDomain,
     updateCount: updateCount,
     // Init
-    init: init
+    init: init,
+    registerToggles: registerToggles
   };
 });
 
 // Building an array and checking indexes prevents a race situation
 // We want to prioritize empty over printing
 function cartFormHandler(event, data) {
-  var keys = [];
-  for (var i in data) {
-    if (data.hasOwnProperty(i)) {
-      keys.push(data[i].name);
+  let numberOfItems = 0;
+  let isPrint = false;
+  for (let i in data) {
+    if (Object.prototype.hasOwnProperty.call(data, i)) {
+      if (data[i].name === 'ids[]') {
+        numberOfItems++;
+      }
+      if (data[i].name === 'print') {
+        isPrint = true;
     }
   }
-  if (keys.indexOf('ids[]') === -1) {
+  }
+  if (event.originalEvent !== undefined) {
+    let itemLimit = event.originalEvent.submitter.dataset.itemLimit;
+    if (numberOfItems < 1 || numberOfItems > itemLimit) {
     return null;
   }
-  if (keys.indexOf('print') > -1) {
+  }
+
+  if (isPrint) {
     return true;
   }
 }
 
-document.addEventListener('VuFind.lightbox.closed', VuFind.cart.updateCount, false);
+VuFind.listen('lightbox.closed', VuFind.cart.updateCount);
