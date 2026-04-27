@@ -87,9 +87,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param string $message Message
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setMessage(string $message): static
+    public function setMessage(string $message): FeedbackEntityInterface
     {
         $this->message = $message;
         return $this;
@@ -110,9 +110,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param array $data Form data
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setFormData(array $data): static
+    public function setFormData(array $data): FeedbackEntityInterface
     {
         $this->form_data = json_encode($data);
         return $this;
@@ -133,9 +133,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param string $name Form name
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setFormName(string $name): static
+    public function setFormName(string $name): FeedbackEntityInterface
     {
         $this->form_name = $name;
         return $this;
@@ -156,9 +156,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static
+    public function setCreated(DateTime $dateTime): FeedbackEntityInterface
     {
         $this->created = $dateTime->format('Y-m-d H:i:s');
         return $this;
@@ -179,9 +179,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param DateTime $dateTime Last update date
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setUpdated(DateTime $dateTime): static
+    public function setUpdated(DateTime $dateTime): FeedbackEntityInterface
     {
         $this->updated = $dateTime->format('Y-m-d H:i:s');
         return $this;
@@ -202,9 +202,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param string $status Status
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setStatus(string $status): static
+    public function setStatus(string $status): FeedbackEntityInterface
     {
         $this->status = $status;
         return $this;
@@ -225,9 +225,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param string $url Site URL
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setSiteUrl(string $url): static
+    public function setSiteUrl(string $url): FeedbackEntityInterface
     {
         $this->site_url = $url;
         return $this;
@@ -248,9 +248,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param ?UserEntityInterface $user User that created request
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static
+    public function setUser(?UserEntityInterface $user): FeedbackEntityInterface
     {
         $this->user_id = $user?->getId();
         return $this;
@@ -273,9 +273,9 @@ class Feedback extends RowGateway implements FeedbackEntityInterface, DbServiceA
      *
      * @param ?UserEntityInterface $user User that updated request
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setUpdatedBy(?UserEntityInterface $user): static
+    public function setUpdatedBy(?UserEntityInterface $user): FeedbackEntityInterface
     {
         $this->updated_by = $user ? $user->getId() : null;
         return $this;

@@ -84,9 +84,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param UserEntityInterface $user User to set
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setUser(UserEntityInterface $user): static
+    public function setUser(UserEntityInterface $user): LoginTokenEntityInterface
     {
         $this->user_id = $user->getId();
         return $this;
@@ -109,9 +109,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param string $token Token
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setToken(string $token): static
+    public function setToken(string $token): LoginTokenEntityInterface
     {
         $this->token = $token;
         return $this;
@@ -132,9 +132,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param string $series Series
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setSeries(string $series): static
+    public function setSeries(string $series): LoginTokenEntityInterface
     {
         $this->series = $series;
         return $this;
@@ -155,9 +155,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param DateTime $dateTime Last login date/time
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setLastLogin(DateTime $dateTime): static
+    public function setLastLogin(DateTime $dateTime): LoginTokenEntityInterface
     {
         $this->last_login = $dateTime->format('Y-m-d H:i:s');
         return $this;
@@ -178,9 +178,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param ?string $browser Browser details (or null for none)
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setBrowser(?string $browser): static
+    public function setBrowser(?string $browser): LoginTokenEntityInterface
     {
         $this->browser = $browser;
         return $this;
@@ -201,9 +201,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param ?string $platform Platform details (or null for none)
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setPlatform(?string $platform): static
+    public function setPlatform(?string $platform): LoginTokenEntityInterface
     {
         $this->platform = $platform;
         return $this;
@@ -224,9 +224,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param int $expires Expiration timestamp
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setExpires(int $expires): static
+    public function setExpires(int $expires): LoginTokenEntityInterface
     {
         $this->expires = $expires;
         return $this;
@@ -247,9 +247,9 @@ class LoginToken extends RowGateway implements DbServiceAwareInterface, LoginTok
      *
      * @param ?string $sid Last session ID (or null for none)
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setLastSessionId(?string $sid): static
+    public function setLastSessionId(?string $sid): LoginTokenEntityInterface
     {
         $this->last_session_id = $sid;
         return $this;

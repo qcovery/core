@@ -85,9 +85,9 @@ class Record extends RowGateway implements RecordEntityInterface
      *
      * @param ?string $recordId Record id
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setRecordId(?string $recordId): static
+    public function setRecordId(?string $recordId): RecordEntityInterface
     {
         $this->record_id = $recordId;
         return $this;
@@ -108,9 +108,9 @@ class Record extends RowGateway implements RecordEntityInterface
      *
      * @param ?string $recordSource Record source
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setSource(?string $recordSource): static
+    public function setSource(?string $recordSource): RecordEntityInterface
     {
         $this->source = $recordSource;
         return $this;
@@ -131,9 +131,9 @@ class Record extends RowGateway implements RecordEntityInterface
      *
      * @param string $recordVersion Record version
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setVersion(string $recordVersion): static
+    public function setVersion(string $recordVersion): RecordEntityInterface
     {
         $this->version = $recordVersion;
         return $this;
@@ -158,9 +158,9 @@ class Record extends RowGateway implements RecordEntityInterface
      *
      * @param ?string $recordData Record data
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setData(?string $recordData): static
+    public function setData(?string $recordData): RecordEntityInterface
     {
         $this->__set('data', $recordData);
         return $this;
@@ -181,9 +181,9 @@ class Record extends RowGateway implements RecordEntityInterface
      *
      * @param DateTime $dateTime Updated date
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setUpdated(DateTime $dateTime): static
+    public function setUpdated(DateTime $dateTime): RecordEntityInterface
     {
         $this->updated = $dateTime->format('Y-m-d H:i:s');
         return $this;

@@ -29,7 +29,7 @@
 
 namespace VuFindTest\Content\Covers;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Content\Covers\Syndetics;
 use VuFind\Http\CachingDownloader;
 use VuFindCode\ISBN;

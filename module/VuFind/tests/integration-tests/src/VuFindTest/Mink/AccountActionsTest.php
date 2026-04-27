@@ -474,7 +474,6 @@ final class AccountActionsTest extends \VuFindTest\Integration\MinkTestCase
                     'Mail' => [
                         'testOnly' => true,
                         'message_log' => $this->getEmailLogPath(),
-                        'message_log_format' => $this->getEmailLogFormat(),
                     ],
                 ],
             ]
@@ -499,8 +498,8 @@ final class AccountActionsTest extends \VuFindTest\Integration\MinkTestCase
         );
 
         // Extract URL from email:
-        $email = $this->getLoggedEmail();
-        preg_match('/You can reset your password at this URL: (http.*)/', $email->getBody()->getBody(), $matches);
+        $email = file_get_contents($this->getEmailLogPath());
+        preg_match('/You can reset your password at this URL: (http.*)/', $email, $matches);
         $link = $matches[1];
 
         // Reset the password:

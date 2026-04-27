@@ -54,9 +54,9 @@ interface UserListEntityInterface extends EntityInterface
      *
      * @param string $title Title
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setTitle(string $title): static;
+    public function setTitle(string $title): UserListEntityInterface;
 
     /**
      * Get title.
@@ -70,9 +70,9 @@ interface UserListEntityInterface extends EntityInterface
      *
      * @param ?string $description Description
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setDescription(?string $description): static;
+    public function setDescription(?string $description): UserListEntityInterface;
 
     /**
      * Get description.
@@ -86,9 +86,9 @@ interface UserListEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static;
+    public function setCreated(DateTime $dateTime): UserListEntityInterface;
 
     /**
      * Get created date.
@@ -102,9 +102,9 @@ interface UserListEntityInterface extends EntityInterface
      *
      * @param bool $public Is the list public?
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setPublic(bool $public): static;
+    public function setPublic(bool $public): UserListEntityInterface;
 
     /**
      * Is this a public list?
@@ -118,9 +118,9 @@ interface UserListEntityInterface extends EntityInterface
      *
      * @param ?UserEntityInterface $user User owning the list.
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static;
+    public function setUser(?UserEntityInterface $user): UserListEntityInterface;
 
     /**
      * Get user.

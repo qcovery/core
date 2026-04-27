@@ -16,7 +16,7 @@ VuFind.register('embedded', function embedded() {
         storage.push(str);
       }
     }
-    sessionStorage.setItem(_STORAGEKEY, $.unique(storage).join(_DELIM));
+    sessionStorage.setItem(_STORAGEKEY, $.uniqueSort(storage).join(_DELIM));
   }
   function addToStorage(id, tab) {
     _STATUS[id] = tab;
@@ -66,6 +66,7 @@ VuFind.register('embedded', function embedded() {
           if (html.length > 0) {
             $('#' + tabid + '-content').html(VuFind.updateCspNonce(html));
             registerTabEvents();
+            VuFind.emit('record-tab-init', {container: document.querySelector('#' + tabid + '-content')});
           } else {
             $('#' + tabid + '-content').html(VuFind.translate('collection_empty'));
           }
@@ -77,7 +78,7 @@ VuFind.register('embedded', function embedded() {
       });
     }
     if (click && !$tab.parent().hasClass('default')) {
-      $tab.click();
+      $tab.trigger("click");
     }
     return true;
   }
@@ -144,18 +145,19 @@ VuFind.register('embedded', function embedded() {
             } else {
               var $firstTab = $(longNode).find('.list-tab-toggle.active');
               if ($firstTab.length === 0) {
-                $firstTab = $(longNode).find('.list-tab-toggle:eq(0)');
+                $firstTab = $(longNode).find('.list-tab-toggle').first();
               }
               ajaxLoadTab($firstTab.attr('id'), true);
             }
             // Bind tab clicks
-            longNode.find('.list-tab-toggle').click(function embeddedTabLoad() {
+            longNode.find('.list-tab-toggle').on('click', function embeddedTabLoad() {
               if (!$(this).parent().hasClass('noajax')) {
                 addToStorage(divID, this.id);
               }
               return ajaxLoadTab(this.id);
             });
-            longNode.find('[id^=usercomment]').find('input[type=submit]').unbind('click').click(
+            longNode.find('[id^=usercomment]').find('input[type=submit]').off("click").on(
+              "click",
               function embeddedComments() {
                 return registerAjaxCommentRecord(longNode);
               }
@@ -225,10 +227,19 @@ VuFind.register('embedded', function embedded() {
     }
   }
 
-  function init() {
-    $('.getFull').on('click', function linkToggle() { return toggleDataView(this); });
+  function updateContainer(params) {
+    const container = $(params.container);
+    container.find('.getFull').on('click', function linkToggle() { return toggleDataView(this); });
+    container.find('.full-record-link').removeClass('hidden');
     loadStorage();
   }
 
-  return { init: init };
+  function init() {
+    updateContainer({container: document});
+    VuFind.listen('results-init', updateContainer);
+  }
+
+  return {
+    init: init
+  };
 });

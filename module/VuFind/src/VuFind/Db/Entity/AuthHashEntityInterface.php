@@ -61,9 +61,9 @@ interface AuthHashEntityInterface extends EntityInterface
      *
      * @param ?string $sessionId PHP Session id string
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setSessionId(?string $sessionId): static;
+    public function setSessionId(?string $sessionId): AuthHashEntityInterface;
 
     /**
      * Get hash value.
@@ -77,9 +77,9 @@ interface AuthHashEntityInterface extends EntityInterface
      *
      * @param string $hash Hash Value
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setHash(string $hash): static;
+    public function setHash(string $hash): AuthHashEntityInterface;
 
     /**
      * Get type of hash.
@@ -93,9 +93,9 @@ interface AuthHashEntityInterface extends EntityInterface
      *
      * @param ?string $type Hash Type
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setHashType(?string $type): static;
+    public function setHashType(?string $type): AuthHashEntityInterface;
 
     /**
      * Get data.
@@ -109,9 +109,9 @@ interface AuthHashEntityInterface extends EntityInterface
      *
      * @param ?string $data Data
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setData(?string $data): static;
+    public function setData(?string $data): AuthHashEntityInterface;
 
     /**
      * Get created date.
@@ -125,7 +125,7 @@ interface AuthHashEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static;
+    public function setCreated(DateTime $dateTime): AuthHashEntityInterface;
 }

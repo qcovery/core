@@ -57,7 +57,7 @@ class Options extends \VuFind\Search\Base\Options
     /**
      * Search configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $searchSettings;
 

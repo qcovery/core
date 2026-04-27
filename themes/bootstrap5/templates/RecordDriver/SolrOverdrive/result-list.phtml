@@ -113,7 +113,7 @@
       <?php endif; ?>
 
       <?php if ($this->driver->tryMethod('getWorkKeys') && $this->searchOptions($this->driver->getSourceIdentifier())->getVersionsAction()): ?>
-        <div class="record-versions ajax hidden-print"></div>
+        <div class="record-versions ajax"></div>
       <?php endif; ?>
 
       <div class="callnumAndLocation ajax-availability hidden">
@@ -128,18 +128,19 @@
         // Display an OpenURL link if configured to do so:
         $openUrl = $this->openUrl($this->driver, 'results');
         $openUrlActive = $openUrl->isActive();
-        $identifierLinksHtml = $this->identifierLinker($this->driver, 'results');
+        $doi = $this->doi($this->driver, 'results');
+        $doiActive = $doi->isActive();
         // Account for replace_other_urls setting
         $urls = $this->record($this->driver)->getLinkDetails($openUrlActive);
         ?>
-        <?php if ($openUrlActive || $identifierLinksHtml || !empty($urls)): ?>
+        <?php if ($openUrlActive || $doiActive || !empty($urls)): ?>
         <?php if ($openUrlActive): ?>
           <br>
           <?=$openUrl->renderTemplate()?>
         <?php endif; ?>
-        <?php if ($identifierLinksHtml): ?>
+        <?php if ($doiActive): ?>
           <br>
-          <?=$identifierLinksHtml?>
+          <?=$doi->renderTemplate()?>
         <?php endif; ?>
         <?php $urls = is_array($urls) ? $urls : []; ?>
         <?php if (!$this->driver->isCollection()): ?>

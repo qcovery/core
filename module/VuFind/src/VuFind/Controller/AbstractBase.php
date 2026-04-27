@@ -36,7 +36,6 @@ use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Uri\Http;
 use Laminas\View\Model\ViewModel;
-use VuFind\Config\Feature\EmailSettingsTrait;
 use VuFind\Controller\Feature\AccessPermissionInterface;
 use VuFind\Db\Entity\UserEntityInterface;
 use VuFind\Exception\Auth as AuthException;
@@ -78,7 +77,6 @@ use function is_object;
  */
 class AbstractBase extends AbstractActionController implements AccessPermissionInterface, TranslatorAwareInterface
 {
-    use EmailSettingsTrait;
     use GetServiceTrait;
     use TranslatorAwareTrait;
 
@@ -268,7 +266,7 @@ class AbstractBase extends AbstractActionController implements AccessPermissionI
         // Fail if we're missing a from and the form element is disabled:
         if ($view->disableFrom) {
             if (empty($view->from)) {
-                $view->from = $this->getEmailSenderAddress($config);
+                $view->from = $config->Site->email;
             }
             if (empty($view->from)) {
                 throw new \Exception('Unable to determine email from address');
@@ -451,7 +449,7 @@ class AbstractBase extends AbstractActionController implements AccessPermissionI
      *
      * @param string $id Configuration identifier (default = main VuFind config)
      *
-     * @return \VuFind\Config\Config
+     * @return \Laminas\Config\Config
      */
     public function getConfig($id = 'config')
     {

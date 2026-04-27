@@ -61,7 +61,7 @@ class Params extends \VuFind\Search\Solr\Params
     /**
      * Blender configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $blenderConfig;
 
@@ -86,7 +86,7 @@ class Params extends \VuFind\Search\Solr\Params
      * @param \VuFind\Config\PluginManager $configLoader  Config loader
      * @param HierarchicalFacetHelper      $facetHelper   Hierarchical facet helper
      * @param array                        $searchParams  Search params for backends
-     * @param \VuFind\Config\Config        $blenderConfig Blender configuration
+     * @param \Laminas\Config\Config       $blenderConfig Blender configuration
      * @param array                        $mappings      Blender mappings
      */
     public function __construct(
@@ -94,7 +94,7 @@ class Params extends \VuFind\Search\Solr\Params
         \VuFind\Config\PluginManager $configLoader,
         HierarchicalFacetHelper $facetHelper,
         array $searchParams,
-        \VuFind\Config\Config $blenderConfig,
+        \Laminas\Config\Config $blenderConfig,
         array $mappings
     ) {
         // Assign these first; they are needed during parent's construct:

@@ -31,7 +31,7 @@
 namespace VuFind\Search;
 
 use Exception;
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Db\Service\SearchServiceInterface;
 
 /**
@@ -52,13 +52,13 @@ class History
      * @param SearchServiceInterface               $searchService  Search table
      * @param string                               $sessionId      Session ID
      * @param \VuFind\Search\Results\PluginManager $resultsManager Results manager
-     * @param ?Config                              $config         Configuration
+     * @param ?\Laminas\Config\Config              $config         Configuration
      */
     public function __construct(
         protected SearchServiceInterface $searchService,
         protected string $sessionId,
         protected \VuFind\Search\Results\PluginManager $resultsManager,
-        protected ?Config $config = null
+        protected ?\Laminas\Config\Config $config = null
     ) {
     }
 

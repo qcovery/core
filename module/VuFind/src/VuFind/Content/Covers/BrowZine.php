@@ -32,8 +32,6 @@ namespace VuFind\Content\Covers;
 use VuFindSearch\Backend\BrowZine\Command\LookupIssnsCommand;
 use VuFindSearch\Service;
 
-use function in_array;
-
 /**
  * BrowZine cover content loader.
  *
@@ -46,13 +44,20 @@ use function in_array;
 class BrowZine extends \VuFind\Content\AbstractCover
 {
     /**
+     * Search service
+     *
+     * @var Service
+     */
+    protected $searchService;
+
+    /**
      * Constructor
      *
-     * @param Service  $searchService Search service
-     * @param string[] $ignoreList    Cover image URLs to ignore (we don't want to display third-party generic images)
+     * @param Service $searchService Search service
      */
-    public function __construct(protected Service $searchService, protected array $ignoreList)
+    public function __construct(Service $searchService)
     {
+        $this->searchService = $searchService;
         $this->supportsIssn = true;
     }
 
@@ -77,7 +82,6 @@ class BrowZine extends \VuFind\Content\AbstractCover
 
         $command = new LookupIssnsCommand('BrowZine', $ids['issn']);
         $result = $this->searchService->invoke($command)->getResult();
-        $url = $result['data'][0]['coverImageUrl'] ?? false;
-        return ($url && in_array($url, $this->ignoreList)) ? false : $url;
+        return $result['data'][0]['coverImageUrl'] ?? false;
     }
 }

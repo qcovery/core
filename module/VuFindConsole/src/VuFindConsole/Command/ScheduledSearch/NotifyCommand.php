@@ -31,13 +31,12 @@ namespace VuFindConsole\Command\ScheduledSearch;
 
 use DateTime;
 use Exception;
+use Laminas\Config\Config;
 use Laminas\View\Renderer\PhpRenderer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use VuFind\Config\Config;
-use VuFind\Config\Feature\EmailSettingsTrait;
 use VuFind\Crypt\SecretCalculator;
 use VuFind\Db\Entity\SearchEntityInterface;
 use VuFind\Db\Entity\UserEntityInterface;
@@ -66,7 +65,6 @@ use function sprintf;
 )]
 class NotifyCommand extends Command implements TranslatorAwareInterface
 {
-    use EmailSettingsTrait;
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
     use \VuFind\I18n\Translator\LanguageInitializerTrait;
 
@@ -97,13 +95,6 @@ class NotifyCommand extends Command implements TranslatorAwareInterface
      * @var int
      */
     protected $limit = 50;
-
-    /**
-     * Sort order to use when performing searches
-     *
-     * @var string
-     */
-    protected $sort = 'first_indexed desc';
 
     /**
      * Constructor
@@ -318,7 +309,7 @@ class NotifyCommand extends Command implements TranslatorAwareInterface
         // Prepare query
         $params = $searchObject->getParams();
         $params->setLimit($this->limit);
-        $params->setSort($this->sort, true);
+        $params->setSort('first_indexed desc', true);
         $searchId = $searchObject->getSearchId();
         try {
             $records = $searchObject->getResults();
@@ -419,7 +410,7 @@ class NotifyCommand extends Command implements TranslatorAwareInterface
     {
         $subject = $this->mainConfig->Site->title
             . ': ' . $this->translate('Scheduled Alert Results');
-        $from = $this->getEmailSenderAddress($this->mainConfig);
+        $from = $this->mainConfig->Site->email;
         $to = $user->getEmail();
         try {
             $this->mailer->send($to, $from, $subject, $message);

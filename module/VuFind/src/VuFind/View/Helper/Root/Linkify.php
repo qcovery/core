@@ -46,27 +46,31 @@ use VStelmakh\UrlHighlight\UrlHighlight;
 class Linkify extends AbstractHelper
 {
     /**
+     * Url highlighter
+     *
+     * @var UrlHighlight
+     */
+    protected $urlHighlight;
+
+    /**
      * Constructor
      *
-     * @param UrlHighlight $urlHighlight            Url highlighter
-     * @param UrlHighlight $urlHighlightExceptEmail Url highlighter that ignores email addresses
+     * @param UrlHighlight $urlHighlight Url highlighter
      */
-    public function __construct(protected UrlHighlight $urlHighlight, protected UrlHighlight $urlHighlightExceptEmail)
+    public function __construct(UrlHighlight $urlHighlight)
     {
+        $this->urlHighlight = $urlHighlight;
     }
 
     /**
      * Replace urls and emails by html tags
      *
-     * @param string $string       String to linkify (must be HTML-escaped)
-     * @param bool   $includeEmail If email addresses should also be linkified
+     * @param string $string String to linkify (must be HTML-escaped)
      *
      * @return string
      */
-    public function __invoke(string $string, bool $includeEmail = true): string
+    public function __invoke(string $string): string
     {
-        return $includeEmail
-            ? $this->urlHighlight->highlightUrls($string)
-            : $this->urlHighlightExceptEmail->highlightUrls($string);
+        return $this->urlHighlight->highlightUrls($string);
     }
 }

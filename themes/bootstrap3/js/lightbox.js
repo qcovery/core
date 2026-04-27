@@ -1,5 +1,8 @@
 /*global VuFind, getFocusableNodes, recaptchaOnLoad, resetCaptcha */
 VuFind.register('lightbox', function Lightbox() {
+  var child = "";
+  var parent = "";
+
   // State
   var _originalUrl = false;
   var _currentUrl = false;
@@ -29,21 +32,17 @@ VuFind.register('lightbox', function Lightbox() {
     _lightboxTitle = false;
     _modal.modal('handleUpdate');
   }
-  function _emit(msg, _details) {
-    var details = _details || {};
-    var event;
-    try {
-      event = new CustomEvent(msg, {
-        detail: details,
-        bubbles: true,
-        cancelable: true
-      });
-    } catch (e) {
-      // Fallback to document.createEvent() if creating a new CustomEvent fails (e.g. IE 11)
-      event = document.createEvent('CustomEvent');
-      event.initCustomEvent(msg, true, true, details);
+
+  function _addQueryParameters(url, params) {
+    let fragmentSplit = url.split('#');
+    let paramsSplit = fragmentSplit[0].split('?');
+    let searchParams = new URLSearchParams(paramsSplit.length > 1 ? paramsSplit[1] : "");
+    for (const [key, value] of Object.entries(params)) {
+      searchParams.set(key, value);
     }
-    return document.dispatchEvent(event);
+    let res = paramsSplit[0] + '?' + searchParams.toString();
+    res += fragmentSplit.length < 2 ? '' : '#' + fragmentSplit[1];
+    return res;
   }
 
   // Public: Present an alert
@@ -64,11 +63,43 @@ VuFind.register('lightbox', function Lightbox() {
   }
 
   /**
+   * Tries to set focus on a node which is not a close trigger
+   * if no other nodes exist then focuses on first close trigger
+   */
+  function setFocusToFirstNode() {
+    var focusableNodes = getFocusableNodes(_modal.get(0));
+
+    // no focusable nodes
+    if (focusableNodes.length === 0) return;
+
+    // remove nodes on whose click, the modal closes
+    var nodesWhichAreNotCloseTargets = focusableNodes.filter(function nodeFilter(node) {
+      return !node.hasAttribute("data-lightbox-close") && (
+        !node.hasAttribute("data-dismiss") ||
+        node.getAttribute("data-dismiss") !== "modal"
+      );
+    });
+
+    if (nodesWhichAreNotCloseTargets.length > 0) {
+      nodesWhichAreNotCloseTargets[0].focus();
+    }
+    if (nodesWhichAreNotCloseTargets.length === 0) {
+      focusableNodes[0].focus();
+    }
+  }
+
+  /**
    * Update content
    *
    * Form data options:
    *
-   * data-lightbox-ignore = do not submit this form in lightbox
+   * data-lightbox-ignore        do not submit this form in lightbox
+   *
+   * Script data options:
+   *
+   * data-lightbox-run           run the script when lightbox content is shown
+   * data-lightbox-run="always"  run the script even if only a success message is displayed
+   *
    */
   // function declarations to avoid style warnings about circular references
   var _constrainLink;
@@ -77,19 +108,25 @@ VuFind.register('lightbox', function Lightbox() {
     if (typeof content !== "string") {
       return;
     }
-    // Isolate successes.
+    // Isolate any success messages and scripts that should always run
     var htmlDiv = $('<div/>').html(VuFind.updateCspNonce(content));
+    var runScripts = htmlDiv.find('script[data-lightbox-run]');
+    var alwaysRunScripts = htmlDiv.find('script[data-lightbox-run="always"]');
     var alerts = htmlDiv.find('.flash-message.alert-success:not([data-lightbox-ignore])');
     if (alerts.length > 0) {
       var msgs = alerts.toArray().map(function getSuccessHtml(el) {
         return el.innerHTML;
-      }).join('<br/>');
+      }).join('<br>');
       var href = alerts.find('.download').attr('href');
       if (typeof href !== 'undefined') {
         location.href = href;
         close();
       } else {
         showAlert(msgs, 'success');
+        // Add any scripts to head to run them
+        alwaysRunScripts.each(function addScript(i, script) {
+          $(document).find('head').append(script);
+        });
       }
       return;
     }
@@ -113,14 +150,20 @@ VuFind.register('lightbox', function Lightbox() {
       $(forms[i]).on('submit', _formSubmit);
     }
     // Select all checkboxes
-    $('#modal').find('.checkbox-select-all').change(function lbSelectAllCheckboxes() {
+    $('#modal').find('.checkbox-select-all').on("change", function lbSelectAllCheckboxes() {
       $(this).closest('.modal-body').find('.checkbox-select-item').prop('checked', this.checked);
     });
-    $('#modal').find('.checkbox-select-item').change(function lbSelectAllDisable() {
+    $('#modal').find('.checkbox-select-item').on("change", function lbSelectAllDisable() {
       $(this).closest('.modal-body').find('.checkbox-select-all').prop('checked', false);
     });
     // Recaptcha
     recaptchaOnLoad();
+    // Set keyboard focus
+    setFocusToFirstNode();
+    // Add any scripts to head to run them
+    runScripts.each(function addScript(i2, script) {
+      $(document).find('head').append(script);
+    });
   }
 
   var _xhr = false;
@@ -138,19 +181,17 @@ VuFind.register('lightbox', function Lightbox() {
     }
     // Add lightbox GET parameter
     if (!obj.url.match(/layout=lightbox/)) {
-      var parts = obj.url.split('#');
-      obj.url = parts[0].indexOf('?') < 0
-        ? parts[0] + '?'
-        : parts[0] + '&';
-      obj.url += 'layout=lightbox';
+      obj.url = _addQueryParameters(obj.url, {'layout': 'lightbox'});
       // Set referrer to current url if it isn't already set:
       if (_currentUrl && !_lbReferrerUrl) {
         _lbReferrerUrl = _currentUrl;
       }
       if (_lbReferrerUrl) {
-        obj.url += '&lbreferer=' + encodeURIComponent(_lbReferrerUrl);
+        obj.url = _addQueryParameters(obj.url, {'lbreferer': _lbReferrerUrl});
       }
-      obj.url += parts.length < 2 ? '' : '#' + parts[1];
+    }
+    if (VuFind.lightbox.parent) {
+      obj.url = _addQueryParameters(obj.url, {'lightboxParent': VuFind.lightbox.parent});
     }
     // Store original URL with the layout=lightbox parameter:
     if (_originalUrl === false) {
@@ -174,7 +215,7 @@ VuFind.register('lightbox', function Lightbox() {
             if (errorMsgs.length && testDiv.find('.record').length) {
               var msgs = errorMsgs.toArray().map(function getAlertHtml(el) {
                 return el.innerHTML;
-              }).join('<br/>');
+              }).join('<br>');
               showAlert(msgs, 'danger');
               return false;
             }
@@ -191,12 +232,20 @@ VuFind.register('lightbox', function Lightbox() {
             || obj.url.match(/MyResearch\/(?!Bulk|Delete|Recover)/)
           ) && flashMessages.length === 0
         ) {
-          var eventResult = _emit('VuFind.lightbox.login', {
-            originalUrl: _originalUrl,
-            formUrl: obj.url
-          });
+          let doRefresh = true;
+          const cancelRefresh = () => doRefresh = false;
+
+          VuFind.emit(
+            'lightbox.login',
+            {
+              formUrl: obj.url,
+              originalUrl: _originalUrl,
+            },
+            cancelRefresh // call this function to cancel refresh
+          );
+
           if (_originalUrl.match(/UserLogin/) || obj.url.match(/catalogLogin/)) {
-            if (eventResult) {
+            if (doRefresh) {
               VuFind.refreshPage();
             }
             return false;
@@ -206,13 +255,13 @@ VuFind.register('lightbox', function Lightbox() {
           _currentUrl = _originalUrl; // Now that we're logged in, where were we?
         }
         if (jq_xhr.status === 205) {
-          VuFind.refreshPage();
+          VuFind.refreshPage(jq_xhr.getResponseHeader('X-VuFind-Refresh-Method') === 'GET');
           return;
         }
         render(content);
       })
       .fail(function lbAjaxFail(deferred, errorType, msg) {
-        showAlert(VuFind.translate('error_occurred') + '<br/>' + msg, 'danger');
+        showAlert(VuFind.translate('error_occurred') + '<br>' + msg, 'danger');
       });
     return _xhr;
   }
@@ -284,7 +333,7 @@ VuFind.register('lightbox', function Lightbox() {
     // Add submit button information
     var submit = $(_clickedButton);
     _clickedButton = null;
-    var buttonData = { name: 'submit', value: 1 };
+    var buttonData = { name: 'submitButton', value: 1 };
     if (submit.length > 0) {
       if (typeof submit.data('lightbox-close') !== 'undefined') {
         close();
@@ -293,7 +342,7 @@ VuFind.register('lightbox', function Lightbox() {
       if (typeof submit.data('lightbox-ignore') !== 'undefined') {
         return true;
       }
-      buttonData.name = submit.attr('name') || 'submit';
+      buttonData.name = submit.attr('name') || 'submitButton';
       buttonData.value = submit.attr('value') || 1;
     }
     data.push(buttonData);
@@ -309,10 +358,9 @@ VuFind.register('lightbox', function Lightbox() {
     }
     // onclose behavior
     if ('string' === typeof $(form).data('lightboxOnclose')) {
-      document.addEventListener('VuFind.lightbox.closed', function lightboxClosed(e) {
-        this.removeEventListener('VuFind.lightbox.closed', arguments.callee);
-        VuFind.evalCallback($(form).data('lightboxOnclose'), e, form);
-      }, false);
+      VuFind.listen('lightbox.closed', function lightboxClosed() {
+        VuFind.evalCallback($(form).data('lightboxOnclose'), null, form);
+      }, { once: true });
     }
     // Prevent multiple submission of submit button in lightbox
     if (submit.closest(_modal).length > 0) {
@@ -332,32 +380,6 @@ VuFind.register('lightbox', function Lightbox() {
     VuFind.modal('show');
     return false;
   };
-
-  /**
-   * Tries to set focus on a node which is not a close trigger
-   * if no other nodes exist then focuses on first close trigger
-   */
-  function setFocusToFirstNode() {
-    var focusableNodes = getFocusableNodes(_modal.get(0));
-
-    // no focusable nodes
-    if (focusableNodes.length === 0) return;
-
-    // remove nodes on whose click, the modal closes
-    var nodesWhichAreNotCloseTargets = focusableNodes.filter(function nodeFilter(node) {
-      return !node.hasAttribute("data-lightbox-close") && (
-        !node.hasAttribute("data-dismiss") ||
-        node.getAttribute("data-dismiss") !== "modal"
-      );
-    });
-
-    if (nodesWhichAreNotCloseTargets.length > 0) {
-      nodesWhichAreNotCloseTargets[0].focus();
-    }
-    if (nodesWhichAreNotCloseTargets.length === 0) {
-      focusableNodes[0].focus();
-    }
-  }
 
   function retainFocus(event) {
     var focusableNodes = getFocusableNodes(_modal.get(0));
@@ -414,24 +436,24 @@ VuFind.register('lightbox', function Lightbox() {
   function bind(el) {
     var target = el || document;
     $(target).find('a[data-lightbox]')
-      .unbind('click', _constrainLink)
+      .off('click', _constrainLink)
       .on('click', _constrainLink);
     $(target).find('form[data-lightbox]')
-      .unbind('submit', _formSubmit)
+      .off('submit', _formSubmit)
       .on('submit', _formSubmit);
 
     // Handle submit buttons attached to a form as well as those in a form. Store
     // information about which button was clicked here as checking focused button
     // doesn't work on all browsers and platforms.
     $('form[data-lightbox]').each(function bindFormSubmitsLightbox(i, form) {
-      $(form).find('[type=submit]').click(_storeClickedStatus);
-      $('[type="submit"][form="' + form.id + '"]').click(_storeClickedStatus);
+      $(form).find('[type=submit]').on("click", _storeClickedStatus);
+      $('[type="submit"][form="' + form.id + '"]').on("click", _storeClickedStatus);
     });
 
     // Display images in the lightbox
     $('[data-lightbox-image]', el).each(function lightboxOpenImage(i, link) {
-      $(link).unbind("click", _constrainLink);
-      $(link).bind("click", function lightboxImageRender(event) {
+      $(link).off("click", _constrainLink);
+      $(link).on("click", function lightboxImageRender(event) {
         event.preventDefault();
         var url = link.dataset.lightboxHref || link.href || link.src;
         var imageCheck = $.ajax({
@@ -441,7 +463,7 @@ VuFind.register('lightbox', function Lightbox() {
         imageCheck.done(function lightboxImageCheckDone(content, status, jq_xhr) {
           if (
             jq_xhr.status === 200 &&
-            jq_xhr.getResponseHeader("content-type").substr(0, 5) === "image"
+            jq_xhr.getResponseHeader("content-type").startsWith("image")
           ) {
             render('<div class="lightbox-image"><img src="' + url + '"/></div>');
           } else {
@@ -451,6 +473,26 @@ VuFind.register('lightbox', function Lightbox() {
       });
     });
   }
+
+  function loadConfiguredLightbox() {
+    if (VuFind.lightbox.child) {
+      // remove lightbox reference
+      let lightboxChild = VuFind.lightbox.child;
+      VuFind.lightbox.child = null;
+      let url = new URL(window.location.href);
+      url.searchParams.delete('lightboxChild');
+      window.history.replaceState({}, document.title, url.toString());
+
+      // load lightbox
+      _currentUrl = lightboxChild;
+      var obj = {
+        url: lightboxChild
+      };
+      ajax(obj);
+      VuFind.modal('show');
+    }
+  }
+
   // Element which to focus after modal is closed
   var _beforeOpenElement = null;
   function reset() {
@@ -461,6 +503,11 @@ VuFind.register('lightbox', function Lightbox() {
     _lightboxTitle = false;
     _modalParams = {};
   }
+
+  function updateContainer(params) {
+    bind(params.container);
+  }
+
   function init() {
     _modal = $('#modal');
     _modalBody = _modal.find('.modal-body');
@@ -474,34 +521,51 @@ VuFind.register('lightbox', function Lightbox() {
         }
         unbindFocus();
         this.setAttribute('aria-hidden', true);
-        _emit('VuFind.lightbox.closing');
+        VuFind.emit('lightbox.closing');
       }
     });
     _modal.on('hidden.bs.modal', function lightboxHidden() {
       VuFind.lightbox.reset();
-      _emit('VuFind.lightbox.closed');
+      VuFind.emit('lightbox.closed');
     });
     _modal.on("shown.bs.modal", function lightboxShown() {
       bindFocus();
+
+      // Disable bootstrap-accessibility.js "enforceFocus" events.
+      // retainFocus() above handles it better.
+      // This is moot once that library (and bootstrap3) are retired.
+      try {
+        var focEls = _modal.find(":tabbable");
+        var firstEl = $(focEls[0]);
+        var lastEl = $(focEls[focEls.length - 1]);
+        $(firstEl).add(lastEl).off('keydown.bs.modal');
+      } catch (ex) {
+        // :tabbable won't work if bootstrap-accessibility.js isn't loaded, in which case we're already good
+      }
     });
 
     VuFind.modal = function modalShortcut(cmd) {
       if (cmd === 'show') {
-        _beforeOpenElement = document.activeElement;
+        // This can get called multiple times, so only take the active element if we don't already have it:
+        if (!_beforeOpenElement) {
+          _beforeOpenElement = document.activeElement;
+        }
         _modal.modal($.extend({ show: true }, _modalParams)).attr('aria-hidden', false);
-        // Set keyboard focus
-        setFocusToFirstNode();
       } else {
         _modal.modal(cmd);
       }
     };
+    VuFind.listen('results-init', updateContainer);
     bind();
+    loadConfiguredLightbox();
   }
 
   // Reveal
   return {
     // Properties
     refreshOnClose: refreshOnClose,
+    parent: parent,
+    child: child,
 
     // Methods
     ajax: ajax,

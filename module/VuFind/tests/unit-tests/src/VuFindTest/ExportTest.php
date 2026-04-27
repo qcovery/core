@@ -29,7 +29,7 @@
 
 namespace VuFindTest;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Export;
 
 /**

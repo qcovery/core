@@ -31,8 +31,7 @@
 namespace VuFindTest\Recommend;
 
 use Laminas\Cache\Storage\StorageInterface as CacheAdapter;
-use PHPUnit\Framework\MockObject\MockObject;
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Config\PluginManager as ConfigPluginManager;
 use VuFind\Connection\LibGuides;
 use VuFind\Recommend\LibGuidesProfile;
@@ -83,7 +82,9 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
     public function setUp(): void
     {
         // Mock LibGuides connector
-        $this->connector = $this->createMock(LibGuides::class);
+        $this->connector = $this->getMockBuilder(LibGuides::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $accountsFixture = $this->getFixture('libguides/api/accounts');
         $accounts = json_decode(substr($accountsFixture, strpos($accountsFixture, '[')));
         $this->connector->method('getAccounts')->willReturn($accounts);
@@ -94,9 +95,10 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testSubjectExactMatch(): void
+    public function testSubjectExactMatch()
     {
-        $config = ['Profile' => ['strategies' => ['Subject']]];
+        $config = new Config([], true);
+        $config->Profile = ['strategies' =>  ['Subject']];
         $libGuidesProfile = $this->buildProfile($config);
 
         $queryResults = $this->buildQueryResults('Geography');
@@ -111,9 +113,10 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testSubjectSubstring(): void
+    public function testSubjectSubstring()
     {
-        $config = ['Profile' => ['strategies' => ['Subject']]];
+        $config = new Config([], true);
+        $config->Profile = ['strategies' =>  ['Subject']];
         $libGuidesProfile = $this->buildProfile($config);
 
         // Exact match would be "Decimal Classification"
@@ -129,9 +132,10 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testSubjectLooseMatch(): void
+    public function testSubjectLooseMatch()
     {
-        $config = ['Profile' => ['strategies' => ['Subject']]];
+        $config = new Config([], true);
+        $config->Profile = ['strategies' =>  ['Subject']];
         $libGuidesProfile = $this->buildProfile($config);
 
         // Exact match would be "Music Theory"
@@ -147,19 +151,18 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testCallNumberMatch(): void
+    public function testCallNumberMatch()
     {
-        $config = [
-            'Profile' => [
-                'strategies' =>  ['CallNumber'],
-                'profile_aliases' => [
-                    'Dewey' => 1234,
-                    'Eratosthenes' => 5678,
-                ],
-                'call_numbers' => [
-                    'D' => 'Eratosthenes',
-                    'P' => 'Dewey',
-                ],
+        $config = new Config([], true);
+        $config->Profile = [
+            'strategies' =>  ['CallNumber'],
+            'profile_aliases' => [
+                'Dewey' => 1234,
+                'Eratosthenes' => 5678,
+            ],
+            'call_numbers' => [
+                'D' => 'Eratosthenes',
+                'P' => 'Dewey',
             ],
         ];
         $libGuidesProfile = $this->buildProfile($config);
@@ -189,11 +192,11 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
     /**
      * Build a partially mocked LibGuidesProfile object
      *
-     * @param array $config The config object
+     * @param Config $config The config object
      *
-     * @return LibGuidesProfile&MockObject
+     * @return LibGuidesProfile
      */
-    protected function buildProfile(array $config): LibGuidesProfile&MockObject
+    protected function buildProfile($config)
     {
         // Mock caching logic in LibGuidesProfile.
         // Caching is from a trait, which is not the point of this test suite.
@@ -201,7 +204,7 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
 
         // For the target class LibGuidesProfile, only mock the caching methods
         $libGuidesProfile = $this->getMockBuilder(LibGuidesProfile::class)
-            ->setConstructorArgs([$this->connector, new Config($config), $this->cacheAdapter])
+            ->setConstructorArgs([$this->connector, $config, $this->cacheAdapter])
             ->onlyMethods(['getCachedData', 'putCachedData'])
             ->getMock();
         $libGuidesProfile->method('getCachedData')->willReturn(null);
@@ -216,7 +219,7 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
      *
      * @return Results The Results object
      */
-    protected function buildQueryResults($queryString, $facets = []): Results
+    protected function buildQueryResults($queryString, $facets = [])
     {
         // Build query Params
         $queryParams = new Params(
@@ -229,7 +232,9 @@ class LibGuidesProfileTest extends \PHPUnit\Framework\TestCase
         $queryResults = new Results(
             $queryParams,
             $this->createStub(\VuFindSearch\Service::class),
-            $this->createMock(\VuFind\Record\Loader::class),
+            $this->getMockBuilder(\VuFind\Record\Loader::class)
+                ->disableOriginalConstructor()
+                ->getMock(),
             null,
             $facets
         );

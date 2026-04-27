@@ -1,14 +1,17 @@
 <?php
   // Sanitize inputs:
-  $sanitize = function ($val) {
-    return preg_replace('/[^\d]*/', '', $val);
+  $sanitize = match($this->facet['type']) {
+    'date' => fn ($val) => preg_replace('/[^\d]*/', '', $val), // digits only for year-only dates
+    'fulldate' => fn ($val) => substr($val, 0, 10),
+    'numeric' => fn ($val) => preg_replace('/[^\d.]*/', '', $val), // digits/decimal points only for numeric
+    default => fn ($val) => $val, // no sanitization for "generic" ranges
   };
   $cleanValues = array_map($sanitize, $this->facet['values'] ?? []);
   $safeBaseId = $this->escapeHtmlAttr($this->title);
 ?>
 <div class="facet">
-  <form class="facet-range-form" name="<?=$safeBaseId?>Filter" id="<?=$safeBaseId?>Filter">
-    <?=$results->getUrlQuery()->asHiddenFields(['page' => "/./", 'filter' => "/^{$this->title}:.*/"])?>
+  <form class="facet-range-form" name="<?=$safeBaseId?>Filter" id="<?=$safeBaseId?>Filter" data-name="<?=$safeBaseId?>" data-filter-field="<?=$this->escapeHtmlAttr($this->facet['type'])?>range[]">
+    <?=$results->getUrlQuery()->asHiddenFields(['page' => '/./', 'filter' => "/^{$this->title}:.*/"])?>
     <input type="hidden" name="<?=$this->escapeHtmlAttr($this->facet['type'])?>range[]" value="<?=$this->escapeHtmlAttr($this->title)?>">
     <div class="date-fields">
       <?php $extraInputAttribs = ($this->facet['type'] == 'date') ? 'maxlength="4" ' : ''; ?>
@@ -32,8 +35,8 @@
   </form>
 </div>
 <?php if ($this->facet['type'] == 'date'): ?>
-  <?php $this->headScript()->appendFile('vendor/bootstrap-slider.min.js'); ?>
-  <?php $this->headLink()->appendStylesheet('vendor/bootstrap-slider.min.css'); ?>
+  <?php $this->assetManager()->appendScriptLink('vendor/bootstrap-slider.min.js'); ?>
+  <?php $this->assetManager()->appendStyleLink('vendor/bootstrap-slider.min.css'); ?>
   <?php
     $min = !empty($cleanValues[0]) ? min($cleanValues[0], 1400) : 1400;
     $future = date('Y', time() + 31536000); // next year
@@ -79,5 +82,5 @@
         });
         JS;
   ?>
-  <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $script, 'SET'); ?>
+  <?=$this->assetManager()->outputInlineScriptString($script); ?>
 <?php endif; ?>

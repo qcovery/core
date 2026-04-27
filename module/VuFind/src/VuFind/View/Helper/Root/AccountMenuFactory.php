@@ -63,13 +63,12 @@ class AccountMenuFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        ?array $options = null
+        array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        $menu = $container->get(\VuFind\Navigation\PluginManager::class)
-            ->get(\VuFind\Navigation\AccountMenu::class);
-        return new $requestedName($menu);
+        $yamlReader = $container->get(\VuFind\Config\YamlReader::class);
+        return new $requestedName($yamlReader->get('AccountMenu.yaml'));
     }
 }

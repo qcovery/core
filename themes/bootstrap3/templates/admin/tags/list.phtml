@@ -7,7 +7,7 @@
 <div class="<?=$this->layoutClass('mainbody')?>">
   <h3><?=$this->translate('List Tags')?></h3>
 
-  <?=$this->render("admin/tags/menu.phtml", ['active' => 'list'])?>
+  <?=$this->render('admin/tags/menu.phtml', ['active' => 'list'])?>
 
   <?=$this->flashmessages()?>
 
@@ -76,11 +76,11 @@
               <label for="<?=$this->prefix?>checkbox_<?=$tag['id']?>">
                 <input id="<?=$this->prefix?>checkbox_<?=$tag['id']?>" type="checkbox" name="ids[]" value="<?=$this->escapeHtmlAttr($tag['id'])?>" class="checkbox_ui">
                 <input type="hidden" name="idsAll[]" value="<?=$this->escapeHtmlAttr($tag['id'])?>">
-                <?=$tag->tag?> (<?= $tag->tag_id?>)
+                <?=$this->escapeHtml($tag['tag'])?> (<?=$this->escapeHtml($tag['tag_id'])?>)
               </label>
             </td>
-            <td><?=$tag->username ?> (<?= $tag->user_id?>)</td>
-            <td><?=$tag->title?> (<?= $tag->resource_id?>)</td>
+            <td><?=$this->escapeHtml($tag['username'])?> (<?=$this->escapeHtml($tag['user_id'])?>)</td>
+            <td><?=$this->escapeHtml($tag['title'])?> (<?=$this->escapeHtml($tag['resource_id'])?>)</td>
           </tr>
         <?php endforeach;?>
       </table>
@@ -97,5 +97,5 @@
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
-  <?=$this->render("admin/menu.phtml")?>
+  <?=$this->render('admin/menu.phtml')?>
 </div>

@@ -76,3 +76,23 @@
 .icon13.expanded {
     background-position: 0 -149px;
 }
+
+/* media component links */
+.media-left .external-links > span {
+    display: block;
+    margin-top: 1rem;
+}
+.media-left .external-links > span a.icon--eds {
+    line-height: unset;
+    white-space: normal;
+}
+
+/* Author name delimiters */
+/* On EDS search result page */
+.search-results-eds .result .author:not(:last-of-type):after,
+/* On combined result page */
+#combined_EDS .record-list .author:not(:last-of-type):after,
+/* On EDS item detail page */
+.record__biblio-value .author:not(:last-of-type):after {
+    content: '; ';
+}

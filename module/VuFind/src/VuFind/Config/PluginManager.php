@@ -81,7 +81,7 @@ class PluginManager extends Base
      *
      * @param string $id Service identifier
      *
-     * @return \VuFind\Config\Config
+     * @return \Laminas\Config\Config
      */
     public function reload($id)
     {

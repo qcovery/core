@@ -31,7 +31,7 @@
 
 namespace VuFindTest\ILS\Driver;
 
-use RuntimeException;
+use Laminas\Config\Exception\RuntimeException;
 use VuFind\Exception\ILS as ILSException;
 use VuFind\ILS\Driver\MultiBackend;
 

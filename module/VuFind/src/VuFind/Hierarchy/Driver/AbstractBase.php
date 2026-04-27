@@ -50,7 +50,7 @@ abstract class AbstractBase
     /**
      * Driver configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -85,13 +85,13 @@ abstract class AbstractBase
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $config          Configuration
-     * @param DataManager           $dataManager     Tree data source plugin manager
-     * @param RendererManager       $rendererManager Tree renderer plugin manager
-     * @param array                 $options         Extra options (if any)
+     * @param \Laminas\Config\Config $config          Configuration
+     * @param DataManager            $dataManager     Tree data source plugin manager
+     * @param RendererManager        $rendererManager Tree renderer plugin manager
+     * @param array                  $options         Extra options (if any)
      */
     public function __construct(
-        \VuFind\Config\Config $config,
+        \Laminas\Config\Config $config,
         DataManager $dataManager,
         RendererManager $rendererManager,
         $options = []

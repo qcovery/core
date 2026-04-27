@@ -31,8 +31,8 @@
 
 namespace VuFind\Auth;
 
+use Laminas\Crypt\Password\Bcrypt;
 use Laminas\Http\PhpEnvironment\Request;
-use VuFind\Crypt\PasswordHasher;
 use VuFind\Db\Entity\UserEntityInterface;
 use VuFind\Db\Service\UserServiceInterface;
 use VuFind\Exception\Auth as AuthException;
@@ -55,13 +55,6 @@ use function is_object;
 class Database extends AbstractBase
 {
     /**
-     * Password hasher
-     *
-     * @var PasswordHasher
-     */
-    protected $hasher;
-
-    /**
      * Username
      *
      * @var string
@@ -74,16 +67,6 @@ class Database extends AbstractBase
      * @var string
      */
     protected $password;
-
-    /**
-     * Constructor
-     *
-     * @param ?PasswordHasher $hasher Password hash service (null to create one)
-     */
-    public function __construct(?PasswordHasher $hasher = null)
-    {
-        $this->hasher = $hasher ?? new PasswordHasher();
-    }
 
     /**
      * Attempt to authenticate the current user. Throws exception if login fails.
@@ -138,7 +121,8 @@ class Database extends AbstractBase
     protected function setUserPassword(UserEntityInterface $user, string $pass): void
     {
         if ($this->passwordHashingEnabled()) {
-            $user->setPasswordHash($this->hasher->create($pass));
+            $bcrypt = new Bcrypt();
+            $user->setPasswordHash($bcrypt->create($pass));
         } else {
             $user->setRawPassword($pass);
         }
@@ -316,7 +300,8 @@ class Database extends AbstractBase
                 );
             }
 
-            return $this->hasher->verify($password, $userRow->getPasswordHash() ?? '');
+            $bcrypt = new Bcrypt();
+            return $bcrypt->verify($password, $userRow->getPasswordHash() ?? '');
         }
 
         // Default case: unencrypted passwords:

@@ -70,7 +70,7 @@ abstract class AbstractBase implements
     /**
      * Configuration settings
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config = null;
 
@@ -94,7 +94,7 @@ abstract class AbstractBase implements
      * exception if the configuration is invalid.
      *
      * @throws AuthException
-     * @return \VuFind\Config\Config
+     * @return \Laminas\Config\Config
      */
     public function getConfig()
     {
@@ -138,7 +138,7 @@ abstract class AbstractBase implements
     /**
      * Set configuration.
      *
-     * @param \VuFind\Config\Config $config Configuration to set
+     * @param \Laminas\Config\Config $config Configuration to set
      *
      * @return void
      */

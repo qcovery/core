@@ -34,29 +34,29 @@ class MultiIdPConfigurationLoader implements
     /**
      * Configured IdPs with entityId and overridden attribute mapping
      *
-     * @var array
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * Configured IdPs with entityId and overridden attribute mapping
      *
-     * @var array
+     * @var \Laminas\Config\Config
      */
     protected $shibConfig;
 
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $config     Configuration
-     * @param \VuFind\Config\Config $shibConfig Shibboleth configuration for IdPs
+     * @param \Laminas\Config\Config $config     Configuration
+     * @param \Laminas\Config\Config $shibConfig Shibboleth configuration for IdPs
      */
     public function __construct(
-        \VuFind\Config\Config $config,
-        \VuFind\Config\Config $shibConfig
+        \Laminas\Config\Config $config,
+        \Laminas\Config\Config $shibConfig
     ) {
-        $this->config = $config->toArray();
-        $this->shibConfig = $shibConfig->toArray();
+        $this->config = $config;
+        $this->shibConfig = $shibConfig;
     }
 
     /**
@@ -69,12 +69,12 @@ class MultiIdPConfigurationLoader implements
      */
     public function getConfiguration($entityId)
     {
-        $config = $this->config['Shibboleth'] ?? [];
+        $config = $this->config->Shibboleth->toArray();
         $idpConfig = null;
         $prefix = null;
         foreach ($this->shibConfig as $name => $configuration) {
             if ($entityId == trim($configuration['entityId'])) {
-                $idpConfig = $configuration;
+                $idpConfig = $configuration->toArray();
                 $prefix = $name;
                 break;
             }

@@ -63,17 +63,15 @@ class CachingDownloaderFactory implements FactoryInterface
     public function __invoke(
         ContainerInterface $container,
         $requestedName,
-        ?array $options = null
+        array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options passed to factory.');
         }
 
-        $configManager = $container->get(\VuFind\Config\PluginManager::class);
         return new $requestedName(
             $container->get(\VuFind\Cache\Manager::class),
-            $configManager,
-            !($configManager->get('config')->CachingDownloader->disabled ?? false)
+            $container->get(\VuFind\Config\PluginManager::class),
         );
     }
 }

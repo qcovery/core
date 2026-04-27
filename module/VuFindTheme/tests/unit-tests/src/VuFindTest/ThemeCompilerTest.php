@@ -112,7 +112,6 @@ class ThemeCompilerTest extends \PHPUnit\Framework\TestCase
 
         // Did the configuration merge correctly?
         $expectedConfig = [
-            'themeName' => 'child',
             'extends' => false,
             'css' => ['child.css'],
             'js' => ['hello.js', 'extra.js'],
@@ -172,7 +171,6 @@ class ThemeCompilerTest extends \PHPUnit\Framework\TestCase
 
         // Did the configuration merge correctly?
         $expectedConfig = [
-            'themeName' => 'mixin_user',
             'extends' => false,
             'css' => ['child.css'],
             'js' => ['hello.js', 'extra.js', 'mixin.js'],

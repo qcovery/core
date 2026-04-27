@@ -1636,7 +1636,7 @@ class Alma extends AbstractBase implements
         $xml = $this->makeRequest('/courses');
         $courses = [];
         foreach ($xml as $course) {
-            $courses[$course->id] = $course->name;
+            $courses[(string)$course->id] = (string)$course->name;
         }
         return $courses;
     }

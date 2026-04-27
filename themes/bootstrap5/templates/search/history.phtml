@@ -2,13 +2,15 @@
   // Set page title.
   $this->headTitle($this->translate('Search History'));
 
-  // Set up breadcrumbs; hide the account breadcrumb when login is disabled:
+  // Hide the account breadcrumb when login is disabled:
   $account = $this->auth()->getManager();
-  $this->breadcrumbs()->reset();
-  if (is_object($account) && $account->loginEnabled()) {
-    $this->breadcrumbs()->add($this->translate('Your Account'), $this->url('myresearch-home'));
-  }
-  $this->breadcrumbs()->add($this->translate('Search History'), active: true);
+  $parentBreadcrumb = is_object($account) && $account->loginEnabled()
+    ? '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li>'
+    : '';
+
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs
+    = $parentBreadcrumb . '<li class="active">' . $this->transEsc('Search History') . '</li>';
 
   $saveSupported = $this->accountCapabilities()->getSavedSearchSetting() === 'enabled';
   $loggedInUser = $this->auth()->getUserObject();
@@ -74,4 +76,4 @@
         })
         JS;
 ?>
-<?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $script, 'SET') ?>
+<?=$this->assetManager()->outputInlineScriptString($script) ?>

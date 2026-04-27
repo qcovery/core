@@ -462,22 +462,22 @@ class MyResearchController extends AbstractBase
      * Support method for savesearchAction(): set the saved flag in a secure
      * fashion, throwing an exception if somebody attempts something invalid.
      *
-     * @param int  $searchId The search ID to save/unsave
-     * @param bool $saved    The new desired state of the saved flag
-     * @param int  $userId   The user ID requesting the change
+     * @param int                 $searchId The search ID to save/unsave
+     * @param bool                $saved    The new desired state of the saved flag
+     * @param UserEntityInterface $user     The user requesting the change
      *
      * @throws \Exception
      * @return void
      */
-    protected function setSavedFlagSecurely($searchId, $saved, $userId)
+    protected function setSavedFlagSecurely($searchId, $saved, $user)
     {
-        $row = $this->getSearchRowSecurely($searchId, $userId);
-        $row->saved = $saved ? 1 : 0;
+        $row = $this->getSearchRowSecurely($searchId, $user->getId());
+        $row->setSaved($saved ? 1 : 0);
         if (!$saved) {
-            $row->notification_frequency = 0;
+            $row->setNotificationFrequency(0);
         }
-        $row->user_id = $userId;
-        $row->save();
+        $row->setUser($user);
+        $this->getDbService(SearchServiceInterface::class)->persistEntity($row);
     }
 
     /**
@@ -522,14 +522,14 @@ class MyResearchController extends AbstractBase
             $userId
         );
         if ($duplicateId) {
-            $savedRow->delete();
+            $this->getDbService(SearchServiceInterface::class)->deleteSearch($savedRow);
             $sid = $duplicateId;
             $savedRow = $this->getSearchRowSecurely($sid, $userId);
         }
 
         // If we didn't find an already-saved row, let's save and retry:
-        if (!($savedRow->saved ?? false)) {
-            $this->setSavedFlagSecurely($sid, true, $userId);
+        if (!($savedRow->getSaved() ?? false)) {
+            $this->setSavedFlagSecurely($sid, true, $user);
             $savedRow = $this->getSearchRowSecurely($sid, $userId);
         }
         if (!($this->getConfig()->Account->force_first_scheduled_email ?? false)) {
@@ -582,7 +582,7 @@ class MyResearchController extends AbstractBase
             $user->getId()
         );
         if ($duplicateId) {
-            $search->delete();
+            $this->getDbService(SearchServiceInterface::class)->deleteSearch($search);
             $this->redirect()->toRoute(
                 'myresearch-schedulesearch',
                 [],
@@ -678,14 +678,14 @@ class MyResearchController extends AbstractBase
                 $user->getId()
             );
             if ($duplicateId) {
-                $rowToCheck->delete();
+                $searchService->deleteSearch($rowToCheck);
                 $id = $duplicateId;
             } else {
-                $this->setSavedFlagSecurely($id, true, $user->getId());
+                $this->setSavedFlagSecurely($id, true, $user);
             }
             $this->flashMessenger()->addMessage('search_save_success', 'success');
         } elseif (($id = $this->params()->fromQuery('delete', false)) !== false) {
-            $this->setSavedFlagSecurely($id, false, $user->getId());
+            $this->setSavedFlagSecurely($id, false, $user);
             $this->flashMessenger()->addMessage('search_unsave_success', 'success');
         } else {
             throw new \Exception('Missing save and delete parameters.');
@@ -1778,7 +1778,7 @@ class MyResearchController extends AbstractBase
                     );
                     $this->getService(Mailer::class)->send(
                         $user->getEmail(),
-                        $this->getEmailSenderAddress($config),
+                        $config->Site->email,
                         $this->translate('recovery_email_subject'),
                         $message
                     );
@@ -1839,7 +1839,7 @@ class MyResearchController extends AbstractBase
         // address; if they have a pending address change, use that.
         $this->getService(Mailer::class)->send(
             $user->getEmail(),
-            $this->getEmailSenderAddress($config),
+            $config->Site->email,
             $this->translate('change_notification_email_subject'),
             $message
         );
@@ -1889,7 +1889,7 @@ class MyResearchController extends AbstractBase
                     $to = ($pending = $user->getPendingEmail()) ? $pending : $user->getEmail();
                     $this->getService(Mailer::class)->send(
                         $to,
-                        $this->getEmailSenderAddress($config),
+                        $config->Site->email,
                         $this->translate('verification_email_subject'),
                         $message
                     );
@@ -2209,7 +2209,7 @@ class MyResearchController extends AbstractBase
                 'error_inconsistent_parameters'
             );
         }
-        $this->getAuthManager()->deleteUserLoginTokens($this->getUser()->id);
+        $this->getAuthManager()->deleteUserLoginTokens($this->getUser()->getId());
         return $this->redirect()->toRoute('myresearch-profile');
     }
 

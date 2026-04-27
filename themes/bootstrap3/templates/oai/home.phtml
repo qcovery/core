@@ -1,6 +1,6 @@
 <?php
   $this->headTitle($this->translate('OAI Server'));
-  $this->layout()->breadcrumbs = $this->transEsc('OAI Server');
+  $this->layout()->breadcrumbs = '<li>' . $this->transEsc('OAI Server') . '</li>';
   $baseUrl = $this->url('oai-server');
 ?>
 <div class="<?=$this->layoutClass('mainbody')?>">
@@ -15,7 +15,7 @@
     <p class="help-block">Returns the Identification information of this OAI Server.</p>
     <p class="help-block">Accepts no additional parameters.</p>
     <div class="form-group">
-      <input class="btn btn-default" type="submit" name="submit" value="<?=$this->transEscAttr('Go')?>">
+      <input class="btn btn-default" type="submit" name="submitButton" value="<?=$this->transEscAttr('Go')?>">
     </div>
   </form>
   <hr>
@@ -45,7 +45,7 @@
       <input id="ListIdentifier_resumptionToken" type="text" name="resumptionToken" class="form-control">
     </div>
     <div class="form-group">
-      <input class="btn btn-default" type="submit" name="submit" value="<?=$this->transEscAttr('Go')?>">
+      <input class="btn btn-default" type="submit" name="submitButton" value="<?=$this->transEscAttr('Go')?>">
     </div>
   </form>
   <hr>
@@ -59,7 +59,7 @@
       <input id="ListMetadataFormats_identifier" type="text" name="identifier" class="form-control">
     </div>
     <div class="form-group">
-      <input class="btn btn-default" type="submit" name="submit" value="<?=$this->transEscAttr('Go')?>">
+      <input class="btn btn-default" type="submit" name="submitButton" value="<?=$this->transEscAttr('Go')?>">
     </div>
   </form>
   <hr>
@@ -77,7 +77,7 @@
       <input id="ListSets_resumptionToken" type="text" name="resumptionToken" class="form-control">
     </div>
     <div class="form-group">
-      <input class="btn btn-default" type="submit" name="submit" value="<?=$this->transEscAttr('Go')?>">
+      <input class="btn btn-default" type="submit" name="submitButton" value="<?=$this->transEscAttr('Go')?>">
     </div>
   </form>
   <hr>
@@ -107,7 +107,7 @@
       <input id="ListRecord_resumptionToken" type="text" name="resumptionToken" class="form-control">
     </div>
     <div class="form-group">
-      <input class="btn btn-default" type="submit" name="submit" value="<?=$this->transEscAttr('Go')?>">
+      <input class="btn btn-default" type="submit" name="submitButton" value="<?=$this->transEscAttr('Go')?>">
     </div>
   </form>
   <hr>
@@ -125,18 +125,18 @@
       <input id="GetRecord_metadataPrefix" type="text" name="metadataPrefix" class="form-control">
     </div>
     <div class="form-group">
-      <input class="btn btn-default" type="submit" name="submit" value="<?=$this->transEscAttr('Go')?>">
+      <input class="btn btn-default" type="submit" name="submitButton" value="<?=$this->transEscAttr('Go')?>">
     </div>
   </form>
 </div>
-<div class="<?=$this->layoutClass('sidebar')?>">
+<nav class="<?=$this->layoutClass('sidebar')?>">
   <h2><?=$this->transEsc('Available Functionality') ?>:</h2>
-  <div class="list-group">
-    <a href="#Identify" class="list-group-item">Identify</a>
-    <a href="#ListIdentifiers" class="list-group-item">ListIdentifiers</a>
-    <a href="#ListMetadataFormats" class="list-group-item">ListMetadataFormats</a>
-    <a href="#ListSets" class="list-group-item">ListSets</a>
-    <a href="#ListRecords" class="list-group-item">ListRecords</a>
-    <a href="#GetRecord" class="list-group-item">GetRecord</a>
-  </div>
-</div>
+  <ul class="list-group list-unstyled">
+    <li><a href="#Identify" class="list-group-item">Identify</a></li>
+    <li><a href="#ListIdentifiers" class="list-group-item">ListIdentifiers</a></li>
+    <li><a href="#ListMetadataFormats" class="list-group-item">ListMetadataFormats</a></li>
+    <li><a href="#ListSets" class="list-group-item">ListSets</a></li>
+    <li><a href="#ListRecords" class="list-group-item">ListRecords</a></li>
+    <li><a href="#GetRecord" class="list-group-item">GetRecord</a></li>
+  </ul>
+</nav>

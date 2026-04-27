@@ -61,9 +61,9 @@ interface UserResourceEntityInterface extends EntityInterface
      *
      * @param UserEntityInterface $user User
      *
-     * @return static
+     * @return UserResourceEntityInterface
      */
-    public function setUser(UserEntityInterface $user): static;
+    public function setUser(UserEntityInterface $user): UserResourceEntityInterface;
 
     /**
      * Get resource.
@@ -77,9 +77,9 @@ interface UserResourceEntityInterface extends EntityInterface
      *
      * @param ResourceEntityInterface $resource Resource
      *
-     * @return static
+     * @return UserResourceEntityInterface
      */
-    public function setResource(ResourceEntityInterface $resource): static;
+    public function setResource(ResourceEntityInterface $resource): UserResourceEntityInterface;
 
     /**
      * Get user list.
@@ -93,9 +93,9 @@ interface UserResourceEntityInterface extends EntityInterface
      *
      * @param ?UserListEntityInterface $list User list
      *
-     * @return static
+     * @return UserResourceEntityInterface
      */
-    public function setUserList(?UserListEntityInterface $list): static;
+    public function setUserList(?UserListEntityInterface $list): UserResourceEntityInterface;
 
     /**
      * Get notes.
@@ -109,9 +109,9 @@ interface UserResourceEntityInterface extends EntityInterface
      *
      * @param ?string $notes Notes associated with the resource
      *
-     * @return static
+     * @return UserResourceEntityInterface
      */
-    public function setNotes(?string $notes): static;
+    public function setNotes(?string $notes): UserResourceEntityInterface;
 
     /**
      * Get saved date.
@@ -125,7 +125,7 @@ interface UserResourceEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return UserResourceEntityInterface
      */
-    public function setSaved(DateTime $dateTime): static;
+    public function setSaved(DateTime $dateTime): UserResourceEntityInterface;
 }

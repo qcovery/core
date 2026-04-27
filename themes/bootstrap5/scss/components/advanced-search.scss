@@ -8,8 +8,8 @@
   position: relative;
   margin-bottom: .5rem;
   padding: 1rem;
-  border: 1px solid $primary-border-subtle;
-  border-radius: $border-radius;
+  border: 1px solid $panel-default-border;
+  border-radius: $border-radius-base;
 
   & ~ & { margin-top: 1rem; } // Spacing between groups
 
@@ -30,12 +30,6 @@
 .adv-search {
   @include clearfix();
   margin-bottom: 1.5rem;
-
-  @include media-breakpoint-down(sm) {
-    .help-block {
-      display: none;
-    }
-  }
 }
 
 .adv-term-input { margin-bottom: .5rem; }
@@ -56,10 +50,15 @@
     vertical-align: middle;
   }
 }
-.adv-submit { @include clearfix(); }
-.adv-submit .clear-btn { float: right; }
 
-@include media-breakpoint-up(sm) {
+.adv-submit {
+  @include clearfix();
+  margin-block: 1rem;
+
+  .clear-btn { float: right; }
+}
+
+@media (min-width: 768px) {
   .adv-group-terms {
     float: left;
     width: 75%;
@@ -90,12 +89,20 @@
 }
 
 #groupPlaceHolder {
+  @extend .btn;
+  @extend .btn-default;
+
   display: block;
-  padding: 1rem;
+  width: fit-content;
+  margin-block: 1rem;
+
+  * {
+    text-decoration: none;
+  }
 }
 
 /* --- Fieldsets --- */
-@include media-breakpoint-up(sm) {
+@media (min-width: 768px) {
   fieldset,
   .fieldset {
     float: left;
@@ -120,7 +127,7 @@
 .adv-term-input,
 .adv-term-op { margin-bottom: .25rem; }
 .adv-search:first-of-type .adv-term-op { display: none; }
-@include media-breakpoint-up(sm) {
+@media (min-width: 768px) {
   .eds-adv .adv-term-op {
     float: left;
     width: 16%;
@@ -154,7 +161,7 @@
 }
 .primo-adv-search .search-container { width: 100%; }
 .primo-adv-label {
-  line-height: $input-height;
+  line-height: $input-height-base;
   padding-right: 1rem;
 }
 @media (min-width: 640px) {
@@ -172,7 +179,7 @@
 }
 
 /* --- Solr --- */
-@include media-breakpoint-up(sm) {
+@media (min-width: 768px) {
   .solr-facet-container {
     display: flex;
     flex-wrap: wrap;

@@ -7,6 +7,9 @@ module.exports = {
   ignorePatterns: [
     "themes/**/vendor/**",
     "themes/**/node_modules/**",
+    "themes/bootstrap5/js/account_ajax.js",
+    "themes/bootstrap5/js/relais.js",
+    "themes/bootstrap5/js/search.js",
     "themes/bootstrap5/js/requests.js",
     "themes/bootstrap5/js/resultcount.js",
     "themes/bootstrap5/js/map_tab_leaflet.js",
@@ -23,6 +26,7 @@ module.exports = {
     "themes/bootstrap5/js/openurl.js",
     "themes/bootstrap5/js/ill.js",
     "themes/bootstrap5/js/record.js",
+    "themes/bootstrap5/js/doi.js",
     "themes/bootstrap5/js/keep_alive.js",
     "themes/bootstrap5/js/embedGBS.js",
     "themes/bootstrap5/js/lib/ajax_request_queue.js",
@@ -45,6 +49,7 @@ module.exports = {
     "themes/bootstrap5/js/config.js",
     "themes/bootstrap5/js/channels.js",
     "themes/bootstrap5/js/truncate.js",
+    "themes/bootstrap3/**"
   ],
   extends: [],
   env: {

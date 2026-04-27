@@ -47,7 +47,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
      */
     public function testDisablePolicyWithCspEnabled(): void
     {
-        $config = new \VuFind\Config\Config(
+        $config = new \Laminas\Config\Config(
             [
                 'CSP' => [
                     'use_nonce' => true,
@@ -89,7 +89,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
      */
     public function testDisablePolicyWithCspReportOnly(): void
     {
-        $config = new \VuFind\Config\Config(
+        $config = new \Laminas\Config\Config(
             [
                 'CSP' => [
                     'use_nonce' => true,
@@ -131,7 +131,7 @@ class CspTest extends \PHPUnit\Framework\TestCase
      */
     public function testDisablePolicyWithCspDisabled(): void
     {
-        $config = new \VuFind\Config\Config(
+        $config = new \Laminas\Config\Config(
             [
                 'CSP' => [
                     'use_nonce' => true,

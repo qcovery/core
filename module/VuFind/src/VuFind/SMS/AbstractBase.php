@@ -43,16 +43,16 @@ abstract class AbstractBase implements SMSInterface
     /**
      * SMS configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $smsConfig;
 
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $config SMS configuration
+     * @param \Laminas\Config\Config $config SMS configuration
      */
-    public function __construct(\VuFind\Config\Config $config)
+    public function __construct(\Laminas\Config\Config $config)
     {
         $this->smsConfig = $config;
     }

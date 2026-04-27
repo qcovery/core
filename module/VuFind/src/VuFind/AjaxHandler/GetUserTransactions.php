@@ -30,7 +30,6 @@
 namespace VuFind\AjaxHandler;
 
 use Laminas\Mvc\Controller\Plugin\Params;
-use VuFind\Account\AccountStatusLevelType;
 
 /**
  * "Get User Transactions" AJAX handler
@@ -41,7 +40,7 @@ use VuFind\Account\AccountStatusLevelType;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetUserTransactions extends AbstractIlsUserAndRendererAction
+class GetUserTransactions extends AbstractIlsAndUserAction
 {
     use \VuFind\ILS\Logic\SummaryTrait;
 
@@ -70,46 +69,27 @@ class GetUserTransactions extends AbstractIlsUserAndRendererAction
             return $this->formatResponse('', self::STATUS_HTTP_ERROR);
         }
 
-        $result = [];
+        $counts = [];
         $functionConfig = $this->ils->checkFunction('getMyTransactions', $patron);
         $page = 1;
         do {
             // Try to use large page size, but take ILS limits into account
             $pageOptions = $this->getPaginationHelper()
                 ->getOptions($page, null, 1000, $functionConfig);
-            $transactions = $this->ils->getMyTransactions($patron, $pageOptions['ilsParams']);
+            $result = $this->ils
+                ->getMyTransactions($patron, $pageOptions['ilsParams']);
 
-            $summary = $this->getTransactionSummary($transactions['records']);
+            $summary = $this->getTransactionSummary($result['records']);
             foreach ($summary as $key => $value) {
-                $result[$key] = ($result[$key] ?? 0) + $value;
+                $counts[$key] = ($counts[$key] ?? 0) + $value;
             }
             $pageEnd = $pageOptions['ilsPaging']
-                ? ceil($transactions['count'] / $pageOptions['limit'])
+                ? ceil($result['count'] / $pageOptions['limit'])
                 : 1;
             $page++;
         } while ($page <= $pageEnd);
 
-        $result['level'] = $this->getAccountStatusLevel($result);
-        $result['html'] = $this->renderer->render('ajax/account/checkouts.phtml', $result);
-        return $this->formatResponse($result);
-    }
-
-    /**
-     * Get account status level for notification icon
-     *
-     * @param array $status Status information
-     *
-     * @return AccountStatusLevelType
-     */
-    protected function getAccountStatusLevel(array $status): AccountStatusLevelType
-    {
-        if ($status['overdue']) {
-            return AccountStatusLevelType::ActionRequired;
-        }
-        if ($status['warn']) {
-            return AccountStatusLevelType::Attention;
-        }
-        return AccountStatusLevelType::Normal;
+        return $this->formatResponse($counts);
     }
 
     /**

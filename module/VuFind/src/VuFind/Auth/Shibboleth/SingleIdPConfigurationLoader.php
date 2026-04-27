@@ -28,16 +28,16 @@ class SingleIdPConfigurationLoader implements ConfigurationLoaderInterface
     /**
      * Configured IdPs with entityId and overridden attribute mapping
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $config Configuration
+     * @param \Laminas\Config\Config $config Configuration
      */
-    public function __construct(\VuFind\Config\Config $config)
+    public function __construct(\Laminas\Config\Config $config)
     {
         $this->config = $config;
     }

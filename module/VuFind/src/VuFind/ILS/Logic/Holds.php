@@ -72,7 +72,7 @@ class Holds
     /**
      * VuFind configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -89,13 +89,13 @@ class Holds
      * @param \VuFind\Auth\ILSAuthenticator $ilsAuth ILS authenticator
      * @param ILSConnection                 $ils     A catalog connection
      * @param \VuFind\Crypt\HMAC            $hmac    HMAC generator
-     * @param \VuFind\Config\Config         $config  VuFind configuration
+     * @param \Laminas\Config\Config        $config  VuFind configuration
      */
     public function __construct(
         \VuFind\Auth\ILSAuthenticator $ilsAuth,
         ILSConnection $ils,
         \VuFind\Crypt\HMAC $hmac,
-        \VuFind\Config\Config $config
+        \Laminas\Config\Config $config
     ) {
         $this->ilsAuth = $ilsAuth;
         $this->hmac = $hmac;

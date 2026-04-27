@@ -93,9 +93,9 @@ class AuthHash extends RowGateway implements AuthHashEntityInterface, DbServiceA
      *
      * @param ?string $sessionId PHP Session id string
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setSessionId(?string $sessionId): static
+    public function setSessionId(?string $sessionId): AuthHashEntityInterface
     {
         $this->session_id = $sessionId;
         return $this;
@@ -116,9 +116,9 @@ class AuthHash extends RowGateway implements AuthHashEntityInterface, DbServiceA
      *
      * @param string $hash Hash Value
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setHash(string $hash): static
+    public function setHash(string $hash): AuthHashEntityInterface
     {
         $this->hash = $hash;
         return $this;
@@ -139,9 +139,9 @@ class AuthHash extends RowGateway implements AuthHashEntityInterface, DbServiceA
      *
      * @param ?string $type Hash Type
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setHashType(?string $type): static
+    public function setHashType(?string $type): AuthHashEntityInterface
     {
         $this->type = $type;
         return $this;
@@ -162,9 +162,9 @@ class AuthHash extends RowGateway implements AuthHashEntityInterface, DbServiceA
      *
      * @param ?string $data Data
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setData(?string $data): static
+    public function setData(?string $data): AuthHashEntityInterface
     {
         $this->__set('data', $data);
         return $this;
@@ -185,9 +185,9 @@ class AuthHash extends RowGateway implements AuthHashEntityInterface, DbServiceA
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return AuthHashEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static
+    public function setCreated(DateTime $dateTime): AuthHashEntityInterface
     {
         $this->created = $dateTime->format('Y-m-d H:i:s');
         return $this;

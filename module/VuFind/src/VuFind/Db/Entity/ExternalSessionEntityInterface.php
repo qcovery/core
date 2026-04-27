@@ -61,9 +61,9 @@ interface ExternalSessionEntityInterface extends EntityInterface
      *
      * @param string $sessionId PHP session id string
      *
-     * @return static
+     * @return ExternalSessionEntityInterface
      */
-    public function setSessionId(string $sessionId): static;
+    public function setSessionId(string $sessionId): ExternalSessionEntityInterface;
 
     /**
      * Get external session id string.
@@ -77,9 +77,9 @@ interface ExternalSessionEntityInterface extends EntityInterface
      *
      * @param string $externalSessionId External session id string
      *
-     * @return static
+     * @return ExternalSessionEntityInterface
      */
-    public function setExternalSessionId(string $externalSessionId): static;
+    public function setExternalSessionId(string $externalSessionId): ExternalSessionEntityInterface;
 
     /**
      * Get created date.
@@ -93,7 +93,7 @@ interface ExternalSessionEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return ExternalSessionEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static;
+    public function setCreated(DateTime $dateTime): ExternalSessionEntityInterface;
 }

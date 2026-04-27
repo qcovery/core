@@ -99,7 +99,7 @@ interface SearchServiceInterface extends DbServiceInterface
     /**
      * Get an array of rows for the specified user.
      *
-     * @param ?string                      $sessionId Session ID of current user or null to ignore searches in session.
+     * @param string                       $sessionId Session ID of current user.
      * @param UserEntityInterface|int|null $userOrId  User entity or ID of current user (optional).
      *
      * @return SearchEntityInterface[]
@@ -143,4 +143,13 @@ interface SearchServiceInterface extends DbServiceInterface
      * @return SearchEntityInterface[]
      */
     public function getSavedSearchesWithMissingChecksums(): array;
+
+    /**
+     * Delete a search entity.
+     *
+     * @param SearchEntityInterface|int $searchOrId Search entity object or ID to delete
+     *
+     * @return void
+     */
+    public function deleteSearch(SearchEntityInterface|int $searchOrId): void;
 }

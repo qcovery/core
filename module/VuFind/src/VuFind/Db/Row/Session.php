@@ -74,9 +74,9 @@ class Session extends RowGateway implements SessionEntityInterface
      *
      * @param ?string $sid Session Id.
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setSessionId(?string $sid): static
+    public function setSessionId(?string $sid): SessionEntityInterface
     {
         $this->session_id = $sid;
         return $this;
@@ -87,9 +87,9 @@ class Session extends RowGateway implements SessionEntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static
+    public function setCreated(DateTime $dateTime): SessionEntityInterface
     {
         $this->created = $dateTime->format('Y-m-d H:i:s');
         return $this;
@@ -100,9 +100,9 @@ class Session extends RowGateway implements SessionEntityInterface
      *
      * @param int $lastUsed Time last used
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setLastUsed(int $lastUsed): static
+    public function setLastUsed(int $lastUsed): SessionEntityInterface
     {
         $this->last_used = $lastUsed;
         return $this;
@@ -123,9 +123,9 @@ class Session extends RowGateway implements SessionEntityInterface
      *
      * @param ?string $data Session data.
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setData(?string $data): static
+    public function setData(?string $data): SessionEntityInterface
     {
         $this->data = $data;
         return $this;

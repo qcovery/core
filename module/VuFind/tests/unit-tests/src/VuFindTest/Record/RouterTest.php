@@ -29,7 +29,7 @@
 
 namespace VuFindTest\Record;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Record\Router;
 use VuFind\RecordDriver\AbstractBase as RecordDriver;
 

@@ -186,7 +186,7 @@ class Params extends AbstractEDSParams
      */
     public function getEdsView()
     {
-        $viewArr = explode('_', $this->view ?? '');
+        $viewArr = explode('|', $this->view ?? '');
         return (1 < count($viewArr)) ? $viewArr[1] : $this->options->getEdsView();
     }
 
@@ -231,14 +231,13 @@ class Params extends AbstractEDSParams
     /**
      * Get a user-friendly string to describe the provided facet field.
      *
-     * @param string $field               Facet field name.
-     * @param string $value               Facet value.
-     * @param string $default             Default field name (null for default behavior).
-     * @param bool   $allowCheckboxFacets Should checkbox facet labels be allowed too?
+     * @param string $field   Facet field name.
+     * @param string $value   Facet value.
+     * @param string $default Default field name (null for default behavior).
      *
-     * @return string Human-readable description of field.
+     * @return string         Human-readable description of field.
      */
-    public function getFacetLabel($field, $value = null, $default = null, $allowCheckboxFacets = true)
+    public function getFacetLabel($field, $value = null, $default = null)
     {
         // Also store Limiter/Search Mode IDs/Values in the config file
         if (str_starts_with($field, 'LIMIT|')) {
@@ -248,7 +247,7 @@ class Params extends AbstractEDSParams
         } else {
             $facetId = $field;
         }
-        return parent::getFacetLabel($facetId, $value, $default ?: $facetId, $allowCheckboxFacets);
+        return parent::getFacetLabel($facetId, $value, $default ?: $facetId);
     }
 
     /**
@@ -310,7 +309,7 @@ class Params extends AbstractEDSParams
         foreach ($this->getOptions()->getViewOptions() as $key => $value) {
             $list[$key] = [
                 'desc' => $value,
-                'selected' => ($key == $this->getView() . '_' . $this->getEdsView()),
+                'selected' => ($key == $this->getView() . '|' . $this->getEdsView()),
             ];
         }
         return $list;

@@ -61,9 +61,9 @@ interface ResourceTagsEntityInterface extends EntityInterface
      *
      * @param ?ResourceEntityInterface $resource Resource
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setResource(?ResourceEntityInterface $resource): static;
+    public function setResource(?ResourceEntityInterface $resource): ResourceTagsEntityInterface;
 
     /**
      * Get tag.
@@ -77,9 +77,9 @@ interface ResourceTagsEntityInterface extends EntityInterface
      *
      * @param TagsEntityInterface $tag Tag
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setTag(TagsEntityInterface $tag): static;
+    public function setTag(TagsEntityInterface $tag): ResourceTagsEntityInterface;
 
     /**
      * Get user list.
@@ -93,9 +93,9 @@ interface ResourceTagsEntityInterface extends EntityInterface
      *
      * @param ?UserListEntityInterface $list User list
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setUserList(?UserListEntityInterface $list): static;
+    public function setUserList(?UserListEntityInterface $list): ResourceTagsEntityInterface;
 
     /**
      * Get user.
@@ -109,9 +109,9 @@ interface ResourceTagsEntityInterface extends EntityInterface
      *
      * @param ?UserEntityInterface $user User
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static;
+    public function setUser(?UserEntityInterface $user): ResourceTagsEntityInterface;
 
     /**
      * Get created date.
@@ -125,7 +125,7 @@ interface ResourceTagsEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setPosted(DateTime $dateTime): static;
+    public function setPosted(DateTime $dateTime): ResourceTagsEntityInterface;
 }

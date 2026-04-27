@@ -29,7 +29,7 @@
 
 namespace VuFindTest\RecordTab;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\RecordTab\Versions;
 
 /**
@@ -55,10 +55,12 @@ class VersionsTest extends \PHPUnit\Framework\TestCase
         $count = 5;
         $som = $this->getMockPluginManager();
         $config = $this->getMockConfig();
-        $recordDriver = $this->createMock(\VuFind\RecordDriver\SolrDefault::class);
+        $recordDriver = $this->getMockBuilder(\VuFind\RecordDriver\SolrDefault::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $recordDriver->expects($this->any())->method('tryMethod')
             ->with($this->equalTo('getOtherVersionCount'))
-            ->willReturn($count);
+            ->will($this->returnValue($count));
         $obj = new Versions($config, $som);
         $obj->setRecordDriver($recordDriver);
         $translator = $this->getMockTranslator(
@@ -102,20 +104,22 @@ class VersionsTest extends \PHPUnit\Framework\TestCase
     {
         $som = $this->getMockPluginManager();
         $config = $this->getMockConfig();
-        $optionsMock = $this->createMock(\VuFind\Search\Base\Options::class);
+        $optionsMock = $this->getMockBuilder(\VuFind\Search\Base\Options::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $som->expects($this->any())->method('get')
             ->with($this->equalTo('foo'))
-            ->willReturn($optionsMock);
+            ->will($this->returnValue($optionsMock));
         $optionsMock->expects($this->once())->method('getVersionsAction')
-            ->willReturn($versionAction);
+            ->will($this->returnValue($versionAction));
         $recordDriver = $this->getMockBuilder(\VuFind\RecordDriver\SolrDefault::class)
             ->disableOriginalConstructor()
             ->getMock();
         $recordDriver->expects($this->once())->method('getSourceIdentifier')
-            ->willReturn('foo');
+            ->will($this->returnValue('foo'));
         $recordDriver->expects($this->any())->method('tryMethod')
             ->with($this->equalTo('getOtherVersionCount'))
-            ->willReturn($versionCount);
+            ->will($this->returnValue($versionCount));
         $obj = new Versions($config, $som);
         $obj->setRecordDriver($recordDriver);
         $this->assertSame($expectedResult, $obj->isActive());
@@ -128,7 +132,10 @@ class VersionsTest extends \PHPUnit\Framework\TestCase
      */
     protected function getMockPluginManager()
     {
-        return $this->createMock(\VuFind\Search\Options\PluginManager::class);
+        $som = $this->getMockBuilder(\VuFind\Search\Options\PluginManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $som;
     }
 
     /**
@@ -138,6 +145,9 @@ class VersionsTest extends \PHPUnit\Framework\TestCase
      */
     protected function getMockConfig()
     {
-        return $this->createMock(\VuFind\Config\Config::class);
+        $config = $this->getMockBuilder(\Laminas\Config\Config::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $config;
     }
 }

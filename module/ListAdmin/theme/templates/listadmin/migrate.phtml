@@ -1,0 +1,26 @@
+<?
+    // Set up page title:
+    $this->headTitle($this->translate('ListAdmin'));
+?>
+<div class="<?=$this->layoutClass('mainbody')?>">
+    <h2><?=$this->transEsc('Migrate lists')?></h2>
+    <?=$this->flashmessages()?>
+
+    <form class="form-feedback result-feedback" name="feedback" method="post" action="<?=$this->url('listadmin-migrate')?>">
+        <div class="form-group">
+            <label class="control-label" for="old_account"><?=$this->transEsc("Old account")?></label>
+            <input type="text" id="old_account" name="old_account" value="<?=$this->escapeHtmlAttr($old_account ?? '')?>" class="form-control" required/>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="new_account"><?=$this->transEsc("New account")?></label>
+            <input type="text" id="new_account" name="new_account" value="<?=$this->escapeHtmlAttr($new_account ?? '')?>" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <input type="submit" name="submit" class="btn btn-primary" value="<?=$this->transEsc("Migrate lists")?>" />
+        </div>
+    </form>
+</div>
+
+<div class="<?=$this->layoutClass('sidebar')?>">
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'listadminmigrate'])?>
+</div>

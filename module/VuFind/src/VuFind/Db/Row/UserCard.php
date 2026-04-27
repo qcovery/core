@@ -82,9 +82,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param string $cardName User card name.
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setCardName(string $cardName): static
+    public function setCardName(string $cardName): UserCardEntityInterface
     {
         $this->card_name = $cardName;
         return $this;
@@ -105,9 +105,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param string $catUsername Catalog username
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setCatUsername(string $catUsername): static
+    public function setCatUsername(string $catUsername): UserCardEntityInterface
     {
         $this->cat_username = $catUsername;
         return $this;
@@ -128,9 +128,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param ?string $catPassword Cat password
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setRawCatPassword(?string $catPassword): static
+    public function setRawCatPassword(?string $catPassword): UserCardEntityInterface
     {
         $this->cat_password = $catPassword;
         return $this;
@@ -151,9 +151,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param ?string $passEnc Encrypted password
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setCatPassEnc(?string $passEnc): static
+    public function setCatPassEnc(?string $passEnc): UserCardEntityInterface
     {
         $this->cat_pass_enc = $passEnc;
         return $this;
@@ -174,9 +174,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param ?string $homeLibrary Home library
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setHomeLibrary(?string $homeLibrary): static
+    public function setHomeLibrary(?string $homeLibrary): UserCardEntityInterface
     {
         $this->home_library = $homeLibrary;
         return $this;
@@ -197,9 +197,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static
+    public function setCreated(DateTime $dateTime): UserCardEntityInterface
     {
         $this->created = $dateTime->format('Y-m-d H:i:s');
         return $this;
@@ -220,9 +220,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param DateTime $dateTime Saved date and time
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setSaved(DateTime $dateTime): static
+    public function setSaved(DateTime $dateTime): UserCardEntityInterface
     {
         $this->saved = $dateTime->format('Y-m-d H:i:s');
         return $this;
@@ -243,9 +243,9 @@ class UserCard extends RowGateway implements DbServiceAwareInterface, UserCardEn
      *
      * @param UserEntityInterface $user User that owns card
      *
-     * @return static
+     * @return UserCardEntityInterface
      */
-    public function setUser(UserEntityInterface $user): static
+    public function setUser(UserEntityInterface $user): UserCardEntityInterface
     {
         $this->user_id = $user->getId();
         return $this;

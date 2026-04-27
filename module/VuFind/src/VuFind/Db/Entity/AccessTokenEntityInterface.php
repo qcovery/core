@@ -45,18 +45,18 @@ interface AccessTokenEntityInterface extends EntityInterface
      *
      * @param ?UserEntityInterface $user User owning token
      *
-     * @return static
+     * @return AccessTokenEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static;
+    public function setUser(?UserEntityInterface $user): AccessTokenEntityInterface;
 
     /**
      * Set data.
      *
      * @param string $data Data
      *
-     * @return static
+     * @return AccessTokenEntityInterface
      */
-    public function setData(string $data): static;
+    public function setData(string $data): AccessTokenEntityInterface;
 
     /**
      * Is the access token revoked?
@@ -70,7 +70,7 @@ interface AccessTokenEntityInterface extends EntityInterface
      *
      * @param bool $revoked Revoked
      *
-     * @return static
+     * @return AccessTokenEntityInterface
      */
-    public function setRevoked(bool $revoked): static;
+    public function setRevoked(bool $revoked): AccessTokenEntityInterface;
 }

@@ -59,7 +59,7 @@ use VuFind\Db\Service\UserServiceInterface;
  * @property string $posted
  */
 class ResourceTags extends RowGateway implements
-    ResourceTagsEntityInterface,
+    \VuFind\Db\Entity\ResourceTagsEntityInterface,
     \VuFind\Db\Table\DbTableAwareInterface,
     DbServiceAwareInterface
 {
@@ -103,9 +103,9 @@ class ResourceTags extends RowGateway implements
      *
      * @param ?ResourceEntityInterface $resource Resource
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setResource(?ResourceEntityInterface $resource): static
+    public function setResource(?ResourceEntityInterface $resource): ResourceTagsEntityInterface
     {
         $this->resource_id = $resource?->getId();
         return $this;
@@ -128,9 +128,9 @@ class ResourceTags extends RowGateway implements
      *
      * @param TagsEntityInterface $tag Tag
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setTag(TagsEntityInterface $tag): static
+    public function setTag(TagsEntityInterface $tag): ResourceTagsEntityInterface
     {
         $this->tag_id = $tag->getId();
         return $this;
@@ -153,9 +153,9 @@ class ResourceTags extends RowGateway implements
      *
      * @param ?UserListEntityInterface $list User list
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setUserList(?UserListEntityInterface $list): static
+    public function setUserList(?UserListEntityInterface $list): ResourceTagsEntityInterface
     {
         $this->list_id = $list?->getId();
         return $this;
@@ -178,9 +178,9 @@ class ResourceTags extends RowGateway implements
      *
      * @param ?UserEntityInterface $user User
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static
+    public function setUser(?UserEntityInterface $user): ResourceTagsEntityInterface
     {
         $this->user_id = $user?->getId();
         return $this;
@@ -201,9 +201,9 @@ class ResourceTags extends RowGateway implements
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return ResourceTagsEntityInterface
      */
-    public function setPosted(DateTime $dateTime): static
+    public function setPosted(DateTime $dateTime): ResourceTagsEntityInterface
     {
         $this->posted = $dateTime->format('Y-m-d H:i:s');
         return $this;

@@ -54,27 +54,27 @@ interface SessionEntityInterface extends EntityInterface
      *
      * @param ?string $sid Session Id.
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setSessionId(?string $sid): static;
+    public function setSessionId(?string $sid): SessionEntityInterface;
 
     /**
      * Created setter.
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static;
+    public function setCreated(DateTime $dateTime): SessionEntityInterface;
 
     /**
      * Set time the session is last used.
      *
      * @param int $lastUsed Time last used
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setLastUsed(int $lastUsed): static;
+    public function setLastUsed(int $lastUsed): SessionEntityInterface;
 
     /**
      * Get time when the session was last used.
@@ -88,9 +88,9 @@ interface SessionEntityInterface extends EntityInterface
      *
      * @param ?string $data Session data.
      *
-     * @return static
+     * @return SessionEntityInterface
      */
-    public function setData(?string $data): static;
+    public function setData(?string $data): SessionEntityInterface;
 
     /**
      * Get session data.

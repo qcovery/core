@@ -38,7 +38,6 @@ use Symfony\Component\Console\Question\Question;
 
 use function in_array;
 use function intval;
-use function is_array;
 
 /**
  * Console command: VuFind installer.
@@ -810,18 +809,16 @@ class InstallCommand extends Command
      * Make sure all modules exist (and create them if they do not). Returns true
      * on success, error message otherwise.
      *
-     * @param OutputInterface $output Output object
-     *
      * @return bool|string
      */
-    protected function buildModules(OutputInterface $output)
+    protected function buildModules()
     {
         if (!empty($this->module)) {
             foreach (explode(',', $this->module) as $module) {
                 $moduleDir = $this->baseDir . '/module/' . $module;
                 // Is module missing? If so, create it from the template:
                 if (!file_exists($moduleDir . '/Module.php')) {
-                    if (($result = $this->buildModule($module, $output)) !== true) {
+                    if (($result = $this->buildModule($module)) !== true) {
                         return $result;
                     }
                 }
@@ -834,12 +831,11 @@ class InstallCommand extends Command
      * Build the module for storing local code changes. Returns true on success,
      * error message otherwise.
      *
-     * @param string          $module The name of the new module (assumed valid!)
-     * @param OutputInterface $output Output object
+     * @param string $module The name of the new module (assumed valid!)
      *
      * @return bool|string
      */
-    protected function buildModule(string $module, OutputInterface $output): bool|string
+    protected function buildModule($module)
     {
         // Create directories:
         $moduleDir = $this->baseDir . '/module/' . $module;
@@ -880,31 +876,7 @@ class InstallCommand extends Command
             $moduleDir . '/Module.php',
             str_replace('VuFindLocalTemplate', $module, $contents)
         );
-        if (!$success) {
-            return "Problem writing {$moduleDir}/Module.php.";
-        }
-
-        // Set up Composer settings:
-        $localComposer = $this->baseDir . '/composer.local.json';
-        $this->backUpFile($output, $localComposer, 'local Composer configuration');
-        $json = json_decode(file_exists($localComposer) ? file_get_contents($localComposer) : '{}', true);
-        if (!is_array($json)) {
-            return "Unable to parse $localComposer.";
-        }
-        $json['autoload']['psr-4'][$module . '\\'] = "module/$module/src/$module";
-        if (!file_put_contents($localComposer, json_encode($json, JSON_PRETTY_PRINT))) {
-            return "Cannot write to $localComposer.";
-        }
-
-        // Try to automatically run Composer to update autoloader; output warning if it fails:
-        chdir($this->baseDir);
-        if (false === exec('composer install', result_code: $composerResult) || $composerResult !== 0) {
-            $output->writeLn(
-                "<error>WARNING: Could not run composer to update autoload rules for module $module.\n"
-                . 'Please run "composer install" to ensure correct custom module loading.</error>'
-            );
-        }
-        return true;
+        return $success ? true : "Problem writing {$moduleDir}/Module.php.";
     }
 
     /**
@@ -1118,7 +1090,7 @@ class InstallCommand extends Command
         }
 
         // Build the custom module(s), if necessary:
-        if (($result = $this->buildModules($output)) !== true) {
+        if (($result = $this->buildModules()) !== true) {
             return $this->failWithError($output, $result);
         }
 

@@ -30,7 +30,7 @@
 
 namespace VuFindTest\Recommend;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Config\PluginManager as ConfigPluginManager;
 use VuFind\Connection\ExternalVuFind;
 use VuFind\Recommend\ConsortialVuFind;
@@ -87,7 +87,7 @@ class ConsortialVuFindTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testGetResults(): void
+    public function testGetResults()
     {
         $config = $this->buildConfig();
         $consortialVuFind = $this->buildConsortialVuFind($config);
@@ -112,7 +112,7 @@ class ConsortialVuFindTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testGetMoreResultsUrl(): void
+    public function testGetMoreResultsUrl()
     {
         $config = $this->buildConfig();
         $consortialVuFind = $this->buildConsortialVuFind($config);
@@ -124,29 +124,30 @@ class ConsortialVuFindTest extends \PHPUnit\Framework\TestCase
     /**
      * Build an object representing an ExternalVuFind.ini configuration file
      *
-     * @return array
+     * @return ConsortialVuFind
      */
-    protected function buildConfig(): array
+    protected function buildConfig()
     {
-        return [
+        $config = new Config([
             'ReShare' => [
                 'api_base_url' => 'http://some.url/api',
                 'record_base_url' => 'https://some.url/Record',
                 'results_base_url' => 'https://some.url/Search/Results',
             ],
-        ];
+        ], true);
+        return $config;
     }
 
     /**
      * Build and pre-process a ConsortialVuFind object
      *
-     * @param array $config The config array
+     * @param Config $config The config object
      *
      * @return ConsortialVuFind
      */
-    protected function buildConsortialVuFind(array $config): ConsortialVuFind
+    protected function buildConsortialVuFind($config)
     {
-        $consortialVuFind = new ConsortialVuFind(new Config($config), $this->connector);
+        $consortialVuFind = new ConsortialVuFind($config, $this->connector);
         $consortialVuFind->setConfig('lookfor:3:ReShare');
 
         $queryResults = $this->buildQueryResults('civil war');
@@ -163,7 +164,7 @@ class ConsortialVuFindTest extends \PHPUnit\Framework\TestCase
      *
      * @return Results The Results object
      */
-    protected function buildQueryResults(string $queryString, array $facets = []): Results
+    protected function buildQueryResults($queryString, $facets = [])
     {
         // Build query Params
         $queryParams = new Params(

@@ -29,9 +29,9 @@
 
 namespace VuFindTest\Auth;
 
+use Laminas\Config\Config;
 use Laminas\Http\Request;
 use VuFind\Auth\LDAP;
-use VuFind\Config\Config;
 
 /**
  * LDAP authentication test class.
@@ -49,63 +49,89 @@ class LDAPTest extends \PHPUnit\Framework\TestCase
     /**
      * Get an authentication object.
      *
-     * @param ?array $config Configuration to use (null for default)
+     * @param ?Config $config Configuration to use (null for default)
      *
      * @return LDAP
      */
-    public function getAuthObject(?array $config = null): LDAP
+    public function getAuthObject(?Config $config = null): LDAP
     {
         $obj = new LDAP($this->createMock(\VuFind\Auth\ILSAuthenticator::class));
-        $obj->setConfig(new Config($config ?? $this->getAuthConfig()));
+        $obj->setConfig($config ?? $this->getAuthConfig());
         return $obj;
     }
 
     /**
      * Get a working configuration for the LDAP object
      *
-     * @return array
+     * @return Config
      */
-    public function getAuthConfig(): array
+    public function getAuthConfig(): Config
     {
-        $ldapConfig = [
-            'host' => 'localhost',
-            'port' => 1234,
-            'basedn' => 'basedn',
-            'username' => 'username',
-        ];
-        return ['LDAP' => $ldapConfig];
+        $ldapConfig = new Config(
+            [
+                'host' => 'localhost',
+                'port' => 1234,
+                'basedn' => 'basedn',
+                'username' => 'username',
+            ],
+            true
+        );
+        return new Config(['LDAP' => $ldapConfig], true);
     }
 
     /**
-     * Data provider for testWithMissingConfiguration.
+     * Verify that missing host causes failure.
      *
      * @return void
      */
-    public static function configKeyProvider(): array
-    {
-        return [
-            'missing host' => ['host'],
-            'missing port' => ['port'],
-            'missing basedn' => ['basedn'],
-            'missing username' => ['username'],
-        ];
-    }
-
-    /**
-     * Verify that missing configuration causes failure.
-     *
-     * @param string $key Configuration key to exclude
-     *
-     * @return void
-     *
-     * @dataProvider configKeyProvider
-     */
-    public function testWithMissingConfiguration(string $key): void
+    public function testWithMissingHost(): void
     {
         $this->expectException(\VuFind\Exception\Auth::class);
 
         $config = $this->getAuthConfig();
-        unset($config['LDAP'][$key]);
+        unset($config->LDAP->host);
+        $this->getAuthObject($config)->getConfig();
+    }
+
+    /**
+     * Verify that missing port causes failure.
+     *
+     * @return void
+     */
+    public function testWithMissingPort(): void
+    {
+        $this->expectException(\VuFind\Exception\Auth::class);
+
+        $config = $this->getAuthConfig();
+        unset($config->LDAP->port);
+        $this->getAuthObject($config)->getConfig();
+    }
+
+    /**
+     * Verify that missing baseDN causes failure.
+     *
+     * @return void
+     */
+    public function testWithMissingBaseDN(): void
+    {
+        $this->expectException(\VuFind\Exception\Auth::class);
+
+        $config = $this->getAuthConfig();
+        unset($config->LDAP->basedn);
+        $this->getAuthObject($config)->getConfig();
+    }
+
+    /**
+     * Verify that missing UID causes failure.
+     *
+     * @return void
+     */
+    public function testWithMissingUid(): void
+    {
+        $this->expectException(\VuFind\Exception\Auth::class);
+
+        $config = $this->getAuthConfig();
+        unset($config->LDAP->username);
         $this->getAuthObject($config)->getConfig();
     }
 
@@ -117,8 +143,8 @@ class LDAPTest extends \PHPUnit\Framework\TestCase
     public function testCaseNormalization(): void
     {
         $config = $this->getAuthConfig();
-        $config['LDAP']['username'] = 'UPPER';
-        $config['LDAP']['basedn'] = 'MixedCase';
+        $config->LDAP->username = 'UPPER';
+        $config->LDAP->basedn = 'MixedCase';
         $auth = $this->getAuthObject($config);
         // username should be lowercased:
         $this->assertEquals(

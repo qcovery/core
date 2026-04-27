@@ -56,7 +56,7 @@ class ScssBuilderCommand extends AbstractCssBuilderCommand
     protected $format = 'SCSS';
 
     /**
-     * Build the SCSS compiler.
+     * Build the LESS compiler.
      *
      * @param OutputInterface $output Output object
      *

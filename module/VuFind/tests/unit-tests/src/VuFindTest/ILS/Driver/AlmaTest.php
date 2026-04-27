@@ -152,11 +152,11 @@ class AlmaTest extends \VuFindTest\Unit\ILSDriverTestCase
      * Overwrites $this->driver
      *
      * @param string $test   Name of test fixture to load
-     * @param ?array $config Driver configuration (null to use default)
+     * @param array  $config Driver configuration (null to use default)
      *
      * @return void
      */
-    protected function createConnector(string $test, ?array $config = null): void
+    protected function createConnector(string $test, array $config = null): void
     {
         // Setup test responses
         $this->fixtureSteps = $this->getJsonFixture("alma/responses/$test.json");
@@ -179,6 +179,22 @@ class AlmaTest extends \VuFindTest\Unit\ILSDriverTestCase
             ->method('makeRequest')
             ->will($this->returnCallback([$this, 'mockMakeRequest']));
         $this->driver->init();
+    }
+
+    /**
+     * Testing getCourses
+     *
+     * @return void
+     */
+    public function testGetCourses()
+    {
+        $this->createConnector('get-courses');
+        $result = $this->driver->getCourses();
+        $expected = [
+            '1234' => 'VuFind Basics',
+            '5678' => 'Advanced VuFind',
+        ];
+        $this->assertEquals($expected, $result);
     }
 
     /**

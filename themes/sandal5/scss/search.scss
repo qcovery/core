@@ -46,7 +46,7 @@
     padding: 4px .75rem;
   }
 }
-@include media-breakpoint-up(sm) {
+@media (min-width: 768px) {
   .result {
     margin-left: 0;
     margin-right: 0;
@@ -73,7 +73,7 @@
   }
   .format,
   .label {
-    color: $primary;
+    color: $brand-primary;
     background-color: #fff;
   }
   .record-number { color: $search-row-selected-color; }
@@ -104,7 +104,7 @@
   color: #fff;
   font-weight: 500;
   background-color: $header-bg;
-  background-image: url('../../sandal5/images/forest.jpg');
+  background-image: url('../../sandal/images/forest.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center top;
@@ -114,7 +114,7 @@
     color: $white;
     text-shadow: 0 1px 0 $black;
   }
-  @include media-breakpoint-up(sm) {
+  @media (min-width: 768px) {
     height: 300px;
     padding: 7rem calc(50vw - 50%); // Align searchbox with container
   }
@@ -131,7 +131,7 @@
   color: #fff;
   background-color: rgba(0,0,0,.3);
   content: "Photo by Paul Gilmore on Unsplash";
-  @include media-breakpoint-up(sm) {
+  @media (min-width: 768px) {
     left: auto;
     right: calc(50% - 50vw + .5rem);
     width: auto;
@@ -190,6 +190,7 @@
 
   .nav-tabs {
     white-space: nowrap;
+    margin-bottom: 1rem;
     border-bottom: none;
   }
   .nav-tabs a,
@@ -208,12 +209,12 @@
     border-color: $white-50;
     background-color: transparent;
   }
-  .nav-tabs a.active {
+  .nav-tabs .active a {
     color: #fff;
     border-color: $white;
   }
 }
-@include media-breakpoint-up(sm) {
+@media (min-width: 768px) {
   #searchForm_lookfor,
   #searchForm_type { margin-bottom: 0; }
   .nav.searchbox .nav-tabs a,

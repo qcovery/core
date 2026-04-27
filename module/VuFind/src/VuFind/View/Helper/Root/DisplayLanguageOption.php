@@ -29,7 +29,7 @@
 
 namespace VuFind\View\Helper\Root;
 
-use Laminas\Translator\TranslatorInterface;
+use Laminas\I18n\Translator\TranslatorInterface;
 
 /**
  * DisplayLanguageOption view helper
@@ -43,12 +43,20 @@ use Laminas\Translator\TranslatorInterface;
 class DisplayLanguageOption extends \Laminas\View\Helper\AbstractHelper
 {
     /**
+     * Translator (or null if unavailable)
+     *
+     * @var TranslatorInterface
+     */
+    protected $translator = null;
+
+    /**
      * Constructor
      *
-     * @param TranslatorInterface $translator Translator
+     * @param TranslatorInterface $translator Main VuFind translator
      */
-    public function __construct(protected TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator)
     {
+        $this->translator = $translator;
     }
 
     /**

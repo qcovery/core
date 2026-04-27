@@ -110,9 +110,7 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
         $ti = $this->getThemeInfo();
         $ti->setTheme('child');
         $expectedChild = include "{$this->fixturePath}/child/theme.config.php";
-        $expectedChild['themeName'] = 'child';
         $expectedParent = include "{$this->fixturePath}/parent/theme.config.php";
-        $expectedParent['themeName'] = 'parent';
         $this->assertEquals('parent', $expectedChild['extends']);
         $this->assertEquals(false, $expectedParent['extends']);
         $this->assertEquals(
@@ -131,12 +129,10 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
         $ti = $this->getThemeInfo();
         $ti->setTheme('mixin_user');
         $expectedChild = include "{$this->fixturePath}/child/theme.config.php";
-        $expectedChild['themeName'] = 'child';
         $expectedParent = include "{$this->fixturePath}/parent/theme.config.php";
-        $expectedParent['themeName'] = 'parent';
         $expectedMixin = include "{$this->fixturePath}/mixin/mixin.config.php";
-        $expectedMixinUser = include "{$this->fixturePath}/mixin_user/theme.config.php";
-        $expectedMixinUser['themeName'] = 'mixin_user';
+        $expectedMixinUser
+            = include "{$this->fixturePath}/mixin_user/theme.config.php";
         $this->assertEquals('parent', $expectedChild['extends']);
         $this->assertEquals(false, $expectedParent['extends']);
         $this->assertEquals(
@@ -311,7 +307,7 @@ class ThemeInfoTest extends \PHPUnit\Framework\TestCase
         $config = $ti->getMergedConfig();
         $this->assertEquals('HTML5', $config['doctype']);
         $this->assertEqualsCanonicalizing(
-            ['doctype', 'extends', 'js', 'helpers', 'themeName'],
+            ['doctype', 'extends', 'js', 'helpers'],
             array_keys($config)
         );
     }

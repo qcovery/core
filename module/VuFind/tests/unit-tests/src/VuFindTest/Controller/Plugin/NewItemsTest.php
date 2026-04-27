@@ -29,7 +29,7 @@
 
 namespace VuFindTest\Controller\Plugin;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Controller\Plugin\NewItems;
 
 /**

@@ -29,7 +29,7 @@
 
 namespace VuFind\View\Helper\Root;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 
 /**
  * Relais view helper

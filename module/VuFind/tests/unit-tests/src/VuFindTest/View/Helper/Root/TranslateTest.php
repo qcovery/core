@@ -457,7 +457,10 @@ class TranslateTest extends \PHPUnit\Framework\TestCase
     public function testLocaleWithTranslator(): void
     {
         $translate = new Translate();
-        $translate->setTranslator($this->getMockTranslator([], 'foo'));
+        $translator = $this->createMock(\Laminas\I18n\Translator\Translator::class);
+        $translator->expects($this->once())->method('getLocale')
+            ->will($this->returnValue('foo'));
+        $translate->setTranslator($translator);
         $this->assertEquals('foo', $translate->getTranslatorLocale());
     }
 
@@ -469,7 +472,7 @@ class TranslateTest extends \PHPUnit\Framework\TestCase
     public function testGetTranslator(): void
     {
         $translate = new Translate();
-        $translator = $this->createMock(\Laminas\Translator\TranslatorInterface::class);
+        $translator = $this->createMock(\Laminas\I18n\Translator\TranslatorInterface::class);
         $translate->setTranslator($translator);
         $this->assertEquals($translator, $translate->getTranslator());
     }

@@ -52,9 +52,9 @@ interface TagsEntityInterface extends EntityInterface
      *
      * @param string $tag Tag
      *
-     * @return static
+     * @return TagsEntityInterface
      */
-    public function setTag(string $tag): static;
+    public function setTag(string $tag): TagsEntityInterface;
 
     /**
      * Tag getter

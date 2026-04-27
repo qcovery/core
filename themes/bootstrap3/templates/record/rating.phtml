@@ -7,7 +7,7 @@
     . '<li>' . $this->recordLinker()->getBreadcrumbHtml($this->driver) . '</li> '
     . '<li class="active">' . $this->transEsc('rating_add_or_update') . '</li>';
 
-  $ratingData = $this->driver->getRatingBreakdown([1 => [10, 29], 2 => [30, 49], 3 => [50, 69], 4 => [70, 89], 5 => [90, 100]]);
+  $ratingData = $this->ratings()->getRatingBreakdown($this->driver, [1 => [10, 29], 2 => [30, 49], 3 => [50, 69], 4 => [70, 89], 5 => [90, 100]]);
   krsort($ratingData['groups']);
   $groupTitleTransEscAttr = [];
   $ranges = [1 => ['10', '20'], 2 => ['30', '40'], 3 => ['50', '60'], 4 => ['70', '80'], 5 => ['90', '100']];
@@ -38,9 +38,9 @@
 <?php else: ?>
   <h2><?=$this->transEsc('rating_add_or_update') ?></h2>
 <?php endif; ?>
-<?php if ($this->auth()->isLoggedIn()): ?>
+<?php if ($this->auth()->getIdentity()): ?>
   <form method="post" name="rateRecord" class="form-add-rating">
-    <input type="hidden" name="submit" value="1">
+    <input type="hidden" name="submitButton" value="1">
     <input type="hidden" name="id" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueId())?>">
     <input type="hidden" name="source" value="<?=$this->escapeHtmlAttr($this->driver->getSourceIdentifier())?>">
     <div class="form-group">
@@ -56,7 +56,7 @@
   </form>
   <?php if ($this->accountCapabilities()->isRatingRemovalAllowed()): ?>
     <form method="post" name="rateRecord" id="form_remove_rating" class="form-remove-rating">
-      <input type="hidden" name="submit" value="1">
+      <input type="hidden" name="submitButton" value="1">
       <input type="hidden" name="id" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueId())?>">
       <input type="hidden" name="source" value="<?=$this->escapeHtmlAttr($this->driver->getSourceIdentifier())?>">
       <input type="hidden" name="rating" value="">
@@ -66,6 +66,6 @@
   <?php $singleSignOn = $this->auth()->getManager()->getSessionInitiator($this->serverUrl(true)); ?>
   <a href="<?=$this->url('myresearch-userlogin') ?>" class="btn btn-primary"<?php if (!$singleSignOn): ?> data-lightbox<?php endif; ?> title="<?=$this->transEscAttr('Login')?>">
     <?=$this->icon('sign-in') ?>
-    <?=$this->transEsc("You must be logged in first") ?>
+    <?=$this->transEsc('You must be logged in first') ?>
   </a>
 <?php endif; ?>

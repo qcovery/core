@@ -30,7 +30,7 @@
 
 namespace VuFind\Search\Options;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 
 /**
  * Trait for setting up view options. Designed to be included in a subclass of
@@ -57,12 +57,10 @@ trait ViewOptionsTrait
             $this->defaultView = $searchSettings->General->default_view;
         }
         // Load view preferences (or defaults if none in .ini file):
-        $viewOptions = [];
-        foreach ($searchSettings->Views ?? [] as $key => $value) {
-            $viewOptions[$key] = $value;
-        }
-        if (!empty($viewOptions)) {
-            $this->viewOptions = $viewOptions;
+        if (isset($searchSettings->Views)) {
+            foreach ($searchSettings->Views as $key => $value) {
+                $this->viewOptions[$key] = $value;
+            }
         } elseif (isset($searchSettings->General->default_view)) {
             $this->viewOptions = [$this->defaultView => $this->defaultView];
         } else {

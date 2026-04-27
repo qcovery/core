@@ -31,13 +31,10 @@ namespace VuFindTest\View\Helper\Root;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
-use VuFind\Escaper\Escaper;
-use VuFind\RecordDataFormatter\Specs\DefaultRecord as DefaultRecordSpec;
 use VuFind\RecordDriver\Response\PublicationDetails;
 use VuFind\Tags\TagsService;
 use VuFind\View\Helper\Root\RecordDataFormatter;
 use VuFind\View\Helper\Root\RecordDataFormatterFactory;
-use VuFind\View\Helper\Root\SchemaOrg;
 
 use function count;
 use function func_get_args;
@@ -77,12 +74,11 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * Get view helpers needed by test.
      *
-     * @param ContainerInterface $container       Mock service container
-     * @param SchemaOrg          $schemaOrgHelper schema.org helper
+     * @param ContainerInterface $container Mock service container
      *
      * @return array
      */
-    protected function getViewHelpers(ContainerInterface $container, SchemaOrg $schemaOrgHelper): array
+    protected function getViewHelpers($container): array
     {
         $context = new \VuFind\View\Helper\Root\Context();
         $record = new \VuFind\View\Helper\Root\Record($this->createMock(TagsService::class));
@@ -98,12 +94,12 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
             ),
             'context' => $context,
             'config' => new \VuFind\View\Helper\Root\Config($container->get(\VuFind\Config\PluginManager::class)),
-            'identifierLinker' => new \VuFind\View\Helper\Root\IdentifierLinker($context),
+            'doi' => new \VuFind\View\Helper\Root\Doi($context),
             'htmlSafeJsonEncode' => new \VuFind\View\Helper\Root\HtmlSafeJsonEncode(),
             'icon' => new \VuFind\View\Helper\Root\Icon(
                 [],
                 new \Laminas\Cache\Storage\Adapter\BlackHole(),
-                new \Laminas\View\Helper\EscapeHtmlAttr(new Escaper()),
+                new \Laminas\View\Helper\EscapeHtmlAttr(),
             ),
             'openUrl' => new \VuFind\View\Helper\Root\OpenUrl(
                 $context,
@@ -113,7 +109,9 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
             'proxyUrl' => new \VuFind\View\Helper\Root\ProxyUrl(),
             'record' => $record,
             'recordLinker' => new \VuFind\View\Helper\Root\RecordLinker($this->getMockRecordRouter()),
-            'schemaOrg' => $schemaOrgHelper,
+            'schemaOrg' => new \VuFind\View\Helper\Root\SchemaOrg(
+                new \Laminas\View\Helper\HtmlAttributes()
+            ),
             'searchMemory' => $this->getSearchMemoryViewHelper(),
             'searchOptions' => new \VuFind\View\Helper\Root\SearchOptions(
                 new \VuFind\Search\Options\PluginManager($container)
@@ -203,11 +201,10 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
      * Build a formatter, including necessary mock view w/ helpers.
      *
      * @param array $additionalConfig Additional RecordDataFormatter config
-     * @param array $additionalSpecs  Additional specs
      *
      * @return RecordDataFormatter
      */
-    protected function getFormatter($additionalConfig = [], $additionalSpecs = [])
+    protected function getFormatter($additionalConfig = [])
     {
         // Build the formatter:
         $factory = new RecordDataFormatterFactory();
@@ -246,27 +243,10 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
                 'RecordDataFormatter' => $recordDataFormatterConfig,
             ])
         );
-        $schemaOrgHelper = new \VuFind\View\Helper\Root\SchemaOrg(
-            new \Laminas\View\Helper\HtmlAttributes()
-        );
-        $specManager = $this->createMock(\VuFind\RecordDataFormatter\Specs\PluginManager::class);
-        $specs = new DefaultRecordSpec($schemaOrgHelper, $recordDataFormatterConfig);
-        foreach ($additionalSpecs as $context => $additionalContextSpec) {
-            $contextSpec = $specs->getDefaults($context);
-            $specs->setDefaults($context, array_merge($additionalContextSpec, $contextSpec));
-        }
-        $specManager->expects($this->any())
-            ->method('get')
-            ->with($this->isType('string'))
-            ->willReturn($specs);
-        $container->set(
-            \VuFind\RecordDataFormatter\Specs\PluginManager::class,
-            $specManager
-        );
         $this->addPathResolverToContainer($container);
 
         // Create a view object with a set of helpers:
-        $helpers = $this->getViewHelpers($container, $schemaOrgHelper);
+        $helpers = $this->getViewHelpers($container);
         $view = $this->getPhpRenderer($helpers);
         $container->set(\Laminas\View\HelperPluginManager::class, $view->getHelperPluginManager());
         $formatter = $factory($container, RecordDataFormatter::class);
@@ -348,7 +328,9 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormatting(string $function): void
     {
-        $spec = [];
+        $driver = $this->getDriver();
+        $formatter = $this->getFormatter();
+        $spec = $formatter->getDefaults('core');
         $spec['Building'] = [
             'dataMethod' => 'getBuildings', 'pos' => 0, 'context' => ['foo' => 1],
             'translationTextDomain' => 'prefix_',
@@ -529,11 +511,6 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
             'renderType' => 'Simple',
             'pos' => 7000,
         ];
-
-        $driver = $this->getDriver();
-        $formatter = $this->getFormatter([], ['core' => $spec]);
-        $spec = $formatter->getDefaults('core');
-
         $expected = [
             'Building' => 'prefix_0',
             'Published in' => '0',
@@ -572,6 +549,9 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
             'ContextSensitive' => '0',
         ];
 
+        // Calling getDefaults again to apply changes from config
+        $formatter->setDefaults('core', $spec);
+        $spec = $formatter->getDefaults('core');
         // Call the method specified by the data provider
         $results = $this->$function($driver, $spec);
         // Check for expected array keys
@@ -657,7 +637,10 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormattingWithGlobalOptions(string $function): void
     {
-        $spec = [];
+        $driver = $this->getDriver();
+        $formatter = $this->getFormatter($this->getGlobalTestConfig());
+        $spec = $formatter->getDefaults('core');
+
         $spec['NormalField'] = [
             'dataMethod' => 'getContainerTitle',
             'renderType' => 'Simple',
@@ -707,10 +690,6 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
             'pos' => 2002,
         ];
 
-        $driver = $this->getDriver();
-        $formatter = $this->getFormatter($this->getGlobalTestConfig(), ['core' => $spec]);
-        $spec = $formatter->getDefaults('core');
-
         $expected = [
             'EnabledField' => '0',
             'EnabledFieldByConfig' => '0',
@@ -720,6 +699,9 @@ class RecordDataFormatterTest extends \PHPUnit\Framework\TestCase
             'Extra' => '0',
         ];
 
+        // Calling getDefaults again to apply changes from config
+        $formatter->setDefaults('core', $spec);
+        $spec = $formatter->getDefaults('core');
         // Call the method specified by the data provider
         $results = $this->$function($driver, $spec);
         // Check for expected array keys

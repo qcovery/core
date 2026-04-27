@@ -49,7 +49,7 @@ abstract class Explanation
     /**
      * Configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 

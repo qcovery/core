@@ -174,13 +174,6 @@ class Params
     protected $checkboxFacets = [];
 
     /**
-     * Whether to fetch result counts for checkbox facets
-     *
-     * @var bool
-     */
-    protected $fetchCheckboxFacetCounts = false;
-
-    /**
      * Applied filters
      *
      * @var array
@@ -747,10 +740,14 @@ class Params
         // Validate and assign the sort value:
         $valid = array_keys($this->getOptions()->getSortOptions());
 
-        if (
-            !empty($sort)
-            && (in_array($sort, $valid) || $this->getMatchingHiddenSortingPatterns($sort))
-        ) {
+        $matchedHiddenPatterns = array_filter(
+            $this->getOptions()->getHiddenSortOptions(),
+            function ($pattern) use ($sort) {
+                return preg_match('/' . $pattern . '/', $sort);
+            }
+        );
+
+        if (!empty($sort) && (in_array($sort, $valid) || count($matchedHiddenPatterns) > 0)) {
             $this->sort = $sort;
         } else {
             $this->sort = $this->getDefaultSort();
@@ -1077,28 +1074,15 @@ class Params
     }
 
     /**
-     * Enable or disable fetching of checkbox facet counts
-     *
-     * @param bool $enable Whether to enable counts
-     *
-     * @return void
-     */
-    public function toggleCheckboxFacetCounts(bool $enable): void
-    {
-        $this->fetchCheckboxFacetCounts = $enable;
-    }
-
-    /**
      * Get a user-friendly string to describe the provided facet field.
      *
-     * @param string $field               Facet field name.
-     * @param string $value               Facet value.
-     * @param string $default             Default field name (null for default behavior).
-     * @param bool   $allowCheckboxFacets Should checkbox facet labels be allowed too?
+     * @param string $field   Facet field name.
+     * @param string $value   Facet value.
+     * @param string $default Default field name (null for default behavior).
      *
-     * @return string Human-readable description of field.
+     * @return string         Human-readable description of field.
      */
-    public function getFacetLabel($field, $value = null, $default = null, $allowCheckboxFacets = true)
+    public function getFacetLabel($field, $value = null, $default = null)
     {
         if (
             !isset($this->facetConfig[$field])
@@ -1107,7 +1091,7 @@ class Params
         ) {
             $field = $this->facetAliases[$field];
         }
-        $checkboxFacet = $allowCheckboxFacets ? ($this->checkboxFacets[$field]["$field:$value"] ?? null) : null;
+        $checkboxFacet = $this->checkboxFacets[$field]["$field:$value"] ?? null;
         if (null !== $checkboxFacet) {
             return $checkboxFacet['desc'];
         }
@@ -1172,8 +1156,8 @@ class Params
         $translatedFacets = $this->getOptions()->getTranslatedFacets();
         // Loop through all the current filter fields
         foreach ($this->filterList as $field => $values) {
-            [$operator, $bareField] = $this->parseOperatorAndFieldName($field);
-            $translate = in_array($bareField, $translatedFacets);
+            [$operator, $field] = $this->parseOperatorAndFieldName($field);
+            $translate = in_array($field, $translatedFacets);
             // and each value currently used for that field
             foreach ($values as $value) {
                 // Add to the list unless it's in the list of fields to skip:
@@ -1181,9 +1165,9 @@ class Params
                     !isset($skipList[$field])
                     || !in_array($value, $skipList[$field])
                 ) {
-                    $facetLabel = $this->getFacetLabel($bareField, $value, allowCheckboxFacets: false);
+                    $facetLabel = $this->getFacetLabel($field, $value);
                     $list[$facetLabel][] = $this->formatFilterListEntry(
-                        $bareField,
+                        $field,
                         $value,
                         $operator,
                         $translate
@@ -1316,14 +1300,14 @@ class Params
     /**
      * Get information on the current state of the boolean checkbox facets.
      *
-     * @param ?array $include        List of checkbox filters to return (null for all)
-     * @param bool   $includeDynamic Should we include dynamically-generated
+     * @param array $include        List of checkbox filters to return (null for all)
+     * @param bool  $includeDynamic Should we include dynamically-generated
      * checkboxes that are not part of the include list above?
      *
      * @return array
      */
     public function getCheckboxFacets(
-        ?array $include = null,
+        array $include = null,
         bool $includeDynamic = true
     ) {
         // Build up an array of checkbox facets with status booleans and
@@ -1870,10 +1854,9 @@ class Params
             ];
         }
         if (!isset($list[$currentSort])) {
-            $matchingHiddenSortingPatterns = $this->getMatchingHiddenSortingPatterns($currentSort);
             // Add selected sort with a generic description so that we display it:
             $list[$currentSort] = [
-                'desc' => $matchingHiddenSortingPatterns[0]['label'] ?? 'unrecognized_sort_option',
+                'desc' => 'unrecognized_sort_option',
                 'selected' => true,
                 'default' => false,
             ];
@@ -2147,27 +2130,5 @@ class Params
     public function isSpecializedSearch(): bool
     {
         return $this->isSpecializedSearch;
-    }
-
-    /**
-     * Get HiddenSorting patterns matching the given sort
-     *
-     * @param ?string $sort Sort
-     *
-     * @return array Array of associative arrays with keys 'label' and 'pattern'
-     */
-    protected function getMatchingHiddenSortingPatterns(?string $sort): array
-    {
-        if (null === $sort) {
-            return [];
-        }
-        return array_values(
-            array_filter(
-                $this->getOptions()->getHiddenSortOptions(),
-                function ($option) use ($sort) {
-                    return preg_match('/' . $option['pattern'] . '/', $sort);
-                }
-            )
-        );
     }
 }

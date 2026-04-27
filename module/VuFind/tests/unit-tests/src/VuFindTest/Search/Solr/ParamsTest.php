@@ -217,36 +217,7 @@ class ParamsTest extends \PHPUnit\Framework\TestCase
             ],
             'HiddenSorting' => [
                 'pattern' => [
-                    '[Ff]irst',
-                    '[Ss]econd',
-                ],
-            ],
-        ];
-
-        $searchConfigKeyLabel = [
-            'Sorting' => [
-                'relevance' => 'Relevance',
-            ],
-            'HiddenSorting' => [
-                'pattern' => [
-                    'FIRST' => '[Ff]irst',
-                    'SECOND' => '[Ss]econd',
-                ],
-            ],
-        ];
-
-        $searchConfigLabel = [
-            'Sorting' => [
-                'relevance' => 'Relevance',
-            ],
-            'HiddenSorting' => [
-                'pattern' => [
-                    '[Ff]irst',
-                    '[Ss]econd',
-                ],
-                'label' => [
-                    'FIRST',
-                    'SECOND',
+                    '[Tt]est',
                 ],
             ],
         ];
@@ -284,6 +255,27 @@ class ParamsTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
+            'hidden' => [
+                $searchConfig,
+                'footestbar',
+                [
+                    'relevance' => [
+                        'desc' => 'Relevance',
+                        'selected' => false,
+                        'default' => true,
+                    ],
+                    'title' => [
+                        'desc' => 'Title',
+                        'selected' => false,
+                        'default' => false,
+                    ],
+                    'footestbar' => [
+                        'desc' => 'unrecognized_sort_option',
+                        'selected' => true,
+                        'default' => false,
+                    ],
+                ],
+            ],
             'invalid' => [
                 $searchConfig,
                 'foobar',
@@ -296,112 +288,6 @@ class ParamsTest extends \PHPUnit\Framework\TestCase
                     'title' => [
                         'desc' => 'Title',
                         'selected' => false,
-                        'default' => false,
-                    ],
-                ],
-            ],
-            'first hidden' => [
-                $searchConfig,
-                'testfirst',
-                [
-                    'relevance' => [
-                        'desc' => 'Relevance',
-                        'selected' => false,
-                        'default' => true,
-                    ],
-                    'title' => [
-                        'desc' => 'Title',
-                        'selected' => false,
-                        'default' => false,
-                    ],
-                    'testfirst' => [
-                        'desc' => 'unrecognized_sort_option',
-                        'selected' => true,
-                        'default' => false,
-                    ],
-                ],
-            ],
-            'second hidden' => [
-                $searchConfig,
-                'testsecond',
-                [
-                    'relevance' => [
-                        'desc' => 'Relevance',
-                        'selected' => false,
-                        'default' => true,
-                    ],
-                    'title' => [
-                        'desc' => 'Title',
-                        'selected' => false,
-                        'default' => false,
-                    ],
-                    'testsecond' => [
-                        'desc' => 'unrecognized_sort_option',
-                        'selected' => true,
-                        'default' => false,
-                    ],
-                ],
-            ],
-            'first hidden with label in key' => [
-                $searchConfigKeyLabel,
-                'testfirst',
-                [
-                    'relevance' => [
-                        'desc' => 'Relevance',
-                        'selected' => false,
-                        'default' => true,
-                    ],
-                    'testfirst' => [
-                        'desc' => 'FIRST',
-                        'selected' => true,
-                        'default' => false,
-                    ],
-                ],
-            ],
-            'second hidden with label in key' => [
-                $searchConfigKeyLabel,
-                'testsecond',
-                [
-                    'relevance' => [
-                        'desc' => 'Relevance',
-                        'selected' => false,
-                        'default' => true,
-                    ],
-                    'testsecond' => [
-                        'desc' => 'SECOND',
-                        'selected' => true,
-                        'default' => false,
-                    ],
-                ],
-            ],
-            'first hidden with label in separate array' => [
-                $searchConfigLabel,
-                'firsttest',
-                [
-                    'relevance' => [
-                        'desc' => 'Relevance',
-                        'selected' => false,
-                        'default' => true,
-                    ],
-                    'firsttest' => [
-                        'desc' => 'FIRST',
-                        'selected' => true,
-                        'default' => false,
-                    ],
-                ],
-            ],
-            'second hidden with label in separate array' => [
-                $searchConfigLabel,
-                'secondtest',
-                [
-                    'relevance' => [
-                        'desc' => 'Relevance',
-                        'selected' => false,
-                        'default' => true,
-                    ],
-                    'secondtest' => [
-                        'desc' => 'SECOND',
-                        'selected' => true,
                         'default' => false,
                     ],
                 ],
@@ -430,14 +316,14 @@ class ParamsTest extends \PHPUnit\Framework\TestCase
     /**
      * Get Params object
      *
-     * @param ?Options       $options    Options object (null to create)
-     * @param ?PluginManager $mockConfig Mock config plugin manager (null to create)
+     * @param Options       $options    Options object (null to create)
+     * @param PluginManager $mockConfig Mock config plugin manager (null to create)
      *
      * @return Params
      */
     protected function getParams(
-        ?Options $options = null,
-        ?PluginManager $mockConfig = null
+        Options $options = null,
+        PluginManager $mockConfig = null
     ): Params {
         $mockConfig ??= $this->createMock(PluginManager::class);
         return new Params(

@@ -32,6 +32,7 @@ namespace VuFindSearch\Backend\Solr\Response\Json;
 use VuFindSearch\Exception\InvalidArgumentException;
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
 
+use function call_user_func;
 use function gettype;
 use function is_array;
 use function sprintf;
@@ -107,7 +108,7 @@ class RecordCollectionFactory implements RecordCollectionFactoryInterface
             if (isset($doc['id']) && ($hl = $hlDetails[$doc['id']] ?? [])) {
                 $doc['__highlight_details'] = $hl;
             }
-            $collection->add(($this->recordFactory)($doc), false);
+            $collection->add(call_user_func($this->recordFactory, $doc), false);
         }
         return $collection;
     }

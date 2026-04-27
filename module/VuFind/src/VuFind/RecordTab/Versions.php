@@ -48,7 +48,7 @@ class Versions extends \VuFind\RecordTab\AbstractBase implements TranslatorAware
     /**
      * Main configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
@@ -62,12 +62,12 @@ class Versions extends \VuFind\RecordTab\AbstractBase implements TranslatorAware
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config                $config Configuration
+     * @param \Laminas\Config\Config               $config Configuration
      * @param \VuFind\Search\Options\PluginManager $som    Search options plugin
      * manager
      */
     public function __construct(
-        \VuFind\Config\Config $config,
+        \Laminas\Config\Config $config,
         \VuFind\Search\Options\PluginManager $som
     ) {
         $this->config = $config;

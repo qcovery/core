@@ -29,9 +29,7 @@
 
 namespace VuFindTest\Config;
 
-use VuFind\Config\Config;
 use VuFind\Config\PathResolver;
-use VuFind\Config\PluginFactory;
 use VuFindTest\Feature\FixtureTrait;
 use VuFindTest\Feature\PathResolverTrait;
 
@@ -55,7 +53,7 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * Plugin factory instance.
      *
-     * @var PluginFactory
+     * @var \VuFind\Config\PluginFactory
      */
     protected $factory;
 
@@ -66,7 +64,7 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp(): void
     {
-        $this->factory = new PluginFactory();
+        $this->factory = new \VuFind\Config\PluginFactory();
     }
 
     /**
@@ -74,9 +72,9 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @param string $name Configuration to load
      *
-     * @return Config
+     * @return \Laminas\Config\Config
      */
-    protected function getConfig(string $name): Config
+    protected function getConfig($name)
     {
         $fileMap = [
             'unit-test-parent.ini'
@@ -87,7 +85,9 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
                 => $this->getFixturePath('configs/inheritance/unit-test-child2.ini'),
         ];
         $realResolver = $this->getPathResolver();
-        $mockResolver = $this->createMock(PathResolver::class);
+        $mockResolver = $this->getMockBuilder(PathResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $mockResolver->expects($this->any())
             ->method('getConfigPath')
             ->willReturnCallback(
@@ -106,7 +106,7 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testBasicRead(): void
+    public function testBasicRead()
     {
         // This should retrieve config.ini, which should have "Library Catalog"
         // set as the default system title.
@@ -119,11 +119,11 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testCustomRead(): void
+    public function testCustomRead()
     {
         // This should retrieve sms.ini, which should include a Carriers array.
         $config = $this->getConfig('sms');
-        $this->assertTrue(count($config->Carriers ?? []) > 0);
+        $this->assertTrue(isset($config->Carriers) && count($config->Carriers) > 0);
     }
 
     /**
@@ -131,7 +131,7 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testInheritance(): void
+    public function testInheritance()
     {
         // Make sure load succeeds:
         $config = $this->getConfig('unit-test-child');
@@ -153,9 +153,6 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
         // Make sure Section 4 arrays were overwritten.
         $this->assertEquals([3], $config->Section4->j->toArray());
         $this->assertEquals(['c' => 3], $config->Section4->k->toArray());
-
-        // Make sure Section 5 arrays passed through as-is.
-        $this->assertEquals(['a' => 1, 'b' => 2], $config->Section5->l->toArray());
     }
 
     /**
@@ -163,7 +160,7 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testInheritanceWithArrayMerging(): void
+    public function testInheritanceWithArrayMerging()
     {
         // Make sure load succeeds:
         $config = $this->getConfig('unit-test-child2');
@@ -182,15 +179,12 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
         // Make sure Section 3 was inherited; values from parent should exist.
         $this->assertEquals('7', $config->Section3->g);
 
-        // Make sure Section 4 arrays were merged.
+        // Make sure Section 4 arrays were overwritten.
         $this->assertEquals([1, 2, 3], $config->Section4->j->toArray());
         $this->assertEquals(
             ['a' => 1, 'b' => 2, 'c' => 3],
             $config->Section4->k->toArray()
         );
-
-        // Make sure Section 5 arrays passed through as-is.
-        $this->assertEquals(['a' => 1, 'b' => 2], $config->Section5->l->toArray());
     }
 
     /**
@@ -199,7 +193,7 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testParentConfigOmission(): void
+    public function testParentConfigOmission()
     {
         $config = $this->getConfig('unit-test-child');
         $this->assertFalse(isset($config->Parent_Config));
@@ -210,9 +204,9 @@ class PluginFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testReadOnlyConfig(): void
+    public function testReadOnlyConfig()
     {
-        $this->expectExceptionMessage('Config is immutable; cannot set z to bad');
+        $this->expectException(\Laminas\Config\Exception\RuntimeException::class);
 
         $config = $this->getConfig('unit-test-parent');
         $config->Section1->z = 'bad';

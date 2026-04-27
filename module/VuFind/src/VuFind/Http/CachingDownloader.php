@@ -48,6 +48,20 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
     use \VuFindHttp\HttpServiceAwareTrait;
 
     /**
+     * CacheManager to update caches if necessary.
+     *
+     * @var CacheManager
+     */
+    protected $cacheManager;
+
+    /**
+     * ConfigManager to get additional settings if necessary.
+     *
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * Cache to use for downloads
      *
      * @var StorageInterface
@@ -73,26 +87,21 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
      *
      * @param CacheManager  $cacheManager  VuFind Cache Manager
      * @param ConfigManager $configManager VuFind Config Manager
-     * @param bool          $cacheEnabled  Main toggle for enabling caching
      */
-    public function __construct(
-        protected CacheManager $cacheManager,
-        protected ConfigManager $configManager,
-        protected bool $cacheEnabled = true
-    ) {
+    public function __construct(CacheManager $cacheManager, ConfigManager $configManager)
+    {
+        $this->cacheManager = $cacheManager;
+        $this->configManager = $configManager;
         $this->setUpCache('default');
     }
 
     /**
      * Get cache and initialize it, if necessary.
      *
-     * @return ?StorageInterface Cache storage interface or null if disabled
+     * @return StorageInterface
      */
-    protected function getDownloaderCache(): ?StorageInterface
+    protected function getDownloaderCache()
     {
-        if (!$this->cacheEnabled) {
-            return null;
-        }
         if ($this->cache == null) {
             $cacheName = $this->cacheManager->addDownloaderCache(
                 $this->cacheId,
@@ -106,13 +115,13 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
     /**
      * Set up a different cache.
      *
-     * @param string  $cacheId             Cache ID
-     * @param ?string $cacheOptionsSection Cache Options Section
-     * @param ?string $cacheOptionsFile    Config file defining the cache options
+     * @param string $cacheId             Cache ID
+     * @param string $cacheOptionsSection Cache Options Section
+     * @param string $cacheOptionsFile    Config file defining the cache options
      *
      * @return void
      */
-    public function setUpCache(string $cacheId, ?string $cacheOptionsSection = null, ?string $cacheOptionsFile = null)
+    public function setUpCache(string $cacheId, string $cacheOptionsSection = null, string $cacheOptionsFile = null)
     {
         $this->cache = null;
         $this->cacheId = $cacheId;
@@ -137,12 +146,12 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
     public function download(
         $url,
         $params = [],
-        ?callable $decodeCallback = null
+        callable $decodeCallback = null
     ) {
         $cache = $this->getDownloaderCache();
         $cacheItemKey = md5($url . http_build_query($params));
 
-        if ($cache && $cache->hasItem($cacheItemKey)) {
+        if ($cache->hasItem($cacheItemKey)) {
             return $cache->getItem($cacheItemKey);
         }
 
@@ -171,9 +180,7 @@ class CachingDownloader implements \VuFindHttp\HttpServiceAwareInterface
 
         $finalValue = $decodeCallback !== null
             ? $decodeCallback($response, $url) : $response->getBody();
-        if ($cache) {
-            $cache->addItem($cacheItemKey, $finalValue);
-        }
+        $cache->addItem($cacheItemKey, $finalValue);
         return $finalValue;
     }
 

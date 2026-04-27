@@ -30,7 +30,7 @@
 
 namespace VuFindTest\View\Helper\Root;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\View\Helper\Root\OpenUrl;
 
 /**

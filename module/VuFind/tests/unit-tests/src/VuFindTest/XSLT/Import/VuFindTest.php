@@ -81,7 +81,7 @@ class VuFindTest extends \PHPUnit\Framework\TestCase
     {
         $container = $this->getMockContainer();
         $this->addPathResolverToContainer($container);
-        $config = new \VuFind\Config\Config([]);
+        $config = new \Laminas\Config\Config([]);
         $container->get(\VuFind\Config\PluginManager::class)->expects($this->once())
             ->method('get')->with('config')->will($this->returnValue($config));
         VuFind::setServiceLocator($container);

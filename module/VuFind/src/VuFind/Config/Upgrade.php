@@ -166,7 +166,6 @@ class Upgrade
         $this->upgradeSearches();
         $this->upgradeSitemap();
         $this->upgradeSms();
-        $this->upgradeEDS();
         $this->upgradeSummon();
         $this->upgradePrimo();
 
@@ -656,7 +655,7 @@ class Upgrade
         unset($newConfig['Index']['local']);
 
         // Warn the user if they are using an unsupported theme:
-        $this->checkTheme('theme', 'bootprint3');
+        $this->checkTheme('theme', 'sandal5');
         $this->checkTheme('mobile_theme', null);
 
         // Translate legacy auth settings:
@@ -1046,32 +1045,6 @@ class Upgrade
 
         // save the file
         $this->saveModifiedConfig('reserves.ini');
-    }
-
-    /**
-     * Upgrade EDS.ini.
-     *
-     * @throws FileAccessException
-     * @return void
-     */
-    protected function upgradeEDS()
-    {
-        // we want to retain the old installation's search and facet settings
-        // exactly as-is
-        $groups = [
-            'Facets', 'FacetsTop', 'Basic_Searches', 'Advanced_Searches', 'Sorting',
-        ];
-        $this->applyOldSettings('EDS.ini', $groups);
-
-        // Fix default view settings in case they use the old style:
-        $newConfig = & $this->newConfigs['EDS.ini']['General'];
-
-        if (!str_contains($newConfig['default_view'], '_')) {
-            $newConfig['default_view'] = 'list_' . $newConfig['default_view'];
-        }
-
-        // save the file
-        $this->saveModifiedConfig('EDS.ini');
     }
 
     /**

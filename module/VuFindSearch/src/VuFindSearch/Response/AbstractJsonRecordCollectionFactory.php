@@ -32,6 +32,7 @@ namespace VuFindSearch\Response;
 
 use VuFindSearch\Exception\InvalidArgumentException;
 
+use function call_user_func;
 use function gettype;
 use function is_array;
 use function is_callable;
@@ -103,7 +104,7 @@ abstract class AbstractJsonRecordCollectionFactory implements RecordCollectionFa
         }
         $collection = new $this->collectionClass($response);
         foreach ($this->getDocumentListFromResponse($response) as $doc) {
-            $collection->add(($this->recordFactory)($doc), false);
+            $collection->add(call_user_func($this->recordFactory, $doc), false);
         }
         return $collection;
     }

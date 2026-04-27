@@ -74,8 +74,8 @@ class RecordVersionsTest extends \VuFindTest\Integration\MinkTestCase
         // Confirm that all four versions are now visible in the versions display:
         $this->waitForPageLoad($page);
         $this->assertEquals(
-            'The collected letters of Thomas and Jane Welsh Carlyle : Versions',
-            $this->findCssAndGetText($page, 'ul.breadcrumb')
+            'Versions - The collected letters of Thomas and Jane Welsh Carlyle :',
+            $this->findCssAndGetText($page, 'ul.breadcrumb li.active')
         );
         $results = $page->findAll('css', '.result');
         $this->assertCount(4, $results);
@@ -163,8 +163,8 @@ class RecordVersionsTest extends \VuFindTest\Integration\MinkTestCase
         // and that all four versions are now visible in the versions display:
         $this->waitForPageLoad($page);
         $this->assertEquals(
-            'The collected letters of Thomas and Jane Welsh Carlyle : Versions',
-            $this->findCssAndGetText($page, 'ul.breadcrumb')
+            'Versions - The collected letters of Thomas and Jane Welsh Carlyle :',
+            $this->findCssAndGetText($page, 'ul.breadcrumb li.active')
         );
         $results = $page->findAll('css', '.result');
         $this->assertCount(4, $results);

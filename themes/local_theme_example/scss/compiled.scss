@@ -9,11 +9,11 @@
  * This file prevents multiple instances of the Bootstrap library from
  * being included by utilizing the theme inheritance feature of VuFind.
  *
- *    bootstrap.scss <--- compiled.scss
+ *    bootstrap.less <--- compiled.less
  *          ^                    ^
  *          |                    |
  *          |                    X
  *          |                    |
- *    sandal.scss    <--- compiled.scss
+ *    bootprint.less <--- compiled.less
  *
  */

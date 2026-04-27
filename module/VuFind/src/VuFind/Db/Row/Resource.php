@@ -294,9 +294,9 @@ class Resource extends RowGateway implements DbServiceAwareInterface, DbTableAwa
      *
      * @param string $recordId recordId
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setRecordId(string $recordId): static
+    public function setRecordId(string $recordId): ResourceEntityInterface
     {
         $this->record_id = $recordId;
         return $this;
@@ -317,9 +317,9 @@ class Resource extends RowGateway implements DbServiceAwareInterface, DbTableAwa
      *
      * @param string $title Title of the record.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setTitle(string $title): static
+    public function setTitle(string $title): ResourceEntityInterface
     {
         $this->title = $title;
         return $this;
@@ -340,9 +340,9 @@ class Resource extends RowGateway implements DbServiceAwareInterface, DbTableAwa
      *
      * @param ?string $author Author of the title.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setAuthor(?string $author): static
+    public function setAuthor(?string $author): ResourceEntityInterface
     {
         $this->author = $author;
         return $this;
@@ -353,9 +353,9 @@ class Resource extends RowGateway implements DbServiceAwareInterface, DbTableAwa
      *
      * @param ?int $year Year title is published.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setYear(?int $year): static
+    public function setYear(?int $year): ResourceEntityInterface
     {
         $this->year = $year;
         return $this;
@@ -366,9 +366,9 @@ class Resource extends RowGateway implements DbServiceAwareInterface, DbTableAwa
      *
      * @param string $source Source (a search backend ID).
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setSource(string $source): static
+    public function setSource(string $source): ResourceEntityInterface
     {
         $this->source = $source;
         return $this;
@@ -389,9 +389,9 @@ class Resource extends RowGateway implements DbServiceAwareInterface, DbTableAwa
      *
      * @param ?string $extraMetadata ExtraMetadata.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setExtraMetadata(?string $extraMetadata): static
+    public function setExtraMetadata(?string $extraMetadata): ResourceEntityInterface
     {
         $this->extra_metadata = $extraMetadata;
         return $this;

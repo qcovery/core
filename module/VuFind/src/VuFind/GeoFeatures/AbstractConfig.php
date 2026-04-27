@@ -29,7 +29,7 @@
 
 namespace VuFind\GeoFeatures;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 
 /**
  * MapTab Configuration Class

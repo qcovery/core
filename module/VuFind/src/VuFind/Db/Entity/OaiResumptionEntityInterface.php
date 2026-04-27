@@ -54,9 +54,9 @@ interface OaiResumptionEntityInterface extends EntityInterface
      *
      * @param ?string $params Resumption parameters.
      *
-     * @return static
+     * @return OaiResumptionEntityInterface
      */
-    public function setResumptionParameters(?string $params): static;
+    public function setResumptionParameters(?string $params): OaiResumptionEntityInterface;
 
     /**
      * Get resumption parameters.
@@ -66,29 +66,13 @@ interface OaiResumptionEntityInterface extends EntityInterface
     public function getResumptionParameters(): ?string;
 
     /**
-     * Set token used for identifying.
-     *
-     * @param string $token Generated token.
-     *
-     * @return static
-     */
-    public function setToken(string $token): static;
-
-    /**
-     * Get token used for identifying.
-     *
-     * @return ?string
-     */
-    public function getToken(): ?string;
-
-    /**
      * Expiry date setter.
      *
      * @param DateTime $dateTime Expiration date
      *
-     * @return static
+     * @return OaiResumptionEntityInterface
      */
-    public function setExpiry(DateTime $dateTime): static;
+    public function setExpiry(DateTime $dateTime): OaiResumptionEntityInterface;
 
     /**
      * Get expiry date.

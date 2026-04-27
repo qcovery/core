@@ -61,9 +61,9 @@ interface RecordEntityInterface extends EntityInterface
      *
      * @param ?string $recordId Record id
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setRecordId(?string $recordId): static;
+    public function setRecordId(?string $recordId): RecordEntityInterface;
 
     /**
      * Get record source.
@@ -77,9 +77,9 @@ interface RecordEntityInterface extends EntityInterface
      *
      * @param ?string $recordSource Record source
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setSource(?string $recordSource): static;
+    public function setSource(?string $recordSource): RecordEntityInterface;
 
     /**
      * Get record version.
@@ -93,9 +93,9 @@ interface RecordEntityInterface extends EntityInterface
      *
      * @param string $recordVersion Record version
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setVersion(string $recordVersion): static;
+    public function setVersion(string $recordVersion): RecordEntityInterface;
 
     /**
      * Get record data.
@@ -109,9 +109,9 @@ interface RecordEntityInterface extends EntityInterface
      *
      * @param ?string $recordData Record data
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setData(?string $recordData): static;
+    public function setData(?string $recordData): RecordEntityInterface;
 
     /**
      * Get updated date.
@@ -125,7 +125,7 @@ interface RecordEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Updated date
      *
-     * @return static
+     * @return RecordEntityInterface
      */
-    public function setUpdated(DateTime $dateTime): static;
+    public function setUpdated(DateTime $dateTime): RecordEntityInterface;
 }

@@ -263,9 +263,9 @@ class UserList extends RowGateway implements
      *
      * @param string $title Title
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setTitle(string $title): static
+    public function setTitle(string $title): UserListEntityInterface
     {
         $this->title = $title;
         return $this;
@@ -286,9 +286,9 @@ class UserList extends RowGateway implements
      *
      * @param ?string $description Description
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setDescription(?string $description): static
+    public function setDescription(?string $description): UserListEntityInterface
     {
         $this->description = $description;
         return $this;
@@ -309,9 +309,9 @@ class UserList extends RowGateway implements
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static
+    public function setCreated(DateTime $dateTime): UserListEntityInterface
     {
         $this->created = $dateTime->format('Y-m-d H:i:s');
         return $this;
@@ -332,9 +332,9 @@ class UserList extends RowGateway implements
      *
      * @param bool $public Is the list public?
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setPublic(bool $public): static
+    public function setPublic(bool $public): UserListEntityInterface
     {
         $this->public = $public ? '1' : '0';
         return $this;
@@ -345,9 +345,9 @@ class UserList extends RowGateway implements
      *
      * @param ?UserEntityInterface $user User owning the list.
      *
-     * @return static
+     * @return UserListEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static
+    public function setUser(?UserEntityInterface $user): UserListEntityInterface
     {
         $this->user_id = $user?->getId();
         return $this;

@@ -94,20 +94,6 @@ class FeedbackController extends AbstractAdmin
     }
 
     /**
-     * Feedback details action
-     *
-     * @return \Laminas\View\Model\ViewModel
-     */
-    public function detailsAction()
-    {
-        $feedbackService = $this->getDbService(FeedbackServiceInterface::class);
-        $feedbackEntity = $feedbackService->getFeedbackById((int)$this->params()->fromRoute('id'));
-        $view = $this->createViewModel(compact('feedbackEntity'));
-        $view->setTemplate('admin/feedback/details');
-        return $view;
-    }
-
-    /**
      * Delete action
      *
      * @return \Laminas\Http\Response
@@ -238,9 +224,7 @@ class FeedbackController extends AbstractAdmin
         try {
             $feedback = $feedbackService->getFeedbackById($id);
             if ($feedback) {
-                $feedback
-                    ->setStatus($newStatus)
-                    ->setUpdatedBy($this->getUser());
+                $feedback->setStatus($newStatus);
                 $feedbackService->persistEntity($feedback);
                 $success = true;
             }

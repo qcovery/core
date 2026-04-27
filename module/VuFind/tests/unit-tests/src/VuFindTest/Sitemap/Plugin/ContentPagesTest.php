@@ -65,44 +65,44 @@ class ContentPagesTest extends \PHPUnit\Framework\TestCase
     protected $themeInfoData = [
         'templates/content/**/*.phtml' => [
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/asklibrary_en.phtml',
                 'relativeFile' => 'templates/content/asklibrary_en.phtml',
             ],
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/asklibrary.phtml',
                 'relativeFile' => 'templates/content/asklibrary.phtml',
             ],
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/content.phtml',
                 'relativeFile' => 'templates/content/content.phtml',
             ],
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/faq.phtml',
                 'relativeFile' => 'templates/content/faq.phtml',
             ],
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/help/search.phtml',
                 'relativeFile' => 'templates/content/help/search.phtml',
             ],
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/help/search_en.phtml',
                 'relativeFile' => 'templates/content/help/search_en.phtml',
             ],
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/markdown.phtml',
                 'relativeFile' => 'templates/content/markdown.phtml',
             ],
         ],
         'templates/content/**/*.md' => [
             [
-                'theme' => 'bootstrap5',
+                'theme' => 'bootstrap3',
                 'file' => '/themepath/templates/content/example.md',
                 'relativeFile' => 'templates/content/example.md',
             ],

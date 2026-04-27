@@ -52,9 +52,9 @@ interface ResourceEntityInterface extends EntityInterface
      *
      * @param string $recordId recordId
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setRecordId(string $recordId): static;
+    public function setRecordId(string $recordId): ResourceEntityInterface;
 
     /**
      * Record Id getter
@@ -68,9 +68,9 @@ interface ResourceEntityInterface extends EntityInterface
      *
      * @param string $title Title of the record.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setTitle(string $title): static;
+    public function setTitle(string $title): ResourceEntityInterface;
 
     /**
      * Title getter
@@ -84,27 +84,27 @@ interface ResourceEntityInterface extends EntityInterface
      *
      * @param ?string $author Author of the title.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setAuthor(?string $author): static;
+    public function setAuthor(?string $author): ResourceEntityInterface;
 
     /**
      * Year setter
      *
      * @param ?int $year Year title is published.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setYear(?int $year): static;
+    public function setYear(?int $year): ResourceEntityInterface;
 
     /**
      * Source setter
      *
      * @param string $source Source (a search backend ID).
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setSource(string $source): static;
+    public function setSource(string $source): ResourceEntityInterface;
 
     /**
      * Source getter
@@ -118,9 +118,9 @@ interface ResourceEntityInterface extends EntityInterface
      *
      * @param ?string $extraMetadata ExtraMetadata.
      *
-     * @return static
+     * @return ResourceEntityInterface
      */
-    public function setExtraMetadata(?string $extraMetadata): static;
+    public function setExtraMetadata(?string $extraMetadata): ResourceEntityInterface;
 
     /**
      * Extra Metadata getter

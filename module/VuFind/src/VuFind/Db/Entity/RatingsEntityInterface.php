@@ -61,9 +61,9 @@ interface RatingsEntityInterface extends EntityInterface
      *
      * @param ?UserEntityInterface $user User
      *
-     * @return static
+     * @return RatingsEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static;
+    public function setUser(?UserEntityInterface $user): RatingsEntityInterface;
 
     /**
      * Get resource.
@@ -77,9 +77,9 @@ interface RatingsEntityInterface extends EntityInterface
      *
      * @param ResourceEntityInterface $resource Resource
      *
-     * @return static
+     * @return RatingsEntityInterface
      */
-    public function setResource(ResourceEntityInterface $resource): static;
+    public function setResource(ResourceEntityInterface $resource): RatingsEntityInterface;
 
     /**
      * Get rating.
@@ -93,9 +93,9 @@ interface RatingsEntityInterface extends EntityInterface
      *
      * @param int $rating Rating
      *
-     * @return static
+     * @return RatingsEntityInterface
      */
-    public function setRating(int $rating): static;
+    public function setRating(int $rating): RatingsEntityInterface;
 
     /**
      * Get created date.
@@ -109,7 +109,7 @@ interface RatingsEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return RatingsEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static;
+    public function setCreated(DateTime $dateTime): RatingsEntityInterface;
 }

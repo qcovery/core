@@ -1,8 +1,5 @@
-/*global Autocomplete, grecaptcha, isPhoneNumberValid */
-/*exported VuFind, bulkFormHandler, deparam, escapeHtmlAttr, getFocusableNodes, getUrlRoot, htmlEncode, phoneNumberFormHandler, recaptchaOnLoad, resetCaptcha, setupMultiILSLoginFields, unwrapJQuery */
-
-// IE 9< console polyfill
-window.console = window.console || { log: function polyfillLog() {} };
+/*global bootstrap, grecaptcha, isPhoneNumberValid, loadCovers */
+/*exported VuFind, bulkFormHandler, deparam, escapeHtmlAttr, extractClassParams, getFocusableNodes, getUrlRoot, htmlEncode, phoneNumberFormHandler, recaptchaOnLoad, resetCaptcha, setupMultiILSLoginFields, unwrapJQuery */
 
 var VuFind = (function VuFind() {
   var defaultSearchBackend = null;
@@ -15,21 +12,65 @@ var VuFind = (function VuFind() {
   var _icons = {};
   var _translations = {};
 
-  // Emit a custom event
-  // Recommendation: prefix with vf-
-  var emit = function emit(name, detail) {
-    if (typeof detail === 'undefined') {
-      document.dispatchEvent(new Event(name));
-    } else {
-      var event = document.createEvent('CustomEvent');
-      event.initCustomEvent(name, true, true, detail); // name, canBubble, cancelable, detail
-      document.dispatchEvent(event);
+  var _elementBase;
+  var _iconsCache = {};
+
+  // Event controls
+
+  let listeners = {};
+  function unlisten(event, fn) {
+    if (typeof listeners[event] === "undefined") {
+      return;
     }
-  };
-  // Listen shortcut to put everyone on the same element
-  var listen = function listen(name, func) {
-    document.addEventListener(name, func, false);
-  };
+
+    const index = listeners[event].indexOf(fn);
+
+    if (index > -1) {
+      listeners[event].splice(index, 1);
+    }
+  }
+
+  // Add a function to call when an event is emitted
+  //
+  // Options:
+  // - once: remove this listener after it's been called
+  function listen(event, fn, { once = false } = {}) {
+    if (typeof listeners[event] === "undefined") {
+      listeners[event] = [];
+    }
+
+    listeners[event].push(fn);
+    const removeListener = () => unlisten(event, fn);
+
+    if (once) {
+      // Remove a "once" listener after calling
+      // Add the function to remove the listener
+      // to the array, listeners are called in order
+      listeners[event].push(removeListener);
+    }
+
+    // Return a function to disable the listener
+    // Makes it easier to control activating and deactivating listeners
+    // This is common for similar libraries
+    return removeListener;
+  }
+
+  // Broadcast an event, passing arguments to all listeners
+  function emit(event, ...args) {
+    // No listeners for this event
+    if (typeof listeners[event] === "undefined") {
+      return;
+    }
+
+    // iterate over a copy of the listeners array
+    // this prevents listeners from being skipped
+    // if the listener before it is removed during execution
+    for (const fn of Array.from(listeners[event])) {
+      fn(...args);
+    }
+  }
+
+  // Module control
 
   var register = function register(name, module) {
     if (_submodules.indexOf(name) === -1) {
@@ -68,32 +109,42 @@ var VuFind = (function VuFind() {
     return null;
   };
 
-  var initDisableSubmitOnClick = function initDisableSubmitOnClick() {
-    $('[data-disable-on-submit]').on('submit', function handleOnClickDisable() {
-      var $form = $(this);
-      // Disable submit elements via setTimeout so that the submit button value gets
-      // included in the submitted data before being disabled:
-      setTimeout(
-        function disableSubmit() {
-          $form.find('[type=submit]').prop('disabled', true);
-        },
-        0
-      );
-    });
+  var initDisableSubmitOnClick = () => {
+    var forms = document.querySelectorAll("[data-disable-on-submit]");
+    forms.forEach(form =>
+      form.addEventListener("submit", () => {
+        var submitButtons = form.querySelectorAll('[type="submit"]');
+        // Disable submit elements via setTimeout so that the submit button value gets
+        // included in the submitted data before being disabled:
+        setTimeout(() => {
+          submitButtons.forEach(button => button.disabled = true);
+        }, 0);
+      }));
   };
 
   var initClickHandlers = function initClickHandlers() {
+    let checkClickHandlers = function (event, elem) {
+      if (elem.hasAttribute('data-click-callback')) {
+        return evalCallback(elem.dataset.clickCallback, event, {});
+      }
+      if (elem.hasAttribute('data-click-set-checked')) {
+        document.getElementById(elem.dataset.clickSetChecked).checked = true;
+        event.preventDefault();
+      }
+      if (elem.hasAttribute('data-toggle-aria-expanded')) {
+        elem.setAttribute('aria-expanded', elem.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+        event.preventDefault();
+      }
+      // Check also parent node for spans (e.g. a button with icon)
+      if (!event.defaultPrevented && elem.localName === 'span' && elem.parentNode) {
+        checkClickHandlers(event, elem.parentNode);
+      }
+    };
+
     window.addEventListener(
       'click',
       function handleClick(event) {
-        let elem = event.target;
-        if (elem.hasAttribute('data-click-callback')) {
-          return evalCallback(elem.dataset.clickCallback, event, {});
-        }
-        if (elem.hasAttribute('data-click-set-checked')) {
-          document.getElementById(elem.dataset.clickSetChecked).checked = true;
-          event.preventDefault();
-        }
+        checkClickHandlers(event, event.target);
       }
     );
     window.addEventListener(
@@ -105,18 +156,6 @@ var VuFind = (function VuFind() {
         }
       }
     );
-  };
-
-  var init = function init() {
-    for (var i = 0; i < _submodules.length; i++) {
-      if (this[_submodules[i]].init) {
-        this[_submodules[i]].init();
-      }
-    }
-    _initialized = true;
-
-    initDisableSubmitOnClick();
-    initClickHandlers();
   };
 
   var addTranslations = function addTranslations(s) {
@@ -146,46 +185,60 @@ var VuFind = (function VuFind() {
       }
     }
   };
-  var icon = function icon(name, attrs = {}) {
+
+  /**
+   * Get an icon identified by a name.
+   *
+   * @param {String} name          Name of the icon to create
+   * @param {Object} attrs         Object containing attributes,
+   *                               key is the attribute of an HTMLElement,
+   *                               value is the values to add for the attribute.
+   * @param {Boolean}   returnElement [Optional] Should the function return an HTMLElement.
+   *                               Default is false.
+   *
+   * @returns {String|HTMLElement}
+   */
+  var icon = function icon(name, attrs = {}, returnElement = false) {
     if (typeof _icons[name] == "undefined") {
       console.error("JS icon missing: " + name);
       return name;
     }
+    // Create a template element for icon function
+    if (!_elementBase) {
+      _elementBase = document.createElement('div');
+    }
+    const cacheKey = `${name}||${JSON.stringify(attrs)}`;
+    if (_iconsCache[cacheKey]) {
+      return returnElement
+        ? _iconsCache[cacheKey].cloneNode(true)
+        : _iconsCache[cacheKey].outerHTML;
+    }
 
-    var html = _icons[name];
+    const clone = _elementBase.cloneNode();
+    clone.insertAdjacentHTML('afterbegin', _icons[name]);
+    let element = clone.firstChild;
 
     // Add additional attributes
-    function addAttrs(_html, _attrs = {}) {
-      var mod = String(_html);
-      for (var attr in _attrs) {
-        if (Object.prototype.hasOwnProperty.call(_attrs, attr)) {
-          var sliceStart = html.indexOf(" ");
-          var sliceEnd = sliceStart;
-          var value = _attrs[attr];
-          var regex = new RegExp(` ${attr}=(['"])([^\\1]+?)\\1`);
-          var existing = html.match(regex);
-          if (existing) {
-            sliceStart = existing.index;
-            sliceEnd = sliceStart + existing[0].length;
-            value = existing[2] + " " + value;
-          }
-          mod = mod.slice(0, sliceStart) +
-              " " + attr + '="' + value + '"' +
-              mod.slice(sliceEnd);
+    function addAttrs(_element, _attrs = {}) {
+      Object.keys(_attrs).forEach(key => {
+        if (key !== 'class') {
+          _element.setAttribute(key, _attrs[key]);
+          return;
         }
-      }
-      return mod;
+        let newAttrs = _attrs[key].split(" ");
+        const oldAttrs = _element.getAttribute(key) || [];
+        const newAttrsSet = new Set([...newAttrs, ...oldAttrs.split(" ")]);
+        _element.className = Array.from(newAttrsSet).join(" ");
+      });
     }
 
     if (typeof attrs == "string") {
-      return addAttrs(html, { class: attrs });
+      addAttrs(element, { class: attrs });
+    } else if (Object.keys(attrs).length > 0) {
+      addAttrs(element, attrs);
     }
-
-    if (Object.keys(attrs).length > 0) {
-      return addAttrs(html, attrs);
-    }
-
-    return html;
+    _iconsCache[cacheKey] = element;
+    return returnElement ? element.cloneNode(true) : element.outerHTML;
   };
   // Icon shortcut methods
   var spinner = function spinner(extraClass = "") {
@@ -201,15 +254,19 @@ var VuFind = (function VuFind() {
   /**
    * Reload the page without causing trouble with POST parameters while keeping hash
    */
-  var refreshPage = function refreshPage() {
+  var refreshPage = function refreshPage(forceGet) {
     var parts = window.location.href.split('#');
-    if (typeof parts[1] === 'undefined') {
+    const hasHash = typeof parts[1] !== 'undefined';
+    if (!hasHash && !forceGet) {
       window.location.reload();
     } else {
       var href = parts[0];
       // Force reload with a timestamp
       href += href.indexOf('?') === -1 ? '?_=' : '&_=';
-      href += new Date().getTime() + '#' + parts[1];
+      href += new Date().getTime();
+      if (hasHash) {
+        href += '#' + parts[1];
+      }
       window.location.href = href;
     }
   };
@@ -227,19 +284,109 @@ var VuFind = (function VuFind() {
     return html.replace(/(<script[^>]*) nonce=["'].*?["']/ig, '$1 nonce="' + getCspNonce() + '"');
   };
 
-  var loadHtml = function loadHtml(_element, url, data, success) {
-    var $elem = $(_element);
-    if ($elem.length === 0) {
-      return;
-    }
-    $.get(url, typeof data !== 'undefined' ? data : {}, function onComplete(responseText, textStatus, jqXhr) {
-      if ('success' === textStatus || 'notmodified' === textStatus) {
-        $elem.html(updateCspNonce(responseText));
-      }
-      if (typeof success !== 'undefined') {
-        success(responseText, textStatus, jqXhr);
+  /**
+   * Set element contents and ensure that any inline scripts run properly
+   *
+   * @param {Element} elm      Target element
+   * @param {string}  html     HTML
+   * @param {Object}  attrs    Any additional attributes
+   * @param {string}  property Target property ('innerHTML', 'outerHTML' or '' for no HTML update)
+   */
+  function setElementContents(elm, html, attrs = {}, property = 'innerHTML') {
+    // Extract any scripts from the HTML and add them separately so that they are executed properly:
+    const scripts = [];
+    const tmpDiv = document.createElement('div');
+    tmpDiv.innerHTML = html;
+    tmpDiv.querySelectorAll('script').forEach((el) => {
+      const type = el.getAttribute('type');
+      if (!type || 'text/javascript' === type) {
+        scripts.push(el.cloneNode(true));
+        el.remove();
       }
     });
+
+    let newElm = elm;
+    if (property === 'innerHTML') {
+      elm.innerHTML = tmpDiv.innerHTML;
+    } else if (property === 'outerHTML') {
+      // Replacing outerHTML will invalidate elm, so find it again by using its next sibling or parent as reference:
+      const nextElm = elm.nextElementSibling;
+      const parentElm = elm.parentElement ? elm.parentElement : null;
+      elm.outerHTML = tmpDiv.innerHTML;
+      // Try to find a new reference, leave as is if not possible:
+      if (nextElm) {
+        newElm = nextElm.previousElementSibling;
+      } else if (parentElm) {
+        newElm = parentElm.lastElementChild;
+      }
+    }
+
+    // Set any attributes (N.B. has to be done before scripts in case they rely on the attributes):
+    Object.entries(attrs).forEach(([attr, value]) => newElm.setAttribute(attr, value));
+
+    // Append any scripts:
+    scripts.forEach((script) => {
+      const scriptEl = document.createElement('script');
+      scriptEl.innerHTML = script.innerHTML;
+      scriptEl.setAttribute('nonce', getCspNonce());
+      if (script.src) {
+        scriptEl.src = script.src;
+      }
+      newElm.appendChild(scriptEl);
+    });
+  }
+
+  /**
+   * Set innerHTML and ensure that any inline scripts run properly
+   *
+   * @param {Element} elm   Target element
+   * @param {string}  html  HTML
+   * @param {Object}  attrs Any additional attributes
+   */
+  function setInnerHtml(elm, html, attrs = {}) {
+    setElementContents(elm, html, attrs, 'innerHTML');
+  }
+
+  /**
+   * Set outerHTML and ensure that any inline scripts run properly
+   *
+   * @param {Element} elm   Target element
+   * @param {string}  html  HTML
+   * @param {Object}  attrs Any additional attributes
+   */
+  function setOuterHtml(elm, html, attrs = {}) {
+    setElementContents(elm, html, attrs, 'outerHTML');
+  }
+
+  var loadHtml = function loadHtml(_element, url, data, success) {
+    var element = typeof _element === 'string' ? document.querySelector(_element) : _element.get(0);
+    if (!element) {
+      return;
+    }
+
+    fetch(url, {
+      method: 'GET',
+      body: data ? JSON.stringify(data) : null
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(translate('error_occurred'));
+        }
+        return response.text();
+      })
+      .then(htmlContent => {
+        setInnerHtml(element, htmlContent);
+        if (typeof success === 'function') {
+          success(htmlContent);
+        }
+      })
+      .catch(error => {
+        console.error('Request failed:', error);
+        setInnerHtml(element, translate('error_occurred'));
+        if (typeof success === 'function') {
+          success(null, error);
+        }
+      });
   };
 
   var isPrinting = function() {
@@ -258,6 +405,152 @@ var VuFind = (function VuFind() {
     _searchId = searchId;
   };
 
+  function setupQRCodeLinks(_container) {
+    var container = _container || document.body;
+    var qrcodeLinks = container.querySelectorAll('a.qrcodeLink');
+    qrcodeLinks.forEach((link) => {
+      link.addEventListener('click', function toggleQRCode() {
+        var holder = this.nextElementSibling;
+        if (holder.querySelectorAll('img').length === 0) {
+          // Replace the QRCode template with the image:
+          const templateEl = holder.querySelector('.qrCodeImgTag');
+          if (templateEl) {
+            templateEl.parentNode.innerHTML = templateEl.innerHTML;
+          }
+        }
+      });
+    });
+  }
+
+  /**
+   * Initialize result page scripts.
+   *
+   * @param {string|Element} _container
+   */
+  var initResultScripts = function initResultScripts(_container) {
+    let container = typeof _container === 'string' ? document.querySelector(_container) : _container;
+    emit('results-init', {container: container});
+    setupQRCodeLinks(container);
+    if (typeof loadCovers === 'function') {
+      loadCovers();
+    }
+  };
+
+  var init = function init() {
+    for (var i = 0; i < _submodules.length; i++) {
+      if (this[_submodules[i]].init) {
+        this[_submodules[i]].init();
+      }
+    }
+    _initialized = true;
+
+    initDisableSubmitOnClick();
+    initClickHandlers();
+    // handle QR code links
+    setupQRCodeLinks();
+  };
+
+  function getBootstrapMajorVersion() {
+    // Bootstrap 5 defines bootstrap global, while 3 doesn't, so we can use that as
+    // an easy way to determine the version:
+    return typeof bootstrap === 'undefined' ? 3 : 5;
+  }
+
+  /**
+   * Disable transition effects and return the previous state
+   *
+   * @param {Element} elem Element to handle (not used with Bootstrap 3)
+   */
+  function disableTransitions(elem) {
+    if (getBootstrapMajorVersion() === 3) {
+      const oldState = $.support.transition;
+      $.support.transition = false;
+      return oldState;
+    }
+    const oldState = elem.style.transitionDuration;
+    elem.style.transitionDuration = '0s';
+    return oldState;
+  }
+
+  /**
+   * Restore transition effects to the given state
+   *
+   * @param {Element} elem Element to handle (not used with Bootstrap 3)
+   * @param {(string|boolean)} state State from previous call to disableTransitions
+   */
+  function restoreTransitions(elem, state) {
+    if (getBootstrapMajorVersion() === 3) {
+      $.support.transition = state;
+      return;
+    }
+
+    elem.style.transitionDuration = state;
+  }
+
+  /**
+   * Check if URLSearchParams contains the given key+value
+   *
+   * URLSearchParams.has(key, value) support is not yet widespread enough to be used
+   * (see https://caniuse.com/mdn-api_urlsearchparams_has_value_parameter)
+   *
+   * @param {URLSearchParams} params URLSearchParams to check
+   * @param {string} key Key
+   * @param {string} value Value
+   *
+   * @returns boolean
+   */
+  function inURLSearchParams(params, key, value) {
+    for (const [paramsKey, paramsValue] of params) {
+      if (paramsKey === key && paramsValue === value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Delete a key+value from URLSearchParams
+   *
+   * URLSearchParams.delete(key, value) support is not yet widespread enough to be used
+   * (see https://caniuse.com/mdn-api_urlsearchparams_delete_value_parameter)
+   *
+   * @param {URLSearchParams} params URLSearchParams to delete from
+   * @param {string} deleteKey Key to delete
+   * @param {string} deleteValue Value to delete
+   *
+   * @returns URLSearchParams
+   */
+  function deleteKeyValueFromURLSearchParams(params, deleteKey, deleteValue) {
+    const newParams = new URLSearchParams();
+    for (const [key, value] of params) {
+      if (key !== deleteKey || value !== deleteValue) {
+        newParams.append(key, value);
+      }
+    }
+    return newParams;
+  }
+
+  /**
+   * Delete a set of parameters from URLSearchParams
+   *
+   * URLSearchParams.delete(key, value) support is not yet widespread enough to be used
+   * (see https://caniuse.com/mdn-api_urlsearchparams_delete_value_parameter)
+   *
+   * @param {URLSearchParams} params URLSearchParams to delete from
+   * @param {URLSearchParams} deleteParams URLSearchParams containing all params to delete
+   *
+   * @returns URLSearchParams
+   */
+  function deleteParamsFromURLSearchParams(params, deleteParams) {
+    const newParams = new URLSearchParams();
+    for (const [key, value] of params) {
+      if (!inURLSearchParams(deleteParams, key, value)) {
+        newParams.append(key, value);
+      }
+    }
+    return newParams;
+  }
+
   //Reveal
   return {
     defaultSearchBackend: defaultSearchBackend,
@@ -267,11 +560,12 @@ var VuFind = (function VuFind() {
     addTranslations: addTranslations,
     init: init,
     emit: emit,
+    listen: listen,
+    unlisten: unlisten,
     evalCallback: evalCallback,
     getCspNonce: getCspNonce,
     icon: icon,
     isPrinting: isPrinting,
-    listen: listen,
     refreshPage: refreshPage,
     register: register,
     setCspNonce: setCspNonce,
@@ -281,17 +575,29 @@ var VuFind = (function VuFind() {
     translate: translate,
     updateCspNonce: updateCspNonce,
     getCurrentSearchId: getCurrentSearchId,
-    setCurrentSearchId: setCurrentSearchId
+    setCurrentSearchId: setCurrentSearchId,
+    initResultScripts: initResultScripts,
+    setupQRCodeLinks: setupQRCodeLinks,
+    setInnerHtml: setInnerHtml,
+    setOuterHtml: setOuterHtml,
+    setElementContents: setElementContents,
+    getBootstrapMajorVersion: getBootstrapMajorVersion,
+    disableTransitions: disableTransitions,
+    restoreTransitions: restoreTransitions,
+    inURLSearchParams: inURLSearchParams,
+    deleteKeyValueFromURLSearchParams: deleteKeyValueFromURLSearchParams,
+    deleteParamsFromURLSearchParams: deleteParamsFromURLSearchParams
   };
 })();
 
 /* --- GLOBAL FUNCTIONS --- */
 function htmlEncode(value) {
-  if (value) {
-    return $('<div />').text(value).html();
-  } else {
-    return '';
-  }
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 /**
@@ -354,8 +660,8 @@ function escapeHtmlAttr(str) {
   });
 }
 
-function extractClassParams(selector) {
-  var str = $(selector).attr('class');
+function extractClassParams(el) {
+  var str = el.className;
   if (typeof str === "undefined") {
     return [];
   }
@@ -369,6 +675,7 @@ function extractClassParams(selector) {
   }
   return params;
 }
+
 // Turn GET string into array
 function deparam(url) {
   if (!url.match(/\?|&/)) {
@@ -382,7 +689,7 @@ function deparam(url) {
     if (name.length === 0) {
       continue;
     }
-    if (name.substring(name.length - 2) === '[]') {
+    if (name.endsWith('[]')) {
       name = name.substring(0, name.length - 2);
       if (!request[name]) {
         request[name] = [];
@@ -419,7 +726,12 @@ function getUrlRoot(url) {
   return urlroot;
 }
 
-// Phone number validation
+/**
+ * Phone number validation
+ * @param {String} numID Phone number field ID
+ * @param {String} regionCode Region code
+ * @deprecated See validation.js for replacement
+ */
 function phoneNumberFormHandler(numID, regionCode) {
   var phoneInput = document.getElementById(numID);
   var number = phoneInput.value;
@@ -430,24 +742,26 @@ function phoneNumberFormHandler(numID, regionCode) {
     } else {
       valid = VuFind.translate('libphonenumber_invalid');
     }
-    $(phoneInput).siblings('.help-block.with-errors').html(valid);
-    $(phoneInput).closest('.form-group').addClass('sms-error');
+    phoneInput.setCustomValidity(valid);
     return false;
   } else {
-    $(phoneInput).closest('.form-group').removeClass('sms-error');
-    $(phoneInput).siblings('.help-block.with-errors').html('');
+    phoneInput.setCustomValidity('');
   }
 }
 
 // Setup captchas after Google script loads
 function recaptchaOnLoad() {
   if (typeof grecaptcha !== 'undefined') {
-    var captchas = $('.g-recaptcha:empty');
+    var captchas = document.querySelectorAll('.g-recaptcha:empty');
     for (var i = 0; i < captchas.length; i++) {
-      $(captchas[i]).data('captchaId', grecaptcha.render(captchas[i], $(captchas[i]).data()));
+      var captchaElement = captchas[i];
+      var captchaData = captchaElement.dataset;
+      var captchaId = grecaptcha.render(captchaElement, captchaData);
+      captchaElement.dataset.captchaId = captchaId;
     }
   }
 }
+
 function resetCaptcha($form) {
   if (typeof grecaptcha !== 'undefined') {
     var captcha = $form.find('.g-recaptcha');
@@ -458,10 +772,27 @@ function resetCaptcha($form) {
 }
 
 function bulkFormHandler(event, data) {
-  if ($('.checkbox-select-item:checked,checkbox-select-all:checked').length === 0) {
+  let numberOfSelected = VuFind.listItemSelection.getAllSelected(event.target).length;
+  if (numberOfSelected === 0) {
     VuFind.lightbox.alert(VuFind.translate('bulk_noitems_advice'), 'danger');
     return false;
   }
+  // originalEvent check can be removed and event.submitter can directly used once jQuery is no longer used in the lightbox
+  const submitter = event.originalEvent.submitter !== undefined && event.originalEvent.submitter !== null
+    ? event.originalEvent.submitter
+    : (event.submitter !== undefined && event.submitter !== null ? event.submitter : null);
+
+  if (submitter !== null) {
+    let limit = submitter.dataset.itemLimit;
+    if (numberOfSelected > limit) {
+      VuFind.lightbox.alert(
+        VuFind.translate('bulk_limit_exceeded', {'%%count%%': numberOfSelected, '%%limit%%': limit}),
+        'danger'
+      );
+      return false;
+    }
+  }
+
   for (var i in data) {
     if ('print' === data[i].name) {
       return true;
@@ -471,132 +802,18 @@ function bulkFormHandler(event, data) {
 
 // Ready functions
 function setupOffcanvas() {
-  if ($('.sidebar').length > 0 && $(document.body).hasClass("offcanvas")) {
-    $('[data-toggle="offcanvas"]').click(function offcanvasClick(e) {
-      e.preventDefault();
-      $('body.offcanvas').toggleClass('active');
+  const sidebar = document.querySelector('.sidebar');
+  const body = document.body;
+
+  if (sidebar && body.classList.contains("vufind-offcanvas")) {
+    const offcanvasToggle = document.querySelectorAll('[data-toggle="vufind-offcanvas"]');
+
+    offcanvasToggle.forEach((element) => {
+      element.addEventListener("click", function offcanvasClick(e) {
+        e.preventDefault();
+        body.classList.toggle('active');
+      });
     });
-  }
-}
-
-function setupAutocomplete() {
-  // If .autocomplete class is missing, autocomplete is disabled and we should bail out.
-  var $searchbox = $('#searchForm_lookfor.autocomplete');
-  if ($searchbox.length === 0) {
-    return;
-  }
-
-  const typeahead = new Autocomplete({
-    rtl: $(document.body).hasClass("rtl"),
-    maxResults: 10,
-    loadingString: VuFind.translate('loading_ellipsis'),
-  });
-
-  let cache = {};
-  const input = $searchbox[0];
-  typeahead(input, function vufindACHandler(query, callback) {
-    const classParams = extractClassParams(input);
-    const searcher = classParams.searcher;
-    const type = classParams.type ? classParams.type : $('#searchForm_type').val();
-
-    const cacheKey = searcher + "|" + type;
-    if (typeof cache[cacheKey] === "undefined") {
-      cache[cacheKey] = {};
-    }
-
-    if (typeof cache[cacheKey][query] !== "undefined") {
-      callback(cache[cacheKey][query]);
-      return;
-    }
-
-    var hiddenFilters = [];
-    $('#searchForm').find('input[name="hiddenFilters[]"]').each(function hiddenFiltersEach() {
-      hiddenFilters.push($(this).val());
-    });
-
-    $.ajax({
-      url: VuFind.path + '/AJAX/JSON',
-      data: {
-        q: query,
-        method: 'getACSuggestions',
-        searcher: searcher,
-        type: type,
-        hiddenFilters,
-      },
-      dataType: 'json',
-      success: function autocompleteJSON(json) {
-        const highlighted = json.data.suggestions.map(
-          (item) => ({
-            text: item.replace(query, `<b>${query}</b>`),
-            value: item,
-          })
-        );
-        cache[cacheKey][query] = highlighted;
-        callback(highlighted);
-      }
-    });
-  });
-
-  // Bind autocomplete auto submit
-  if ($searchbox.hasClass("ac-auto-submit")) {
-    input.addEventListener("ac-select", (event) => {
-      const value = typeof event.detail === "string"
-        ? event.detail
-        : event.detail.value;
-      input.value = value;
-      $("#searchForm").submit();
-    });
-  }
-}
-
-/**
- * Handle arrow keys to jump to next record
- */
-function keyboardShortcuts() {
-  var $searchform = $('#searchForm_lookfor');
-  if ($('.pager').length > 0) {
-    $(window).keydown(function shortcutKeyDown(e) {
-      if (!$searchform.is(':focus')) {
-        var $target = null;
-        switch (e.keyCode) {
-        case 37: // left arrow key
-          $target = $('.pager').find('a.previous');
-          if ($target.length > 0) {
-            $target[0].click();
-            return;
-          }
-          break;
-        case 38: // up arrow key
-          if (e.ctrlKey) {
-            $target = $('.pager').find('a.backtosearch');
-            if ($target.length > 0) {
-              $target[0].click();
-              return;
-            }
-          }
-          break;
-        case 39: //right arrow key
-          $target = $('.pager').find('a.next');
-          if ($target.length > 0) {
-            $target[0].click();
-            return;
-          }
-          break;
-        case 40: // down arrow key
-          break;
-        }
-      }
-    });
-  }
-}
-
-function setupIeSupport() {
-  // Disable Bootstrap modal focus enforce on IE since it breaks Recaptcha.
-  // Cannot use conditional comments since IE 11 doesn't support them but still has
-  // the issue
-  var ua = window.navigator.userAgent;
-  if (ua.indexOf('MSIE') || ua.indexOf('Trident/')) {
-    $.fn.modal.Constructor.prototype.enforceFocus = function emptyEnforceFocus() { };
   }
 }
 
@@ -605,13 +822,21 @@ function unwrapJQuery(node) {
 }
 
 function setupJumpMenus(_container) {
-  var container = _container || $('body');
-  container.find('select.jumpMenu').change(function jumpMenu(){ $(this).parent('form').submit(); });
+  var container = unwrapJQuery(_container || document.body);
+  var selects = container.querySelectorAll('select.jumpMenu');
+  selects.forEach((select) => {
+    select.addEventListener('change', function jumpMenu() {
+      // Check if jumpMenu is still enabled (search.js may have disabled it):
+      if (select.classList.contains('jumpMenu')) {
+        select.parentElement.submit();
+      }
+    });
+  });
 }
 
 function setupMultiILSLoginFields(loginMethods, idPrefix) {
   var searchPrefix = idPrefix ? '#' + idPrefix : '#';
-  $(searchPrefix + 'target').change(function onChangeLoginTarget() {
+  $(searchPrefix + 'target').on("change", function onChangeLoginTarget() {
     var target = $(this).val();
     var $username = $(searchPrefix + 'username');
     var $usernameGroup = $username.closest('.form-group');
@@ -633,66 +858,24 @@ function setupMultiILSLoginFields(loginMethods, idPrefix) {
         $password.val('');
       }
     }
-  }).change();
+  }).trigger("change");
 }
 
-function setupQRCodeLinks(_container) {
-  var container = _container || $('body');
-
-  container.find('a.qrcodeLink').click(function qrcodeToggle() {
-    var holder = $(this).next('.qrcode');
-    if (holder.find('img').length === 0) {
-      // We need to insert the QRCode image
-      var template = holder.find('.qrCodeImgTag').html();
-      holder.html(template);
-    }
-  });
-}
-
-$(document).ready(function commonDocReady() {
+document.addEventListener('DOMContentLoaded', () => {
+  VuFind.emit("ready");
   // Start up all of our submodules
   VuFind.init();
-  // Setup search autocomplete
-  setupAutocomplete();
   // Off canvas
   setupOffcanvas();
-  // Keyboard shortcuts in detail view
-  keyboardShortcuts();
 
   // support "jump menu" dropdown boxes
   setupJumpMenus();
 
-  // handle QR code links
-  setupQRCodeLinks();
-
-  // Checkbox select all
-  $('.checkbox-select-all').on('change', function selectAllCheckboxes() {
-    var $form = this.form ? $(this.form) : $(this).closest('form');
-    if (this.checked) {
-      $form.find('.checkbox-select-item:not(:checked)').trigger('click');
-    } else {
-      $form.find('.checkbox-select-item:checked').trigger('click');
-    }
-    $('[form="' + $form.attr('id') + '"]').prop('checked', this.checked);
-    $form.find('.checkbox-select-all').prop('checked', this.checked);
-    $('.checkbox-select-all[form="' + $form.attr('id') + '"]').prop('checked', this.checked);
-  });
-  $('.checkbox-select-item').on('change', function selectAllDisable() {
-    var $form = this.form ? $(this.form) : $(this).closest('form');
-    if ($form.length === 0) {
-      return;
-    }
-    if (!$(this).prop('checked')) {
-      $form.find('.checkbox-select-all').prop('checked', false);
-      $('.checkbox-select-all[form="' + $form.attr('id') + '"]').prop('checked', false);
-    }
-  });
-
   // Print
-  var url = window.location.href;
-  if (url.indexOf('?print=') !== -1 || url.indexOf('&print=') !== -1) {
-    $("link[media='print']").attr("media", "all");
+  if (VuFind.isPrinting()) {
+    var printStylesheets = document.querySelectorAll('link[media="print"]');
+    printStylesheets.forEach((stylesheet) => {
+      stylesheet.media = 'all';
+    });
   }
-
-  setupIeSupport();
 });

@@ -54,9 +54,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param string $message Message
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setMessage(string $message): static;
+    public function setMessage(string $message): FeedbackEntityInterface;
 
     /**
      * Message getter
@@ -70,9 +70,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param array $data Form data
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setFormData(array $data): static;
+    public function setFormData(array $data): FeedbackEntityInterface;
 
     /**
      * Form data getter
@@ -86,9 +86,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param string $name Form name
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setFormName(string $name): static;
+    public function setFormName(string $name): FeedbackEntityInterface;
 
     /**
      * Form name getter
@@ -102,9 +102,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Created date
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static;
+    public function setCreated(DateTime $dateTime): FeedbackEntityInterface;
 
     /**
      * Created getter
@@ -118,9 +118,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Last update date
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setUpdated(DateTime $dateTime): static;
+    public function setUpdated(DateTime $dateTime): FeedbackEntityInterface;
 
     /**
      * Updated getter
@@ -134,9 +134,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param string $status Status
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setStatus(string $status): static;
+    public function setStatus(string $status): FeedbackEntityInterface;
 
     /**
      * Status getter
@@ -150,9 +150,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param string $url Site URL
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setSiteUrl(string $url): static;
+    public function setSiteUrl(string $url): FeedbackEntityInterface;
 
     /**
      * Site URL getter
@@ -166,9 +166,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param ?UserEntityInterface $user User that created request
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setUser(?UserEntityInterface $user): static;
+    public function setUser(?UserEntityInterface $user): FeedbackEntityInterface;
 
     /**
      * User getter
@@ -182,9 +182,9 @@ interface FeedbackEntityInterface extends EntityInterface
      *
      * @param ?UserEntityInterface $user User that updated request
      *
-     * @return static
+     * @return FeedbackEntityInterface
      */
-    public function setUpdatedBy(?UserEntityInterface $user): static;
+    public function setUpdatedBy(?UserEntityInterface $user): FeedbackEntityInterface;
 
     /**
      * Updatedby getter

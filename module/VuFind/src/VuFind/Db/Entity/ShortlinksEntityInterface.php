@@ -62,9 +62,9 @@ interface ShortlinksEntityInterface extends EntityInterface
      *
      * @param string $path Path
      *
-     * @return static
+     * @return ShortlinksEntityInterface
      */
-    public function setPath(string $path): static;
+    public function setPath(string $path): ShortlinksEntityInterface;
 
     /**
      * Get shortlinks hash.
@@ -78,9 +78,9 @@ interface ShortlinksEntityInterface extends EntityInterface
      *
      * @param ?string $hash Shortlinks hash
      *
-     * @return static
+     * @return ShortlinksEntityInterface
      */
-    public function setHash(?string $hash): static;
+    public function setHash(?string $hash): ShortlinksEntityInterface;
 
     /**
      * Get creation timestamp.
@@ -94,7 +94,7 @@ interface ShortlinksEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Creation timestamp
      *
-     * @return static
+     * @return ShortlinksEntityInterface
      */
-    public function setCreated(DateTime $dateTime): static;
+    public function setCreated(DateTime $dateTime): ShortlinksEntityInterface;
 }

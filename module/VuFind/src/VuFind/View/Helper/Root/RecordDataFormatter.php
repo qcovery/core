@@ -32,8 +32,6 @@
 namespace VuFind\View\Helper\Root;
 
 use Laminas\View\Helper\AbstractHelper;
-use VuFind\RecordDataFormatter\Specs\PluginManager as SpecsManager;
-use VuFind\RecordDataFormatter\Specs\SpecInterface;
 use VuFind\RecordDriver\AbstractBase as RecordDriver;
 
 use function call_user_func;
@@ -55,30 +53,45 @@ use function is_callable;
 class RecordDataFormatter extends AbstractHelper
 {
     /**
+     * Default settings.
+     *
+     * @var array
+     */
+    protected $defaults = [];
+
+    /**
      * Record driver object.
      *
-     * @var ?RecordDriver
+     * @var RecordDriver
      */
-    protected ?RecordDriver $driver = null;
+    protected $driver = null;
+
+    /**
+     * Config.
+     *
+     * @var \Laminas\Config\Config
+     */
+    protected $config;
 
     /**
      * Constructor
      *
-     * @param SpecsManager $specsManager Specs Plugin Manager
+     * @param ?\Laminas\Config\Config $config Config
      */
-    public function __construct(protected SpecsManager $specsManager)
+    public function __construct($config = null)
     {
+        $this->config = $config;
     }
 
     /**
      * Store a record driver object and return this object so that the appropriate
      * data can be rendered.
      *
-     * @param ?RecordDriver $driver Record driver object.
+     * @param RecordDriver $driver Record driver object.
      *
      * @return RecordDataFormatter
      */
-    public function __invoke(?RecordDriver $driver = null): RecordDataFormatter
+    public function __invoke(RecordDriver $driver = null): RecordDataFormatter
     {
         $this->driver = $driver;
         return $this;
@@ -92,7 +105,7 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @return int
      */
-    protected function sortCallback(array $a, array $b): int
+    protected function sortCallback($a, $b)
     {
         // Sort on 'pos' with 'label' as tie-breaker.
         return ($a['pos'] == $b['pos'])
@@ -106,11 +119,11 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @param mixed $value            Data to check for zero value.
      * @param array $options          Rendering options.
-     * @param bool  $ignoreCombineAlt If value should always be allowed when renderType is CombineAlt
+     * @param array $ignoreCombineAlt If value should always be allowed when renderType is CombineAlt
      *
      * @return bool
      */
-    protected function allowValue(mixed $value, array $options, bool $ignoreCombineAlt = false): bool
+    protected function allowValue($value, $options, $ignoreCombineAlt = false)
     {
         if (!empty($value) || ($ignoreCombineAlt && ($options['renderType'] ?? 'Simple') == 'CombineAlt')) {
             return true;
@@ -128,7 +141,7 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @return ?array
      */
-    protected function render(string $field, mixed $data, array $options): ?array
+    protected function render($field, $data, $options)
     {
         if (!($options['enabled'] ?? true)) {
             return null;
@@ -177,7 +190,7 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @return array
      */
-    public function getData(...$args): array
+    public function getData(...$args)
     {
         if ($args[0] instanceof RecordDriver) {
             $this->driver = $args[0];
@@ -214,13 +227,29 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @return array
      */
-    public function getDefaults(string $key): array
+    public function getDefaults($key)
     {
-        $specs = $this->getSpecPluginForDriver();
-        if ($specs === null) {
-            throw new \Exception('Using the RecordDataFormatter view helper with a driver that is not supported.');
+        // No value stored? Return empty array:
+        if (!isset($this->defaults[$key])) {
+            return [];
         }
-        return $specs->getDefaults($key);
+        // Callback stored? Resolve to array on demand:
+        if (is_callable($this->defaults[$key])) {
+            $this->defaults[$key] = $this->defaults[$key]();
+            if (!is_array($this->defaults[$key])) {
+                throw new \Exception('Callback for ' . $key . ' must return array');
+            }
+        }
+        // Adding defaults from config
+        foreach ($this->config->Defaults->$key ?? [] as $field) {
+            $this->defaults[$key][$field] = [];
+        }
+        // Adding options from config
+        foreach ($this->defaults[$key] as $field => $options) {
+            $this->defaults[$key][$field] = $this->addOptions($key, $field, $options);
+        }
+        // Send back array:
+        return $this->defaults[$key];
     }
 
     /**
@@ -231,32 +260,52 @@ class RecordDataFormatter extends AbstractHelper
      * callable returning an array).
      *
      * @return void
-     *
-     * @deprecated Set defaults on spec class directly
      */
-    public function setDefaults(string $key, array|callable $values): void
+    public function setDefaults($key, $values)
     {
-        $specs = $this->getSpecPluginForDriver();
-        if ($specs !== null && method_exists($specs, 'setDefaults')) {
-            $specs->setDefaults($key, $values);
+        if (!is_array($values) && !is_callable($values)) {
+            throw new \Exception('$values must be array or callable');
         }
+        $this->defaults[$key] = $values;
     }
 
     /**
-     * Get matching spec plugin for the driver.
+     * Add global and configured options to options of a field.
      *
-     * @return ?SpecInterface
+     * @param string $context Context of the field.
+     * @param string $field   Field
+     * @param array  $options Options of a field.
+     *
+     * @return ?array
      */
-    protected function getSpecPluginForDriver(): ?SpecInterface
+    protected function addOptions($context, $field, $options)
     {
-        $specClass = \VuFind\RecordDataFormatter\Specs\DefaultRecord::class;
-        if ($this->driver !== null) {
-            $specClass = $this->driver->getRecordDataFormatterSpecClass();
+        if ($globalOptions = ($this->config->Global ?? false)) {
+            $options = array_filter($options, function ($val) {
+                return $val !== null;
+            });
+            $options = array_merge($globalOptions->toArray(), $options);
         }
-        if ($specClass === null) {
-            return null;
+
+        $section = 'Field_' . $field;
+        if ($fieldOptions = ($this->config->$section ?? false)) {
+            $fieldOptions = array_filter($fieldOptions->toArray(), function ($val) {
+                return $val !== null;
+            });
+            $options = array_merge($options, $fieldOptions);
         }
-        return $this->specsManager->get($specClass);
+
+        $contextSection = $options['overrideContext'][$context] ?? false;
+        if (
+            $contextOptions = $this->config->$contextSection ?? false
+        ) {
+            $contextOptions = array_filter($contextOptions->toArray(), function ($val) {
+                return $val !== null;
+            });
+            $options = array_merge($options, $contextOptions);
+        }
+
+        return $options;
     }
 
     /**
@@ -266,7 +315,7 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @return mixed
      */
-    protected function extractData(array $options): mixed
+    protected function extractData(array $options)
     {
         // Static cache for persisting data.
         static $cache = [];
@@ -307,9 +356,9 @@ class RecordDataFormatter extends AbstractHelper
      * @return array
      */
     protected function renderMulti(
-        mixed $data,
+        $data,
         array $options
-    ): array {
+    ) {
         // Make sure we have a callback for sorting the $data into groups...
         $callback = $options['multiFunction'] ?? null;
         if (!is_callable($callback)) {
@@ -345,9 +394,9 @@ class RecordDataFormatter extends AbstractHelper
      * @return string
      */
     protected function renderRecordHelper(
-        mixed $data,
+        $data,
         array $options
-    ): string {
+    ) {
         $method = $options['helperMethod'] ?? null;
         $plugin = $this->getView()->plugin('record');
         if (empty($method) || !is_callable([$plugin, $method])) {
@@ -365,9 +414,9 @@ class RecordDataFormatter extends AbstractHelper
      * @return string
      */
     protected function renderRecordDriverTemplate(
-        mixed $data,
+        $data,
         array $options
-    ): string {
+    ) {
         if (!isset($options['template'])) {
             throw new \Exception('Template option missing.');
         }
@@ -375,7 +424,6 @@ class RecordDataFormatter extends AbstractHelper
         $context = $options['context'] ?? [];
         $context['driver'] = $this->driver;
         $context['data'] = $data;
-        $context['options'] = $options;
         return trim(
             $helper($this->driver)->renderTemplate($options['template'], $context)
         );
@@ -390,7 +438,7 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @return string|bool
      */
-    protected function getLink(string $value, array $options): string|bool
+    protected function getLink($value, $options)
     {
         if ($options['recordLink'] ?? false) {
             $helper = $this->getView()->plugin('record');
@@ -405,12 +453,12 @@ class RecordDataFormatter extends AbstractHelper
      * @param mixed $data    Data to render
      * @param array $options Rendering options.
      *
-     * @return ?string
+     * @return string
      */
     protected function renderCombineAlt(
-        mixed $data,
+        $data,
         array $options
-    ): ?string {
+    ) {
         // Determine the rendering method to use, and bail out if it's illegal:
         $method = empty($options['combineAltRenderType'])
             ? 'renderSimple' : 'render' . $options['combineAltRenderType'];
@@ -458,7 +506,7 @@ class RecordDataFormatter extends AbstractHelper
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function renderSimple(mixed $data, array $options): string
+    protected function renderSimple($data, array $options)
     {
         $view = $this->getView();
         $escaper = ($options['translate'] ?? false)

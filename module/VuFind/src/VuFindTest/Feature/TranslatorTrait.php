@@ -29,9 +29,6 @@
 
 namespace VuFindTest\Feature;
 
-use Laminas\Mvc\I18n\Translator;
-use PHPUnit\Framework\MockObject\MockObject;
-
 /**
  * Trait for tests involving Laminas Translator.
  *
@@ -49,20 +46,21 @@ trait TranslatorTrait
      * @param array  $translations Key => value translation map.
      * @param string $locale       Locale, default to 'en'
      *
-     * @return MockObject&Translator
+     * @return \Laminas\I18n\Translator\TranslatorInterface
      */
-    protected function getMockTranslator(array $translations, string $locale = 'en'): MockObject&Translator
+    protected function getMockTranslator(array $translations, string $locale = 'en')
     {
         $callback = function ($str, $domain) use ($translations) {
             return $translations[$domain][$str] ?? $str;
         };
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['translate'])
-            ->addMethods(['getLocale'])
-            ->getMock();
-        $translator->expects($this->any())->method('translate')->willReturnCallback($callback);
-        $translator->expects($this->any())->method('getLocale')->willReturn($locale);
+        $translator
+            = $this->getMockBuilder(\Laminas\I18n\Translator\TranslatorInterface::class)
+                ->addMethods(['getLocale'])
+                ->getMockForAbstractClass();
+        $translator->expects($this->any())->method('translate')
+            ->will($this->returnCallback($callback));
+        $translator->expects($this->any())->method('getLocale')
+            ->will($this->returnValue($locale));
         return $translator;
     }
 }

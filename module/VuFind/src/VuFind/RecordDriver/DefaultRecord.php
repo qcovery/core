@@ -61,11 +61,11 @@ class DefaultRecord extends AbstractBase
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $mainConfig     VuFind main configuration (omit
+     * @param \Laminas\Config\Config $mainConfig     VuFind main configuration (omit
      * for built-in defaults)
-     * @param \VuFind\Config\Config $recordConfig   Record-specific configuration
+     * @param \Laminas\Config\Config $recordConfig   Record-specific configuration
      * file (omit to use $mainConfig as $recordConfig)
-     * @param \VuFind\Config\Config $searchSettings Search-specific configuration
+     * @param \Laminas\Config\Config $searchSettings Search-specific configuration
      * file
      */
     public function __construct(
@@ -1365,7 +1365,7 @@ class DefaultRecord extends AbstractBase
     public function getTitleSection()
     {
         // Not currently stored in the default index schema
-        return null;
+        return '';
     }
 
     /**
@@ -1377,7 +1377,7 @@ class DefaultRecord extends AbstractBase
     public function getTitleStatement()
     {
         // Not currently stored in the default index schema
-        return null;
+        return '';
     }
 
     /**
@@ -1815,15 +1815,5 @@ class DefaultRecord extends AbstractBase
     public function getCoordinateLabels()
     {
         return (array)($this->fields['long_lat_label'] ?? []);
-    }
-
-    /**
-     * Get class name for RecordDataFormatter spec.
-     *
-     * @return ?string
-     */
-    public function getRecordDataFormatterSpecClass(): ?string
-    {
-        return \VuFind\RecordDataFormatter\Specs\DefaultRecord::class;
     }
 }

@@ -125,10 +125,11 @@ class ExternalAuthController extends AbstractBase implements LoggerAwareInterfac
         }
 
         $packet = '$u' . time() . '$e';
+        $hash = new \Laminas\Crypt\Hash();
         $algorithm = !empty($config->EZproxy->secret_hash_method)
             ? $config->EZproxy->secret_hash_method : 'SHA512';
         $ticket = $config->EZproxy->secret . $user . $packet;
-        $ticket = hash($algorithm, $ticket);
+        $ticket = $hash->compute($algorithm, $ticket);
         $ticket .= $packet;
         $params = http_build_query(
             ['user' => $user, 'ticket' => $ticket, 'url' => $url]

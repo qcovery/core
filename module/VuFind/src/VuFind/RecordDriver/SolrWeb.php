@@ -43,11 +43,11 @@ class SolrWeb extends SolrDefault
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $mainConfig     VuFind main configuration (omit
+     * @param \Laminas\Config\Config $mainConfig     VuFind main configuration (omit
      * for built-in defaults)
-     * @param \VuFind\Config\Config $recordConfig   Record-specific configuration
+     * @param \Laminas\Config\Config $recordConfig   Record-specific configuration
      * file (omit to use $mainConfig as $recordConfig)
-     * @param \VuFind\Config\Config $searchSettings Search-specific configuration
+     * @param \Laminas\Config\Config $searchSettings Search-specific configuration
      * file
      */
     public function __construct(

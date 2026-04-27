@@ -29,9 +29,9 @@
 
 namespace VuFind\Controller;
 
+use Laminas\Crypt\Password\Bcrypt;
 use Laminas\Mvc\MvcEvent;
 use VuFind\Config\Writer as ConfigWriter;
-use VuFind\Crypt\PasswordHasher;
 use VuFind\Db\Service\TagServiceInterface;
 use VuFind\Db\Service\UserCardServiceInterface;
 use VuFind\Db\Service\UserServiceInterface;
@@ -413,8 +413,7 @@ class InstallController extends AbstractBase
             } else {
                 // Connect to database:
                 try {
-                    // We need a default database name to use to establish a connection:
-                    $dbName = ($view->driver == 'pgsql') ? 'template1' : 'mysql';
+                    $dbName = ($view->driver == 'pgsql') ? 'template1' : $view->driver;
                     $connectionParams = [
                         'driver' => $view->driver,
                         'hostname' => $view->dbhost,
@@ -441,10 +440,8 @@ class InstallController extends AbstractBase
                         : $db->getPlatform()->quoteValue($newpass);
                     $preCommands = $this->getPreCommands($view, $escapedPass);
                     $postCommands = $this->getPostCommands($view);
-                    // We use the same file to initialize the MariaDB and MySQL databases:
-                    $sqlFilename = $view->driver === 'mariadb' ? 'mysql' : $view->driver;
                     $sql = file_get_contents(
-                        APPLICATION_PATH . "/module/VuFind/sql/{$sqlFilename}.sql"
+                        APPLICATION_PATH . "/module/VuFind/sql/{$view->driver}.sql"
                     );
                     if ($skip) {
                         $omnisql = '';
@@ -580,8 +577,7 @@ class InstallController extends AbstractBase
             $status = false;
         } else {
             try {
-                $status = 'ils-offline' !== $this->getILS()->getOfflineMode(true)
-                    || ('NoILS' === $config->Catalog->driver);
+                $status = 'ils-offline' !== $this->getILS()->getOfflineMode(true);
             } catch (\Exception $e) {
                 $status = false;
             }
@@ -744,8 +740,8 @@ class InstallController extends AbstractBase
      * Support method for fixsecurityAction(). Returns true if the configuration
      * was modified, false otherwise.
      *
-     * @param \VuFind\Config\Config $config Existing VuFind configuration
-     * @param ConfigWriter          $writer Config writer
+     * @param \Laminas\Config\Config $config Existing VuFind configuration
+     * @param ConfigWriter           $writer Config writer
      *
      * @return bool
      */
@@ -835,19 +831,18 @@ class InstallController extends AbstractBase
         // Now we want to loop through the database and update passwords (if
         // necessary).
         $ilsAuthenticator = $this->getService(\VuFind\Auth\ILSAuthenticator::class);
-        $userService = $this->getDbService(UserServiceInterface::class);
-        $userRows = $userService->getInsecureRows();
+        $userRows = $this->getDbService(UserServiceInterface::class)->getInsecureRows();
         if (count($userRows) > 0) {
-            $hasher = $this->getService(PasswordHasher::class);
+            $bcrypt = new Bcrypt();
             foreach ($userRows as $row) {
                 if ($row->getRawPassword() != '') {
-                    $row->setPasswordHash($hasher->create($row->getRawPassword()));
+                    $row->setPasswordHash($bcrypt->create($row->getRawPassword()));
                     $row->setRawPassword('');
                 }
                 if ($rawPassword = $row->getRawCatPassword()) {
                     $ilsAuthenticator->saveUserCatalogCredentials($row, $row->getCatUsername(), $rawPassword);
                 } else {
-                    $userService->persistEntity($row);
+                    $row->save();
                 }
             }
             $msg = count($userRows) . ' user row(s) encrypted.';

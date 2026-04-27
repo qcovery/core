@@ -93,7 +93,7 @@ class Importer
         $encoding = $config->getEncoding();
         $data = [];
         $output = '';
-        while ($line = fgetcsv($in, escape: '\\')) {
+        while ($line = fgetcsv($in)) {
             $data[] = $this->collectValuesFromLine(
                 $this->adjustEncoding($line, $encoding),
                 $config
@@ -177,14 +177,14 @@ class Importer
         switch (strtolower(trim($mode))) {
             case 'fields':
                 // Load configuration from the header row:
-                $row = fgetcsv($in, escape: '\\');
+                $row = fgetcsv($in);
                 foreach ($row as $i => $field) {
                     $config->configureColumn($i, ['field' => $field]);
                 }
                 break;
             case 'skip':
                 //  Just skip a row:
-                fgetcsv($in, escape: '\\');
+                fgetcsv($in);
                 break;
             case 'none':
             default:

@@ -3,11 +3,11 @@
   $id = $this->driver->getUniqueId();
   $source = $this->driver->getSourceIdentifier();
   if (isset($this->list) && is_object($this->list)) {
-    $list_id = $this->list->id;
-    $user_id = $this->list->user_id;
+    $list_id = $this->list->getId();
+    $user_id = $this->list->getUser()->getId();
   } else {
     $list_id = null;
-    $user_id = $this->user ? $this->user->id : null;
+    $user_id = $this->user ? $this->user->getId() : null;
   }
   // Thumbnail
   $coverDetails = $this->record($this->driver)->getCoverDetails('list-entry', 'medium', $this->recordLinker()->getUrl($this->driver));
@@ -34,42 +34,51 @@
     <div class="media-body">
       <div class="result-body">
         <div class="resultItemLine1">
-          <?php $missing = $this->driver instanceof \VuFind\RecordDriver\Missing; ?>
-          <?php if (!$missing): ?><a href="<?=$this->escapeHtmlAttr($this->recordLinker()->getUrl($this->driver))?>" class="getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>"><?php endif; ?>
-            <span class="title"><?=$this->record($this->driver)->getTitleHtml()?></span>
-          <?php if (!$missing): ?></a><?php endif; ?>
-          <?php foreach ($this->driver->tryMethod('getTitlesAltScript', [], []) as $altTitle): ?>
-            <div class="title-alt">
-              <?=$this->escapeHtml($altTitle)?>
-            </div>
-          <?php endforeach; ?>
-        </div>
+          <h2>
+            <?php $missing = $this->driver instanceof \VuFind\RecordDriver\Missing; ?>
+            <?php if (!$missing): ?><a href="<?=$this->escapeHtmlAttr($this->recordLinker()->getUrl($this->driver))?>" class="getFull" data-view="<?=$this->params->getOptions()->getListViewOption() ?>"><?php endif; ?>
+              <span class="title"><?=$this->record($this->driver)->getTitleHtml()?></span>
+            <?php if (!$missing): ?></a><?php endif; ?>
+            <?php foreach ($this->driver->tryMethod('getTitlesAltScript', [], []) as $altTitle): ?>
+              <div class="title-alt">
+                <?=$this->escapeHtml($altTitle)?>
+              </div>
+            <?php endforeach; ?>
 
+            <?php if (!$this->driver->isCollection()): ?>
+              <?php $summAuthors = $this->driver->getPrimaryAuthors(); ?>
+              <?php if (!empty($summAuthors)): ?>
+                <span class="authors">
+                  <?=$this->transEsc('by')?>
+                  <?php $authorCount = count($summAuthors); ?>
+                  <?php foreach ($summAuthors as $i => $summAuthor): ?>
+                    <a href="<?=$this->record($this->driver)->getLink('author', $summAuthor)?>"><?=$this->escapeHtml($summAuthor)?></a><?=($i + 1 < $authorCount ? ';' : '') ?>
+                  <?php endforeach; ?>
+                </span>
+              <?php endif; ?>
+            <?php endif; ?>
+          </h2>
+        </div>
         <div class="resultItemLine2">
           <?php if ($this->driver->isCollection()): ?>
             <?=implode('<br>', array_map([$this, 'escapeHtml'], $this->driver->getSummary())); ?>
           <?php else: ?>
-            <?php $summAuthors = $this->driver->getPrimaryAuthors(); if (!empty($summAuthors)): ?>
-              <?=$this->transEsc('by')?>
-              <?php $authorCount = count($summAuthors); foreach ($summAuthors as $i => $summAuthor): ?>
-                <a href="<?=$this->record($this->driver)->getLink('author', $summAuthor)?>"><?=$this->escapeHtml($summAuthor)?></a><?=($i + 1 < $authorCount ? ';' : '') ?>
-              <?php endforeach; ?>
-            <?php endif; ?>
-
-            <?php $journalTitle = $this->driver->getContainerTitle(); $summDate = $this->driver->getPublicationDates(); ?>
+            <?php
+              $journalTitle = $this->driver->getContainerTitle();
+              $summDate = $this->driver->getPublicationDates();
+            ?>
             <?php if (!empty($journalTitle)): ?>
-              <?=!empty($summAuthor) ? '<br>' : ''?>
               <?=/* TODO: handle highlighting more elegantly here */ $this->transEsc('Published in') . ' <a href="' . $this->record($this->driver)->getLink('journaltitle', str_replace(['{{{{START_HILITE}}}}', '{{{{END_HILITE}}}}'], '', $journalTitle)) . '">' . $this->highlight($journalTitle) . '</a>';?>
               <?=!empty($summDate) ? ' (' . $this->escapeHtml($summDate[0]) . ')' : ''?>
             <?php elseif (!empty($summDate)): ?>
-              <?=!empty($summAuthor) ? '<br>' : ''?>
               <?=$this->transEsc('Published') . ' ' . $this->escapeHtml($summDate[0])?>
             <?php endif; ?>
-            <?php $summInCollection = $this->driver->getContainingCollections(); if (false && !empty($summInCollection)): ?>
+            <?php $summInCollection = $this->driver->getContainingCollections(); ?>
+            <?php if (!empty($summInCollection)): ?>
               <?php foreach ($summInCollection as $collId => $collText): ?>
                 <div>
-                  <b><?=$this->transEsc("in_collection_label")?></b>
-                  <a class="collectionLinkText" href="<?=$this->record($this->driver)->getLink('collection', $collid)?>">
+                  <b><?=$this->transEsc('in_collection_label')?></b>
+                  <a class="collectionLinkText" href="<?=$this->record($this->driver)->getLink('collection', $collId)?>">
                     <?=$this->escapeHtml($collText)?>
                   </a>
                 </div>
@@ -94,8 +103,8 @@
             } ?>
 
           <?php
-            $listTags = ($this->usertags()->getMode() !== 'disabled') ? $this->driver->getTags(
-                null === $list_id ? true : $list_id, // get tags for all lists if no single list is selected
+            $listTags = ($this->usertags()->getMode() !== 'disabled') ? $this->record($this->driver)->getTagsFromFavorites(
+                $list_id,
                 $user_id,
                 'tag'
             ) : [];
@@ -103,11 +112,11 @@
           <?php if (count($listTags) > 0): ?>
             <strong><?=$this->transEsc('Your Tags')?>:</strong>
             <?php foreach ($listTags as $tag): ?>
-              <a href="<?=$this->currentPath() . $results->getUrlQuery()->addFacet('tags', $tag->tag)?>"><?=$this->escapeHtml($tag->tag)?></a>
+              <a href="<?=$this->currentPath() . $results->getUrlQuery()->addFacet('tags', $tag['tag'])?>"><?=$this->escapeHtml($tag['tag'])?></a>
             <?php endforeach; ?>
             <br>
           <?php endif; ?>
-          <?php $listNotes = $this->driver->getListNotes($list_id, $user_id); ?>
+          <?php $listNotes = $this->record($this->driver)->getListNotes($list_id, $user_id); ?>
           <?php if (count($listNotes) > 0): ?>
             <strong><?=$this->transEsc('Notes')?>:</strong>
             <?php if (count($listNotes) > 1): ?><br><?php endif; ?>
@@ -118,8 +127,9 @@
 
           <?php if (count($this->lists ?? []) > 0): ?>
               <strong><?=$this->transEsc('Saved in')?>:</strong>
-              <?php $i = 0;foreach ($this->lists as $current): ?>
-                  <a href="<?=$this->url('userList', ['id' => $current->id])?>"><?=$this->escapeHtml($current->title)?></a><?php if ($i++ < count($this->lists) - 1): ?>,<?php endif; ?>
+              <?php $i = 0; ?>
+              <?php foreach ($this->lists as $current): ?>
+                <a href="<?=$this->url('userList', ['id' => $current->getId()])?>"><?=$this->escapeHtml($current->getTitle())?></a><?php if ($i++ < count($this->lists) - 1): ?>,<?php endif; ?>
               <?php endforeach; ?>
               <br>
           <?php endif; ?>
@@ -136,25 +146,26 @@
               </span>
               <div class="locationDetails"></div>
             <?php else: ?>
-              <?php $summCallNo = $this->driver->getCallNumber(); if (!empty($summCallNo)): ?>
+              <?php $summCallNo = $this->driver->getCallNumber(); ?>
+              <?php if (!empty($summCallNo)): ?>
                 <strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?>
               <?php endif; ?>
             <?php endif; ?>
           </div>
 
-          <?php /* We need to find out if we're supposed to display an OpenURL link ($openUrlActive),
-                but even if we don't plan to display the link, we still want to get the $openUrl
-                value for use in generating a COinS (Z3988) tag -- see bottom of file.
-              */
+          <?php
+            /* We need to find out if we're supposed to display an OpenURL link ($openUrlActive),
+               but even if we don't plan to display the link, we still want to get the $openUrl
+               value for use in generating a COinS (Z3988) tag -- see bottom of file.
+             */
             $openUrl = $this->openUrl($this->driver, 'results');
             $openUrlActive = $openUrl->isActive();
             $doi = $this->doi($this->driver, 'results');
             $doiActive = $doi->isActive();
             // Account for replace_other_urls setting
             $urls = $this->record($this->driver)->getLinkDetails($openUrlActive);
-
-            if ($openUrlActive || $doiActive || !empty($urls)):
           ?>
+          <?php if ($openUrlActive || $doiActive || !empty($urls)): ?>
             <?php if ($openUrlActive): ?>
               <br>
               <?=$openUrl->renderTemplate()?>
@@ -165,17 +176,26 @@
               <?=$doi->renderTemplate()?>
             <?php endif; ?>
 
-            <?php if (!is_array($urls)) { $urls = []; }
-              if (!$this->driver->isCollection()):
-                foreach ($urls as $current): ?>
-                  <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext icon-link" target="new">
-                    <?=$this->icon('external-link', 'icon-link__icon') ?>
-                    <span class="icon-link__label"><?=($current['url'] == $current['desc']) ? $this->transEsc('Get full text') : $this->escapeHtml($current['desc'])?></span>
-                  </a>
-                <?php endforeach; ?>
-              <?php endif; ?>
+            <?php $urls = is_array($urls) ? $urls : []; ?>
+            <?php if (!$this->driver->isCollection()): ?>
+              <?php foreach ($urls as $current): ?>
+                <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext icon-link" target="new">
+                  <?=$this->icon('external-link', 'icon-link__icon') ?>
+                  <span class="icon-link__label"><?=($current['url'] == $current['desc']) ? $this->transEsc('Get full text') : $this->escapeHtml($current['desc'])?></span>
+                </a>
+              <?php endforeach; ?>
             <?php endif; ?>
+          <?php endif; ?>
           <br>
+
+          <?php if (
+            $this->searchOptions($this->driver->getSourceIdentifier())->displayCitationLinksInResults()
+            && $links = $driver->tryMethod('getCitations')
+          ): ?>
+            <div class="result-citation-links">
+              <?=$this->record($this->driver)->renderTemplate('data-citations.phtml', ['data' => $links])?>
+            </div>
+          <?php endif; ?>
 
           <?=$this->record($this->driver)->getFormatList() ?>
 
@@ -197,21 +217,21 @@
               ? $this->url('myresearch-favorites')
               : $this->url('userList', ['id' => $list_id]);
           $deleteUrlGet = $deleteUrl . '?delete=' . urlencode($id) . '&amp;source=' . urlencode($source);
-
-          $dLabel = 'delete-label-' . preg_replace('[\W]', '-', $id);
+          $md5Id = md5($id);
         ?>
-        <div class="dropdown">
-          <a class="dropdown-toggle icon-link" id="<?=$dLabel ?>" role="button" data-toggle="dropdown" href="<?=$deleteUrlGet ?>">
-            <?=$this->icon('user-list-remove', 'icon-link__icon') ?>
-            <span class="icon-link__label"><?=$this->transEsc('Delete') ?></span>
-          </a>
-          <ul class="dropdown-menu" role="menu" aria-labelledby="<?=$dLabel ?>">
-            <li><a id="confirm_delete_item_<?=$this->escapeHtmlAttr($id);?>" title="<?=$this->transEscAttr('confirm_delete_brief')?>"><?=$this->transEsc('confirm_dialog_yes')?></a></li>
-            <li><a><?=$this->transEsc('confirm_dialog_no')?></a></li>
-          </ul>
-        </div>
-
-        <?=$this->driver->supportsCoinsOpenUrl() ? '<span class="Z3988" title="' . $this->escapeHtmlAttr($this->driver->getCoinsOpenUrl()) . '"></span>' : ''?>
+        <?=
+          $this->component(
+              'confirm-button',
+              [
+                  'buttonClass' => 'btn-link',
+                  'buttonLink' => $deleteUrlGet,
+                  'buttonIcon' => 'user-list-remove',
+                  'buttonLabel' => 'Delete',
+                  'confirmId' => 'confirm_delete_item_' . $md5Id,
+              ]
+          )
+        ?>
+        <?=$this->driver->supportsCoinsOpenUrl() ? '<span class="Z3988" aria-hidden="true" title="' . $this->escapeHtmlAttr($this->driver->getCoinsOpenUrl()) . '"></span>' : ''?>
       </div>
     </div>
     <?php if ($thumbnail && $thumbnailAlignment == 'right'): ?>
@@ -222,11 +242,11 @@
     $escId = $this->escapeJs($id);
     $escSource = $this->escapeJs($source);
     $script = <<<JS
-        $('#confirm_delete_item_${escId}').click(function(e) {
+        $('#confirm_delete_item_{$md5Id}').click(function(e) {
             e.preventDefault();
-            $.post('${deleteUrl}', {
-                        'delete':'${escId}',
-                        'source':'${escSource}',
+            $.post('{$deleteUrl}', {
+                        'delete':'{$escId}',
+                        'source':'{$escSource}',
                         'confirm':true
                     },
                     function() {
@@ -236,5 +256,5 @@
         });
         JS;
   ?>
-  <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, $script, 'SET');?>
+  <?=$this->assetManager()->outputInlineScriptString($script);?>
 </li>

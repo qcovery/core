@@ -1,8 +1,10 @@
 <?php
     $this->headTitle('Deminifier');
+    $this->layout()->breadcrumbs = '<li><a href="' . $this->url('devtools-home') . '">Development Tools</a>'
+      . '<li class="active">Deminifier</li>';
 ?>
 
-<h2>Deminifier</h2>
+<h1>Deminifier</h1>
 
 <?php if (empty($min)): ?>
   <form method='POST'>
@@ -19,7 +21,7 @@
 
 <?php if (isset($results)): ?>
   <h3>Results Object</h3>
-  <p>Class: <?=get_class($results)?></p>
+  <p>Class: <?=$results::class?></p>
 <?php endif; ?>
 
 <?php if (isset($query)): ?>

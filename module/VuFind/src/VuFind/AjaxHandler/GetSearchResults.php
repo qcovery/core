@@ -171,10 +171,6 @@ class GetSearchResults extends \VuFind\AjaxHandler\AbstractBase implements
             $this->saveSearchToHistory($results);
         }
 
-        if ($results->getOptions()->resultScrollerActive()) {
-            $requestParams->getController()->resultScroller()->init($results);
-        }
-
         // Always save search parameters, since these are namespaced by search
         // class ID.
         $this->searchMemory->rememberParams($results->getParams());
@@ -262,7 +258,7 @@ class GetSearchResults extends \VuFind\AjaxHandler\AbstractBase implements
     protected function renderPagination(
         ParamsHelper $requestParams,
         Results $results,
-        string $template = 'Helpers/pagination.phtml',
+        string $template = 'search/pagination.phtml',
         string $ulClass = '',
         string $navClass = ''
     ): ?string {
@@ -278,7 +274,7 @@ class GetSearchResults extends \VuFind\AjaxHandler\AbstractBase implements
             $results->getPaginator(),
             'Sliding',
             $template,
-            ['params' => ['results' => $results], 'options' => $paginationOptions]
+            ['results' => $results, 'options' => $paginationOptions]
         );
     }
 
@@ -292,7 +288,7 @@ class GetSearchResults extends \VuFind\AjaxHandler\AbstractBase implements
      */
     protected function renderPaginationSimple(ParamsHelper $requestParams, Results $results): ?string
     {
-        return $this->renderPagination($requestParams, $results, 'Helpers/pagination-simple.phtml');
+        return $this->renderPagination($requestParams, $results, 'search/pagination_simple.phtml');
     }
 
     /**
@@ -305,7 +301,7 @@ class GetSearchResults extends \VuFind\AjaxHandler\AbstractBase implements
      */
     protected function renderPaginationTop(ParamsHelper $requestParams, Results $results): ?string
     {
-        return $this->renderPagination($requestParams, $results, 'Helpers/pagination-top.phtml');
+        return $this->renderPagination($requestParams, $results, 'search/pagination-top.phtml');
     }
 
     /**

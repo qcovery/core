@@ -46,28 +46,11 @@ use VuFindHttp\HttpService;
 class CachingDownloaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * Data provider for testDownload
-     *
-     * @return array
-     */
-    public static function downloadProvider(): array
-    {
-        return [
-            'cache enabled' => [true],
-            'cache disabled' => [false],
-        ];
-    }
-
-    /**
      * Test a download
      *
-     * @param bool $cacheEnabled Is the cache enabled?
-     *
      * @return void
-     *
-     * @dataProvider downloadProvider
      */
-    public function testDownload(bool $cacheEnabled): void
+    public function testDownload()
     {
         $container = new \VuFindTest\Container\MockContainer($this);
 
@@ -76,48 +59,43 @@ class CachingDownloaderTest extends \PHPUnit\Framework\TestCase
         $testCacheKey = md5($testUrl);
 
         // httpService
-        $service = $this->createMock(HttpService::class);
-        $response = $this->createMock(Response::class);
+        $service = $this->getMockBuilder(HttpService::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $response = $this->getMockBuilder(Response::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $response->expects($this->once())->method('isOk')->willReturn(true);
         $response->expects($this->once())->method('getBody')->willReturn($testBody);
 
         $service->expects($this->once())->method('get')->with($testUrl)->willReturn($response);
 
         // cacheManager
-        $storage = $this->createMock(\Laminas\Cache\Storage\StorageInterface::class);
+        $storage = $this->getMockBuilder(\Laminas\Cache\Storage\StorageInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $storage->expects($this->once())->method('hasItem')->with($testCacheKey)->willReturn(false);
+        $storage->expects($this->once())->method('addItem')->with($testCacheKey, $testBody);
+
         $cacheManagerMock = $container->createMock(\VuFind\Cache\Manager::class);
-
-        if ($cacheEnabled) {
-            $storage->expects($this->once())->method('hasItem')->with($testCacheKey)->willReturn(false);
-            $storage->expects($this->once())->method('addItem')->with($testCacheKey, $testBody);
-
-            $cacheManagerMock
-                ->expects($this->once())
-                ->method('addDownloaderCache')
-                ->with('default')
-                ->willReturn('downloader-default');
-            $cacheManagerMock
-                ->expects($this->once())
-                ->method('getCache')
-                ->with('downloader-default')
-                ->willReturn($storage);
-        } else {
-            $storage->expects($this->never())->method('hasItem');
-            $storage->expects($this->never())->method('addItem');
-
-            $cacheManagerMock
-                ->expects($this->never())
-                ->method('addDownloaderCache');
-            $cacheManagerMock
-                ->expects($this->never())
-                ->method('getCache');
-        }
+        $cacheManagerMock
+            ->expects($this->once())
+            ->method('addDownloaderCache')
+            ->with('default')
+            ->willReturn('downloader-default');
+        $cacheManagerMock
+            ->expects($this->once())
+            ->method('getCache')
+            ->with('downloader-default')
+            ->willReturn($storage);
 
         // configManager
         $configManagerMock = $this->createMock(\VuFind\Config\PluginManager::class);
 
         // downloader
-        $downloader = new CachingDownloader($cacheManagerMock, $configManagerMock, $cacheEnabled);
+        $downloader = new CachingDownloader($cacheManagerMock, $configManagerMock);
         $downloader->setHttpService($service);
 
         $body = $downloader->download(
@@ -131,7 +109,7 @@ class CachingDownloaderTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      */
-    public function testException(): void
+    public function testException()
     {
         $this->expectException(HttpDownloadException::class);
 
@@ -141,14 +119,18 @@ class CachingDownloaderTest extends \PHPUnit\Framework\TestCase
         $testCacheKey = md5($testUrl);
 
         // httpService
-        $service = $this->createMock(HttpService::class);
+        $service = $this->getMockBuilder(HttpService::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $service->expects($this->once())
             ->method('get')
             ->with($testUrl)
             ->willThrowException(new \Exception('Download failed (404): ' . $testUrl));
 
         // cacheManager
-        $storage = $this->createMock(\Laminas\Cache\Storage\StorageInterface::class);
+        $storage = $this->getMockBuilder(\Laminas\Cache\Storage\StorageInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $storage->expects($this->once())->method('hasItem')->with($testCacheKey)->willReturn(false);
 
@@ -166,7 +148,7 @@ class CachingDownloaderTest extends \PHPUnit\Framework\TestCase
         $configManagerMock = $this->createMock(\VuFind\Config\PluginManager::class);
 
         // downloader
-        $downloader = new CachingDownloader($cacheManagerMock, $configManagerMock, true);
+        $downloader = new CachingDownloader($cacheManagerMock, $configManagerMock);
         $downloader->setHttpService($service);
 
         $downloader->download(

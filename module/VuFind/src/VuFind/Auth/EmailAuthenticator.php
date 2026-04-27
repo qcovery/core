@@ -31,7 +31,6 @@ namespace VuFind\Auth;
 
 use Laminas\Http\Request;
 use Laminas\View\Renderer\PhpRenderer;
-use VuFind\Config\Feature\EmailSettingsTrait;
 use VuFind\Db\Service\AuthHashServiceInterface;
 use VuFind\Exception\Auth as AuthException;
 use VuFind\Net\UserIpReader;
@@ -52,7 +51,6 @@ use VuFind\Validator\CsrfInterface;
 class EmailAuthenticator implements \VuFind\I18n\Translator\TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
-    use EmailSettingsTrait;
 
     /**
      * How long a login request is considered to be valid (seconds)
@@ -69,7 +67,7 @@ class EmailAuthenticator implements \VuFind\I18n\Translator\TranslatorAwareInter
      * @param \VuFind\Mailer\Mailer           $mailer          Mailer
      * @param PhpRenderer                     $viewRenderer    View Renderer
      * @param UserIpReader                    $userIpReader    User IP address reader
-     * @param \VuFind\Config\Config           $config          Configuration
+     * @param \Laminas\Config\Config          $config          Configuration
      * @param AuthHashServiceInterface        $authHashService AuthHash database service
      */
     public function __construct(
@@ -78,7 +76,7 @@ class EmailAuthenticator implements \VuFind\I18n\Translator\TranslatorAwareInter
         protected \VuFind\Mailer\Mailer $mailer,
         protected PhpRenderer $viewRenderer,
         protected UserIpReader $userIpReader,
-        protected \VuFind\Config\Config $config,
+        protected \Laminas\Config\Config $config,
         protected AuthHashServiceInterface $authHashService
     ) {
     }
@@ -143,7 +141,9 @@ class EmailAuthenticator implements \VuFind\I18n\Translator\TranslatorAwareInter
         $viewParams['title'] = $this->config->Site->title;
 
         $message = $this->viewRenderer->render($template, $viewParams);
-        $from = $this->getEmailSenderAddress($this->config, $email);
+        $from = !empty($this->config->Mail->user_email_in_from)
+            ? $email
+            : ($this->config->Mail->default_from ?? $this->config->Site->email);
         $subject = $this->translator->translate($subject);
         $subject = str_replace('%%title%%', $viewParams['title'], $subject);
 

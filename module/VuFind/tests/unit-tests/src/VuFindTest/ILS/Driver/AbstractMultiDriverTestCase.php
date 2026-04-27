@@ -32,7 +32,7 @@
 
 namespace VuFindTest\ILS\Driver;
 
-use RuntimeException;
+use Laminas\Config\Exception\RuntimeException;
 use VuFind\ILS\Driver\AbstractMultiDriver;
 
 use function call_user_func_array;

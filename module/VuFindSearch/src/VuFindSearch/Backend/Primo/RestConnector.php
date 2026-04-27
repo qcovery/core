@@ -361,12 +361,8 @@ class RestConnector implements ConnectorInterface, \Laminas\Log\LoggerAwareInter
         // By setting this value to true, also matches, which
         // are NOT available via Holdingsfile are returned
         // (yes, right, set this to true - that's ExLibris Logic)
-        if (null !== ($pc = $args['pcAvailability'] ?? null)) {
-            $qs['pcAvailability'] = $pc ? 'true' : 'false';
-        }
-
-        if (null !== ($ft = $args['cdiFulltext'] ?? null)) {
-            $qs['searchInFulltextUserSelection'] = $ft ? 'true' : 'false';
+        if ($args['pcAvailability']) {
+            $qs['pcAvailability'] = 'true';
         }
 
         // QUERYSTRING: offset and limit
@@ -515,7 +511,6 @@ class RestConnector implements ConnectorInterface, \Laminas\Log\LoggerAwareInter
             $item['issn'] = $search->issn ?? [];
             $item['publisher'] = $display->publisher ?? [];
             $item['peer_reviewed'] = ($display->lds50[0] ?? '') === 'peer_reviewed';
-            $item['attributes'] = (array)($display->attribute ?? []);
             $openurl = $pnx->links->openurl[0] ?? '';
             $item['url'] = $openurl && !str_starts_with($openurl, '$')
                 ? $openurl

@@ -29,7 +29,7 @@
 
 namespace VuFind\Recommend;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 use VuFind\Connection\ExternalVuFind as Connection;
 
 use function intval;

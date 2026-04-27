@@ -33,7 +33,7 @@
 
 namespace VuFind\I18n\Locale;
 
-use VuFind\Config\Config;
+use Laminas\Config\Config;
 
 use function array_key_exists;
 use function in_array;

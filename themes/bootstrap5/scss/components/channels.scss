@@ -2,7 +2,7 @@
   margin-top: 1rem;
   margin-bottom: 2rem;
 }
-@include media-breakpoint-down(sm) {
+@media (max-width: 767px) {
   .channel-wrapper {
     margin-left: 1rem;
   }
@@ -13,7 +13,7 @@
   max-height: 300px;
   padding: 1rem;
   background-color: #eee;
-  border-radius: $border-radius;
+  border-radius: $border-radius-base;
 }
 
 .channel-add-menu {
@@ -23,7 +23,7 @@
   border-bottom: 1px solid $gray;
   text-align: center;
 }
-@include media-breakpoint-up(sm) {
+@media (min-width: 768px) {
   .channel-add-menu {
     float: right;
     margin: 0;

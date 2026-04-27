@@ -81,8 +81,8 @@ class Captcha extends AbstractPlugin implements TranslatorAwareInterface
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $config   Config file
-     * @param array                 $captchas CAPTCHA objects
+     * @param \Laminas\Config\Config $config   Config file
+     * @param array                  $captchas CAPTCHA objects
      *
      * @return void
      */

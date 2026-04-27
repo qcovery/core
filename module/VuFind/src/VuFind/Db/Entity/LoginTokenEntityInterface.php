@@ -54,9 +54,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param UserEntityInterface $user User to set
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setUser(UserEntityInterface $user): static;
+    public function setUser(UserEntityInterface $user): LoginTokenEntityInterface;
 
     /**
      * User getter (only null if entity has not been populated yet).
@@ -70,9 +70,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param string $token Token
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setToken(string $token): static;
+    public function setToken(string $token): LoginTokenEntityInterface;
 
     /**
      * Get token string.
@@ -86,9 +86,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param string $series Series
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setSeries(string $series): static;
+    public function setSeries(string $series): LoginTokenEntityInterface;
 
     /**
      * Get series string.
@@ -102,9 +102,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param DateTime $dateTime Last login date/time
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setLastLogin(DateTime $dateTime): static;
+    public function setLastLogin(DateTime $dateTime): LoginTokenEntityInterface;
 
     /**
      * Get last login date/time.
@@ -118,9 +118,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param ?string $browser Browser details (or null for none)
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setBrowser(?string $browser): static;
+    public function setBrowser(?string $browser): LoginTokenEntityInterface;
 
     /**
      * Get browser details (or null for none).
@@ -134,9 +134,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param ?string $platform Platform details (or null for none)
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setPlatform(?string $platform): static;
+    public function setPlatform(?string $platform): LoginTokenEntityInterface;
 
     /**
      * Get platform details (or null for none).
@@ -150,9 +150,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param int $expires Expiration timestamp
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setExpires(int $expires): static;
+    public function setExpires(int $expires): LoginTokenEntityInterface;
 
     /**
      * Get expiration timestamp.
@@ -166,9 +166,9 @@ interface LoginTokenEntityInterface extends EntityInterface
      *
      * @param ?string $sid Last session ID (or null for none)
      *
-     * @return static
+     * @return LoginTokenEntityInterface
      */
-    public function setLastSessionId(?string $sid): static;
+    public function setLastSessionId(?string $sid): LoginTokenEntityInterface;
 
     /**
      * Get last session ID (or null for none).

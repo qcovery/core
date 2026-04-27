@@ -70,7 +70,7 @@ class ImageLoader implements \Laminas\Log\LoggerAwareInterface
     /**
      * User-configured image to load from theme on error.
      *
-     * @var ?string
+     * @var string
      */
     protected $configuredFailImage = null;
 
@@ -79,7 +79,7 @@ class ImageLoader implements \Laminas\Log\LoggerAwareInterface
      *
      * @var string
      */
-    protected $defaultFailImage = 'images/hidden-image.gif';
+    protected $defaultFailImage = 'images/noCover2.gif';
 
     /**
      * Array containing map of allowed file extensions to mimetypes

@@ -21,7 +21,7 @@
 
       <?php /* Display qrcode if appropriate: */ ?>
       <?php if ($QRCode): ?>
-        <span class="record-qrcode">
+        <span class="hidden-xs">
           <br><img alt="<?=$this->transEscAttr('QR Code')?>" class="qrcode" src="<?=$this->escapeHtmlAttr($QRCode);?>">
         </span>
       <?php endif; ?>
@@ -51,7 +51,6 @@
         <?=$this->transEsc('cached_record_warning')?>
       </div>
     <?php endif; ?>
-    <?=$this->record($this->driver)->getLabelList() ?>
 
     <?php foreach ($this->driver->tryMethod('getFullTitlesAltScript', [], []) as $altTitle): ?>
       <div class="title-alt">

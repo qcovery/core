@@ -1,26 +1,26 @@
-/*global VuFind, setupQRCodeLinks */
+/*global VuFind */
 VuFind.combinedSearch = (function CombinedSearch() {
-  function initResultScripts(container) {
-    VuFind.openurl.init(container);
-    VuFind.itemStatuses.init(container);
-    VuFind.saveStatuses.init(container);
-    setupQRCodeLinks(container);
-    VuFind.recordVersions.init(container);
-  }
 
   function init(container, url) {
     VuFind.loadHtml(container, url, '', function containerLoad(responseText) {
-      if (responseText.length === 0) {
-        container.hide();
+      if (!responseText || responseText.length === 0) {
+        var element = typeof container === 'string' ? document.querySelector(container) : container;
+        if (element) {
+          element.style.display = "none";
+          let parent = element.parentNode;
+          while (parent && parent.classList.contains('js-hide-if-empty')) {
+            parent.style.display = "none";
+            parent = parent.parentNode;
+          }
+        }
       } else {
-        initResultScripts(container);
+        VuFind.initResultScripts(container);
       }
     });
   }
 
   var my = {
-    init: init,
-    initResultScripts: initResultScripts
+    init: init
   };
 
   return my;

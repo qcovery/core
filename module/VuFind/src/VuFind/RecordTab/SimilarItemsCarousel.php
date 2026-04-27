@@ -59,19 +59,19 @@ class SimilarItemsCarousel extends AbstractBase
     /**
      * Configuration
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * Constructor
      *
-     * @param \VuFindSearch\Service  $search Search service
-     * @param ?\VuFind\Config\Config $config Configuration
+     * @param \VuFindSearch\Service   $search Search service
+     * @param ?\Laminas\Config\Config $config Configuration
      */
     public function __construct(
         \VuFindSearch\Service $search,
-        ?\VuFind\Config\Config $config = null
+        ?\Laminas\Config\Config $config = null
     ) {
         $this->searchService = $search;
         $this->config = $config;

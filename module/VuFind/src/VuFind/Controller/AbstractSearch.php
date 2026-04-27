@@ -107,9 +107,8 @@ class AbstractSearch extends AbstractBase
 
         // Handle request to edit existing saved search:
         $view->saved = false;
-        // 'edit' query parameter is added for legacy template support
-        $searchId = $this->params()->fromQuery('sid') ?? $this->params()->fromQuery('edit');
-        if ($searchId !== null) {
+        $searchId = $this->params()->fromQuery('edit', false);
+        if ($searchId !== false && intval($searchId) > 0) {
             $view->saved = $this->restoreAdvancedSearch($searchId);
         }
 
@@ -158,6 +157,17 @@ class AbstractSearch extends AbstractBase
         $url = $this->url()->fromRoute($details);
         $url .= $savedSearch->getUrlQuery()->getParams(false);
         return $this->redirect()->toUrl($url);
+    }
+
+    /**
+     * Is the result scroller active?
+     *
+     * @return bool
+     */
+    protected function resultScrollerActive()
+    {
+        // Disabled by default:
+        return false;
     }
 
     /**
@@ -384,7 +394,11 @@ class AbstractSearch extends AbstractBase
         if ($totalResults > 0 && $page > $lastPage) {
             $queryParams = $request;
             $queryParams['page'] = $lastPage;
-            return $this->redirect()->toRoute('search-results', [], [ 'query' => $queryParams ]);
+            return $this->redirect()->toRoute(
+                $params->getOptions()->getSearchAction(),
+                [],
+                ['query' => $queryParams]
+            );
         }
 
         // If we received an EmptySet back, that indicates that the real search
@@ -413,7 +427,7 @@ class AbstractSearch extends AbstractBase
             }
 
             // Set up results scroller:
-            if ($results->getOptions()->resultScrollerActive()) {
+            if ($this->resultScrollerActive()) {
                 $this->resultScroller()->init($results);
             }
 

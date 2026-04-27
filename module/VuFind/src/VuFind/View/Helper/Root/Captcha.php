@@ -56,18 +56,18 @@ class Captcha extends \Laminas\View\Helper\AbstractHelper
     /**
      * Config
      *
-     * @var \VuFind\Config\Config
+     * @var \Laminas\Config\Config
      */
     protected $config;
 
     /**
      * Constructor
      *
-     * @param \VuFind\Config\Config $config   Config
-     * @param array                 $captchas Captchas
+     * @param \Laminas\Config\Config $config   Config
+     * @param array                  $captchas Captchas
      */
     public function __construct(
-        \VuFind\Config\Config $config,
+        \Laminas\Config\Config $config,
         array $captchas = []
     ) {
         $this->config = $config;

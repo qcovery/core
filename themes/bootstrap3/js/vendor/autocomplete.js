@@ -1,4 +1,4 @@
-/* https://github.com/vufind-org/autocomplete.js (v2.1.5) (2023-04-13) */
+/* https://github.com/vufind-org/autocomplete.js (v2.1.10) (2024-06-06) */
 function Autocomplete(_settings) {
   const _DEFAULTS = {
     delay: 250,
@@ -25,13 +25,22 @@ function Autocomplete(_settings) {
       const args = [].slice.call(arguments);
 
       clearTimeout(timeout);
-      timeout = setTimeout(function() {
+      timeout = setTimeout(function () {
         func.apply(context, args);
       }, delay);
+
+      return timeout;
     };
   }
 
+  function randomID() {
+    return Math.random().toString(16).slice(-6);
+  }
+
   function _align(input) {
+    if (input === false) {
+      return;
+    }
     const inputBox = input.getBoundingClientRect();
     list.style.minWidth = inputBox.width + "px";
     list.style.top = inputBox.bottom + window.scrollY + "px";
@@ -58,17 +67,19 @@ function Autocomplete(_settings) {
     list.classList.add("open");
   }
 
-  function _hide(e) {
-    if (
-      typeof e !== "undefined" &&
-      !!e.relatedTarget &&
-      e.relatedTarget.hasAttribute("href")
-    ) {
-      return;
-    }
+  let lastCB = null;
+  let debounceTimeout;
+  function _hide() {
     list.classList.remove("open");
+    list.innerHTML = "";
+
+    clearTimeout(debounceTimeout);
     _currentIndex = -1;
+    if (lastInput) {
+      lastInput.setAttribute('aria-expanded', 'false');
+    }
     lastInput = false;
+    lastCB = null;
   }
 
   function _selectItem(item, input) {
@@ -76,9 +87,7 @@ function Autocomplete(_settings) {
       return;
     }
     // Broadcast
-    var event = document.createEvent("CustomEvent");
-    // CustomEvent: name, canBubble, cancelable, detail
-    event.initCustomEvent("ac-select", true, true, item);
+    var event = new CustomEvent("ac-select", { bubbles: true, cancelable: true, detail: item });
     input.dispatchEvent(event);
     // Copy value
     if (typeof item === "string" || typeof item === "number") {
@@ -94,9 +103,16 @@ function Autocomplete(_settings) {
     _hide();
   }
 
-  function _renderItem(item, input) {
+  function _renderItem(item, input, index = null) {
     let el = document.createElement("div");
+    el.setAttribute("role", "option");
+    el.setAttribute("aria-selected", false);
     el.classList.add("ac-item");
+    el.setAttribute(
+      "id",
+      input.getAttribute("id") + "__" + (index === null ? randomID() : index),
+    );
+
     if (typeof item === "string" || typeof item === "number") {
       el.innerHTML = item;
     } else if (typeof item._header !== "undefined") {
@@ -120,7 +136,7 @@ function Autocomplete(_settings) {
     }
     el.addEventListener(
       "mousedown",
-      e => {
+      (e) => {
         if (e.which === 1) {
           e.preventDefault();
           _selectItem(item, input);
@@ -138,43 +154,54 @@ function Autocomplete(_settings) {
     if (items.length > settings.limit) {
       items = items.slice(0, settings.limit);
     }
-    const listEls = items.map(item => _renderItem(item, input));
+    const listEls = items.map((item, index) => _renderItem(item, input, index));
     list.innerHTML = "";
-    listEls.map(el => list.appendChild(el));
+    listEls.map((el) => list.appendChild(el));
 
     // Setup keyboard information
-    _currentItems = items.slice().filter(item => {
+    _currentItems = items.slice().filter((item) => {
       return (
         typeof item._header === "undefined" &&
         typeof item._disabled === "undefined"
       );
     });
     _currentListEls = listEls.filter(
-      el =>
+      (el) =>
         !el.classList.contains("ac-header") &&
         !el.classList.contains("ac-disabled")
     );
     _currentIndex = -1;
   }
 
-  let lastCB;
   function _search(handler, input) {
     if (input.value.length < settings.minInputLength) {
       _hide();
       return;
     }
 
+    let loadingEl = _renderItem({ _header: settings.loadingString }, input);
+    list.innerHTML = loadingEl.outerHTML;
+
     let thisCB = new Date().getTime();
     lastCB = thisCB;
 
     handler(input.value, function callback(items) {
-      if (thisCB !== lastCB || items === false || items.length === 0) {
+      const outdatedHandler = thisCB !== lastCB;
+      if (outdatedHandler) {
+        // We should just ignore outdated handler callbacks; newer code will do
+        // the right thing, and taking action based on an old request will only
+        // cause problems.
+        return;
+      }
+      if (!items || items.length === 0) {
         _hide();
         return;
       }
       _searchCallback(items, input);
       _show(input);
       _align(input);
+      // Set aria-expanded here so that the load indicator isn't marked expanded
+      input.setAttribute('aria-expanded', 'true');
     });
   }
 
@@ -185,46 +212,55 @@ function Autocomplete(_settings) {
     }
     switch (event.which) {
       // arrow keys through items
-      case 38: // up key
+      case 38: // UP key
         event.preventDefault();
-        if (_currentIndex === -1) {
-          return;
+        if (_currentIndex > -1) {
+          _currentListEls[_currentIndex].classList.remove("is-selected");
+          _currentListEls[_currentIndex].setAttribute("aria-selected", false);
         }
-        _currentListEls[_currentIndex].classList.remove("is-selected");
         _currentIndex -= 1;
-        if (_currentIndex === -1) {
-          return;
+        if (_currentIndex <= -2) {
+          _currentIndex = _currentItems.length - 1;
         }
-        _currentListEls[_currentIndex].classList.add("is-selected");
         break;
-      case 40: // down key
+      case 40: // DOWN key
         event.preventDefault();
         if (lastInput === false) {
           _search(handler, input);
           return;
         }
-        if (_currentIndex === _currentItems.length - 1) {
-          return;
-        }
         if (_currentIndex > -1) {
           _currentListEls[_currentIndex].classList.remove("is-selected");
+          _currentListEls[_currentIndex].setAttribute("aria-selected", false);
         }
         _currentIndex += 1;
-        _currentListEls[_currentIndex].classList.add("is-selected");
-        break;
-      // enter to nav or populate
-      case 9:
-      case 13:
-        if (_currentIndex === -1) {
-          return;
+        if (_currentIndex >= _currentItems.length) {
+          _currentIndex = -1;
         }
-        event.preventDefault();
-        _selectItem(_currentItems[_currentIndex], input);
         break;
-      // hide on escape
+      // ENTER to nav or populate
+      case 13:
+        if (_currentIndex > -1) {
+          event.preventDefault();
+          _selectItem(_currentItems[_currentIndex], input);
+        }
+        break;
+      // hide on ESCAPE
       case 27:
         _hide();
         break;
+    }
+
+    if (_currentIndex > -1) {
+      input.setAttribute(
+        "aria-activedescendant",
+        _currentListEls[_currentIndex].getAttribute("id"),
+      );
+
+      _currentListEls[_currentIndex].classList.add("is-selected");
+      _currentListEls[_currentIndex].setAttribute("aria-selected", true);
+    } else {
+      input.removeAttribute("aria-activedescendant");
     }
   }
 
@@ -232,6 +268,7 @@ function Autocomplete(_settings) {
     if (!input) {
       return false;
     }
+
     if (typeof handler === "undefined") {
       throw new Error(
         "Autocomplete needs handler to return items based on a query: function(query, callback) {}"
@@ -243,33 +280,52 @@ function Autocomplete(_settings) {
       list = document.querySelector(".autocomplete-results");
       if (!list) {
         list = document.createElement("div");
+        list.setAttribute("id", "ac-" + randomID());
         list.classList.add("autocomplete-results");
         document.body.appendChild(list);
         window.addEventListener(
           "resize",
-          function acresize() {
-            if (lastInput === false) {
-              return;
-            }
-            _align(lastInput);
-          },
+          () => _align(lastInput),
+          false
+        );
+        window.addEventListener(
+          "scroll",
+          () => _align(lastInput),
           false
         );
       }
     }
 
+    // Aria
+    list.setAttribute("role", "listbox");
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "both");
+    input.setAttribute('aria-expanded', 'false');
+    input.setAttribute("aria-controls", list.getAttribute("id"));
+    input.setAttribute("enterkeyhint", "search"); // phone keyboard hint
+    input.setAttribute("autocapitalize", "off");  // disable browser tinkering
+    input.setAttribute("autocomplete", "off");    // ^
+    input.setAttribute("spellcheck", "false");    // ^
+    if (typeof input.autocorrect !== 'undefined') {
+      input.setAttribute("autocorrect", "off");     // ^ only with Safari
+    }
+
     // Activation / De-activation
-    input.setAttribute("autocomplete", "off");
-    input.addEventListener("focus", _ => _search(handler, input), false);
+    if (input.getAttribute("autofocus") !== null) {
+      // ignore the first autofocus
+      input.addEventListener("focus", () => {
+        input.addEventListener("focus", () => _search(handler, input));
+      }, { once: true });
+    } else {
+      input.addEventListener("focus", () => _search(handler, input));
+    }
     input.addEventListener("blur", _hide, false);
 
     // Input typing
     const debounceSearch = _debounce(_search, settings.delay);
     input.addEventListener(
       "input",
-      event => {
-        let loadingEl = _renderItem({ _header: settings.loadingString });
-        list.innerHTML = loadingEl.outerHTML;
+      (event) => {
         _show(input);
         _align(input);
 
@@ -279,7 +335,7 @@ function Autocomplete(_settings) {
         ) {
           _search(handler, input);
         } else {
-          debounceSearch(handler, input);
+          debounceTimeout = debounceSearch(handler, input);
         }
       },
       false
@@ -288,9 +344,14 @@ function Autocomplete(_settings) {
     // Checking control characters
     input.addEventListener(
       "keydown",
-      event => _keydown(handler, input, event),
+      (event) => _keydown(handler, input, event),
       false
     );
+
+    input.ac = {
+      show: _show,
+      hide: _hide,
+    }
 
     return input;
   };

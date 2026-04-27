@@ -45,7 +45,6 @@ use Behat\Mink\Element\Element;
 final class BulkTest extends \VuFindTest\Integration\MinkTestCase
 {
     use \VuFindTest\Feature\LiveDatabaseTrait;
-    use \VuFindTest\Feature\RetryClickTrait;
     use \VuFindTest\Feature\UserCreationTrait;
 
     /**
@@ -270,102 +269,66 @@ final class BulkTest extends \VuFindTest\Integration\MinkTestCase
         $this->clickCss($page, '#modal input[type="submit"]');
         $this->waitForPageLoad($page);
 
-        // If all records were deleted, success message should be visible, and delete button should be gone after
-        // lightbox is closed.
-        $this->waitForLightboxHidden();
+        // If all records were deleted, success message should be visible in
+        // lightbox, and delete button should be gone after lightbox is closed.
         $this->assertEquals(
             'Your saved item(s) were deleted.',
-            $this->findCssAndGetText($page, '.alert-success')
+            $this->findCssAndGetText($page, '.modal .alert-success')
         );
+        $this->closeLightbox($page, true);
         $this->unfindCss($page, 'button[name="delete"]');
-    }
-
-    /**
-     * Data provider to allow testing of top or bottom controls.
-     *
-     * @return array[]
-     */
-    public static function topOrBottomProvider(): array
-    {
-        return [
-            'top button' => [''],
-            'bottom button' => ['bottom_'],
-        ];
     }
 
     /**
      * Test that the export control works.
      *
-     * @param string $idPrefix Prefix for bulk control IDs.
-     *
      * @return void
-     *
-     * @dataProvider topOrBottomProvider
      */
-    public function testBulkExport(string $idPrefix): void
+    public function testBulkExport(): void
     {
-        $session = $this->getMinkSession();
         $page = $this->setUpGenericBulkTest();
-        $buttonSelector = '#' . $idPrefix . 'ribbon-export';
+        $button = $this->findCss($page, '#ribbon-export');
 
         // First try clicking without selecting anything:
-        $this->clickCss($page, $buttonSelector);
+        $button->click();
         $this->checkForNonSelectedMessage($page);
         $this->closeLightbox($page, true);
 
         // Now do it for real -- we should get a lightbox prompt.
-        $page->find('css', '#' . $idPrefix . 'addFormCheckboxSelectAll')->check();
-        $this->waitStatement('$("input.checkbox-select-item:checked").length === 2');
-        $this->clickCss($page, $buttonSelector);
+        $page->find('css', '#addFormCheckboxSelectAll')->check();
+        $button->click();
 
         // Select EndNote option
-        try {
-            // We don't want to wait the full default timeout here since that wastes a lot
-            // of time if a click failed to register; however, we shouldn't wait for too
-            // short of a time, or else a slow response can break the test by causing a
-            // double form submission.
-            $select = $this->findCss($page, '#format', 1500);
-        } catch (\Exception $e) {
-            $this->retryClickWithResizedWindow($session, $page, $buttonSelector);
-            $select = $this->findCss($page, '#format');
-        }
+        $select = $this->findCss($page, '#format');
         $select->selectOption('EndNote');
 
         // Do the export:
-        $this->clickCss($page, '.form-cart-export input[name=submitButton]');
-        $buttonText = $this->findCssAndGetText($page, '.alert .text-center .btn');
-        $this->assertEquals('Download File', $buttonText);
+        $submit = $this->findCss($page, '.modal-body input[name=submitButton]');
+        $submit->click();
+        $result = $this->findCss($page, '.modal-body .alert .text-center .btn');
+        $this->assertEquals('Download File', $result->getText());
     }
 
     /**
      * Test that the print control works.
      *
-     * @param string $idPrefix Prefix for bulk control IDs.
-     *
      * @return void
-     *
-     * @dataProvider topOrBottomProvider
      */
-    public function testBulkPrint(string $idPrefix): void
+    public function testBulkPrint(): void
     {
         $session = $this->getMinkSession();
         $page = $this->setUpGenericBulkTest();
-        $buttonSelector = '#' . $idPrefix . 'ribbon-print';
+        $button = $this->findCss($page, '#ribbon-print');
 
         // First try clicking without selecting anything:
-        $this->clickCss($page, $buttonSelector);
+        $button->click();
         $this->checkForNonSelectedMessage($page);
         $page->find('css', '.modal-body .btn')->click();
 
         // Now do it for real -- we should get redirected.
-        $page->find('css', '#' . $idPrefix . 'addFormCheckboxSelectAll')->check();
-        $this->waitStatement('$("input.checkbox-select-item:checked").length === 2');
-        $this->clickCss($page, $buttonSelector);
+        $page->find('css', '#addFormCheckboxSelectAll')->check();
+        $button->click();
         [, $params] = explode('?', $session->getCurrentUrl());
-        if (str_starts_with($params, 'lookfor')) {
-            $this->retryClickWithResizedWindow($session, $page, $buttonSelector);
-            [, $params] = explode('?', $session->getCurrentUrl());
-        }
         $this->assertEquals(
             'print=true&id[]=Solr|testsample1&id[]=Solr|testsample2',
             str_replace(['%5B', '%5D', '%7C'], ['[', ']', '|'], $params)

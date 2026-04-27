@@ -32,7 +32,7 @@
 namespace VuFind\Resolver\Driver;
 
 use DOMDocument;
-use DOMXPath;
+use Laminas\Dom\DOMXPath;
 
 use function chr;
 use function count;
