@@ -1,4 +1,8 @@
 <?php
+    if (get_class($this->driver) == 'VuFind\RecordDriver\Missing') {
+        // if record is missing, don't show availability (call to formatSolrData would fail)
+        return;
+    }
     // solr data for transfer to prevent further solr requests
     $solrData = $this->driver->formatSolrData();
 ?>
