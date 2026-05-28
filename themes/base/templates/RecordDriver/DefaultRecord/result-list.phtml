@@ -208,6 +208,16 @@
         <?php endforeach; ?>
       <?php endif; ?>
 
+      <?php if ($this->driver->tryMethod('explainEnabled')): ?>
+        <?=
+        $this->record($this->driver)->renderTemplate('result-list-explain.phtml', [
+          'driver' => $this->driver,
+          'request' => $this->request,
+          'result' => $this->result,
+        ]);
+        ?>
+      <?php endif; ?>
+
       <?=$this->driver->supportsCoinsOpenUrl() ? '<span class="Z3988" title="' . $this->escapeHtmlAttr($this->driver->getCoinsOpenUrl()) . '"></span>' : ''?>
     </div>
   </div>

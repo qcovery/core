@@ -1121,6 +1121,21 @@ main
     display: none;
     }
 
+.template-name-results .result-list-explain {
+    display: block;
+}
+
+.template-name-results .result-list-explain > span {
+    display: inline-block;
+    height: 35px;
+    line-height: 35px;
+    vertical-align: bottom;
+}
+
+.template-name-results .result-list-explain .js-result-list-explain {
+    width: 90%;
+}
+
 .autocomplete-results,
 .close-offcanvas {
 	display: none;
@@ -1192,10 +1207,12 @@ main
     color: var(--black);
     }
 
+.collapse,
 .facet-group .collapse {
     display: none;
     }
 
+.collapse.show,
 .facet-group .collapse.show {
     display: block;
     }
