@@ -554,9 +554,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
             if ($this->list) {
                 if ($this->source == 'Search2') {
-                    $url = "/Search2Record/{$this->id}";
+                    $url = $this->urlHelper->fromRoute('home') . "Search2Record/{$this->id}";
                 } else {
-                    $url = "/Record/{$this->id}";
+                    $url = $this->urlHelper->fromRoute('home') . "Record/{$this->id}";
                 }
             }
 
