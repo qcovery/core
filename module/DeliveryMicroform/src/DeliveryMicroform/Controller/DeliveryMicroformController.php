@@ -64,8 +64,9 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
 
         $callnumbers = $this->getMarcValues($driver, '980');
         foreach ($callnumbers as $callnumber) {
-            if  ($callnumber->getSubField('2')->getData() == $config['DeliveryMicroform']['callnumber_iln']) {
-                $view->callnumber = $callnumber->getSubField('d')->getData();
+
+            if  ($this->getSubfieldValue($callnumber, '2') == $config['DeliveryMicroform']['callnumber_iln']) {
+                $view->callnumber = $this->getSubfieldValue($callnumber, 'd');
             }
         }
 
@@ -205,9 +206,21 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
     private function getMarcValue($driver, $marcField) {
         $marcFieldArray = explode('|', $marcField);
         if (sizeof($marcFieldArray) == 2) {
-            return $driver->getMarcReader()->getField($marcFieldArray[0])->getSubField($marcFieldArray[1])->getData();
+            foreach ($driver->getMarcReader()->getFields($marcFieldArray[0])[0]['subfields'] as $subfield) {
+                if ($subfield['code'] == $marcFieldArray[1]) {
+                    return $subfield['data'];
+                }
+            }
         }
         return '';
+    }
+
+    private function getSubfieldValue($fieldObject, $subfieldCode) {
+        foreach ($fieldObject['subfields'] as $subfield) {
+            if ($subfield['code'] == $subfieldCode) {
+                return $subfield['data'];
+            }
+        }
     }
 
     private function getMarcValues($driver, $marcField) {
