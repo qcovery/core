@@ -22,7 +22,7 @@ class CaLiefHelper extends AbstractHelper
         
         $sl = $sm->getServiceLocator();
         $auth = $sl->get('VuFind\AuthManager');
-        $user = $auth->isLoggedIn();
+        $user = $auth->getIdentity();
         if ($user) {
             $table = $sl->get('CaLief\DB\Table\UserCalief');
             $tableAdmin = $sl->get('CaLief\DB\Table\CaliefAdmin');

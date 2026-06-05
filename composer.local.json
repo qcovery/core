@@ -1,0 +1,39 @@
+{
+    "autoload": {
+        "psr-4": {
+            "AutocompleteTerms\\": ["module/AutocompleteTerms/src/AutocompleteTerms", "module/AutocompleteTerms"],
+            "AvailabilityFeedback\\": ["module/AvailabilityFeedback/src/AvailabilityFeedback", "module/AvailabilityFeedback"],
+            "AvailabilityPlus\\": ["module/AvailabilityPlus/src/AvailabilityPlus", "module/AvailabilityPlus"],
+            "BelugaConfig\\": ["module/BelugaConfig/src/BelugaConfig", "module/BelugaConfig"],
+            "BeluginoCover\\": ["module/BeluginoCover/src/BeluginoCover", "module/BeluginoCover"],
+            "CaLief\\": ["module/CaLief/src/CaLief", "module/CaLief"],
+            "DAIAplus\\": ["module/DAIAplus/src/DAIAplus", "module/DAIAplus"],
+            "Delivery\\": ["module/Delivery/src/Delivery", "module/Delivery"],
+            "DeliveryMicroform\\": ["module/DeliveryMicroform/src/DeliveryMicroform", "module/DeliveryMicroform"],
+            "DependentWorks\\": ["module/DependentWorks/src/DependentWorks", "module/DependentWorks"],
+            "DismaxMunge\\": ["module/DismaxMunge/src/DismaxMunge", "module/DismaxMunge"],
+            "ExtendedFacets\\": ["module/ExtendedFacets/src/ExtendedFacets", "module/ExtendedFacets"],
+            "ExtendedFeedback\\": ["module/ExtendedFeedback/src/ExtendedFeedback", "module/ExtendedFeedback"],
+            "FacetPrefix\\": ["module/FacetPrefix/src/FacetPrefix", "module/FacetPrefix"],
+            "Findex\\": ["module/Findex/src/Findex", "module/Findex"],
+            "FulltextFinder\\": ["module/FulltextFinder/src/FulltextFinder", "module/FulltextFinder"],
+            "HeadTitle\\": ["module/HeadTitle/src/HeadTitle", "module/HeadTitle"],
+            "HelpTooltips\\": ["module/HelpTooltips/src/HelpTooltips", "module/HelpTooltips"],
+            "LMS\\": ["module/LMS/src/LMS", "module/LMS"],
+            "Libraries\\": ["module/Libraries/src/Libraries", "module/Libraries"],
+            "LimitBatch\\": ["module/LimitBatch/src/LimitBatch", "module/LimitBatch"],
+            "ListAdmin\\": ["module/ListAdmin/src/ListAdmin", "module/ListAdmin"],
+            "PAIAplus\\": ["module/PAIAplus/src/PAIAplus", "module/PAIAplus"],
+            "PublicationSuggestion\\": ["module/PublicationSuggestion/src/PublicationSuggestion", "module/PublicationSuggestion"],
+            "RVK\\": ["module/RVK/src/RVK", "module/RVK"],
+            "RecordDriver\\": ["module/RecordDriver/src/RecordDriver", "module/RecordDriver"],
+            "RelevancePicker\\": ["module/RelevancePicker/src/RelevancePicker", "module/RelevancePicker"],
+            "ResultFeedback\\": ["module/ResultFeedback/src/ResultFeedback", "module/ResultFeedback"],
+            "SearchKeys\\": ["module/SearchKeys/src/SearchKeys", "module/SearchKeys"],
+            "SearchTools\\": ["module/SearchTools/src/SearchTools", "module/SearchTools"],
+            "SemesterApparatus\\": ["module/SemesterApparatus/src/SemesterApparatus", "module/SemesterApparatus"],
+            "StorageInfo\\": ["module/StorageInfo/src/StorageInfo", "module/StorageInfo"],
+            "UISettings\\": ["module/UISettings/src/UISettings", "module/UISettings"]
+        }
+    }
+}

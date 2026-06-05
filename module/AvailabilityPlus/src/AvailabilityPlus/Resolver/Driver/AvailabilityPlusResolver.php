@@ -35,13 +35,19 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
     protected $language;
 
+    protected Url $urlHelper;
+
+    protected $specsReader;
+
+
+
     /**
      * Constructor
      *
      * @param string            $baseUrl    Base URL for link resolver
      * @param Client $httpClient HTTP client
      */
-    public function __construct(ContainerInterface $sm, $baseUrl, Client $httpClient, $additionalParams, $rules, HMAC $hmac, $resolverConfig, Url $urlHelper) {
+    public function __construct(ContainerInterface $sm, $baseUrl, Client $httpClient, $additionalParams, $rules, HMAC $hmac, $resolverConfig, Url $urlHelper, ?SearchSpecsReader $specsReader = null) {
         parent::__construct($baseUrl);
         $this->serviceLocator = $sm;
         $this->httpClient = $httpClient;
@@ -51,6 +57,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
         $this->resolverConfig = $resolverConfig;
         $this->setLanguage();
         $this->urlHelper = $urlHelper;
+        $this->specsReader = $specsReader;
     }
 
     /**
@@ -117,8 +124,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     }
 
     protected function applyCustomChanges() {
-        $specsReader = new SearchSpecsReader();
-        $rules = $specsReader->get($this->rules) ?? [];
+        $rules = $this->specsReader->get($this->rules) ?? [];
 
         foreach ($this->parsed_data as $key => $item) {
             $rules_applied = [];

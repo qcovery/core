@@ -1,5 +1,5 @@
 <?
-  if($loggedin = $this->auth()->isLoggedIn()) {
+  if($loggedin = $this->auth()->getIdentity()) {
     $user_id = $loggedin->id;
     $loggedin = true;
   } else {

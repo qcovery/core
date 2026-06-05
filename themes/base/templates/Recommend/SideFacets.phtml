@@ -1,6 +1,6 @@
 <?php
   $this->layout()->sideFacetsInstanceCounter = ($this->layout()->sideFacetsInstanceCounter ?? 0) + 1;
-  $this->headScript()->appendFile('facets.js');
+  $this->assetManager()->appendScriptLink('facets.js');
 
   // Save results/options to $this so they are available to sub-templates:
   $this->results = $results = $this->recommend->getResults();
@@ -19,26 +19,8 @@
       }
     }
   }
-
-  $hierarchicalFacets = $this->recommend->getHierarchicalFacets();
-  if ($hierarchicalFacets) {
-    // jstree.min.js used to be injected by hierarchical-facet.js, but with deferred
-    // processing it's called too late to append anything to the headers.
-    $this->headScript()->appendFile('vendor/jsTree/jstree.min.js');
-    $this->headScript()->appendFile('jstree-vufind-facet-plugin.js');
-
-  }
 ?>
 <button class="close-offcanvas btn btn-link" data-toggle="offcanvas"><?=$this->transEsc('navigate_back') ?></button>
-
-<?php if ($results->getResultTotal() > 0 || $hasVisibleCheckboxes): ?>
-  <h2><?=$this->transEsc($this->slot('side-facet-caption')->get('Refine Results')) ?></h2>
-  <span class="sr-only"><?=$this->transEscAttr('page_reload_on_select_hint') ?></span>
-<?php endif; ?>
-
-<?=$this->render('search/controls/limit.phtml')?>
-<?=$this->render('search/controls/sort.phtml')?>
-
 <?php
   $checkboxFilters = $this->recommend->getCheckboxFacetSet();
   $hasVisibleCheckboxes = false;
@@ -51,6 +33,10 @@
     }
   }
 ?>
+<?php if ($results->getResultTotal() > 0 || $hasVisibleCheckboxes): ?>
+  <h2><?=$this->transEsc($this->slot('side-facet-caption')->get('Refine Results')) ?></h2>
+  <span class="sr-only"><?=$this->transEscAttr('page_reload_on_select_hint') ?></span>
+<?php endif; ?>
 
 <?php if ($hasVisibleCheckboxes): ?>
     <div class="checkboxFilter">
@@ -128,4 +114,4 @@
     </div>
   <?php endforeach; ?>
 <?php endif; ?>
-<?=$this->inlineScript(\Laminas\View\Helper\HeadScript::SCRIPT, "registerSideFacetTruncation();", 'SET');?>
+<?=$this->assetManager()->outputInlineScriptString('registerSideFacetTruncation();');?>

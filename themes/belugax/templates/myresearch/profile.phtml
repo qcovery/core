@@ -15,7 +15,7 @@ $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
     <h2><?=$this->transEsc('Your Profile')?></h2>
     <?=$this->flashmessages();?>
 
-    <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+    <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->getIdentity()]); ?>
 
     <table class="table table-striped">
         <?
@@ -103,6 +103,6 @@ $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
     </div>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?>">
-    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'profile'])?>
+<div class="<?=$this->layoutClass('sidebar')?>" id="myresearch-sidebar" role="navigation" aria-label="<?=$this->transEsc('account_menu_label')?>">
+    <?=$this->accountMenu()->render('profile')?>
 </div>

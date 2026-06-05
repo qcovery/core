@@ -22,7 +22,7 @@
 
   // Convenience variable:
   $account = $this->auth()->getManager();
-  $user = $this->auth()->isLoggedIn();
+  $user = $this->auth()->getIdentity();
 ?>
 
 <?=$this->flashmessages()?>
@@ -44,7 +44,7 @@
     </div>
     <div class="search-controls">
       <? if (isset($list)): ?>
-        <? if ($list->editAllowed($account->isLoggedIn())): ?>
+        <? if ($list->editAllowed($account->getIdentity())): ?>
           <a href="<?=$this->url('editList', ['id' => $list->id]) ?>" class="btn btn-link"><i class="bel-stift" aria-hidden="true"></i> <?=$this->transEsc("edit_list")?></a>
           <div class="btn-group">
             <a class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="<?=$this->url('myresearch-deletelist') ?>?listID=<?=urlencode($list->id)?>">
@@ -80,7 +80,7 @@
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
-  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => isset($list) ? 'list' . $list['id'] : 'favorites'])?>
+  <?=$this->accountMenu()->render(isset($list) ? 'list' . $list->getId() : 'favorites')?>
   <? foreach ($this->results->getRecommendations('side') as $current): ?>
     <?=$this->recommend($current)?>
   <? endforeach; ?>

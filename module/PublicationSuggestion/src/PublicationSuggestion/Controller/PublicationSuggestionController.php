@@ -49,7 +49,7 @@ class PublicationSuggestionController extends \VuFind\Controller\AbstractBase
         $config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('PublicationSuggestion');
 
         $account = $this->getAuthManager();
-        if ($config['PublicationSuggestion']['force_login'] && $account->isLoggedIn() == false) {
+        if ($config['PublicationSuggestion']['force_login'] && $account->getIdentity() == false) {
             return $this->forceLogin();
         }
 

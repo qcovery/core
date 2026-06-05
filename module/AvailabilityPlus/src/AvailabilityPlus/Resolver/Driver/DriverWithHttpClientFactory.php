@@ -3,6 +3,7 @@ namespace AvailabilityPlus\Resolver\Driver;
 
 use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
+use VuFind\Config\SearchSpecsReader;
 
 class DriverWithHttpClientFactory extends \VuFind\Resolver\Driver\DriverWithHttpClientFactory
 {
@@ -36,7 +37,8 @@ class DriverWithHttpClientFactory extends \VuFind\Resolver\Driver\DriverWithHttp
             "availabilityplus-resolver-{$resolverName}.yaml",
             $container->get(\VuFind\Crypt\HMAC::class),
             $config[$resolverName],
-            $container->get('ControllerPluginManager')->get('url')
+            $container->get('ControllerPluginManager')->get('url'),
+            $container->get(SearchSpecsReader::class),
         );
     }
 }

@@ -1,5 +1,5 @@
 <?
-  $user = $this->auth()->isLoggedIn();
+  $user = $this->auth()->getIdentity();
   $patron = $user ? $this->auth()->getILSPatron() : false;
   $capabilityParams = $patron ? ['patron' => $patron] : [];
 
@@ -51,6 +51,6 @@
   </a>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?>">
-  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'mylists'])?>
+<div class="<?=$this->layoutClass('sidebar')?>" id="myresearch-sidebar" role="navigation" aria-label="<?=$this->transEsc('account_menu_label')?>">
+    <?=$this->accountMenu()->render('mylists')?>
 </div>

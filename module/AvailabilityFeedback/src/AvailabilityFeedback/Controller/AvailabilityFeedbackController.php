@@ -47,7 +47,7 @@ class AvailabilityFeedbackController extends \VuFind\Controller\AbstractBase
     public function emailAction()
     {
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        if ($account->getIdentity() == false) {
             return $this->forceLogin();
         }
 

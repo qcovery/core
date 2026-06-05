@@ -34,6 +34,6 @@
     ?>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?>">
-    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => isset($list) ? 'list' . $list['id'] : 'favorites'])?>
+<div class="<?=$this->layoutClass('sidebar')?>" id="myresearch-sidebar" role="navigation" aria-label="<?=$this->transEsc('account_menu_label')?>">
+    <?=$this->accountMenu()->render(isset($list) ? 'list' . $list['id'] : 'favorites')?>
 </div>

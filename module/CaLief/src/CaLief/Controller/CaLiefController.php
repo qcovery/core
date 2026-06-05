@@ -73,7 +73,7 @@ class CaLiefController extends AbstractBase
     {
         // First make sure user is logged in to VuFind:
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        if ($account->getIdentity() == false) {
             return $this->forceLogin();
         }
 
@@ -117,7 +117,7 @@ class CaLiefController extends AbstractBase
     {
         // First make sure user is logged in to VuFind:
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        if ($account->getIdentity() == false) {
             return $this->forceLogin();
         }
 
@@ -169,7 +169,7 @@ class CaLiefController extends AbstractBase
     {
         // First make sure user is logged in to VuFind:
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        if ($account->getIdentity() == false) {
             return $this->forceLogin();
         }
 
@@ -221,7 +221,7 @@ class CaLiefController extends AbstractBase
     
     public function adminAction() {
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        if ($account->getIdentity() == false) {
             return $this->forceLogin();
         }
         
@@ -279,7 +279,7 @@ class CaLiefController extends AbstractBase
     
     /* public function logsAction() {
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        if ($account->getIdentity() == false) {
             return $this->forceLogin();
         }
         
@@ -341,7 +341,7 @@ class CaLiefController extends AbstractBase
 */
     public function orderAction() {
         $account = $this->getAuthManager();
-        if ($account->isLoggedIn() == false) {
+        if ($account->getIdentity() == false) {
             return $this->forceLogin();
         }
         

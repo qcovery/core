@@ -43,7 +43,7 @@ class ListAdminController extends AbstractBase
 {
     public function migrateAction () {
         $account = $this->getAuthManager();
-        $user = $account->isLoggedIn();
+        $user = $account->getIdentity();
         if ($user == false) {
             return $this->forceLogin();
         }

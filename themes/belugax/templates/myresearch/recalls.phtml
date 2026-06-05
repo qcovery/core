@@ -13,7 +13,7 @@
 
   <?=$this->flashmessages()?>
 
-  <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+  <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->getIdentity()]); ?>
   
     <?
       if (isset($this->cancelResults['canceledItems'])) {
@@ -162,6 +162,6 @@
   <? endif; ?>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?>">
-  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'recalls'])?>
+<div class="<?=$this->layoutClass('sidebar')?>" id="myresearch-sidebar" role="navigation" aria-label="<?=$this->transEsc('account_menu_label')?>">
+    <?=$this->accountMenu()->render('recalls')?>
 </div>
