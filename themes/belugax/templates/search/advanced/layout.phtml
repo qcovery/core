@@ -30,7 +30,7 @@
   }
 
   // Step 1: Load the javascript
-  $this->headScript()->appendFile(
+  $this->assetManager()->appendScriptLink(
     isset($this->advancedSearchJsOverride) ? $this->advancedSearchJsOverride : 'advanced_search.js'
   );
   // Step 2: Build the page

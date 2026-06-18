@@ -24,7 +24,7 @@
     ?>
     <!-- RTL styling -->
     <? if ($this->layout()->rtl) {
-      $this->headLink()->appendStylesheet('vendor/bootstrap-rtl.min.css');
+      $this->assetManager()->appendStyleLink('vendor/bootstrap-rtl.min.css');
     } ?>
     <?=$this->headLink()?>
     <?=$this->headStyle()?>
@@ -71,8 +71,8 @@
         // Deal with cart stuff:
         $cart = $this->cart();
         if ($cart->isActive()) {
-          $this->headScript()->appendFile("vendor/js.cookie.js");
-          $this->headScript()->appendFile("cart.js");
+          $this->assetManager()->appendScriptLink("vendor/js.cookie.js");
+          $this->assetManager()->appendScriptLink("cart.js");
           $domain = $cart->getCookieDomain();
           if (!empty($domain)) {
             $this->headScript()->appendScript(
@@ -109,7 +109,7 @@
       if ($this->keepAlive()) {
           $this->headScript()->appendScript('var keepAliveInterval = '
             . $this->keepAlive());
-          $this->headScript()->appendFile("keep_alive.js");
+          $this->assetManager()->appendScriptLink("keep_alive.js");
       }
     ?>
     <?
