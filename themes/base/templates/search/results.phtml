@@ -56,8 +56,8 @@
 
   // Load only if list view parameter is NOT full:
   if ($this->params->getOptions()->getListViewOption() !== 'full') {
-      $this->headScript()->appendFile("record.js");
-      $this->headScript()->appendFile("embedded_record.js");
+      $this->assetManager()->appendScriptLink("record.js");
+      $this->assetManager()->appendScriptLink("embedded_record.js");
   }
 
   $tabConfig = $this->searchTabs()->getTabConfig($this->searchClassId, $this->lookfor, $this->searchIndex, $this->searchType);

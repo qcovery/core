@@ -65,7 +65,7 @@
 
     <?php if($uiSettingsCss = $this->uisettings()->getUISettingsCss()):?>
       <?php foreach($uiSettingsCss as $uiSettingsCssStylesheet): ?>
-        <?php $this->headLink()->appendStylesheet($uiSettingsCssStylesheet); ?>
+        <?php $this->assetManager()->appendStyleLink($uiSettingsCssStylesheet); ?>
       <?php endforeach; ?>
     <?php endif; ?>
 
