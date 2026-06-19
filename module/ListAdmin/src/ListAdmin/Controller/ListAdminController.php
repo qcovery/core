@@ -88,7 +88,7 @@ class ListAdminController extends AbstractBase
         $config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('ListAdmin');
         if (isset($config->ListAdmin->admins)) {
             foreach ($config->ListAdmin->admins as $adminId) {
-                if ($user->username == $adminId) {
+                if ($user->getUsername() == $adminId) {
                     return true;
                 }
             }
