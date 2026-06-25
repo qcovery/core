@@ -1,10 +1,10 @@
 # CleanUpUserData
-Dieses Modul stellt einen Konsolenbefehl bereit, der veraltete Benutzerdaten aus der Datenbank entfernt. Benutzerkonten, bei denen der letzte Login länger als eine konfigurierbare Anzahl von Stunden zurückliegt, werden dabei gelöscht.
+Dieses Modul stellt einen Konsolenbefehl bereit, der bei veraltete Benutzerdaten die persönlichen Angaben der Nutzenden in der Datenbank bereinigt.
 
 ## Beschreibung
 Das CleanUpUserData-Modul erweitert VuFind um einen Wartungsbefehl zur Datenbankbereinigung. Die Hauptfunktionen umfassen:
 
-- Löschen von Benutzerdatensätzen, deren letzter Login älter als eine definierte Stundenanzahl ist
+- Bereinigen von Benutzerdatensätzen, deren letzter Login älter als eine definierte Stundenanzahl ist
 - Konfigurierbare Zeitgrenze über den Parameter `--hours` (Standardwert: 24 Stunden)
 - Bereitstellung eines Bash-Skripts für den einfachen Einsatz als Cronjob
 
@@ -32,9 +32,9 @@ php public/index.php util/cleanup_user_data --hours 48
 ```
 
 ### Parameter
-| Parameter | Beschreibung | Standardwert |
-|-----------|--------------|--------------|
-| `--hours` | Zeitraum in Stunden – Benutzer, deren letzter Login länger zurückliegt, werden gelöscht | 24 |
+| Parameter | Beschreibung                                                                             | Standardwert |
+|-----------|------------------------------------------------------------------------------------------|--------------|
+| `--hours` | Zeitraum in Stunden – Benutzer, deren letzter Login länger zurückliegt, werden bereinigt | 24 |
 
 ### Bash-Skript
 Im Verzeichnis `scripts/` befindet sich das Skript `clean_up_user_data.sh`, das die notwendigen Umgebungsvariablen setzt und den Befehl ausführt:
@@ -70,8 +70,7 @@ CleanUpUserData/
 ```
 
 ### Befehlsname
-- Primär: `util/cleanup_user_data`
-- Alias: `util/cleanupuserdata`
+- `util/cleanup_user_data`
 
 ## Lizenz
 Dieses Modul ist unter der GNU General Public License v2.0 lizenziert.

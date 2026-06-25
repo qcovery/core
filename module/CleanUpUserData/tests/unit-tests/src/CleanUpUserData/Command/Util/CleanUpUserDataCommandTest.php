@@ -1,31 +1,31 @@
 <?php
 
-/**
- * CleanUpRecordCacheCommand test.
- *
- * PHP version 7
- *
- * Copyright (C) Villanova University 2020.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2,
- * as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * @category VuFind
- * @package  Tests
- * @author   Demian Katz <demian.katz@villanova.edu>
- * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
- */
+    /**
+     * Clean up user data.
+     *
+     * PHP version 7
+     *
+     * Copyright (C) Villanova University 2020.
+     *
+     * This program is free software; you can redistribute it and/or modify
+     * it under the terms of the GNU General Public License version 2,
+     * as published by the Free Software Foundation.
+     *
+     * This program is distributed in the hope that it will be useful,
+     * but WITHOUT ANY WARRANTY; without even the implied warranty of
+     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     * GNU General Public License for more details.
+     *
+     * You should have received a copy of the GNU General Public License
+     * along with this program; if not, write to the Free Software
+     * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+     *
+     * @category VuFind
+     * @package  Tests
+     * @author   Johannes Schultze <schultze@effective-webwork.de>
+     * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
+     * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
+     */
 
 namespace CleanUpUserDataTest\Command\Util;
 
@@ -92,7 +92,7 @@ class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Test that the cleanup() method calls update on the user table with selected values set to ''.
+     * Test that the cleanup() method calls update on the user table with selected values.
      *
      * @return void
      */
@@ -128,6 +128,7 @@ class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
                         $user[$field] = $value;
                     }
                 }
+                return count($users);
             });
 
         // select() returns the current state of the mock database.
@@ -136,7 +137,17 @@ class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
                 return $users;
             });
 
-        $command = new CleanUpUserDataCommand($table);
+        $config = new \Laminas\Config\Config([
+            'CleanUp' => [
+                'firstname' => '',
+                'lastname' => '',
+                'cat_pass_enc' => '',
+                'created' => '2000-01-01 00:00:00',
+                'last_language' => '',
+                'email' => '',
+            ]
+        ]);
+        $command = new CleanUpUserDataCommand($table, $config);
         $command->cleanup();
 
         // Fetch users via select and verify fields are cleared afterwards.
@@ -152,30 +163,26 @@ class CleanUpUserDataCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Test that the cleanup command deletes the expected users.
+     * Test that the cleanup command cleans up the expected users.
      *
      * @return void
      */
     public function testBasicOperation()
     {
-        $users = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $users[] = $this->buildPopulatedUserRow($i);
-        }
-
         $table = $this->getMockBuilder(\VuFind\Db\Table\User::class)
             ->disableOriginalConstructor()
-            ->addMethods(['cleanup'])
+            ->onlyMethods(['update'])
             ->getMock();
         $table->expects($this->once())
-            ->method('cleanup')
-            ->will($this->returnValue($users));
+            ->method('update')
+            ->will($this->returnValue(5));
 
-        $command = new CleanUpUserDataCommand($table);
+        $config = new \Laminas\Config\Config(['Global' => ['default_hours' => 24]]);
+        $command = new CleanUpUserDataCommand($table, $config);
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        $expected = "5 records deleted.\n";
+        $expected = "5 row(s) in user table cleaned up successfully. (24 hours)\n";
         $this->assertEquals($expected, $commandTester->getDisplay());
         $this->assertEquals(0, $commandTester->getStatusCode());
     }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Console command: clean up record cache.
+ * Console command: clean up user data.
  *
  * PHP version 7
  *
@@ -37,7 +37,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use VuFind\Db\Table\User;
 
 /**
- * Console command: clean up record cache.
+ * Console command: clean up user data.
  *
  * @category VuFind
  * @package  Console
@@ -64,23 +64,17 @@ class CleanUpUserDataCommand extends Command
     /**
      * Main framework configuration
      *
-     * @var array
+     * @var Config
      */
     protected $mainConfig;
 
-    /**
-     * Hours to keep user data.
-     *
-     * @var int
-     */
-    protected $hours;
 
     /**
      * Constructor
      *
-     * @param User        $table Record table object
+     * @param User        $table      User table object
      * @param Config      $mainConfig Main framework configuration
-     * @param string|null $name  The name of the command; passing null means it
+     * @param string|null $name       The name of the command; passing null means it
      * must be set in configure()
      */
     public function __construct(User $table, Config $mainConfig, string $name = null) {
@@ -110,26 +104,30 @@ class CleanUpUserDataCommand extends Command
     /**
      * Clean up user data.
      *
+     * @param int $hours Hours to keep user data.
+     *
      * @return int
      */
-    public function cleanup() {
+    public function cleanup(int $hours = 24): int
+    {
         $date = new \DateTime();
-        $date->sub(new \DateInterval("PT{$this->hours}H"));
+        $date->sub(new \DateInterval("PT{$hours}H"));
         $callback = function ($select) use ($date) {
             $select->where->lessThan('last_login', $date->format('Y-m-d H:i:s'));
         };
 
-        return $this->userTable->update(
-            [
+        $cleanUpFields = isset($this->mainConfig->CleanUp)
+            ? $this->mainConfig->CleanUp->toArray()
+            : [
                 'firstname' => '',
                 'lastname' => '',
                 'cat_pass_enc' => '',
                 'created' => '2000-01-01 00:00:00',
                 'last_language' => '',
                 'email' => '',
-            ],
-            $callback
-        );
+            ];
+
+        return $this->userTable->update($cleanUpFields, $callback);
     }
 
     /**
@@ -139,9 +137,9 @@ class CleanUpUserDataCommand extends Command
      */
     private function getDefaultHours() {
         $defaultHours = 24;
-        if (isset($this->mainConfig['Global']['default_hours'])
-            && !empty($this->mainConfig['Global']['default_hours'])) {
-            $defaultHours = $this->mainConfig['Global']['default_hours'];
+        if (isset($this->mainConfig->Global->default_hours)
+            && !empty($this->mainConfig->Global->default_hours)) {
+            $defaultHours = $this->mainConfig->Global->default_hours;
         }
         return $defaultHours;
     }
@@ -157,9 +155,9 @@ class CleanUpUserDataCommand extends Command
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $this->hours = $input->getOption('hours') ?? $this->getDefaultHours();
-        $cleanedUpRows = $this->cleanup();
-        $output->writeln("{$cleanedUpRows} row(s) in user table cleaned up successfully. ({$this->hours} hours)");
+        $hours = $input->getOption('hours') ?? $this->getDefaultHours();
+        $cleanedUpRows = $this->cleanup($hours);
+        $output->writeln("{$cleanedUpRows} row(s) in user table cleaned up successfully. ({$hours} hours)");
         return 0;
     }
 }

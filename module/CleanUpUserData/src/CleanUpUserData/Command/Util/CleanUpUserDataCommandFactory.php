@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Factory for Util/CleanUpRecordCache command.
+ * Factory for util/cleanup_user_data command.
  *
  * PHP version 7
  *
@@ -36,7 +36,7 @@ use Psr\Container\ContainerExceptionInterface as ContainerException;
 use Psr\Container\ContainerInterface;
 
 /**
- * Factory for Util/CleanUpRecordCache command.
+ * Factory for util/cleanup_user_data command.
  *
  * @category VuFind
  * @package  Console
