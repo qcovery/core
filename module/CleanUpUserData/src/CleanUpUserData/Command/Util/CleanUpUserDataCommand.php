@@ -98,7 +98,7 @@ class CleanUpUserDataCommand extends Command
         $this
             ->setDescription('User data cleaner')
             ->setHelp('Removes unneeded user data records from the database.')
-            ->setAliases(['util/cleanupuserdata'])
+            ->setAliases(['util/cleanup_user_data'])
             ->addOption(
                 'hours',
                 null,
@@ -110,15 +110,26 @@ class CleanUpUserDataCommand extends Command
     /**
      * Clean up user data.
      *
-     * @return void
+     * @return int
      */
     public function cleanup() {
-        $this->userTable->update(['firstname' => '']);
-        $this->userTable->update(['lastname' => '']);
-        $this->userTable->update(['cat_pass_enc' => '']);
-        $this->userTable->update(['created' => '2000-01-01 00:00:00']);
-        $this->userTable->update(['last_language' => '']);
-        $this->userTable->update(['email' => '']);
+        $date = new \DateTime();
+        $date->sub(new \DateInterval("PT{$this->hours}H"));
+        $callback = function ($select) use ($date) {
+            $select->where->lessThan('last_login', $date->format('Y-m-d H:i:s'));
+        };
+
+        return $this->userTable->update(
+            [
+                'firstname' => '',
+                'lastname' => '',
+                'cat_pass_enc' => '',
+                'created' => '2000-01-01 00:00:00',
+                'last_language' => '',
+                'email' => '',
+            ],
+            $callback
+        );
     }
 
     /**
@@ -147,8 +158,8 @@ class CleanUpUserDataCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->hours = $input->getOption('hours') ?? $this->getDefaultHours();
-        $this->cleanup();
-        $output->writeln("Users cleaned up successfully. ({$this->hours} hours)");
+        $cleanedUpRows = $this->cleanup();
+        $output->writeln("{$cleanedUpRows} row(s) in user table cleaned up successfully. ({$this->hours} hours)");
         return 0;
     }
 }

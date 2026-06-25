@@ -7,7 +7,7 @@ $config = [
                     'CleanUpUserData\Command\Util\CleanUpUserDataCommand' => 'CleanUpUserData\Command\Util\CleanUpUserDataCommandFactory',
                 ],
                 'aliases' => [
-                    'util/cleanupuserdata' => 'CleanUpUserData\Command\Util\CleanUpUserDataCommand',
+                    'util/cleanup_user_data' => 'CleanUpUserData\Command\Util\CleanUpUserDataCommand',
                 ],
             ],
         ],
