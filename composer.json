@@ -35,7 +35,7 @@
         "composer/semver": "3.4.3",
         "endroid/qr-code": "5.1.0",
         "firebase/php-jwt": "7.0.2",
-        "guzzlehttp/guzzle": "7.9.2",
+        "guzzlehttp/guzzle": "7.13.2",
         "jaybizzle/crawler-detect": "^1.2",
         "laminas/laminas-cache": "3.13.0",
         "laminas/laminas-cache-storage-adapter-blackhole": "^2.0",
