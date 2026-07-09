@@ -385,6 +385,7 @@ class DAIA extends AvailabilityPlusResolver
                 '&doc_id=' . urlencode($doc_id) .
                 '&item_id=' . urlencode($item_id) .
                 '&type=recall' .
+                '&storage_id=' . urlencode($storage_id) .
                 '&hashKey=' . $this->hmac->generate($hmacKeys, $hmacPairs);
         } else {
             return $this->urlHelper->fromRoute('home') .
