@@ -60,40 +60,51 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
 
         foreach ($this->scores['bq'] as $key => $value) {
             $key = str_replace('bq-', '', $key);
-            $term = $this->searchTerm[$key.$value];
             if ($key != 'all') {
-                $this->results['boosting-'.$key][$term] = array('field' => $key, 'term' => $term, 'value' => $value, 'percent' => round( 100 * $value / $allBoostings));
-                $this->results['all']['boosting-'.$key] = array('percent' => round(100 * $value / $all));
+                $term = $this->searchTerm[$key.$value] ?? '';
+                $this->results['boosting-'.$key][$term] = [
+                    'field' => $key,
+                    'term' => $term,
+                    'value' => $value,
+                    'percent' => $this->calculatePercent($value, $allBoostings)
+                ];
+                $this->results['all']['boosting-'.$key] = [
+                    'percent' => $this->calculatePercent($value, $all)
+                ];
             }
         }
 
         foreach ($this->results['fields-terms'] as $term => $data) {
-        $cluster = $this->getCluster($data['field']);
-        $percent = round(100 * $data['value'] / $allFields);
-            if (isset( $cluster ) && $percent > 0) {
+            $cluster = $this->getCluster($data['field']);
+            $percent = $this->calculatePercent($data['value'], $allFields);
+            if (isset($cluster) && $percent > 0) {
                 $this->results['fields-terms'][$term]['cluster'] = $this->clusterName[$cluster];
-                $this->results['fields-terms'][$term]['percent'] = round(100 * $data['value'] / $allFields);
+                $this->results['fields-terms'][$term]['percent'] = $percent;
             } else {
                 unset($this->results['fields-terms'][$term]);
             }
         }
         foreach ($this->results['fields-phrase'] as $term => $data) {
-        $cluster = $this->getCluster($data['field']);
-        $percent = round(100 * $data['value'] / $allFields);
+            $cluster = $this->getCluster($data['field']);
+            $percent = $this->calculatePercent($data['value'], $allFields);
             if (isset($cluster) && $percent > 0) {
                 $this->results['fields-phrase'][$term]['cluster'] = $this->clusterName[$cluster];
-                $this->results['fields-phrase'][$term]['percent'] = round(100 * $data['value'] / $allFields);
+                $this->results['fields-phrase'][$term]['percent'] = $percent;
             } else {
                 unset($this->results['fields-phrase'][$term]);
             }
         }
-        $this->results['all']['fields-terms'] = array('percent' => round(100 * $allFieldTerms / $all));
-        $this->results['all']['fields-phrase'] = array('percent' => round(100 * $allFieldPhrase / $all));
-        $this->results['all']['fields-all'] = array('percent' => round(100 * $allFields / $all));
+
+        $this->results['all']['fields-terms'] = ['percent' => $this->calculatePercent($allFieldTerms, $all)];
+        $this->results['all']['fields-phrase'] = ['percent' => $this->calculatePercent($allFieldPhrase, $all)];
+        $this->results['all']['fields-all'] = ['percent' => $this->calculatePercent($allFields, $all)];
 
         return $this->results;
     }
 
+    protected function calculatePercent($value, $total) {
+        return $total > 0 ? round(100 * $value / $total) : 0;
+    }
 
     protected function parseValues() {
         $tie = 0;
