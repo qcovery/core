@@ -460,7 +460,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
         if (!empty($url)) {
             $level = 'ParentWorkILNSolr';
-            $label = 'Go to parent work (local holding)';
+            $label = 'Go to parent work - local holding';
             $response = $this->generateResponse($check, 'ArticleParentId', $level, $label, $template, $parentData, $check_type, $url, true);
             $response['html'] = $this->renderer->render($template , $response);
         }
