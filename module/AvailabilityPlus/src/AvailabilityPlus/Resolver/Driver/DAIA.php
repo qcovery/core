@@ -377,6 +377,7 @@ class DAIA extends AvailabilityPlusResolver
                 "/StorageRetrievalRequest?id={$id}" .
                 '&doc_id=' . urlencode($doc_id) .
                 '&item_id=' . urlencode($item_id) .
+                '&type=order' .
                 '&hashKey=' . $this->hmac->generate($hmacKeys, $hmacPairs);
         } else if ($action == 'recall') {
             return $this->urlHelper->fromRoute('home') .
