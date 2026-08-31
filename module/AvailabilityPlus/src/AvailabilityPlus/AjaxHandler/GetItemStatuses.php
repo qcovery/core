@@ -75,8 +75,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     public function handleRequest(Params $params) {
         $responses = [];
         $id = $params->fromPost('id', $params->fromQuery('id', ''));
-        $solrData = $params->fromPost('full', $params->fromQuery('full', ''));
-        $solrData = json_decode(base64_decode($solrData), true);
 
         $this->source = $params->fromPost('source', $params->fromQuery('source', ''));
         $this->list = ($params->fromPost('list', $params->fromQuery('list', 'false')) === 'true') ? 1 : 0;
@@ -90,12 +88,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             $check_mode = 'continue';
 
             try {
-                // do not make another solr request except for testcases
-                if (!empty($solrData)) {
-                    $this->driver = $this->recordLoader->load($id, $this->source, false, null, true, $solrData);
-                } else {
-                    $this->driver = $this->recordLoader->load($id, $this->source);
-                }
+                $this->driver = $this->recordLoader->load($id, $this->source);
 
                 $mediatype = $params->fromPost('mediatype', $params->fromQuery('mediatype', ''));
                 if (empty($mediatype)) {
