@@ -58,7 +58,6 @@ VuFind.register('itemStatuses', function ItemStatuses() {
     let itemStatusDelay = 200;
     let itemStatusRunning = false;
     let itemStatusList = false;
-    let itemFullData = '';
     let itemStatusSource = '';
     let itemStatusMediatype = '';
     let itemLanguage = '';
@@ -75,7 +74,6 @@ VuFind.register('itemStatuses', function ItemStatuses() {
 
         for (let i = 0; i < itemStatusIds.length; i++) {
             let item = itemStatusEls[itemStatusIds[i]];
-            itemFullData = item.attr('data-full');
             itemStatusSource = item.attr('data-src');
             itemStatusList = item.attr('data-list') == 1;
             itemStatusMediatype = item.attr('data-mediatype');
@@ -94,7 +92,6 @@ VuFind.register('itemStatuses', function ItemStatuses() {
                     language: itemLanguage,
                     debug: itemStatusDebug,
                     testcase: itemStatusTestCase,
-                    full: itemFullData,
                 },
             })
                 .done(function checkItemStatusDone(response) {
@@ -120,7 +117,6 @@ VuFind.register('itemStatuses', function ItemStatuses() {
         clearTimeout(itemStatusTimer);
         itemStatusIds.push(id);
         itemStatusEls[id] = $(item);
-        itemFullData = $(item).attr('data-full');
         itemStatusSource = $(item).attr('data-src');
         itemStatusList = $(item).attr('data-list') == 1;
         itemStatusMediatype = $(item).attr('data-mediatype');

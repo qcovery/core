@@ -67,20 +67,6 @@ return array (
   array (
     'plugin_managers' => 
     array (
-      'recorddriver' => 
-      array (
-        'delegators' => 
-        array (
-          'AvailabilityPlus\\RecordDriver\\SolrMarc' => 
-          array (
-            0 => 'VuFind\\RecordDriver\\IlsAwareDelegatorFactory',
-          ),
-          'VuFind\\RecordDriver\\SolrMarcRemote' => 
-          array (
-            0 => 'VuFind\\RecordDriver\\IlsAwareDelegatorFactory',
-          ),
-        ),
-      ),
       'ajaxhandler' => 
       array (
         'factories' => 
@@ -137,17 +123,6 @@ return array (
           'Unpaywall' => 'AvailabilityPlus\Resolver\Driver\Unpaywall'
         ),
       ),
-    ),
-  ),
-  'service_manager' => 
-  array (
-    'factories' => 
-    array (
-      'AvailabilityPlus\\Record\\Loader' => 'VuFind\\Record\\LoaderFactory',
-    ),
-    'aliases' => 
-    array (
-      'VuFind\\Record\\Loader' => 'AvailabilityPlus\\Record\\Loader',
     ),
   ),
 );

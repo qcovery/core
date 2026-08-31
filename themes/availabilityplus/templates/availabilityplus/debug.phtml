@@ -18,9 +18,6 @@
     $list_name = 'ResultList';
     if ($list == 0) $list_name = 'DetailView';
 
-    // solr data for transfer to prevent further solr requests
-    $solrData = $this->driver->formatSolrData();
-
     $language = $this->layout()->userLang;
     $id = $this->driver->getUniqueID();
     $encodedId = urlencode($id);
@@ -48,7 +45,7 @@
     </div>
 
     <h3>Debug ID <b><a href="<?=$this->url('home')?><?=$recordRoute?>/<?=$encodedId?>"><?=$this->escapeHtml($id)?></a></b> <?=$list_name?> <?=$source?></h3>
-    <div class="availabilityItem" data-full="<?=$solrData?>" data-id="<?=$id?>" data-list="<?=$list?>" data-src="<?=$source?>" data-language="<?=$this->layout()->userLang; ?>" data-debug="1">
+    <div class="availabilityItem" data-id="<?=$id?>" data-list="<?=$list?>" data-src="<?=$source?>" data-language="<?=$this->layout()->userLang; ?>" data-debug="1">
         <span class="status ajax-availability hidden">
             <?=$this->icon('spinner')?>
             <?=$this->transEsc('loading_ellipsis')?>

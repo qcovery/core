@@ -1,6 +1,6 @@
 # AvailabilityPlus - Module Description
 
-**This module is developed for VuFind 8.X**  
+**This module is developed for VuFind 10.X**  
 **There is also a branch for VuFind 9.X (tested in 9.1.1)**  
 (For VuFind 5 use [this branch](https://github.com/qcovery/core/blob/develop-5-aplus/module/AvailabilityPlus/))
 
@@ -27,10 +27,8 @@ The module tries to address the complex issue of checking and displaying availab
 - [ ] You need to change your pluginmanager settings and extends to `AvailabilityPlus` for those files:
     ```
     <your-module>/RecordDriver/SolrMarc.php
-    <your-module>/RecordDriver/SolrDefaultFactory.php
     <your-module>/AjaxHandler/GetItemStatuses.php
     <your-module>/AjaxHandler/GetItemStatusesFactory.php
-    <your-module>/Record/Loader.php
     ```
 - [ ] You also need to check if you have duplicate function names with the AvailabilityPlus module.
 - [ ] The module AvailabilityPlus need to be added to the modules used by VuFind in the Apache configuration. AvailabilityPlus needs to be specified before your custom Module.

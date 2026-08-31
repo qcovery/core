@@ -1,13 +1,11 @@
 <?php
     if (get_class($this->driver) == 'VuFind\RecordDriver\Missing') {
-        // if record is missing, don't show availability (call to formatSolrData would fail)
+        // if record is missing, don't show availability
         return;
     }
-    // solr data for transfer to prevent further solr requests
-    $solrData = $this->driver->formatSolrData();
 ?>
 
-<div class="availabilityItem <?=$this->additionalClass?>" data-full="<?=$solrData?>" data-id="<?=$this->driver->getUniqueID();?>" data-list="<?=$this->list?>" data-src="<?=$this->driver->getSourceIdentifier(); ?>" data-language="<?=$this->layout()->userLang;?>">
+<div class="availabilityItem <?=$this->additionalClass?>" data-id="<?=$this->driver->getUniqueID();?>" data-list="<?=$this->list?>" data-src="<?=$this->driver->getSourceIdentifier(); ?>" data-language="<?=$this->layout()->userLang;?>">
 	<span class="status ajax-availability hidden">
         <?=$this->icon('spinner')?>
         <?=$this->transEsc('loading_ellipsis')?>
