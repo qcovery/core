@@ -86,7 +86,7 @@
         "laminas/laminas-translator": "^1",
         "laminas/laminas-validator": "2.64.4",
         "laminas/laminas-view": "2.36.0",
-        "league/commonmark": "2.8.2",
+        "league/commonmark": "2.10.0",
         "league/oauth1-client": "1.11.0",
         "league/oauth2-client": "^2.7",
         "league/oauth2-server": "^9.2",
@@ -134,7 +134,7 @@
         "phpunit/phpunit": "11.5.50",
         "pietercolpaert/hardf": "0.5.0",
         "rector/rector": "2.2.7",
-        "squizlabs/php_codesniffer": "4.0.1"
+        "squizlabs/php_codesniffer": "4.0.4"
     },
     "suggest": {
         "apereo/phpcas": "Allows CAS authentication to be used. Note that this functionality is deprecated."
