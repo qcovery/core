@@ -1,7 +1,13 @@
 <?php
-    $explainData = $this->results->getExplain(); 
-    $this->relevancetooltip()->setData($explainData[$this->id]);
-    $tooltip = $this->relevancetooltip()->getResults();
+    // The Results object only provides getExplain() if RelevancePicker's Results class is active.
+    // The RelevancePicker module must be listed after the Libraries module in modules.conf.
+    $explainData = method_exists($this->results, 'getExplain') ? $this->results->getExplain() : [];
+    $explain = $explainData[$this->id] ?? '';
 ?>
-<a href="javascript:void(0)" title='<?=$this->render('tooltip-text.phtml', ['tooltip' => $tooltip]) ?>'>&nbsp;&nbsp;&nbsp;</a>
-
+<?php if ($explain !== ''): ?>
+    <?php
+        $this->relevancetooltip()->setData($explain);
+        $tooltip = $this->relevancetooltip()->getResults();
+    ?>
+    <a href="javascript:void(0)" title='<?=$this->render('tooltip-text.phtml', ['tooltip' => $tooltip]) ?>'>&nbsp;&nbsp;&nbsp;</a>
+<?php endif; ?>

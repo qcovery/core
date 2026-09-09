@@ -29,6 +29,8 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
     protected $clusters;
     protected $searchTerm;
     protected $results;
+    protected $minimumBoostingValues = [];
+    protected $scoreStructure = [];
 
     public function __construct() {
     }
@@ -166,7 +168,7 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
     }
 
     protected function getCluster($field) {
-        return $this->clusters[$field];
+        return $this->clusters[$field] ?? null;
     }
 
     protected function prepareScores() {
@@ -189,6 +191,10 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
         $maxItem = ['fields-phrase' => '' , 'fields-terms' => ''];
         $maxValue = ['fields-phrase' => 0 , 'fields-terms'  => 0];
         foreach ( $scores as $area => $areaScores ) {
+            // Skip if $areaScores is not an array:
+            if ( !is_array( $areaScores ) ) {
+                continue;
+            }
             foreach ( $areaScores as $item => $value ) {
                 $item = str_replace( '_unstemmed' , '' , $item );
                 if ( strpos( $area , 'fields-' ) === 0 ) {
@@ -198,15 +204,18 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
                     $this->scores['br']['all'] += $tie * $value;
                     $this->scores['br'][$suffix] += $tie * $value;
                     $this->scores['fields-all']['all'] += $tie * $value;
+                    $this->scores['fields-all'][$item] ??= 0;
                     $this->scores['fields-all'][$item] += $tie * $value;
+                    $this->scores[$area][$item] ??= 0;
                     $this->scores[$area][$item] += $tie * $value;
                     $this->scores[$area]['all'] += $tie * $value;
-                    if ( $value > $maxValue[$area] ) {
+                    if ( $value > ( $maxValue[$area] ?? 0 ) ) {
                         $maxItem[$area] = $item;
                         $maxValue[$area] = $value;
                     }
                 } else {
                     $this->scores['all']['all'] += $value;
+                    $this->scores[$area]['all'] ??= 0;
                     $this->scores[$area]['all'] += $value;
                     if ( !isset( $this->scores[$area][$item])) {
                         $this->scores[$area][$item] = 0;
@@ -230,7 +239,7 @@ class ToolTip extends \Laminas\View\Helper\AbstractHelper
                     }
                 }
             }
-            if (strpos($area, 'fields-') === 0 && $maxValue[$area] > 0) {
+            if (strpos($area, 'fields-') === 0 && ( $maxValue[$area] ?? 0 ) > 0) {
                 $term = $this->searchTerm[$maxItem[$area].$maxValue[$area]];
                 $this->results[$area][$term] = ['field' => $maxItem[$area] , 'term' => $term , 'value' => $maxValue[$area]];
                 $suffix = (strpos($area, 'terms') !== false) ? 'terms' : 'phrase';

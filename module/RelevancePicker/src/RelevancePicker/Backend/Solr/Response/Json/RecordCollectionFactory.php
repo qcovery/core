@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Simple JSON-based factory for record collection.
+ * JSON-based factory for record collections with Solr explain data.
  *
- * PHP version 7
+ * PHP version 8
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -26,14 +26,15 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
+
 namespace RelevancePicker\Backend\Solr\Response\Json;
 
-use VuFindSearch\Exception\InvalidArgumentException;
-use VuFindSearch\Response\RecordCollectionFactoryInterface;
-use VuFindSearch\Backend\Solr\Response\Json\Record;
-
 /**
- * Simple JSON-based factory for record collection.
+ * JSON-based factory for record collections with Solr explain data.
+ *
+ * The record collection drops the Solr debug section. The explanation of each
+ * record is attached to the record itself before the record drivers are built.
+ * That way it stays available in the result list.
  *
  * @category VuFind
  * @package  Search
@@ -41,66 +42,32 @@ use VuFindSearch\Backend\Solr\Response\Json\Record;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org
  */
-class RecordCollectionFactory implements RecordCollectionFactoryInterface
+class RecordCollectionFactory extends \VuFindSearch\Backend\Solr\Response\Json\RecordCollectionFactory
 {
     /**
-     * Factory to turn data into a record object.
-     *
-     * @var Callable
-     */
-    protected $recordFactory;
-
-    /**
-     * Class of collection.
+     * Field the explanation is stored in.
      *
      * @var string
      */
-    protected $collectionClass;
-
-    /**
-     * Constructor.
-     *
-     * @param Callable $recordFactory   Callback to construct records
-     * @param string   $collectionClass Class of collection
-     *
-     * @return void
-     */
-    public function __construct($recordFactory = null,
-        $collectionClass = 'RelevancePicker\Backend\Solr\Response\Json\RecordCollection'
-    ) {
-        if (null === $recordFactory) {
-            $this->recordFactory = function ($data) {
-                return new Record($data);
-            };
-        } else {
-            $this->recordFactory = $recordFactory;
-        }
-        $this->collectionClass = $collectionClass;
-    }
+    public const EXPLAIN_FIELD = 'relevancepicker_explain';
 
     /**
      * Return record collection.
      *
      * @param array $response Deserialized JSON response
      *
-     * @return RecordCollection
+     * @return \VuFindSearch\Response\RecordCollectionInterface
      */
     public function factory($response)
     {
-        if (!is_array($response)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Unexpected type of value: Expected array, got %s',
-                    gettype($response)
-                )
-            );
-        }
-        $collection = new $this->collectionClass($response);
-        if (isset($response['response']['docs'])) {
-            foreach ($response['response']['docs'] as $doc) {
-                $collection->add(call_user_func($this->recordFactory, $doc));
+        if (is_array($response) && !empty($response['debug']['explain'])) {
+            foreach ($response['response']['docs'] ?? [] as $index => $doc) {
+                $explain = $response['debug']['explain'][$doc['id'] ?? ''] ?? null;
+                if (null !== $explain) {
+                    $response['response']['docs'][$index][static::EXPLAIN_FIELD] = $explain;
+                }
             }
         }
-        return $collection;
+        return parent::factory($response);
     }
 }
