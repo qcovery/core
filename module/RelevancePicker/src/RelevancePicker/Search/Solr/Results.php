@@ -1,8 +1,8 @@
 <?php
 /**
- * Params Extension for Libraries Module
+ * Results Extension for RelevancePicker Module
  *
- * PHP version 5
+ * PHP version 8
  *
  * Copyright (C) Staats- und Universitätsbibliothek 2017.
  *
@@ -19,75 +19,69 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Hajo Seng <hajo.seng@sub.uni-hamburg.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://github.com/subhh/beluga
  */
+
 namespace RelevancePicker\Search\Solr;
 
-//use VuFind\Search\Solr\Params as BaseParams;
-use VuFind\Search\Solr\Results as BaseResults;
-use VuFindSearch\Command\SearchCommand;
+use Libraries\Search\Solr\Results as BaseResults;
+use RelevancePicker\Backend\Solr\Response\Json\RecordCollectionFactory;
 
+/**
+ * Solr results providing the explain data of the current result page.
+ *
+ * Extends the Libraries results, since both modules provide their own Solr
+ * results class.
+ */
 class Results extends BaseResults
 {
     /**
-     * ExplainData.
+     * Explain data of the current result page, record id as key.
      *
-     * @array explain
+     * @var ?array
      */
-    protected $explain = [];
+    protected $explain = null;
 
     /**
-     * Support method for performAndProcessSearch -- perform a search based on the
-     * parameters passed to the object.
+     * Get the explain data of the current result page.
+     * The data is read from the records, where it was added by RecordCollectionFactory.
      *
-     * @return void
+     * @return array|null Explain data, using record id as key
      */
-    protected function performSearch()
+    public function getExplain(): ?array
     {
-        $query  = $this->getParams()->getQuery();
-        $limit  = $this->getParams()->getLimit();
-        $offset = $this->getStartRecord() - 1;
-        $params = $this->getParams()->getBackendParameters();
-        $searchService = $this->getSearchService();
-
-        $command = new SearchCommand(
-            $this->backendId,
-            $query,
-            $offset,
-            $limit,
-            $params
-        );
-        $searchService->invoke($command);
-        $collection = $command->getResult();
-
-        $this->responseFacets = $collection->getFacets();
-        $this->resultTotal = $collection->getTotal();
-
-        // Process spelling suggestions
-        $spellcheck = $collection->getSpellcheck();
-        $this->spellingQuery = $spellcheck->getQuery();
-        $this->suggestions = $this->getSpellingProcessor()
-            ->getSuggestions($spellcheck, $this->getParams()->getQuery());
-
-        // Construct record drivers for all the items in the response:
-        $this->results = $collection->getRecords();
-
-        // Process Explain Data:
-        $this->explain = $collection->getExplain();
-    }
-
-    /**
-     * Get explain Data
-     *
-     * @return array.
-     */
-    public function getExplain()
-    {
+        if (null === $this->explain) {
+            $this->explain = [];
+            foreach ($this->getResults() as $record) {
+                $rawData = $record->tryMethod('getRawData') ?? [];
+                $explain = $rawData[RecordCollectionFactory::EXPLAIN_FIELD] ?? null;
+                if (null !== $explain) {
+                    $this->explain[$record->getUniqueID()] = $this->reduceExplain($explain);
+                }
+            }
+        }
         return $this->explain;
     }
-}
 
+    /**
+     * Reduce Solr explanation to the summary lines used for the tooltip.
+     *
+     * @param string $explain Explanation of a single record
+     *
+     * @return string
+     */
+    protected function reduceExplain($explain): string
+    {
+        $summaryLines = [];
+        foreach (explode("\n", $explain) as $line) {
+            if (preg_match('/^[0-9 ].+of:$/', $line)) {
+                $summaryLines[] = $line;
+            }
+        }
+        return "\n" . implode("\n", $summaryLines);
+    }
+}
