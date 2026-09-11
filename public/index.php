@@ -1,4 +1,5 @@
 <?php
+include __DIR__ . '/../module/subhhcore/script/authorize.php';
 
 // If the profiler is enabled, set it up now:
 $vufindProfiler = getenv('VUFIND_PROFILER_XHPROF');
