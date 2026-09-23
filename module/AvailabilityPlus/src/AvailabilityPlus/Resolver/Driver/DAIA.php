@@ -242,7 +242,8 @@ class DAIA extends AvailabilityPlusResolver
     protected function applyCustomChanges() {
         $rules = $this->specsReader->get($this->rules);
 
-        foreach ($this->parsed_data['document'][0]['item'] as $key => $item) {
+        // $item must be a reference to make sure that changes made to $item are available in the following actions and conditions.
+        foreach ($this->parsed_data['document'][0]['item'] as $key => &$item) {
             $rules_applied = [];
 
             foreach ($rules as $rule_key => $rule) {
@@ -303,6 +304,8 @@ class DAIA extends AvailabilityPlusResolver
                 }
             }
         }
+
+        unset($item);
     }
 
     protected function getObjectPathValue($item, $path) {
@@ -310,19 +313,19 @@ class DAIA extends AvailabilityPlusResolver
 
         switch (count($path)) {
             case 1:
-                $content = $item[$path[0]];
+                $content = $item[$path[0]] ?? '';
                 break;
             case 2:
-                $content = $item[$path[0]][$path[1]];
+                $content = $item[$path[0]][$path[1]] ?? '';
                 break;
             case 3:
-                $content = $item[$path[0]][$path[1]][$path[2]];
+                $content = $item[$path[0]][$path[1]][$path[2]] ?? '';
                 break;
             case 4:
-                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]];
+                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]] ?? '';
                 break;
             case 5:
-                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]];
+                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] ?? '';
                 break;
         }
 

@@ -126,7 +126,8 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
     protected function applyCustomChanges() {
         $rules = $this->specsReader->get($this->rules) ?? [];
 
-        foreach ($this->parsed_data as $key => $item) {
+        // $item must be a reference to make sure that changes made to $item are available in the following actions and conditions.
+        foreach ($this->parsed_data as $key => &$item) {
             $rules_applied = [];
 
             foreach ($rules as $rule_key => $rule) {
@@ -134,7 +135,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
                 foreach ($rule['conditions'] as $condition) {
                     $match_array = [];
-                    $field_content = $item[$condition['field']];
+                    $field_content = $item[$condition['field']] ?? '';
                     preg_match("|{$condition['content']}|", $field_content, $match_array);
 
                     if (!empty($match_array)) {
@@ -147,11 +148,11 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
                 if ($rule_applies) {
                     foreach($rule['actions'] as $action) {
-                        $content_old = $item[$action['field']];
+                        $content_old = $item[$action['field']] ?? '';
                         $content_new = $content_old;
 
                         if (!empty($action['pattern'])) {
-                            $content_preg =  $item[$action['content_field']];
+                            $content_preg =  $item[$action['content_field']] ?? '';
                             $content_new = preg_replace("|{$action['pattern']}|", $action['replacement'], $content_preg);
                             $this->parsed_data[$key]["{$action['field']}_org"] = $content_old;
                             $this->parsed_data[$key][$action['field']] = $content_new;
@@ -186,6 +187,8 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 $this->parsed_data[$key]['rules_applied'] = $rules_applied;
             }
         }
+
+        unset($item);
     }
 
     protected function getObjectPathValue($item, $path) {
@@ -193,19 +196,19 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
         switch (count($path)) {
             case 1:
-                $content = $item[$path[0]];
+                $content = $item[$path[0]] ?? '';
                 break;
             case 2:
-                $content = $item[$path[0]][$path[1]];
+                $content = $item[$path[0]][$path[1]] ?? '';
                 break;
             case 3:
-                $content = $item[$path[0]][$path[1]][$path[2]];
+                $content = $item[$path[0]][$path[1]][$path[2]] ?? '';
                 break;
             case 4:
-                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]];
+                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]] ?? '';
                 break;
             case 5:
-                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]];
+                $content = $item[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] ?? '';
                 break;
         }
 

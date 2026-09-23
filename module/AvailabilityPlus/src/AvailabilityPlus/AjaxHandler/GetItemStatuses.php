@@ -75,6 +75,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     public function handleRequest(Params $params) {
         $responses = [];
         $id = $params->fromPost('id', $params->fromQuery('id', ''));
+        if (is_array($id)) {
+            // make sure we have a single id
+            $id = reset($id) ?: '';
+        }
         $solrData = $params->fromPost('full', $params->fromQuery('full', ''));
         $solrData = json_decode(base64_decode($solrData), true);
 
