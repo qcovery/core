@@ -64,7 +64,6 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
 
         $callnumbers = $this->getMarcValues($driver, '980');
         foreach ($callnumbers as $callnumber) {
-
             if  ($this->getSubfieldValue($callnumber, '2') == $config['DeliveryMicroform']['callnumber_iln']) {
                 $view->callnumber = $this->getSubfieldValue($callnumber, 'd');
             }
@@ -75,8 +74,8 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
         $user = $this->getUser();
 
         if ($user) {
-            $view->userName = $user->username;
-            $view->userFullname = $user->firstname . ' ' . $user->lastname;
+            $view->userName = $user->getUsername();
+            $view->userFullname = $user->getFirstname() . ' ' . $user->getLastname();
         } else {
             $view->userName = 'Nicht angemeldet';
             $view->userFullname = $this->getFormValue('deliverymicroform_name');
@@ -87,7 +86,7 @@ class DeliveryMicroformController extends \VuFind\Controller\AbstractBase
 
         $userEmail = $this->getFormValue('deliverymicroform_email');
         if (empty($userEmail) && $user) {
-            $userEmail = $user->email;
+            $userEmail = $user->getEmail();
         }
         $view->userEmail = $userEmail;
 
