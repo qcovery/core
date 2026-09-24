@@ -374,7 +374,7 @@ class DAIA extends AvailabilityPlusResolver
         if ($action == 'order') {
             return $this->urlHelper->fromRoute('home') .
                 "Record/{$id}" .
-                "/StorageRetrievalRequest?id={$id}" .
+                "/Hold?id={$id}" .
                 '&doc_id=' . urlencode($doc_id) .
                 '&item_id=' . urlencode($item_id) .
                 '&type=order' .
