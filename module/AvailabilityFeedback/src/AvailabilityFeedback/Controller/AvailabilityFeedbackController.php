@@ -103,7 +103,7 @@ class AvailabilityFeedbackController extends \VuFind\Controller\AbstractBase
         $view->comments = $this->params()->fromPost('comments');
 
         $view->hideForm = false;
-        if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
+        if ($this->formWasSubmitted('submit', $view->useCaptcha)) {
             if (empty($view->userEmail)) {
                 $this->flashMessenger()->addMessage('bulk_error_missing', 'error');
                 return;
@@ -172,7 +172,11 @@ class AvailabilityFeedbackController extends \VuFind\Controller\AbstractBase
     private function getMarcValue($driver, $marcField) {
         $marcFieldArray = explode('|', $marcField);
         if (sizeof($marcFieldArray) == 2) {
-            return $driver->getMarcReader()->getField($marcFieldArray[0])->getSubField($marcFieldArray[1])->getData();
+            foreach ($driver->getMarcReader()->getField($marcFieldArray[0])['subfields'] as $subfield) {
+                if ($subfield['code'] == $marcFieldArray[1]) {
+                    return $subfield['data'];
+                }
+            }
         }
         return '';
     }
