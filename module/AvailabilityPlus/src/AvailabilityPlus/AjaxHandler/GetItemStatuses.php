@@ -451,7 +451,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 }
 
                 if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                    $url = "/Record/{$parentId}";
+                    $url = $this->urlHelper->fromRoute('home')."Record/{$parentId}";
                 }
             } catch (\Exception $e) {
                 $url = '';
