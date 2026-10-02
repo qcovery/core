@@ -127,6 +127,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                             foreach($results as $result) {
                                 if(!empty($result)) {
                                     if(!empty($result['html'])) $check_mode = $this->current_mode;
+                                    $result = $this->removeResolverConfig($result);
                                     if($this->debug) {
                                         $result['html'] = $this->applyTemplate('ajax/debug.phtml', [ 'debug' => $result ]);
                                     }
@@ -360,6 +361,30 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         $template = $this->default_template;
         if(!empty($data['view-method'])) $template = $data['view-method'];
         return $template;
+    }
+
+    /**
+     * Recursively remove the key 'resolverConfig' (may contain credentials) from the response and debug output.
+     * Add `debug = true` to your availabiliytplus-resolver.ini to keep this section for debugging purposes.
+     *
+     * @param mixed $data Data to sanitize
+     *
+     * @return mixed Sanitized copy of the data
+     */
+    private function removeResolverConfig($data) {
+        if (!is_array($data)) {
+            return $data;
+        }
+        foreach ($data as $key => $value) {
+            if ($key === 'resolverConfig'
+                && !(is_array($value) && filter_var($value['debug'] ?? false, FILTER_VALIDATE_BOOLEAN))
+            ) {
+                unset($data[$key]);
+            } else {
+                $data[$key] = $this->removeResolverConfig($value);
+            }
+        }
+        return $data;
     }
 
     /**
