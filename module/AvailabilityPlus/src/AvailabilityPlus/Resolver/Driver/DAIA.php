@@ -252,7 +252,7 @@ class DAIA extends AvailabilityPlusResolver
                 foreach ($rule['conditions'] as $condition) {
                     $match_array = [];
                     $field_content = $this->getObjectPathValue($item, explode('->', $condition['field']));
-                    preg_match("|{$condition['content']}|", $field_content, $match_array);
+                    preg_match("~{$condition['content']}~", $field_content, $match_array);
 
                     if (!empty($match_array)) {
                         $rule_applies = true;
@@ -269,7 +269,7 @@ class DAIA extends AvailabilityPlusResolver
 
                         if (!empty($action['pattern'])) {
                             $content_preg =  $this->getObjectPathValue($item, explode('->', $action['content_field']));
-                            $content_new = preg_replace("|{$action['pattern']}|", $action['replacement'], $content_preg);
+                            $content_new = preg_replace("~{$action['pattern']}~", $action['replacement'], $content_preg);
                             $this->setObjectPathValue($key, explode('->', "{$action['field']}_org"), $content_old);
                             $this->setObjectPathValue($key, explode('->', $action['field']), $content_new);
                         } else if(isset($action['content'])) {

@@ -129,7 +129,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
                 foreach ($rule['conditions'] as $condition) {
                     $match_array = [];
                     $field_content = $item[$condition['field']];
-                    preg_match("|{$condition['content']}|", $field_content, $match_array);
+                    preg_match("~{$condition['content']}~", $field_content, $match_array);
 
                     if (!empty($match_array)) {
                         $rule_applies = true;
@@ -146,7 +146,7 @@ class AvailabilityPlusResolver extends \VuFind\Resolver\Driver\AbstractBase
 
                         if (!empty($action['pattern'])) {
                             $content_preg =  $item[$action['content_field']];
-                            $content_new = preg_replace("|{$action['pattern']}|", $action['replacement'], $content_preg);
+                            $content_new = preg_replace("~{$action['pattern']}~", $action['replacement'], $content_preg);
                             $this->parsed_data[$key]["{$action['field']}_org"] = $content_old;
                             $this->parsed_data[$key][$action['field']] = $content_new;
                         } else if (isset($action['content'])) {
