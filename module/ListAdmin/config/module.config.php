@@ -12,6 +12,18 @@ $config = [
             'listadmin' => 'ListAdmin\Controller\ListAdminController',
         ],
     ],
+    'vufind' => [
+        'plugin_managers' => [
+            'navigation' => [
+                'factories' => [
+                    'ListAdmin\Navigation\AccountMenu' => 'ListAdmin\Navigation\AccountMenuFactory',
+                ],
+                'aliases' => [
+                    'VuFind\Navigation\AccountMenu' => 'ListAdmin\Navigation\AccountMenu',
+                ],
+            ],
+        ],
+    ],
 ];
 
 // Define static routes -- Controller/Action strings
