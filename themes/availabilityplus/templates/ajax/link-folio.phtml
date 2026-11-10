@@ -1,0 +1,86 @@
+<?php
+/**
+ * Template for the Folio resolver (AvailabilityPlus\Resolver\Driver\Folio)
+ *
+ * $data contains the parsed_data of the resolver, one entry per item with the
+ * fields: instance_id, instance_hrid, holdings_id, item_id, barcode, callnumber,
+ * issue_number, copy_number, collection, location, notes, uri, loan_type,
+ * folio_status, due_date (formatted), due_date_raw (as delivered by FOLIO),
+ * status, status_class, orderLink (hold link), orderLinkLabel
+ *
+ * Fields that can additionally be set by rules (availabilityplus-resolver-Folio.yaml):
+ *  - additional_status / additional_status_class: second status line
+ *  - orderLinkExternal: open the order link in a new window
+ *
+ */
+
+if (empty($data) || !is_array($data)) {
+    return;
+}
+
+// items removed by rules (function removeItem) are not displayed
+$items = array_values(array_filter($data, function ($item) {
+    return empty($item['item_removed']);
+}));
+
+if (empty($items)) {
+    return;
+}
+
+$renderStatus = function ($item) {
+    $html = '';
+    if (!empty($item['status'])) {
+        $html .= '<div class="folio-status ' . $this->escapeHtmlAttr($item['status_class'] ?? '') . '">';
+        if (!empty($item['due_date'])) {
+            $html .= $this->transEsc('on_loan_until')
+                . ' <span class="folio-due-date">' . $this->escapeHtml($item['due_date']) . '</span>';
+        } else {
+            $html .= $this->transEsc($item['status']);
+        }
+        $html .= '</div>';
+    }
+    if (!empty($item['additional_status'])) {
+        $html .= '<div class="folio-additional-status ' . $this->escapeHtmlAttr($item['additional_status_class'] ?? '') . '">'
+            . $this->transEsc($item['additional_status']) . '</div>';
+    }
+    return $html;
+};
+
+$renderOrderLink = function ($item) {
+    if (empty($item['orderLink'])) {
+        return '';
+    }
+    $target = !empty($item['orderLinkExternal']) ? ' target="_blank" rel="noopener"' : '';
+    return '<a href="' . $this->escapeHtmlAttr($item['orderLink']) . '" class="folio-action"' . $target . '>'
+        . $this->transEsc($item['orderLinkLabel'] ?: 'recall') . '</a>';
+};
+?>
+
+<?php foreach ($items as $item): ?>
+    <div class="folio-item">
+        <?php if (!empty($item['location'])): ?>
+            <div class="folio-location"><?=$this->transEsc($item['location'])?></div>
+        <?php endif; ?>
+        <?php if (!empty($item['callnumber'])): ?>
+            <div class="folio-callnumber"><?=$this->escapeHtml($item['callnumber'])?></div>
+        <?php endif; ?>
+        <?php if (!empty($item['issue_number'])): ?>
+            <div class="folio-issue-number"><span class="folio-prefix"><?=$this->transEsc('volume_issue')?>:</span> <?=$this->escapeHtml($item['issue_number'])?></div>
+        <?php endif; ?>
+        <?=$renderStatus($item)?>
+        <?php if (!empty($item['notes'])): ?>
+            <div class="folio-notes"><?=$this->escapeHtml($item['notes'])?></div>
+        <?php endif; ?>
+        <?php if (!empty($item['uri'])): ?>
+            <div class="folio-uri"><a href="<?=$this->escapeHtmlAttr($item['uri'])?>" target="_blank" rel="noopener"><?=$this->transEsc('Online Access')?></a></div>
+        <?php endif; ?>
+        <?=$renderOrderLink($item)?>
+    </div>
+
+    <?php if ($list && count($items) > 1): ?>
+        <div class="additional_copies"><a href="<?=$this->escapeHtmlAttr($this->recordLinker()->getUrl($driver))?>"><?=$this->transEsc('additional_copies')?>...</a></div>
+        <?php break; ?>
+    <?php endif; ?>
+    <?php if ($mode == 'break_on_first') break; ?>
+
+<?php endforeach; ?>

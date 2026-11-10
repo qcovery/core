@@ -67,7 +67,7 @@ function runItemAjaxForQueue() {
             url: VuFind.path + '/AJAX/JSON?method=getItemStatuses',
             dataType: 'json',
             method: 'get',
-            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype, language:itemLanguage, debug:itemStatusDebug}
+            data: {id:[itemStatusIds[i]], list:itemStatusList, source:itemStatusSource, mediatype:itemStatusMediatype, language:itemLanguage, debug:itemStatusDebug, sid:VuFind.getCurrentSearchId()}
         })
             .done(function checkItemStatusDone(response) {
                 for (let j = 0; j < response.data.statuses.length; j++) {

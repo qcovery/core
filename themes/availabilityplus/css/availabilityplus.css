@@ -7,6 +7,7 @@
 }
 
 .daia_item,
+.folio-item,
 .availability_item,
 .daiaplus-title {
   margin-bottom: 15px;
@@ -52,18 +53,21 @@
 }
 
 .daia_green,
+.folio_green,
 .ApprovalRequired {
   color: #3DA22D;
   font-weight: bold;
 }
 
 .daia_orange,
+.folio_orange,
 .ShortLoan {
   color: #EB8E12;
   font-weight: bold;
 }
 
-.daia_red {
+.daia_red,
+.folio_red {
   color: #FF0000;
   font-weight: bold;
 }

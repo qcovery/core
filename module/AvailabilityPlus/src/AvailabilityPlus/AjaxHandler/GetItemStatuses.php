@@ -371,7 +371,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      * @return string (html code)
      */
     private function applyTemplate($template, $response) {
-        return $this->renderer->render($template, $response);
+        // The record driver is passed to the template, so the templates can build record links via $this->recordLinker()->getUrl($driver)
+        return $this->renderer->render($template, $response + ['driver' => $this->driver]);
     }
 
     /**
@@ -434,6 +435,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
         $resolverHandler = new Connection($this->resolverManager->get($resolverType));
         $resolverHandler->setLanguage($this->language);
+        // record id, e.g. for hold links (only used by resolvers implementing
+        // setRecord(), the connection ignores the call for all others)
+        $resolverHandler->setRecord($this->id, $this->source);
         $marc_data = $this->driver->getMarcData($resolver);
         $params = $this->prepareResolverParams($marc_data);
         $resolver_url = $resolverHandler->getResolverUrl($params);

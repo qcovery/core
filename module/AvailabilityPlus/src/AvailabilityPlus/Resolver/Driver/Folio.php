@@ -70,6 +70,22 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
     protected const DEFAULT_TOKEN_LIFETIME = 600;
 
     /**
+     * HMAC keys used for the hold link, matching the [Holds] HMACKeys of VuFind's
+     * FOLIO ILS driver (Folio.ini).
+     */
+    protected const DEFAULT_HOLD_HMAC_KEYS = 'holding_id:item_id:status:level';
+
+    /**
+     * FOLIO item statuses for which a hold link is generated.
+     */
+    protected const DEFAULT_HOLD_STATUSES = 'Checked out';
+
+    /**
+     * Format of the due date passed to the template.
+     */
+    protected const DEFAULT_DATE_FORMAT = 'd.m.Y';
+
+    /**
      * Mapping of FOLIO item status names to the status label and the css class
      * used in the view templates.
      *
@@ -81,7 +97,7 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
      */
     protected $statusMap = [
         'Available' => ['Available', 'folio_green'],
-        'Checked out' => ['On Loan', 'folio_red'],
+        'Checked out' => ['On Loan', 'folio_orange'],
         'Awaiting pickup' => ['Awaiting Pickup', 'folio_orange'],
         'Awaiting delivery' => ['Awaiting Delivery', 'folio_orange'],
         'In transit' => ['In Transit', 'folio_orange'],
@@ -109,6 +125,37 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
      * @var array
      */
     protected $locations = [];
+
+    /**
+     * Id of the record in the index (needed for the hold link).
+     *
+     * @var string
+     */
+    protected $recordId = '';
+
+    /**
+     * Search backend of the record, e.g. Solr or Search2.
+     *
+     * @var string
+     */
+    protected $recordSource = '';
+
+    /**
+     * Set the record the availability is requested for.
+     *
+     * Called by the AvailabilityPlus ajax handler, the id is needed to build the
+     * link to VuFind's hold form.
+     *
+     * @param string $id     Record id in the index
+     * @param string $source Search backend (Solr, Search2)
+     *
+     * @return void
+     */
+    public function setRecord($id, $source = '')
+    {
+        $this->recordId = (string)$id;
+        $this->recordSource = (string)$source;
+    }
 
     /**
      * Get Resolver Url
@@ -168,9 +215,11 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
                 continue;
             }
 
+            $items = $this->getItems($holding['id'] ?? '');
             $holdings[] = [
                 'holding' => $holding,
-                'items' => $this->getItems($holding['id'] ?? ''),
+                'items' => $items,
+                'loans' => $this->getOpenLoans($items),
             ];
         }
 
@@ -269,12 +318,13 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
                     ?? ($item['temporaryLoanType']['name'] ?? '');
                 $record['folio_status'] = $item['status']['name'] ?? '';
 
-                // TODO: the due date of a checked out item is only available
-                // via /circulation/loans?query=(itemId=="<uuid>" AND
-                // status.name==Open). This needs an additional request per item
-                // and the permission circulation.loans.collection.get for the
-                // configured FOLIO user, therefore it is left out for now.
-                $record['due_date'] = '';
+                // due date of the current loan
+                // Some FOLIO setups deliver it within the item, otherwise it is
+                // taken from the open loan (see getOpenLoans). Empty if neither
+                // is available.
+                $record['due_date_raw'] = $item['dueDate']
+                    ?? ($holdingData['loans'][$record['item_id']]['dueDate'] ?? '');
+                $record['due_date'] = $this->formatDate($record['due_date_raw']);
 
                 [$status, $statusClass] = $this->mapStatus($record['folio_status']);
                 $record['status'] = $status;
@@ -283,9 +333,9 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
                 // action link
                 $record['orderLink'] = '';
                 $record['orderLinkLabel'] = '';
-                if (in_array($record['folio_status'], ['Checked out', 'On order', 'In process'])) {
+                if (in_array($record['folio_status'], $this->getHoldStatuses())) {
                     $record['orderLink'] = $this->computeOrderLink($record);
-                    $record['orderLinkLabel'] = 'Request';
+                    $record['orderLinkLabel'] = $record['orderLink'] ? 'recall' : '';
                 }
 
                 $this->parsed_data[$key++] = $record;
@@ -579,20 +629,140 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
     /**
      * Compute Order Link
      *
-     * Generates the link used to request an item.
+     * Generates a link to VuFind's hold form, similar to DAIA::generateOrderLink().
      *
-     * TODO: not implemented yet. It has to be decided whether requests are
-     * placed via VuFind (/Record/<solrId>/Hold, compare the Koha resolver,
-     * requires an hmac hash and a matching ILS driver) or by linking to the
-     * FOLIO/Stripes user interface.
+     * The hold form validates the request with an hmac hash over the parameters
+     * listed as HMACKeys in the [Holds] section of the ILS driver configuration.
+     * The keys used here (setting hold_hmac_keys) therefore have to match the ILS
+     * driver, by default the keys of VuFind's FOLIO ILS driver are used.
      *
      * @param array $record The already parsed item data
      *
-     * @return string
+     * @return string The link or an empty string if it can not be generated
      */
     protected function computeOrderLink(array $record): string
     {
-        return '';
+        if (empty($this->recordId) || empty($record['item_id'])) {
+            return '';
+        }
+
+        // all values the hold form may be validated with
+        $values = [
+            'id' => $this->recordId,
+            'item_id' => $record['item_id'],
+            'holding_id' => $record['holdings_id'],
+            'doc_id' => $record['instance_id'],
+            'status' => $record['folio_status'],
+            'level' => 'copy',
+        ];
+
+        $hmacKeys = array_map(
+            'trim',
+            explode(':', $this->getConfigValue('hold_hmac_keys', self::DEFAULT_HOLD_HMAC_KEYS))
+        );
+
+        $query = [];
+        foreach ($hmacKeys as $hmacKey) {
+            // the record id is part of the route
+            if ($hmacKey != 'id') {
+                $query[$hmacKey] = $values[$hmacKey] ?? '';
+            }
+        }
+        $query['hashKey'] = $this->hmac->generate($hmacKeys, $values);
+
+        $route = ($this->recordSource == 'Search2') ? 'Search2Record' : 'Record';
+
+        return $this->urlPath . $route . '/' . rawurlencode($this->recordId)
+            . '/Hold?' . http_build_query($query);
+    }
+
+    /**
+     * Get the open loans of the checked out items of a holdings record.
+     *
+     * Loans are only requested for checked out items without a due date of their
+     * own and only if load_due_dates is enabled. The FOLIO user needs the
+     * permission to read loans; if the request fails, the error is logged and the
+     * availability is displayed without due date.
+     *
+     * @param array $items FOLIO items of a holdings record
+     *
+     * @return array Open loans, item uuid used as key
+     */
+    protected function getOpenLoans(array $items): array
+    {
+        if (!$this->loadDueDates()) {
+            return [];
+        }
+
+        $itemIds = [];
+        foreach ($items as $item) {
+            if (
+                ($item['status']['name'] ?? '') == 'Checked out'
+                && empty($item['dueDate'])
+                && !empty($item['id'])
+            ) {
+                $itemIds[] = $item['id'];
+            }
+        }
+
+        if (empty($itemIds)) {
+            return [];
+        }
+
+        $itemQuery = implode(
+            ' or ',
+            array_map(function ($itemId) {
+                return 'itemId=="' . $this->escapeCql($itemId) . '"';
+            }, $itemIds)
+        );
+        $url = $this->buildUrl(
+            '/circulation/loans',
+            [
+                'query' => '(status.name=="Open" and (' . $itemQuery . '))',
+                'limit' => count($itemIds),
+            ]
+        );
+
+        try {
+            $result = $this->makeRequest($url);
+        } catch (ILSException $e) {
+            $this->logWarning('Could not load loans, due dates are not available: ' . $e->getMessage());
+            return [];
+        }
+
+        $loans = [];
+        foreach ($result['data']['loans'] ?? [] as $loan) {
+            if (!empty($loan['itemId'])) {
+                $loans[$loan['itemId']] = $loan;
+            }
+        }
+
+        return $loans;
+    }
+
+    /**
+     * Format a date delivered by FOLIO (ISO 8601, usually UTC) in the local
+     * timezone.
+     *
+     * @param string $date Date delivered by FOLIO
+     *
+     * @return string Formatted date or an empty string
+     */
+    protected function formatDate(string $date): string
+    {
+        if (empty($date)) {
+            return '';
+        }
+
+        try {
+            $dateTime = new \DateTime($date);
+            $dateTime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+        } catch (\Exception $e) {
+            $this->logWarning("Could not parse date '$date': " . $e->getMessage());
+            return '';
+        }
+
+        return $dateTime->format($this->getConfigValue('date_format', self::DEFAULT_DATE_FORMAT));
     }
 
     /**
@@ -696,6 +866,28 @@ class Folio extends AvailabilityPlusResolver implements \Laminas\Log\LoggerAware
     protected function getLimit(): int
     {
         return (int)$this->getConfigValue('limit', self::DEFAULT_LIMIT);
+    }
+
+    /**
+     * FOLIO item statuses for which a hold link is generated.
+     *
+     * @return array
+     */
+    protected function getHoldStatuses(): array
+    {
+        $statuses = $this->getConfigValue('hold_statuses', self::DEFAULT_HOLD_STATUSES);
+
+        return array_filter(array_map('trim', explode(',', $statuses)));
+    }
+
+    /**
+     * Should the due dates of checked out items be loaded?
+     *
+     * @return bool
+     */
+    protected function loadDueDates(): bool
+    {
+        return filter_var($this->getConfigValue('load_due_dates', false), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
