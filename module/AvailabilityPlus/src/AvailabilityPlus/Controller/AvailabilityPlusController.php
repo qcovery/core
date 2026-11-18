@@ -57,7 +57,11 @@ class AvailabilityPlusController extends \VuFind\Controller\AbstractBase
     }
 
     public function testcasesAction() {
-        return $this->createViewModel();
+        $cases = $this->serviceLocator
+            ->get(\VuFind\Config\SearchSpecsReader::class)
+            ->get('availabilityplus-testcases.yaml');
+
+        return $this->createViewModel(['cases' => $cases]);
     }
 
     public function debugAction() {

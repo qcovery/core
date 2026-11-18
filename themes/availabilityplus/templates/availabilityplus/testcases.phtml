@@ -2,9 +2,8 @@
     // Set up page title:
 	$this->headTitle($this->transEsc('AvailabilityPlus::AvailabilityPlus Test Cases'));
 
-	//Load Cases
-    $specsReader = new \VuFind\Config\SearchSpecsReader();
-    $cases = $specsReader->get('availabilityplus-testcases.yaml');
+    // Test cases are loaded in AvailabilityPlusController::testcasesAction()
+    $cases = $this->cases ?? [];
 
     // Variables:
     $list = 1;
