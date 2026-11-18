@@ -455,7 +455,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 }
 
                 if (!empty($ilnMatch[0]['iln']['data'][0])) {
-                    $url = "/Record/{$parentId}";
+                    $url = $this->urlHelper->fromRoute('home') . "Record/{$parentId}";
                 }
             } catch (\Exception $e) {
                 $url = '';
@@ -558,9 +558,9 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
 
             if ($this->list) {
                 if ($this->source == 'Search2') {
-                    $url = "/Search2Record/{$this->id}";
+                    $url = $this->urlHelper->fromRoute('home') . "Search2Record/{$this->id}";
                 } else {
-                    $url = "/Record/{$this->id}";
+                    $url = $this->urlHelper->fromRoute('home') . "Record/{$this->id}";
                 }
             }
 
