@@ -3,8 +3,15 @@
 namespace Grouping\Module\Configuration;
 
 /*
- * Requires the RecordDriver module to be loaded before this module
- * (Grouping\RecordDriver\SolrMarc extends RecordDriver\RecordDriver\SolrMarc).
+ * Requires the RecordDriver and Libraries modules to be loaded before this module
+ * (Grouping\RecordDriver\SolrMarc extends RecordDriver\RecordDriver\SolrMarc,
+ * Grouping\Search\Factory\SolrDefaultBackendFactory extends the Libraries
+ * backend factory to keep the library filter of the Libraries connector).
+ *
+ * The "Solr" backend factory registered below replaces the default factories
+ * of backend registries for Libraries and RelevancePicker. The
+ * RelevancePicker explain data is therefore attached by the Grouping
+ * RecordCollectionFactory itself.
  *
  * Grouping is switched on per instance in config.ini:
  *
